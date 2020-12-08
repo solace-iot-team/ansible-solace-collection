@@ -33,12 +33,14 @@ jobs:
     steps:
 
       - name: Check Auth
-        if: github.actor != 'ricardojosegomezulmke'
+        if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
         run: |
           echo "not authorized"
           echo '::set-output name=IS_AUTHORIZED::false'
-          exit 1
         id: auth
+      - name: Cancel Workflow
+        if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
+        uses: andymckay/cancel-action@0.2
 
       - name: Print test env
         if: env.DEBUG_FLAG == 'true'
@@ -55,12 +57,6 @@ jobs:
           echo "GITHUB_REF=$GITHUB_REF"
           echo "github.event=${{ toJson(github.event) }}"
           echo "github.event_name=${{ github.event_name }}"
-
-      - name: Cancel Workflow
-        if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
-        uses: andymckay/cancel-action@0.2
-
-      - run: exit 1
 
       - name: Checkout Current Branch
         uses: actions/checkout@master
