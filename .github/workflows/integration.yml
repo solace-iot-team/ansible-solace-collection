@@ -59,6 +59,7 @@ jobs:
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
         uses: andymckay/cancel-action@0.2
 
+      - run: exit 1  
 
       - name: Checkout Current Branch
         uses: actions/checkout@master
