@@ -4,10 +4,12 @@
 
 scriptDir=$(cd $(dirname "$0") && pwd);
 scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
-projectHome=${scriptDir%/ansible-solace-collection/*}
-if [[ ! $projectHome =~ "ansible-solace-collection" ]]; then
-  projectHome=$projectHome/ansible-solace-collection
-fi
+if [ -z "$PROJECT_HOME" ]; then
+  projectHome=${scriptDir%/ansible-solace-collection/*}
+  if [[ ! $projectHome =~ "ansible-solace-collection" ]]; then
+    projectHome=$projectHome/ansible-solace-collection
+  fi
+else projectHome=$PROJECT_HOME
 source $projectHome/.lib/functions.sh
 testRunner="test-runner"
 scriptLogName="$testRunner.$scriptName"

@@ -4,10 +4,8 @@
 
 scriptDir=$(cd $(dirname "$0") && pwd);
 scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
-projectHome=${scriptDir%/ansible-solace-collection/*}
-if [[ ! $projectHome =~ "ansible-solace-collection" ]]; then
-  projectHome=$projectHome/ansible-solace-collection
-fi
+if [ -z "$PROJECT_HOME" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
+projectHome=$PROJECT_HOME
 source $projectHome/.lib/functions.sh
 export testTargetGroup=${scriptDir##*/}
 scriptLogName="$testTargetGroup.$scriptName"
