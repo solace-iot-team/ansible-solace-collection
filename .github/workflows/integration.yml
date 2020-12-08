@@ -95,6 +95,7 @@ jobs:
 
       - name: Run Tests
         run: |
+          export ANSIBLE_PYTHON_INTERPRETER=$(python -c "import sys; print(sys.executable)")
           export PROJECT_HOME="$GITHUB_WORKSPACE"
           export SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}"
           export SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}"
