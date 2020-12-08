@@ -6,6 +6,8 @@ on:
   # for testing
   workflow_dispatch:
 
+  push:
+      
   # schedule:
   #   # * is a special character in YAML so you have to quote this string
   #   - cron:  '0 1 * * *'
@@ -16,6 +18,7 @@ env:
 
   TEST_SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}
   TEST_SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}
+  TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
 
 jobs:
   integration:
@@ -23,7 +26,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.6', '3.8', '3.9' ]
+        # python-version: [ '3.6', '3.8', '3.9' ]
+        python-version: [ '3.6' ]
 
     steps:
 
@@ -46,6 +50,17 @@ jobs:
         if: env.DEBUG_FLAG == 'true'
         run: |
           python -V
+
+      - name: Install ansible and collection dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible
+          pip install -r requirements.txt
+          pip install docker-compose
+
+      - name: test
+        run: |
+          ls -la ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
 
 
 ###
