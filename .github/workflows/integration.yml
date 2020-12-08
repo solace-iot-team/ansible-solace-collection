@@ -16,8 +16,6 @@ env:
 
   DEBUG_FLAG: ${{ true }}
 
-  # TEST_SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}
-  # TEST_SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
   TEST_TEST_RUNNER_SCRIPT: "test-runner/run.wf.sh"
   TEST_TEST_RUNNER_LOGS_NAME: test-runner-logs
@@ -34,6 +32,14 @@ jobs:
 
     steps:
 
+      - name: Check Auth
+        if: github.actor != 'ricardojosegomezulmke'
+        run: |
+          echo "not authorized"
+          echo '::set-output name=IS_AUTHORIZED::false'
+          exit 1
+        id: auth
+
       - name: Print test env
         if: env.DEBUG_FLAG == 'true'
         run: |
@@ -47,6 +53,12 @@ jobs:
           echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
           echo "GITHUB_REF=$GITHUB_REF"
+          echo "github.event=${{ github.event }}
+
+      - name: Cancel Workflow
+        if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
+        uses: andymckay/cancel-action@0.2
+
 
       - name: Checkout Current Branch
         uses: actions/checkout@master
