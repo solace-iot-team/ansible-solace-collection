@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
   push:
-      
+
   # schedule:
   #   # * is a special character in YAML so you have to quote this string
   #   - cron:  '0 1 * * *'
@@ -58,9 +58,27 @@ jobs:
           pip install -r requirements.txt
           pip install docker-compose
 
-      - name: test
+      - name: Test Installation
+        if: env.DEBUG_FLAG == 'true'
         run: |
+          pip show ansible
+          ansible --version
+          ansible-galaxy --version
+          pip show xmltodict
           ls -la ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
+
+      - name: Build and install collection
+        run: |
+          cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
+          ansible-galaxy collection build .
+          ansible-galaxy collection install *.gz
+
+      - name: Test Collection Installation
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          pwd
+          ls -la
+          ansible-galaxy -vvv collection list solace.pubsub_plus
 
 
 ###
