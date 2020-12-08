@@ -1,0 +1,36 @@
+# (c) 2020 Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- name: "Check vars"
+  assert:
+    that:
+      - env is defined
+      - sc_service is defined
+      - SOLACE_CLOUD_API_TOKEN is defined
+      - WORKING_DIR is defined
+    fail_msg: "one or more variables not defined"
+
+- name: "Check solace cloud inventory file exists"
+  stat:
+    path: "{{ WORKING_DIR }}/{{ env.broker_inventory_file_name }}"
+  register: sc_inventory_stat
+- fail:
+    msg: "{{ WORKING_DIR }}/{{ env.broker_inventory_file_name }} not found"
+  when: sc_inventory_stat.stat.islnk is not defined
+
+- name: "Delete Solace Cloud Service by Name"
+  solace_cloud_service:
+    api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+    name: "{{ sc_service.name }}"
+    state: absent
+
+- name: "Delete Solace Cloud Service Inventory File"
+  file:
+    path: "{{ WORKING_DIR }}/{{ env.broker_inventory_file_name }}"
+    state: absent
+  delegate_to: localhost
+
+###
+# The End.
