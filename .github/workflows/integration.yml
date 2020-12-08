@@ -19,7 +19,6 @@ env:
   # TEST_SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}
   # TEST_SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
-  TEST_TEST_RUNNER_LOG_DIR: "./logs"
   TEST_TEST_RUNNER_SCRIPT: "test-runner/run.wf.sh"
   TEST_TEST_RUNNER_LOGS_NAME: test-runner-logs
   TEST_RUNNER_LOGS_DIR: logs
@@ -99,7 +98,7 @@ jobs:
           export PROJECT_HOME="$GITHUB_WORKSPACE"
           export SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}"
           export SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}"
-          export LOG_DIR="$GITHUB_WORKSPACE/${TEST_TEST_RUNNER_LOG_DIR}"
+          export LOG_DIR="$GITHUB_WORKSPACE/${TEST_RUNNER_LOGS_DIR}"
           ./${TEST_TEST_RUNNER_SCRIPT}
 
       - name: Archive logs
@@ -107,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.TEST_TEST_RUNNER_LOGS_NAME }}
-          path: ${{ github.workspace }}/${{ env.TEST_TEST_RUNNER_LOG_DIR }}
+          path: ${{ github.workspace }}/${{ env.TEST_RUNNER_LOGS_DIR }}
           if-no-files-found: error
 
 ###
