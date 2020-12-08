@@ -13,6 +13,7 @@ source $PROJECT_HOME/.lib/functions.sh
 # Environment Variables
 
   if [ -z "$WORKING_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
+  if [ -z "$LOG_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
 
 ##############################################################################################################################
 # Settings
