@@ -48,14 +48,6 @@ jobs:
           echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
           echo "GITHUB_REF=$GITHUB_REF"
-          # echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
-          # echo "github.token=${{ github.token }}"
-
-          export PROJECT_HOME="$GITHUB_WORKSPACE"
-          echo "PROJECT_HOME=$PROJECT_HOME"
-          ls -la $PROJECT_HOME
-
-          exit 1
 
       - name: Checkout Current Branch
         uses: actions/checkout@master
