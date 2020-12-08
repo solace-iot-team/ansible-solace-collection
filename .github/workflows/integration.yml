@@ -53,7 +53,7 @@ jobs:
           echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
           echo "GITHUB_REF=$GITHUB_REF"
-          echo "github.event=${{ github.event }}
+          echo "github.event=${{ github.event }}"
 
       - name: Cancel Workflow
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
