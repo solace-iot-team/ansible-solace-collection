@@ -4,11 +4,10 @@
 
 scriptDir=$(cd $(dirname "$0") && pwd);
 scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
-if [ -z "$PROJECT_HOME" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
-projectHome=$PROJECT_HOME
-source $projectHome/.lib/functions.sh
 testRunner="test-runner"
 scriptLogName="$testRunner.$scriptName"
+if [ -z "$PROJECT_HOME" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
+source $PROJECT_HOME/.lib/functions.sh
 
 ############################################################################################################################
 # Environment Variables
@@ -21,10 +20,10 @@ scriptLogName="$testRunner.$scriptName"
 # Settings
 export RUN_FG=false
 baseLogDir=$LOG_DIR
-testsBaseDir="$projectHome/tests"
-localBrokerInventoryFile="$projectHome/test-runner/files/local.broker.inventory.yml"
-localBrokerDockerComposeFile="$projectHome/test-runner/files/PubSubStandard_singleNode.yml"
-solaceCloudAccountInventoryFile="$projectHome/test-runner/files/solace-cloud-account.inventory.yml"
+testsBaseDir="$PROJECT_HOME/tests"
+localBrokerInventoryFile="$PROJECT_HOME/test-runner/files/local.broker.inventory.yml"
+localBrokerDockerComposeFile="$PROJECT_HOME/test-runner/files/PubSubStandard_singleNode.yml"
+solaceCloudAccountInventoryFile="$PROJECT_HOME/test-runner/files/solace-cloud-account.inventory.yml"
 brokerDockerImages=(
   "solace/solace-pubsub-standard:9.3.1.28"
   # "solace/solace-pubsub-standard:9.5.0.30"

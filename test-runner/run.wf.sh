@@ -9,7 +9,9 @@ if [ -z "$PROJECT_HOME" ]; then
   if [[ ! $projectHome =~ "ansible-solace-collection" ]]; then
     projectHome=$projectHome/ansible-solace-collection
   fi
+  export PROJECT_HOME=$projectHome
 else projectHome=$PROJECT_HOME
+fi
 source $projectHome/.lib/functions.sh
 testRunner="test-runner"
 scriptLogName="$testRunner.$scriptName"

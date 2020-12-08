@@ -8,7 +8,7 @@ projectHome=${scriptDir%/ansible-solace-collection/*}
 if [[ ! $projectHome =~ "ansible-solace-collection" ]]; then
   projectHome=$projectHome/ansible-solace-collection
 fi
-source $projectHome/.lib/functions.sh
+export PROJECT_HOME=$projectHome
 
 
 ansibleSolaceTests=(
