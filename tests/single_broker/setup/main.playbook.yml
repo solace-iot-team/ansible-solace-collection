@@ -1,0 +1,39 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Single Broker Setup "
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  pre_tasks:
+  - include_vars:
+      file: "solace-cloud-service.vars.yml"
+      name: sc_service
+  - include_vars:
+      file: "env.vars.yml"
+      name: env
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+        broker_type: "{{ BROKER_TYPE }}"
+
+    - name: "Ensure {{ working_dir }} exists"
+      file:
+        path: "{{ working_dir }}"
+        state: directory
+      delegate_to: localhost
+
+    - name: "Local Broker Setup"
+      include_tasks: ./tasks/setup.local.yml
+      when: broker_type == "local"
+
+    - name: "Solace Cloud Broker Setup"
+      include_tasks: ./tasks/setup.solace-cloud.yml
+      when: broker_type == "solace_cloud"
+
+###
+# The End.

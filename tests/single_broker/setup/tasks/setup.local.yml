@@ -1,0 +1,54 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- name: "Check vars"
+  assert:
+    that:
+      - LOCAL_BROKER_INVENTORY_FILE is defined
+      - BROKER_DOCKER_IMAGE is defined
+      - BROKER_DOCKER_COMPOSE_FILE is defined
+    fail_msg: "one or more variables not defined"
+
+- name: "Set facts"
+  set_fact:
+    broker_docker_image: "{{ BROKER_DOCKER_IMAGE }}"
+    broker_docker_compose_file: "{{ BROKER_DOCKER_COMPOSE_FILE }}"
+    docker_compose_path: "{{ BROKER_DOCKER_COMPOSE_FILE | dirname }}"
+    docker_compose_file: "{{ BROKER_DOCKER_COMPOSE_FILE | basename }}"
+
+- name: "Docker Compose up"
+  community.general.docker_compose:
+    project_src: "{{ docker_compose_path }}"
+    files:
+      - "{{ docker_compose_file }}"
+    state: present
+    restarted: yes
+
+- set_fact:
+    broker_url: "{{ 'https' if sempv2_is_secure_connection else 'http' }}://{{ sempv2_host }}:{{ sempv2_port }}"
+
+- name: "Wait for Broker Up"
+  uri:
+    url: "{{ broker_url }}"
+    return_content: yes
+    status_code: [200, -1]
+  register: result
+  until: result.status == 200
+  retries: 20
+  delay: 5
+
+- assert:
+    that: result.status == 200
+    fail_msg: "cannot reach local broker on {{ broker_url }}"
+
+- name: "Save local broker inventory to working dir"
+  copy:
+    src: "{{ LOCAL_BROKER_INVENTORY_FILE }}"
+    dest: "{{ WORKING_DIR }}/{{ env.broker_inventory_file_name }}"
+  changed_when: false
+  delegate_to: localhost
+
+###
+# The End.
