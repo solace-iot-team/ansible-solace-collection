@@ -16,9 +16,10 @@ env:
 
   DEBUG_FLAG: ${{ true }}
 
-  TEST_SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}
-  TEST_SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}
+  # TEST_SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}
+  # TEST_SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
+  TEST_TEST_RUNNER_SCRIPT: "test-runner/run.wf.sh"
 
 jobs:
   integration:
@@ -78,8 +79,13 @@ jobs:
         run: |
           pwd
           ls -la
-          ansible-galaxy -vvv collection list solace.pubsub_plus
+          ansible-galaxy collection list -vvv solace.pubsub_plus
 
+      - name: Run Tests
+        run: |
+          export SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}"
+          export SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}"
+          ./${TEST_TEST_RUNNER_SCRIPT}
 
 ###
 # The End.
