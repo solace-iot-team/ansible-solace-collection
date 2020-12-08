@@ -107,7 +107,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.TEST_TEST_RUNNER_LOGS_NAME }}
-          path: "${GITHUB_WORKSPACE}/${TEST_TEST_RUNNER_LOG_DIR}"
+          path: ${{ github.workspace }}/${{ env.TEST_TEST_RUNNER_LOG_DIR }}
           if-no-files-found: error
 
 ###
