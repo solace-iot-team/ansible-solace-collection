@@ -10,9 +10,7 @@ if [ -z "$PROJECT_HOME" ]; then
     projectHome=$projectHome/ansible-solace-collection
   fi
   export PROJECT_HOME=$projectHome
-else projectHome=$PROJECT_HOME
 fi
-source $projectHome/.lib/functions.sh
 testRunner="test-runner"
 scriptLogName="$testRunner.$scriptName"
 
@@ -27,10 +25,9 @@ export ANSIBLE_VERBOSITY=3
 export ANSIBLE_SOLACE_ENABLE_LOGGING=True
 
 FAILED=0
-# ./_run.sh > $LOG_DIR/$scriptLogName.out 2>&1
-./_run.sh
+# $scriptDir/_run.sh > $LOG_DIR/$scriptLogName.out 2>&1
+$scriptDir/_run.sh
 code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - $scriptLogName"; FAILED=1; fi
-
 
 ##############################################################################################################################
 # Check for errors
