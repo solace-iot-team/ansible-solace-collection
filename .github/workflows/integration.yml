@@ -1,0 +1,52 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+name: integration test runner
+on:
+  # for testing
+  workflow_dispatch:
+
+  # schedule:
+  #   # * is a special character in YAML so you have to quote this string
+  #   - cron:  '0 1 * * *'
+
+env:
+
+  DEBUG_FLAG: ${{ true }}
+
+  TEST_SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}
+  TEST_SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}
+
+jobs:
+  integration:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.6', '3.8', '3.9' ]
+
+    steps:
+
+      - name: Print test env
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          env | grep TEST
+
+      - name: Checkout Current Branch
+        uses: actions/checkout@master
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Print Python Version
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          python -V
+
+
+###
+# The End.
