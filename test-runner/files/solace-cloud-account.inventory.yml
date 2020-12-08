@@ -1,0 +1,8 @@
+---
+all:
+  hosts:
+    solace-iot-team:
+      ansible_connection: local
+
+###
+# The End.

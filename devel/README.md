@@ -5,7 +5,7 @@ Setup the development environment.
 ## MacOS
 
 ### Install Python Version(s)
-_**tested with python 3.9.0**_
+
 ````bash
 # upgrade to latest pip3
 python3 -m pip install --upgrade pip
@@ -15,7 +15,7 @@ brew install pyenv
 pip3 install virtualenv
 
 pyenv install 3.6.12
-# bin: /Users/rjgu/.pyenv/versions/3.6.12/bin/python3
+# bin: ~/.pyenv/versions/3.6.12/bin/python3
 
 ````
 
@@ -25,7 +25,7 @@ pyenv install 3.6.12
 mkdir ./venvs
 cd venvs
 # create virtual env
-virtualenv -p /Users/rjgu/.pyenv/versions/3.6.12/bin/python3 venv3.6.12
+virtualenv -p ~/.pyenv/versions/3.6.12/bin/python3 venv3.6.12
 # activate virtual env
 source venv3.6.12/bin/activate
 # check
