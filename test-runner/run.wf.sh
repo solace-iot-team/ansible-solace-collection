@@ -12,7 +12,9 @@ source $projectHome/.lib/functions.sh
 testRunner="test-runner"
 scriptLogName="$testRunner.$scriptName"
 
-export LOG_DIR=$scriptDir/logs
+if [ -z "$LOG_DIR" ]; then
+  export LOG_DIR=$scriptDir/logs
+fi
 mkdir -p $LOG_DIR
 rm -rf $LOG_DIR/*
 

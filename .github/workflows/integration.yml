@@ -19,7 +19,10 @@ env:
   # TEST_SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}
   # TEST_SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS: ${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
+  TEST_TEST_RUNNER_LOG_DIR: "./logs"
   TEST_TEST_RUNNER_SCRIPT: "test-runner/run.wf.sh"
+  TEST_TEST_RUNNER_LOGS_NAME: logs
+  TEST_RUNNER_LOGS_DIR: logs
 
 jobs:
   integration:
@@ -36,6 +39,18 @@ jobs:
         if: env.DEBUG_FLAG == 'true'
         run: |
           env | grep TEST
+
+      - name: Print github env before checkout
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          pwd
+          # echo "GITHUB_SHA=$GITHUB_SHA"
+          echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          echo "GITHUB_REF=$GITHUB_REF"
+          # echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
+          # echo "github.token=${{ github.token }}"
+          exit 1
 
       - name: Checkout Current Branch
         uses: actions/checkout@master
@@ -85,7 +100,18 @@ jobs:
         run: |
           export SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}"
           export SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}"
+          export LOG_DIR=${TEST_TEST_RUNNER_LOG_DIR}
           ./${TEST_TEST_RUNNER_SCRIPT}
+
+      - name: Archive logs
+        if: always()
+        env:
+          RUNNER_ASSET_DIR: ./${{ env.TEST_RUNNER_LOGS_DIR }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.TEST_TEST_RUNNER_LOGS_NAME }}
+          path: ${{ env.RUNNER_ASSET_DIR }}
+          if-no-files-found: error
 
 ###
 # The End.
