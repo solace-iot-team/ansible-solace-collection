@@ -25,7 +25,7 @@ localBrokerInventoryFile="$PROJECT_HOME/test-runner/files/local.broker.inventory
 localBrokerDockerComposeFile="$PROJECT_HOME/test-runner/files/PubSubStandard_singleNode.yml"
 solaceCloudAccountInventoryFile="$PROJECT_HOME/test-runner/files/solace-cloud-account.inventory.yml"
 brokerDockerImages=(
-  "solace/solace-pubsub-standard:9.3.1.28"
+  # "solace/solace-pubsub-standard:9.3.1.28"
   # "solace/solace-pubsub-standard:9.5.0.30"
   # "solace/solace-pubsub-standard:9.6.0.32"
   # "solace/solace-pubsub-standard:9.6.0.38"
@@ -39,7 +39,8 @@ ansibleSolaceTestTargetGroup="single_broker"
 
   for brokerDockerImage in ${brokerDockerImages[@]}; do
 
-    export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup/$brokerDockerImage"
+    brokerDockerImageLogPath=${brokerDockerImage//":"/"_"}
+    export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup/$brokerDockerImageLogPath"
     mkdir -p $LOG_DIR
 
     export BROKER_TYPE="local"
