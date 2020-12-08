@@ -53,13 +53,13 @@ jobs:
           echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
           echo "GITHUB_REF=$GITHUB_REF"
-          echo "github.event=${{ github.event }}"
+          echo "github.event=${{ toJson(github.event) }}"
 
       - name: Cancel Workflow
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
         uses: andymckay/cancel-action@0.2
 
-      - run: exit 1  
+      - run: exit 1
 
       - name: Checkout Current Branch
         uses: actions/checkout@master
