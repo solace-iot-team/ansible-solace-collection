@@ -1,0 +1,97 @@
+
+################################################################################
+# usage:
+# activate:   source bin/asc-devel-activate
+# deactivate: asc-devel-deactivate
+# show:       asc-devel-show
+
+if [ "${BASH_SOURCE-}" = "$0" ]; then
+    echo "You must source this script: \$ source $0" >&2
+    exit 33
+fi
+
+scriptDir=$(cd $(/usr/bin/env dirname .) && pwd);
+
+echo "scriptDir=$scriptDir"
+
+projectHome=${scriptDir%/ansible-solace-collection/*}
+if [[ ! $projectHome =~ "ansible-solace-collection" ]]; then
+  projectHome=$projectHome/ansible-solace-collection
+fi
+
+echo "projectHome=$projectHome"
+
+asc-devel-show() {
+  echo > /dev/tty
+  echo "Ansible env vars:" > /dev/tty
+  env | grep ANSIBLE > /dev/tty
+  echo "Links:" > /dev/tty
+  ls -la $pythonSitePackages/ansible_collections/solace > /dev/tty
+  echo > /dev/tty
+}
+
+asc-devel-deactivate () {
+    unset ANSIBLE_COLLECTIONS_PATH
+    unset ANSIBLE_MODULE_UTILS
+    unset ANSIBLE_LIBRARY
+    unset ANSIBLE_DOC_FRAGMENT_PLUGINS
+    unset ANSIBLE_VERBOSITY
+    unset ANSIBLE_SOLACE_ENABLE_LOGGING
+    unset ANSIBLE_SOLACE_LOG_PATH
+    unset ANSIBLE_PYTHON_INTERPRETER
+
+    if ! [ -z "${_OLD_ASC_PS1+_}" ] ; then
+        PS1="$_OLD_ASC_PS1"
+        export PS1
+        unset _OLD_ASC_PS1
+    fi
+
+    x=$(asc-devel-show)
+    unset -f asc-devel-deactivate
+    unset -f asc-devel-show
+}
+
+export pythonSitePackages=$(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+#export ANSIBLE_COLLECTIONS_PATH="$projectHome/src:$pythonSitePackages"
+export ANSIBLE_MODULE_UTILS="$projectHome/src/ansible_collections/solace/pubsub_plus/plugins/module_utils"
+export ANSIBLE_LIBRARY="$$projectHome/src/ansible_collections/solace/pubsub_plus/plugins/modules"
+export ANSIBLE_DOC_FRAGMENT_PLUGINS="$projectHome/src/ansible_collections/solace/pubsub_plus/plugins/doc_fragments"
+
+export ANSIBLE_VERBOSITY=3
+export ANSIBLE_SOLACE_ENABLE_LOGGING=true
+logFilename=$projectHome/.dev/logs/ansible_solace_pubsub_plus.log
+rm -f $logFilename
+export ANSIBLE_SOLACE_LOG_PATH=$logFilename
+
+export ANSIBLE_PYTHON_INTERPRETER=$(python -c "import sys; print(sys.executable)")
+
+# vscode/pylint
+rm -f $pythonSitePackages/ansible_collections/solace
+ln -s $projectHome/src/ansible_collections/solace $pythonSitePackages/ansible_collections/solace
+
+if [ -z "${_OLD_ASC_PS1+_}" ]; then
+  _OLD_ASC_PS1="${PS1-}"
+  PS1="(asc-devel)${PS1-}"
+  export PS1
+fi
+
+x=$(asc-devel-show)
+
+# # adjust to your python installation
+# export ANSIBLE_PYTHON_INTERPRETER=/usr/local/bin/python
+#
+# export ANSIBLE_SOLACE_ENABLE_LOGGING=true
+#
+#
+# # Prepend ansible-solace path to ansible env vars
+# export ANSIBLE_SOLACE_HOME=`pwd`/..
+# if [[ -z $ANSIBLE_MODULE_UTILS ]]; then COLON=""; else COLON=":"; fi
+# export ANSIBLE_MODULE_UTILS="$ANSIBLE_SOLACE_HOME/lib/ansible/module_utils$COLON$ANSIBLE_MODULE_UTILS"
+# if [[ -z $ANSIBLE_LIBRARY ]]; then COLON=""; else COLON=":"; fi
+# export ANSIBLE_LIBRARY="$ANSIBLE_SOLACE_HOME/lib/ansible/modules$COLON$ANSIBLE_LIBRARY"
+# if [[ -z $ANSIBLE_DOC_FRAGMENT_PLUGINS ]]; then COLON=""; else COLON=":"; fi
+# export ANSIBLE_DOC_FRAGMENT_PLUGINS="$ANSIBLE_SOLACE_HOME/lib/ansible/plugins/doc_fragments$COLON$ANSIBLE_DOC_FRAGMENT_PLUGINS"
+
+
+###
+# The End.
