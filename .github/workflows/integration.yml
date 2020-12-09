@@ -1,12 +1,12 @@
 # Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-name: integration test runner
+name: integration tests
 on:
   # for testing
   workflow_dispatch:
 
-  push:
+  # push:
 
   # schedule:
   #   # * is a special character in YAML so you have to quote this string
@@ -33,7 +33,7 @@ jobs:
     steps:
 
       - name: Check Auth
-        if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmkexx'
+        if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
         run: |
           echo "not authorized"
           echo '::set-output name=IS_AUTHORIZED::false'
