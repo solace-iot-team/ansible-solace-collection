@@ -45,13 +45,15 @@ source venv3.6.12/bin/activate
 
 ### Install Solace Collection Requirements in Python Virtual Env
 ````bash
-
-pip install -r {root}/requirements.txt
-
+(venv3.6.12) ...$ pip install -r {root}/requirements.txt
+````
+### Install Python Linter in Python Virtual Env
+````bash
+(venv3.6.12) ...$ pip install pylint
 ````
 
 ### Activate Ansible-Solace Collection Devel Env
-````
+````bash
 (venv3.6.12) ...$ source {root}/devel/bin/asc-devel-activate
 (asc-devel)(venv3.6.12) ...$ asc-devel-show
 
@@ -60,16 +62,17 @@ env vars & links
 ````
 
 ### Deactivate Ansible-Solace Collection Devel Env
-````
+````bash
 (asc-devel)(venv3.6.12) ...$ asc-devel-deactivate
 (venv3.6.12) ...$
 ````
 
 ### Deactivate Python Virtual Env
-````
+````bash
 (venv3.6.12) ...$ deactivate
 ...$
 ````
+
 
 ---
 The End.
