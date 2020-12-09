@@ -10,15 +10,13 @@ on:
     types: [created]
 
 env:
-
-  DEBUG_FLAG: ${{ true }}
-
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
 
 jobs:
   publish:
 
     runs-on: ubuntu-latest
+
     steps:
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
