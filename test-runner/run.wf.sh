@@ -24,6 +24,14 @@ export ANSIBLE_DEBUG=False
 export ANSIBLE_VERBOSITY=3
 export ANSIBLE_SOLACE_ENABLE_LOGGING=True
 
+# add python and ansible version to LOG_DIR
+pythonVersion=$(python -c "from platform import python_version; print(python_version())")
+firstLine=$(ansible --version | head -1)
+ansibleVersion=${firstLine//" "/"_"}
+export LOG_DIR="$LOG_DIR/python_$pythonVersion/$ansibleVersion"
+mkdir -p $LOG_DIR
+
+
 FAILED=0
 # $scriptDir/_run.sh > $LOG_DIR/$scriptLogName.out 2>&1
 $scriptDir/_run.sh

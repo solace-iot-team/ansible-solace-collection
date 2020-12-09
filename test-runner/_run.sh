@@ -29,7 +29,7 @@ brokerDockerImages=(
   # "solace/solace-pubsub-standard:9.5.0.30"
   # "solace/solace-pubsub-standard:9.6.0.32"
   # "solace/solace-pubsub-standard:9.6.0.38"
-  # "solace/solace-pubsub-standard:9.7.0.29"
+  "solace/solace-pubsub-standard:9.7.0.29"
   "solace/solace-pubsub-standard:latest"
 )
 

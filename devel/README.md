@@ -2,7 +2,7 @@
 
 Setup the development environment.
 
-## MacOS 
+## MacOS
 
 ### Install Python Version(s)
 
@@ -43,11 +43,17 @@ source venv3.6.12/bin/activate
 (venv3.6.12) ...$ ansible --version
 ````
 
+### Install Solace Collection Requirements in Python Virtual Env
+````bash
+
+pip install -r {root}/requirements.txt
+
+````
 
 ### Activate Ansible-Solace Devel Env
 ````
-(venv3.6.12) ...$ source devel/bin/devel-activate
-(asc-devel)(venv3.6.12) ...$ devel-show
+(venv3.6.12) ...$ source {root}/devel/bin/asc-devel-activate
+(asc-devel)(venv3.6.12) ...$ asc-devel-show
 
 output:
 env vars & links
@@ -55,7 +61,7 @@ env vars & links
 
 ### Deactivate Ansible-Solace Devel Env
 ````
-(asc-devel)(venv3.6.12) ...$ devel-deactivate
+(asc-devel)(venv3.6.12) ...$ asc-devel-deactivate
 (venv3.6.12) ...$
 ````
 

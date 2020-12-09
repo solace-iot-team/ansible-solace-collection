@@ -12,14 +12,14 @@ fi
 
 scriptDir=$(cd $(/usr/bin/env dirname .) && pwd);
 
-echo "scriptDir=$scriptDir"
+# echo "scriptDir=$scriptDir"
 
 projectHome=${scriptDir%/ansible-solace-collection/*}
 if [[ ! $projectHome =~ "ansible-solace-collection" ]]; then
   projectHome=$projectHome/ansible-solace-collection
 fi
 
-echo "projectHome=$projectHome"
+# echo "projectHome=$projectHome"
 
 asc-devel-show() {
   echo > /dev/tty
