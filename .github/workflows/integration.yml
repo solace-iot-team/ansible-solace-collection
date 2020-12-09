@@ -6,11 +6,8 @@ on:
   # for testing
   workflow_dispatch:
 
-  # push:
-
-  # schedule:
-  #   # * is a special character in YAML so you have to quote this string
-  #   - cron:  '0 1 * * *'
+  schedule:
+    - cron: '0 1 * * THU'
 
 env:
 
@@ -26,6 +23,7 @@ jobs:
 
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       matrix:
         # python-version: [ '3.6' ]
         python-version: [ '3.6', '3.8', '3.9' ]
@@ -117,7 +115,7 @@ jobs:
           ./${TEST_TEST_RUNNER_SCRIPT}
 
       - name: Archive logs
-        if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED != 'false' }}
+        if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED != 'false' && github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.TEST_TEST_RUNNER_LOGS_NAME }}
