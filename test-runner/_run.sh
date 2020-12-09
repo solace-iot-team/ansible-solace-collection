@@ -68,7 +68,7 @@ ansibleSolaceTestTargetGroup="single_broker"
   echo "# test target group: $ansibleSolaceTestTargetGroup($BROKER_TYPE)"
 
   runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
-  $runScript
+  # $runScript
   code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
 #################################################################################################################################################

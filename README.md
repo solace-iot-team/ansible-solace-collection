@@ -1,6 +1,7 @@
 # Ansible Collection for Solace PubSub+
 
-![integration test](https://github.com/solace-iot-team/ansible-solace-collection/workflows/integration%20test%20runner/badge.svg)
+![integration tests](https://github.com/solace-iot-team/ansible-solace-collection/workflows/integration%20tests/badge.svg)
+
 
 ---
 The End.

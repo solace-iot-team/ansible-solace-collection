@@ -29,6 +29,7 @@ jobs:
       matrix:
         # python-version: [ '3.6', '3.8', '3.9' ]
         python-version: [ '3.6' ]
+        ansible-version: [ 'ansible>=2.9.11,<2.10.0', 'ansible>=2.10.0' ]
 
     steps:
 
@@ -74,9 +75,12 @@ jobs:
           python -V
 
       - name: Install ansible and collection dependencies
+        env:
+          ANSIBLE: ${{ matrix.ansible-version }}
         run: |
           python -m pip install --upgrade pip
-          pip install ansible
+          pip install '$ANSIBLE'
+          exit 1
           pip install -r requirements.txt
           pip install docker-compose
 
