@@ -2,7 +2,7 @@
 
 Setup the development environment.
 
-## MacOS
+## MacOS 
 
 ### Install Python Version(s)
 
