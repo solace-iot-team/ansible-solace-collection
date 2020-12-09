@@ -50,7 +50,7 @@ pip install -r {root}/requirements.txt
 
 ````
 
-### Activate Ansible-Solace Devel Env
+### Activate Ansible-Solace Collection Devel Env
 ````
 (venv3.6.12) ...$ source {root}/devel/bin/asc-devel-activate
 (asc-devel)(venv3.6.12) ...$ asc-devel-show
@@ -59,7 +59,7 @@ output:
 env vars & links
 ````
 
-### Deactivate Ansible-Solace Devel Env
+### Deactivate Ansible-Solace Collection Devel Env
 ````
 (asc-devel)(venv3.6.12) ...$ asc-devel-deactivate
 (venv3.6.12) ...$
