@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
   schedule:
-    - cron: '0 1 * * THU'
+    # - cron: '0 1 * * THU'
+    - cron: '0 1 * * *'
 
 env:
 
