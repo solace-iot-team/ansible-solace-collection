@@ -1,0 +1,28 @@
+# (c) 2020 Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- name: "Check vars"
+  assert:
+    that:
+      - sc_service is defined
+      - SOLACE_CLOUD_API_TOKEN is defined
+      - INVENTORY_FILE is defined
+    fail_msg: "one or more variables not defined"
+
+- name: "Delete Solace Cloud Service by Name"
+  solace_cloud_service:
+    api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+    name: "{{ sc_service.name }}"
+    state: absent
+
+- name: "Delete Solace Cloud Service Inventory File"
+  file:
+    path: "{{ INVENTORY_FILE }}"
+    state: absent
+  changed_when: false
+  delegate_to: localhost
+
+###
+# The End.

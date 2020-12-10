@@ -15,51 +15,36 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$LOG_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
   if [ -z "$WORKING_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
   if [ -z "$RUN_FG" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: RUN_FG"; exit 1; fi
-  if [ -z "$INVENTORY_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: INVENTORY_FILE"; exit 1; fi
 
-  if [ -z "$BROKER_TYPE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: BROKER_TYPE"; exit 1; fi
-  if [[ "$BROKER_TYPE" == "local" ]]; then
-    if [ -z "$BROKER_DOCKER_IMAGE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: BROKER_DOCKER_IMAGE"; exit 1; fi
-    if [ -z "$BROKER_DOCKER_COMPOSE_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: BROKER_DOCKER_COMPOSE_FILE"; exit 1; fi
-    if [ -z "$LOCAL_BROKER_INVENTORY_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: LOCAL_BROKER_INVENTORY_FILE"; exit 1; fi
-  elif [[ "$BROKER_TYPE" == "solace_cloud" ]]; then
-    if [ -z "$SOLACE_CLOUD_API_TOKEN" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN"; exit 1; fi
-  else echo ">>> ERROR: - $scriptLogName - unknown BROKER_TYPE=$BROKER_TYPE"; exit 1; fi
-
+  if [ -z "$LOCAL_BROKER_INVENTORY_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: LOCAL_BROKER_INVENTORY_FILE"; exit 1; fi
+  if [ -z "$BROKER_DOCKER_COMPOSE_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: BROKER_DOCKER_COMPOSE_FILE"; exit 1; fi
+  if [ -z "$SOLACE_CLOUD_API_TOKEN" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN"; exit 1; fi
+  if [ -z "$SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE"; exit 1; fi
+  if [ -z "$TEARDOWN_SOLACE_CLOUD" ]; then export TEARDOWN_SOLACE_CLOUD=True; fi
 
 ##############################################################################################################################
-# Prepare
+# Settings
 
   export ANSIBLE_SOLACE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible-solace.log"
   export ANSIBLE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible.log"
 
 ##############################################################################################################################
-# Settings
-
-inventory=$(assertFile $scriptLogName $INVENTORY_FILE) || exit
-
-playbooks=(
-  "$scriptDir/main.playbook.yml"
-)
-
-##############################################################################################################################
 # Run
-for playbook in ${playbooks[@]}; do
 
-  playbook=$(assertFile $scriptLogName $playbook) || exit
+  localBrokerInventory=$(assertFile $scriptLogName $LOCAL_BROKER_INVENTORY_FILE) || exit
+  solaceCloudAccInventory=$(assertFile $scriptLogName $SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE) || exit
+  playbook=$(assertFile $scriptLogName "$scriptDir/main.playbook.yml") || exit
+
   ansible-playbook \
-                  -i $inventory \
+                  -i $localBrokerInventory \
+                  -i $solaceCloudAccInventory \
                   $playbook \
                   --extra-vars "WORKING_DIR=$WORKING_DIR" \
-                  --extra-vars "BROKER_TYPE=$BROKER_TYPE" \
                   --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN" \
-                  --extra-vars "LOCAL_BROKER_INVENTORY_FILE=$LOCAL_BROKER_INVENTORY_FILE" \
-                  --extra-vars "BROKER_DOCKER_IMAGE=$BROKER_DOCKER_IMAGE" \
-                  --extra-vars "BROKER_DOCKER_COMPOSE_FILE=$BROKER_DOCKER_COMPOSE_FILE"
+                  --extra-vars "BROKER_DOCKER_COMPOSE_FILE=$BROKER_DOCKER_COMPOSE_FILE" \
+                  --extra-vars "TEARDOWN_SOLACE_CLOUD=$TEARDOWN_SOLACE_CLOUD"
 
   code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
-
-done
 
 echo ">>> SUCCESS: $scriptLogName"
 

@@ -18,7 +18,7 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$ANSIBLE_SOLACE_TESTS" ]; then
     export ANSIBLE_SOLACE_TESTS=(
       "setup"
-      "solace_get_available"
+      "solace_facts"
       "teardown"
     )
   fi
@@ -28,7 +28,7 @@ source $PROJECT_HOME/.lib/functions.sh
 
 export WORKING_DIR="$scriptDir/tmp"
 mkdir -p $WORKING_DIR
-rm -rf $WORKING_DIR/*
+if [ -z "$CLEAN_WORKING_DIR" ]; then rm -rf "$WORKING_DIR/*"; fi
 
 ##############################################################################################################################
 # Run

@@ -68,14 +68,13 @@ samples:
 
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-from ansible.module_utils.basic import AnsibleModule
-import traceback
-
 MODULE_HAS_IMPORT_ERROR = False
 MODULE_IMPORT_ERR_TRACEBACK = None
+import traceback
 try:
+    import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
+    import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+    from ansible.module_utils.basic import AnsibleModule
     import requests
 except ImportError:
     MODULE_HAS_IMPORT_ERROR = True

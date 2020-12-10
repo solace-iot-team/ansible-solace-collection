@@ -266,6 +266,7 @@ def get_formattedHostInventory(search_dict, host_entry, api_token, meta):
     hosts[host_entry] = {
         'meta': meta,
         'ansible_connection': 'local',
+        'broker_type': 'solace_cloud',
         'solace_cloud_api_token': api_token,
         'solace_cloud_service_id': search_dict['serviceId'],
         'sempv2_host': eps_val['SEMP']['SecuredSEMP']['uriComponents']['host'],

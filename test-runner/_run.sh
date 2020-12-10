@@ -71,11 +71,36 @@ ansibleSolaceTestTargetGroup="single_broker"
   code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
 #################################################################################################################################################
-ansibleSolaceTestTargetGroup="next_group"
+ansibleSolaceTestTargetGroup="two_brokers"
 #################################################################################################################################################
 
+  lastTest=${brokerDockerImages[-1]}
+  for brokerDockerImage in ${brokerDockerImages[@]}; do
 
+    brokerDockerImageLogPath=${brokerDockerImage//":"/"_"}
+    export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup/$brokerDockerImageLogPath"
+    mkdir -p $LOG_DIR
 
+    export BROKER_DOCKER_IMAGE=$brokerDockerImage
+    export LOCAL_BROKER_INVENTORY_FILE=$localBrokerInventoryFile
+    export BROKER_DOCKER_COMPOSE_FILE=$localBrokerDockerComposeFile
+    export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
+    export SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE=$solaceCloudAccountInventoryFile
+
+    if [[ "$lastTest" == "$brokerDockerImage" ]]; then
+      export TEARDOWN_SOLACE_CLOUD=True
+    else
+      export TEARDOWN_SOLACE_CLOUD=False
+    fi
+
+    echo "##############################################################################################################"
+    echo "# Test target group: $ansibleSolaceTestTargetGroup(solace_cloud, $brokerDockerImage)"
+
+    runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
+    $runScript
+    code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+
+  done
 
 ###
 # The End.

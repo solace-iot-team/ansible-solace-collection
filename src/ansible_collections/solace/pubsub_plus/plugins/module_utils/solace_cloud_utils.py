@@ -3,14 +3,17 @@
 # Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 """Collection of utility classes and functions to aid the solace_cloud_* modules."""
 
 import traceback
-import logging
-import json
 SCU_HAS_IMPORT_ERROR = False
 SCU_IMPORT_ERR_TRACEBACK = None
 try:
+    import logging
+    import json
     import requests
     import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
 except ImportError:

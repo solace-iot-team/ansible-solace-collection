@@ -3,6 +3,7 @@ all:
   hosts:
     solace-iot-team:
       ansible_connection: local
+      broker_type: solace_cloud
 
 ###
 # The End.
