@@ -117,21 +117,14 @@ RETURN = '''
         type: complex
 '''
 
-MODULE_HAS_IMPORT_ERROR = False
-MODULE_IMPORT_ERR_TRACEBACK = None
-import traceback
-try:
-    import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-    from ansible.module_utils.basic import AnsibleModule
-    import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
-except ImportError:
-    MODULE_HAS_IMPORT_ERROR = True
-    MODULE_IMPORT_ERR_TRACEBACK = traceback.format_exc()
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
+from ansible.module_utils.basic import AnsibleModule
 
 class SolaceCloudAccountGatherFactsTask(scu.SolaceCloudTask):
 
     def __init__(self, module):
-        sc.module_fail_on_import_error(module, MODULE_HAS_IMPORT_ERROR, MODULE_IMPORT_ERR_TRACEBACK)
+        sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
         scu.SolaceCloudTask.__init__(self, module)
         return
 

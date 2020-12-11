@@ -119,6 +119,7 @@ class SolaceCloudServiceTask(scu.SolaceCloudTask):
     LOOKUP_ITEM_KEY_NAME = 'name'
 
     def __init__(self, module):
+        sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
         scu.SolaceCloudTask.__init__(self, module)
         self._service_id = None
         self.validate_args(*(self.get_args() + self.lookup_item_kv()))

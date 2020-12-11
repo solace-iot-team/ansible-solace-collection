@@ -8,17 +8,17 @@ __metaclass__ = type
 
 """Common functions."""
 
-import re
-import traceback
-import logging
-import json
-import os
-import sys
-from distutils.util import strtobool
-import copy
-
 HAS_IMPORT_ERROR = False
+IMPORT_ERR_TRACEBACK = None
+import traceback
 try:
+    import re  
+    import logging
+    import json
+    import os
+    import sys
+    from distutils.util import strtobool
+    import copy
     from json.decoder import JSONDecodeError
     import requests
     import xmltodict
@@ -37,7 +37,6 @@ if not _PY3_MIN:
         '"msg": "solace.pubsub_plus requires a minimum of Python3 version 3.6. Current version: %s."}' % (_SC_SYSTEM_ERR_RC, ''.join(sys.version.splitlines()))
     )
     sys.exit(1)
-
 
 def module_fail_on_import_error(module, is_error, import_error_traceback=None):
     if is_error:
@@ -115,23 +114,14 @@ def log_http_roundtrip(resp):
     return
 
 
-class BearerAuth(requests.auth.AuthBase):
-    def __init__(self, token):
-        self.token = token
+if not HAS_IMPORT_ERROR:
+    class BearerAuth(requests.auth.AuthBase):
+        def __init__(self, token):
+            self.token = token
 
-    def __call__(self, r):
-        r.headers["authorization"] = "Bearer " + self.token
-        return r
-
-# if not HAS_IMPORT_ERROR:
-#     class BearerAuth(requests.auth.AuthBase):
-#         def __init__(self, token):
-#             self.token = token
-# 
-#         def __call__(self, r):
-#             r.headers["authorization"] = "Bearer " + self.token
-#             return r
-
+        def __call__(self, r):
+            r.headers["authorization"] = "Bearer " + self.token
+            return r
 
 # solace cloud: cast everything to string
 # broker: cast strings to ints & floats, string booleans to boolean

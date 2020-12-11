@@ -8,21 +8,15 @@ __metaclass__ = type
 
 """Collection of utility classes and functions to aid the solace_* modules."""
 
-import traceback
-import logging
-import json
-import time
-SU_HAS_IMPORT_ERROR = False
-SU_IMPORT_ERR_TRACEBACK = None
-try:
-    from inspect import signature
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
+if not sc.HAS_IMPORT_ERROR:
     import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
-    import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
+    import logging
+    import json
+    import time
+    from inspect import signature
     from ansible.errors import AnsibleError
     import requests
-except ImportError:
-    SU_HAS_IMPORT_ERROR = True
-    SU_IMPORT_ERR_TRACEBACK = traceback.format_exc()
 
 
 """ Default Whitelist Keys """
@@ -97,7 +91,7 @@ class SolaceTask:
     REQUIRED_TOGETHER_KEYS = dict()
 
     def __init__(self, module):
-        sc.module_fail_on_import_error(module, SU_HAS_IMPORT_ERROR, SU_IMPORT_ERR_TRACEBACK)
+        sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
         self.module = module
         solace_cloud_api_token = self.module.params.get('solace_cloud_api_token', None)
         solace_cloud_service_id = self.module.params.get('solace_cloud_service_id', None)
@@ -634,7 +628,7 @@ def is_broker_solace_cloud(solace_config):
     return True
 
 
-if not SU_HAS_IMPORT_ERROR:
+if not sc.HAS_IMPORT_ERROR:
     class BearerAuth(requests.auth.AuthBase):
         def __init__(self, token):
             self.token = token

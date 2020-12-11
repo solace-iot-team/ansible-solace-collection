@@ -81,16 +81,9 @@ response:
 
 '''
 
-from ansible.module_utils.basic import AnsibleModule
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import traceback
-HAS_IMPORT_ERROR = False
-IMPORT_ERR_TRACEBACK = None
-try:
-    import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
-except ImportError:
-    HAS_IMPORT_ERROR = True
-    IMPORT_ERR_TRACEBACK = traceback.format_exc()
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
+from ansible.module_utils.basic import AnsibleModule
 
 class SolaceCloudGetServiceTask(scu.SolaceCloudTask):
 
@@ -98,7 +91,7 @@ class SolaceCloudGetServiceTask(scu.SolaceCloudTask):
     LOOKUP_ITEM_KEY_NAME = 'name'
 
     def __init__(self, module):
-        sc.module_fail_on_import_error(module, HAS_IMPORT_ERROR, IMPORT_ERR_TRACEBACK)
+        sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
         scu.SolaceCloudTask.__init__(self, module)
         self._service_id = None
         self.validate_args(*(self.get_args() + self.lookup_item_kv()))

@@ -8,18 +8,11 @@ __metaclass__ = type
 
 """Collection of utility classes and functions to aid the solace_cloud_* modules."""
 
-import traceback
-SCU_HAS_IMPORT_ERROR = False
-SCU_IMPORT_ERR_TRACEBACK = None
-try:
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
+if not sc.HAS_IMPORT_ERROR:
     import logging
     import json
     import requests
-    import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-except ImportError:
-    SCU_HAS_IMPORT_ERROR = True
-    SCU_IMPORT_ERR_TRACEBACK = traceback.format_exc()
-
 
 """ Solace Cloud resources """
 SOLACE_CLOUD_API_BASE_PATH = "https://api.solace.cloud/api/v0"
@@ -44,7 +37,7 @@ class SolaceCloudTask:
     REQUIRED_TOGETHER_KEYS = dict()
 
     def __init__(self, module):
-        sc.module_fail_on_import_error(module, SCU_HAS_IMPORT_ERROR, SCU_IMPORT_ERR_TRACEBACK)
+        sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
         self.module = module
         self.sc_config = SolaceCloudConfig(
             api_token=self.module.params['api_token'],
