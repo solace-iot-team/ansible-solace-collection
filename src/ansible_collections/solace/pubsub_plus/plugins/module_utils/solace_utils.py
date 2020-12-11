@@ -16,8 +16,8 @@ SU_HAS_IMPORT_ERROR = False
 SU_IMPORT_ERR_TRACEBACK = None
 try:
     from inspect import signature
-    import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
     import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
+    import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
     from ansible.errors import AnsibleError
     import requests
 except ImportError:

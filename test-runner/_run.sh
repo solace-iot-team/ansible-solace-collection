@@ -49,7 +49,7 @@ ansibleSolaceTestTargetGroup="single_broker"
     export BROKER_DOCKER_COMPOSE_FILE=$localBrokerDockerComposeFile
 
     echo "##############################################################################################################"
-    echo "# Test target group: $ansibleSolaceTestTargetGroup($BROKER_TYPE, $brokerDockerImage)"
+    echo "# Test target group: $ansibleSolaceTestTargetGroup($brokerDockerImage)"
 
     runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
     $runScript
@@ -64,7 +64,7 @@ ansibleSolaceTestTargetGroup="single_broker"
   export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
 
   echo "##############################################################################################################"
-  echo "# test target group: $ansibleSolaceTestTargetGroup($BROKER_TYPE)"
+  echo "# test target group: $ansibleSolaceTestTargetGroup(solace_cloud)"
 
   runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
   $runScript
@@ -101,6 +101,24 @@ ansibleSolaceTestTargetGroup="two_brokers"
     code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
   done
+
+#################################################################################################################################################
+ansibleSolaceTestTargetGroup="solace_cloud"
+#################################################################################################################################################
+  echo "##############################################################################################################"
+  echo "# Test target group: $ansibleSolaceTestTargetGroup(solace_cloud)"
+
+  export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup"
+  mkdir -p $LOG_DIR
+
+  export SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE=$solaceCloudAccountInventoryFile
+  # test only
+  # export TEARDOWN_SOLACE_CLOUD=False
+
+  runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
+  $runScript
+  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+
 
 ###
 # The End.

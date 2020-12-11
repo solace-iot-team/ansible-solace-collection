@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# (c) 2020 Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Exception_Test_2: solace_cloud_service: various"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+        api_token_restriced: "{{ SOLACE_CLOUD_API_TOKEN_RESTRICTED }}"
+        sc_account_name: "{{ inventory_hostname }}"
+
+    - name: "Ex 2: update service"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        name: "Ansible-Solace-Test-Service-1"
+        settings:
+          msgVpnName: as-test-service-1-u
+          datacenterId: "aws-eu-west-2a"
+          serviceTypeId: "enterprise"
+          serviceClassId: "enterprise-250-nano"
+        state: present
+      register: result
+      failed_when: result.rc != 1 or result.delta == None
+
+    - name: "Ex 2: Delete by Service Id & name"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        name: "Ansible-Solace-Test-Service-1"
+        service_id: "xxxxx"
+        state: absent
+      register: result
+      failed_when: result.rc != 0
+
+###
+# The End.

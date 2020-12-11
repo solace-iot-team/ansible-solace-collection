@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# (c) 2020 Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Ex 3_3: solace_cloud_service: test for Delta Changes"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  pre_tasks:
+  - include_vars:
+      file: "solace-cloud-service.vars.yml"
+      name: sc_services
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+        api_token_restriced: "{{ SOLACE_CLOUD_API_TOKEN_RESTRICTED }}"
+        sc_account_name: "{{ inventory_hostname }}"
+
+    - set_fact:
+        sc_service: "{{ sc_services.solace_cloud_services[0] }}"
+        sc_service_name: as-test-delta-settings
+        sc_service_vpn: as-test-delta-settings
+
+    - name: "Ex 3: Create New Service"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        name: "{{ sc_service_name }}"
+        settings:
+          msgVpnName: "{{ sc_service_vpn }}"
+          datacenterId: "{{ sc_service.datacenterId }}"
+          serviceTypeId: "{{ sc_service.serviceTypeId}}"
+          serviceClassId: "{{ sc_service.serviceClassId }}"
+          attributes:
+            customizedMessagingPorts:
+              serviceSmfPlainTextListenPort: 55555
+              serviceSmfCompressedListenPort: 55003
+              serviceSmfTlsListenPort: 55443
+        state: present
+      register: result
+
+    - set_fact:
+        sc_service_id: "{{ result.response.serviceId }}"
+
+    - name: "Ex 3: Wait for Service Provisioning to Complete"
+      solace_cloud_get_service:
+        api_token: "{{ api_token }}"
+        service_id: "{{ sc_service_id }}"
+      register: result
+      until: "result.rc != 0 or result.response.creationState == 'completed'"
+      # wait max for 40 * 30 seconds, then give up
+      retries: 40
+      delay: 30 # Every 30 seconds
+      no_log: true
+
+    - name: "Ex 3: No Update"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        name: "{{ sc_service.name }}"
+        settings:
+          msgVpnName: "{{ sc_service.msgVpnName}}"
+          datacenterId: "{{ sc_service.datacenterId }}"
+          serviceTypeId: "{{ sc_service.serviceTypeId}}"
+          serviceClassId: "{{ sc_service.serviceClassId }}"
+        state: present
+      register: result
+
+    - name: "Ex 3: Update msgVpnName"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        name: "{{ sc_service_name }}"
+        settings:
+          msgVpnName: "{{ sc_service.msgVpnName}}-update"
+          datacenterId: "{{ sc_service.datacenterId }}"
+          serviceTypeId: "{{ sc_service.serviceTypeId}}"
+          serviceClassId: "{{ sc_service.serviceClassId }}"
+        state: present
+      register: result
+      failed_when: result.rc != 1 or result.delta == None or result.delta.msgVpnName == None
+
+    - name: "Ex 3: Update Ports"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        name: "{{ sc_service_name }}"
+        settings:
+          msgVpnName: "{{ sc_service_vpn }}"
+          datacenterId: "{{ sc_service.datacenterId }}"
+          serviceTypeId: "{{ sc_service.serviceTypeId}}"
+          serviceClassId: "{{ sc_service.serviceClassId }}"
+          attributes:
+            customizedMessagingPorts:
+              serviceSmfPlainTextListenPort: 1111
+        state: present
+      register: result
+      failed_when: result.rc != 1 or result.delta.attributes.customizedMessagingPorts.serviceSmfPlainTextListenPort == None
+
+    - name: "Ex 3: Delete by Service Id"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        service_id: "{{ sc_service_id }}"
+        state: absent
+      register: result
+      failed_when: result.rc != 0
+
+    - name: "Ex 3: Delete by Service Id"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        service_id: "{{ sc_service_id }}"
+        state: absent
+      register: result
+      failed_when: result.rc != 0
+###
+# The End.

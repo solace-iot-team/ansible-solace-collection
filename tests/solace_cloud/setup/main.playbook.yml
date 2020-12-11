@@ -1,0 +1,70 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Create Solace Cloud Services"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  pre_tasks:
+  - include_vars:
+      file: "solace-cloud-service.vars.yml"
+      name: sc_services
+  - include_vars:
+      file: "env.vars.yml"
+      name: env
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+        sc_created_inventory_file: "{{ WORKING_DIR }}/{{ SOLACE_CLOUD_INVENTORY_FILE_NAME }}"
+
+    - assert:
+        that: broker_type == "solace_cloud"
+
+    - name: "Ensure {{ working_dir }} exists"
+      file:
+        path: "{{ working_dir }}"
+        state: directory
+      delegate_to: localhost
+
+    - set_fact:
+        created_services_dict: {}
+
+    - name: "Solace Cloud Service: Create"
+      include_tasks: ./tasks/setup.solace-cloud.yml
+      register: create_task_result
+      loop: "{{ sc_services.solace_cloud_services }}"
+      loop_control:
+        loop_var: sc_service
+
+        # run again to test idempotency
+    - name: "Solace Cloud Service: Create"
+      include_tasks: ./tasks/setup.solace-cloud.yml
+      register: create_task_result
+      loop: "{{ sc_services.solace_cloud_services }}"
+      loop_control:
+        loop_var: sc_service
+
+    - name: "Create services inventory"
+      set_fact:
+        sc_inventory: "{{ lookup('template', 'inventory.j2') | from_json }}"
+
+    - name: "Save created services to {{ sc_created_inventory_file }}"
+      copy:
+        content: "{{ sc_inventory | to_nice_yaml(indent=2) }}"
+        dest: "{{ sc_created_inventory_file }}"
+      delegate_to: localhost
+
+    # now run it again to test idempotency
+    - name: "Solace Cloud Service: Create"
+      include_tasks: ./tasks/setup.solace-cloud.yml
+      register: create_task_result
+      loop: "{{ sc_services.solace_cloud_services }}"
+      loop_control:
+        loop_var: sc_service
+
+###
+# The End.

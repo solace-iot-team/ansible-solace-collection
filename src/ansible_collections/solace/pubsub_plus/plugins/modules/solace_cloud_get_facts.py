@@ -159,25 +159,25 @@ RETURN = '''
 
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-from ansible.module_utils.basic import AnsibleModule
+MODULE_HAS_IMPORT_ERROR = False
+MODULE_IMPORT_ERR_TRACEBACK = None
 import traceback
-HAS_IMPORT_ERROR = False
-IMPORT_ERR_TRACEBACK = None
 try:
+    import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
+    from ansible.module_utils.basic import AnsibleModule
     from ansible.errors import AnsibleError
     from urllib.parse import urlparse
     import json
     from json.decoder import JSONDecodeError
 except ImportError:
-    HAS_IMPORT_ERROR = True
-    IMPORT_ERR_TRACEBACK = traceback.format_exc()
+    MODULE_HAS_IMPORT_ERROR = True
+    MODULE_IMPORT_ERR_TRACEBACK = traceback.format_exc()
 
 
 class SolaceCloudGetFactsTask():
 
     def __init__(self, module):
-        sc.module_fail_on_import_error(module, HAS_IMPORT_ERROR, IMPORT_ERR_TRACEBACK)
+        sc.module_fail_on_import_error(module, MODULE_HAS_IMPORT_ERROR, MODULE_IMPORT_ERR_TRACEBACK)
         self.module = module
         return
 

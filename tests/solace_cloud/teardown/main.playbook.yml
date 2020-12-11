@@ -1,0 +1,58 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Teardown Solace Cloud Services"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  pre_tasks:
+  - include_vars:
+      file: "solace-cloud-service.vars.yml"
+      name: sc_services
+  - include_vars:
+      file: "env.vars.yml"
+      name: env
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+        sc_created_inventory_file: "{{ WORKING_DIR }}/{{ SOLACE_CLOUD_INVENTORY_FILE_NAME }}"
+        teardown_solace_cloud: "{{ TEARDOWN_SOLACE_CLOUD | default(True) }}"
+
+    - assert:
+        that: broker_type == "solace_cloud"
+
+    - name: "Ensure {{ working_dir }} exists"
+      file:
+        path: "{{ working_dir }}"
+        state: directory
+      delegate_to: localhost
+
+    - name: "Delete Solace Cloud Service by ID"
+      solace_cloud_service:
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+        service_id: "{{ solace_cloud_service_id }}"
+        state: absent
+      when: teardown_solace_cloud
+
+    # run again to test idempotency
+    - name: "Delete Solace Cloud Service by ID"
+      solace_cloud_service:
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+        service_id: "{{ solace_cloud_service_id }}"
+        state: absent
+      when: teardown_solace_cloud
+
+    - name: "Delete Solace Cloud Services Inventory File"
+      file:
+        path: "{{ sc_created_inventory_file }}"
+        state: absent
+      changed_when: false
+      delegate_to: localhost
+      when: teardown_solace_cloud
+
+###
+# The End.

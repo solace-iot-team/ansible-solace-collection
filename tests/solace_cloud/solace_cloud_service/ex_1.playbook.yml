@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+# (c) 2020 Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Exception_Test_1: solace_cloud_service"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+        api_token_restriced: "{{ SOLACE_CLOUD_API_TOKEN_RESTRICTED }}"
+        sc_account_name: "{{ inventory_hostname }}"
+
+    - name: "Exception_Test: no name, state=present"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        # name: this-service-should-never-be-created
+        settings:
+          msgVpnName: "not-created-vpn"
+          datacenterId: "aws-eu-west-2a"
+          serviceTypeId: "enterprise"
+          serviceClassId: "enterprise-giga"
+        state: present
+      register: result
+      failed_when: "result.rc != 1"
+
+    - name: "Exception_Test: no name, state=absent"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        # name: this-service-should-never-be-created
+        state: absent
+      register: result
+      failed_when: "result.rc != 1"
+
+    - name: "Exception_Test: wrong service_id, state=absent"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        # name: this-service-should-never-be-created
+        service_id: xxxxx
+        state: absent
+      register: result
+      failed_when: "result.rc != 0"
+
+    - name: "Exception_Test: Plan not available"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        name: this-service-should-never-be-created
+        settings:
+          msgVpnName: "not-created-vpn"
+          datacenterId: "aws-eu-west-2a"
+          serviceTypeId: "enterprise"
+          serviceClassId: "enterprise-giga"
+        state: present
+      register: result
+      failed_when: "result.rc != 1"
+
+    - name: "Exception_Test: Token has no permissions"
+      solace_cloud_service:
+        api_token: "{{ api_token_restriced }}"
+        name: never-created-service
+        settings:
+          msgVpnName: "not-created-vpn"
+          datacenterId: "aws-eu-west-2a"
+          serviceTypeId: "enterprise"
+          serviceClassId: "enterprise-250-nano"
+        state: present
+      register: result
+      failed_when: "result.rc != 1"
+
+    - name: "Exception_Test: not a token"
+      solace_cloud_service:
+        api_token: "xxxx-yyyy"
+        name: never-created-service
+        settings:
+          msgVpnName: "not-created-vpn"
+          datacenterId: "aws-eu-west-2a"
+          serviceTypeId: "enterprise"
+          serviceClassId: "enterprise-250-nano"
+        state: present
+      register: result
+      failed_when: "result.rc != 1"
+
+    - name: "Exception_Test: no settings"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        name: this-service-should-never-be-created
+        # settings:
+        #   msgVpnName: "not-created-vpn"
+        #   datacenterId: "aws-eu-west-2a"
+        #   serviceTypeId: "enterprise"
+        #   serviceClassId: "enterprise-giga"
+        state: present
+      register: result
+      failed_when: "result.rc != 1"
+
+    - name: "Exception_Test: empty settings"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        name: this-service-should-never-be-created
+        settings:
+        #   msgVpnName: "not-created-vpn"
+        #   datacenterId: "aws-eu-west-2a"
+        #   serviceTypeId: "enterprise"
+        #   serviceClassId: "enterprise-giga"
+        state: present
+      register: result
+      failed_when: "result.rc != 1"
+
+    - name: "Exception_Test: insufficient settings"
+      solace_cloud_service:
+        api_token: "{{ api_token }}"
+        name: this-service-should-never-be-created
+        settings:
+          msgVpnName: "not-created-vpn"
+        #   datacenterId: "aws-eu-west-2a"
+        #   serviceTypeId: "enterprise"
+        #   serviceClassId: "enterprise-giga"
+        state: present
+      register: result
+      failed_when: "result.rc != 1"
+
+
+###
+# The End.

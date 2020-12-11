@@ -1,0 +1,93 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+    - debug:
+        msg: "Get SEMP Management Endpoints for {{ sc_service.name }} "
+
+    - name: "Get Service: {{ sc_service.name }}"
+      solace_cloud_get_service:
+        api_token: "{{ api_token }}"
+        service_id: "{{ sc_service.serviceId }}"
+      register: result
+
+    - name: "Set Fact: Solace Service Details"
+      set_fact:
+        sc_service_details: "{{ result.response }}"
+      no_log: true
+
+    - name: "Save Solace Cloud Service Details to File"
+      copy:
+        content: "{{ sc_service_details | to_nice_json }}"
+        dest: "{{ working_dir }}/facts.solace_cloud_service.{{ sc_service.name }}.details.json"
+      delegate_to: localhost
+
+    - name: "Get Semp Management Endpoints for: {{ sc_service.name }}"
+      solace_cloud_get_facts:
+        from_dict: "{{ sc_service_details }}"
+        field_funcs:
+          - get_serviceSEMPManagementEndpoints
+      register: semp_enpoints_facts
+
+    - name: "Save Solace Cloud Service SEMP Management Endpoints to File"
+      copy:
+        content: "{{ semp_enpoints_facts | to_nice_json }}"
+        dest: "{{ working_dir }}/facts.solace_cloud_service.{{ sc_service.name }}.semp.json"
+      delegate_to: localhost
+
+    - name: "Get Host Inventory for: {{ sc_service.name }}"
+      solace_cloud_get_facts:
+        from_dict: "{{ sc_service_details }}"
+        get_formattedHostInventory:
+          host_entry: "{{ sc_service.name }}"
+          api_token: "{{ api_token }}"
+          meta:
+            service_name: "{{ sc_service_details.name }}"
+            service_id: "{{ sc_service_details.serviceId }}"
+            datacenterId: "{{ sc_service_details.datacenterId }}"
+            serviceTypeId: "{{ sc_service_details.serviceTypeId}}"
+            serviceClassId: "{{ sc_service_details.serviceClassId }}"
+            serviceClassDisplayedAttributes: "{{ sc_service_details.serviceClassDisplayedAttributes }}"
+      register: inv_results
+
+    - name: "Save Solace Cloud Service inventory to File"
+      copy:
+        content: "{{ inv_results.facts.formattedHostInventory | to_nice_json }}"
+        dest: "{{ working_dir }}/inventory.{{ sc_service.name }}.json"
+      delegate_to: localhost
+
+    - name: "Set Fact: Solace Service SEMP"
+      set_fact:
+        sempv2_host: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.host }}"
+        sempv2_port: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.port }}"
+        sempv2_is_secure_connection: True
+        sempv2_username: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.username }}"
+        sempv2_password: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.password }}"
+        sempv2_timeout: 60
+
+    - name: "Gather Solace Facts from Service"
+      solace_gather_facts:
+        host: "{{ sempv2_host }}"
+        port: "{{ sempv2_port }}"
+        secure_connection: "{{ sempv2_is_secure_connection }}"
+        username: "{{ sempv2_username }}"
+        password: "{{ sempv2_password }}"
+        timeout: "{{ sempv2_timeout }}"
+        solace_cloud_api_token: "{{ api_token }}"
+        solace_cloud_service_id: "{{ sc_service.serviceId }}"
+
+    - name: "Show ansible_facts.solace"
+      debug:
+        msg:
+          - "ansible_facts.solace:"
+          - "{{ ansible_facts.solace }}"
+
+    - name: "Save Solace Cloud Service Facts to File"
+      copy:
+        content: "{{ ansible_facts.solace | to_nice_json }}"
+        dest: "{{ working_dir }}/solace_facts.solace_cloud_service.{{ sc_service.name }}.json"
+      delegate_to: localhost
+
+
+###
+# The End.

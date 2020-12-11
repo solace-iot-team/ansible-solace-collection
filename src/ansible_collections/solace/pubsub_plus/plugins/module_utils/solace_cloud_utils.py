@@ -90,10 +90,6 @@ class SolaceCloudTask:
                 if settings and len(settings.keys()):
                     # compare new settings against configuration
                     current_settings = current_configuration
-
-                    # logging.debug("\n\n\nsettings=\n%s\n\n\n", json.dumps(settings, indent=2))
-                    # logging.debug("\n\n\ncurrent_settings=\n%s\n\n\n", json.dumps(current_settings, indent=2))
-
                     bad_keys = [key for key in settings if key not in current_settings.keys()]
                     # remove whitelist items from bad_keys
                     bad_keys = [item for item in bad_keys if item not in whitelist]

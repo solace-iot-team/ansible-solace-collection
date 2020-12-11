@@ -59,7 +59,7 @@ export ANSIBLE_DOC_FRAGMENT_PLUGINS="$projectHome/src/ansible_collections/solace
 
 export ANSIBLE_VERBOSITY=3
 export ANSIBLE_SOLACE_ENABLE_LOGGING=true
-logFilename=$projectHome/.dev/logs/ansible_solace_pubsub_plus.log
+logFilename=$projectHome/devel/logs/ansible_solace.log
 rm -f $logFilename
 export ANSIBLE_SOLACE_LOG_PATH=$logFilename
 

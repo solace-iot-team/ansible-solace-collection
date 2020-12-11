@@ -28,7 +28,7 @@ source $PROJECT_HOME/.lib/functions.sh
 
 export WORKING_DIR="$scriptDir/tmp"
 mkdir -p $WORKING_DIR
-rm -rf $WORKING_DIR/*
+if [ -z "$CLEAN_WORKING_DIR" ]; then rm -rf $WORKING_DIR/*; fi
 
 ##############################################################################################################################
 # Run

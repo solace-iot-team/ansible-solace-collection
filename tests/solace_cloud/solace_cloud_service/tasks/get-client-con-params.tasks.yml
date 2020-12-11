@@ -1,0 +1,68 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+    - debug:
+        msg: "Get Client Connection Details for: {{ sc_service.name }} "
+
+    - name: "Get Service: {{ sc_service.name }}"
+      solace_cloud_get_service:
+        api_token: "{{ api_token }}"
+        service_id: "{{ sc_service.serviceId }}"
+      register: result
+
+    - name: "Set Fact: Solace Service Details"
+      set_fact:
+        sc_service_details: "{{ result.response }}"
+      no_log: true
+
+    - name: "Get Semp Management Endpoints for: {{ sc_service.name }}"
+      solace_cloud_get_facts:
+        from_dict: "{{ sc_service_details }}"
+        field_funcs:
+          - get_serviceSEMPManagementEndpoints
+      register: semp_enpoints_facts
+
+    - name: "Set Fact: Solace Service SEMP"
+      set_fact:
+        sempv2_host: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.host }}"
+        sempv2_port: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.port }}"
+        sempv2_is_secure_connection: True
+        sempv2_username: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.username }}"
+        sempv2_password: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.password }}"
+        sempv2_timeout: 60
+
+    - name: "Gather Solace Facts from Service"
+      solace_gather_facts:
+        host: "{{ sempv2_host }}"
+        port: "{{ sempv2_port }}"
+        secure_connection: "{{ sempv2_is_secure_connection }}"
+        username: "{{ sempv2_username }}"
+        password: "{{ sempv2_password }}"
+        timeout: "{{ sempv2_timeout }}"
+        solace_cloud_api_token: "{{ api_token }}"
+        solace_cloud_service_id: "{{ sc_service.serviceId }}"
+      no_log: true
+
+    - name: "Get Facts: all client connection details"
+      solace_get_facts:
+        hostvars: "{{ hostvars }}"
+        host: "{{ inventory_hostname }}"
+        fields:
+        field_funcs:
+          - get_allClientConnectionDetails
+      register: result
+      no_log: true
+
+    - set_fact:
+        client_connection_details: "{{ result.facts }}"
+
+    - name: "Save 'client_connection_details' to File"
+      copy:
+        content: "{{ client_connection_details | to_nice_json }}"
+        dest: "{{ working_dir }}/facts.solace_cloud_service.{{ sc_service.name }}.client_connection_details.json"
+      delegate_to: localhost
+
+
+###
+# The End.

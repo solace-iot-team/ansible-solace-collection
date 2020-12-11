@@ -1,0 +1,92 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "TEST: solace_cloud_account_facts"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+        sc_account_name: "{{ inventory_hostname }}"
+
+    - assert:
+        that: broker_type == "solace_cloud"
+
+    - name: "Solace Cloud Account: Gather Facts as Dict"
+      solace_cloud_account_gather_facts:
+        api_token: "{{ api_token }}"
+        account_name: "{{ sc_account_name }}"
+        return_format: dict
+      register: sca_facts_dict_result
+
+    - name: "Save Facts Dict: Solace Cloud Account"
+      copy:
+        content: "{{ sca_facts_dict_result | to_nice_json }}"
+        dest: "{{ working_dir }}/facts.dict.solace_cloud_account.{{ sc_account_name }}.json"
+      delegate_to: localhost
+      changed_when: false
+
+    - name: "Set Fact as Dict: Solace Cloud Account Services"
+      set_fact:
+        sca_services_dict_facts: "{{ sca_facts_dict_result.ansible_facts.solace_cloud_accounts[sc_account_name].services }}"
+      no_log: true
+
+    - name: "Solace Cloud Account: Gather Facts as List"
+      solace_cloud_account_gather_facts:
+        api_token: "{{ api_token }}"
+        account_name: "{{ sc_account_name }}"
+        return_format: list
+      register: sca_facts_list_result
+
+    - name: "Save Facts List: Solace Cloud Account"
+      copy:
+        content: "{{ sca_facts_list_result | to_nice_json }}"
+        dest: "{{ working_dir }}/facts.list.solace_cloud_account.{{ inventory_hostname }}.json"
+      delegate_to: localhost
+      changed_when: false
+
+    - name: "Set Fact: Solace Cloud Account Services"
+      set_fact:
+        sca_services_list_facts: "{{ sca_facts_list_result.ansible_facts.solace_cloud_accounts[sc_account_name].services }}"
+      no_log: true
+
+    - name: "Loop: Get Service for all Services By serviceId"
+      solace_cloud_get_service:
+        api_token: "{{ api_token }}"
+        service_id: "{{ sc_service.serviceId }}"
+      loop: "{{ sca_services_list_facts }}"
+      loop_control:
+        loop_var: sc_service
+        index_var: sc_service_i
+        label: "[by serviceId] Service: name={{ sc_service.name }}, id={{ sc_service.serviceId }}"
+
+    - name: "Loop: Get Service for all Services By name"
+      solace_cloud_get_service:
+        api_token: "{{ api_token }}"
+        name: "{{ sc_service.name }}"
+      loop: "{{ sca_services_list_facts }}"
+      loop_control:
+        loop_var: sc_service
+        index_var: sc_service_i
+        label: "[by name] Service: name={{ sc_service.name }}, id={{ sc_service.serviceId }}"
+
+    - name: "Loop: Get Semp Connection Params for each Service in the Solace Cloud Account"
+      include_tasks: ./tasks/get-semp-con-params.tasks.yml
+      loop: "{{ sca_services_list_facts }}"
+      loop_control:
+        loop_var: sc_service
+
+    - name: "Loop: Get Client Connection Params for each Service in the Solace Cloud Account"
+      include_tasks: ./tasks/get-client-con-params.tasks.yml
+      loop: "{{ sca_services_list_facts }}"
+      loop_control:
+        loop_var: sc_service
+
+###
+# The End.

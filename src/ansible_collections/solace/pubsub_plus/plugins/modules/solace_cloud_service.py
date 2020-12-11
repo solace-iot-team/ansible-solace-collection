@@ -240,8 +240,12 @@ class SolaceCloudServiceTask(scu.SolaceCloudTask):
 
     def get_configuration(self, sc_config, path_array, lookup_item_key=None, lookup_item_value=None):
         """Return ok flag and dict of object if found, otherwise None."""
+
         ok, resp = scu.make_get_request(sc_config, path_array)
+        # not found: ok=False, resp['status_code']==404
         if not ok:
+            if resp['status_code'] == 404:
+                return True, None
             return False, resp
         if lookup_item_key and lookup_item_value:
             service = self._find_service(resp, lookup_item_key, lookup_item_value)
