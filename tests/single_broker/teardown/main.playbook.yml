@@ -20,6 +20,7 @@
       set_fact:
         working_dir: "{{ WORKING_DIR }}"
         broker_type: "{{ BROKER_TYPE }}"
+        teardown_solace_cloud: "{{ TEARDOWN_SOLACE_CLOUD | default(True) }}"
 
     - name: "Ensure {{ working_dir }} exists"
       file:
@@ -33,7 +34,7 @@
 
     - name: "Solace Cloud Broker Teardown"
       include_tasks: ./tasks/teardown.solace-cloud.yml
-      when: broker_type == "solace_cloud"
+      when: broker_type == "solace_cloud" and teardown_solace_cloud
 
 ###
 # The End.

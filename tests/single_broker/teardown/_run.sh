@@ -23,6 +23,7 @@ source $PROJECT_HOME/.lib/functions.sh
   elif [[ "$BROKER_TYPE" == "solace_cloud" ]]; then
     if [ -z "$SOLACE_CLOUD_API_TOKEN" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN"; exit 1; fi
   else echo ">>> ERROR: - $scriptLogName - unknown BROKER_TYPE=$BROKER_TYPE"; exit 1; fi
+  if [ -z "$TEARDOWN_SOLACE_CLOUD" ]; then export TEARDOWN_SOLACE_CLOUD=True; fi
 
 ##############################################################################################################################
 # Settings
@@ -45,8 +46,8 @@ for playbook in ${playbooks[@]}; do
                   --extra-vars "WORKING_DIR=$WORKING_DIR" \
                   --extra-vars "BROKER_TYPE=$BROKER_TYPE" \
                   --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN" \
-                  --extra-vars "BROKER_DOCKER_COMPOSE_FILE=$BROKER_DOCKER_COMPOSE_FILE"
-
+                  --extra-vars "BROKER_DOCKER_COMPOSE_FILE=$BROKER_DOCKER_COMPOSE_FILE" \
+                  --extra-vars "TEARDOWN_SOLACE_CLOUD=$TEARDOWN_SOLACE_CLOUD"
   code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
 done
