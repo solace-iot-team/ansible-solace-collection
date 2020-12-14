@@ -75,33 +75,22 @@ RETURN = '''
 ansible_facts.solace:
     description: The facts as returned from the APIs.
     type: dict
-    returned: on success
+    returned: success
     elements: complex
     sample:
-
-    "ansible_facts": {
-        "solace": {
-
-        # Common
-
-            "Server": "Solace_VMR/9.6.0.27",
-            "about": {
-                "api": {
-                    "platform": "VMR",
-                    "sempVersion": "2.17"
-                },
-                "user": {
-                    "globalAccessLevel": "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER",
-                    "msgVpns": [
-                        {
-                            "accessLevel": "read-write",
-                            "msgVpnName": "default"
-                        }
-                    ]
-                }
-            }
-
-        # Service facts, vary between versions / broker, cloud ...
+        ansible_facts:
+            solace:
+                Server: "Solace_VMR/9.6.0.27"
+                about:
+                    api:
+                        platform: "VMR"
+                        sempVersion: "2.17"
+                    user:
+                        globalAccessLevel: "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER"
+                        msgVpns:
+                            - msgVpnName: "default"
+                              accessLevel: "read-write"
+                service_facts:
 
 '''
 
@@ -116,6 +105,11 @@ if not sc.HAS_IMPORT_ERROR:
 class SolaceGatherFactsTask(su.SolaceTask):
 
     def __init__(self, module):
+
+        import logging
+        logging.debug("hello, world")    
+
+
         sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
         su.SolaceTask.__init__(self, module)
         return

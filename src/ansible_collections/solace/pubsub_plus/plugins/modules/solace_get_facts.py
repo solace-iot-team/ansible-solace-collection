@@ -53,15 +53,19 @@ options:
       - get_serviceSMFMessagingEndpoints
       - get_bridge_remoteMsgVpnLocations
       - get_allClientConnectionDetails
-    functions:
+    suboptions:
       get_bridge_remoteMsgVpnLocations:
         description:
             - "Retrieve enabled remote message vpn locations (plain, secured, compressed) for the service/broker."
             - "For Solace Cloud: {hostname}:{port}."
             - "For broker: v:{virtualRouterName}."
+        type: str
+        required: no
       get_allClientConnectionDetails:
         description:
             - "Retrieve all enabled client connection details for the various protocols for the service/broker."
+        type: str
+        required: no
 
 seealso:
 - module: solace_gather_facts
@@ -121,47 +125,14 @@ RETURN = '''
 facts:
     description: The facts requested.
     type: dict
-    returned: on success
+    returned: success
     elements: complex
-    samples:
-
-        "facts": {
-            "serviceSmfCompressionListenPort": 55003,
-            "serviceSmfPlainTextListenPort": 55555,
-            "serviceSmfTlsListenPort": 55443,
-            "virtualRouterName": "single-aws-eu-west-6e-4ftdf"
-        }
-
-        "facts": {
-                "serviceMessagingEndpoints": {
-                    "SMF": {
-                        "CompressedSMF": {
-                            "uri": "tcp://mr4yqbkp31vav.messaging.solace.cloud:55003",
-                            "uriComponents": {
-                                "host": "mr4yqbkp31vav.messaging.solace.cloud",
-                                "port": 55003,
-                                "protocol": "tcp"
-                            }
-                        },
-                        "SMF": {
-                            "uri": "tcp://mr4yqbkp31vav.messaging.solace.cloud:55555",
-                            "uriComponents": {
-                                "host": "mr4yqbkp31vav.messaging.solace.cloud",
-                                "port": 55555,
-                                "protocol": "tcp"
-                            }
-                        },
-                        "SecuredSMF": {
-                            "uri": "tcps://mr4yqbkp31vav.messaging.solace.cloud:55443",
-                            "uriComponents": {
-                                "host": "mr4yqbkp31vav.messaging.solace.cloud",
-                                "port": 55443,
-                                "protocol": "tcps"
-                            }
-                        }
-                    }
-                }
-            }
+    sample:
+        facts:
+            serviceSmfCompressionListenPort: 55003
+            serviceSmfPlainTextListenPort: 55555
+            serviceSmfTlsListenPort: 55443
+            virtualRouterName: "single-aws-eu-west-6e-4ftdf"
 
 '''
 

@@ -60,12 +60,6 @@ msg:
     description: The response from the HTTP call or error description.
     type: str
 
-samples:
-
-    "is_available": false,
-    "msg": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
-
-
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc

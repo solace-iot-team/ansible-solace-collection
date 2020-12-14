@@ -22,7 +22,8 @@ description: >
   Use to retrieve the SEMP endpoints for a Solace Cloud service as inputs for other modules.
 
 seealso:
-- solace_cloud_get_facts
+  - module: solace_cloud_get_facts
+  - module: solace_get_facts
 
 notes:
 - "Reference: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm)."
@@ -47,9 +48,6 @@ options:
 
 extends_documentation_fragment:
 - solace.solace_cloud_service_config
-
-seealso:
-- module: solace_get_facts
 
 author:
   - Ricardo Gomez-Ulmke (ricardo.gomez-ulmke@solace.com)

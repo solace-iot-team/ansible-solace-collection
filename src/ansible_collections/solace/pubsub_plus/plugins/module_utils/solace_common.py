@@ -66,7 +66,7 @@ if ENABLE_LOGGING:
         logFile = loggingPathEnvVal
     logging.basicConfig(filename=logFile,
                         level=logging.DEBUG,
-                        format='%(asctime)s - %(name)s - %(levelname)s - %(funcName)s(): %(message)s')
+                        format='%(asctime)s - %(levelname)s - %(name)s - %(module)s - %(funcName)s(): %(message)s')
     logging.info('Module start #############################################################################################')
 
 ################################################################################################
