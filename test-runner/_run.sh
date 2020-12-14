@@ -33,6 +33,19 @@ brokerDockerImages=(
 )
 
 #################################################################################################################################################
+ansibleSolaceTestTargetGroup="docs"
+#################################################################################################################################################
+  echo "##############################################################################################################"
+  echo "# Test target group: $ansibleSolaceTestTargetGroup($brokerDockerImage)"
+
+  export SOLACE_PUBSUB_PLUS_COLLECTION_PATH="$PROJECT_HOME/src/ansible_collections/solace/pubsub_plus"
+  export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup"
+  mkdir -p $LOG_DIR
+  runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
+  $runScript
+  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+
+#################################################################################################################################################
 ansibleSolaceTestTargetGroup="single_broker"
 #################################################################################################################################################
 
@@ -62,6 +75,7 @@ ansibleSolaceTestTargetGroup="single_broker"
   export BROKER_TYPE="solace_cloud"
   export INVENTORY_FILE=$solaceCloudAccountInventoryFile
   export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
+  export TEARDOWN_SOLACE_CLOUD=False # keep it for next test
 
   echo "##############################################################################################################"
   echo "# test target group: $ansibleSolaceTestTargetGroup(solace_cloud)"
