@@ -82,7 +82,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install "$ANSIBLE_VERSION"
           pip install -r requirements.txt
-          pip install docker-compose
+          pip install -r tests/tests.requirements.txt
 
       - name: Test Installation
         if: env.DEBUG_FLAG == 'true'
@@ -91,6 +91,7 @@ jobs:
           ansible --version
           ansible-galaxy --version
           pip show xmltodict
+          make --version
           ls -la ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
 
       - name: Build and install collection
