@@ -32,24 +32,17 @@ source venv3.6.12/bin/activate
 (venv3.6.12) ...$ python3 -V
 
 ````
-
-### Install Ansible Components in Python Virtual Env
+### Upgrade pip
 ````bash
 (venv3.6.12) ...$ python3 -m pip install --upgrade pip
-(venv3.6.12) ...$ pip install ansible
-(venv3.6.12) ...$ pip install docker-compose
-
+````
+### Install Devel Requirements in Python Virtual Env
+````bash
+(venv3.6.12) ...$ cd devel
+(venv3.6.12) ...$ pip install -r devel.requirements.txt
+(venv3.6.12) ...$ pip install -r ../requirements.txt
 # check
 (venv3.6.12) ...$ ansible --version
-````
-
-### Install Solace Collection Requirements in Python Virtual Env
-````bash
-(venv3.6.12) ...$ pip install -r {root}/requirements.txt
-````
-### Install Python Linter in Python Virtual Env
-````bash
-(venv3.6.12) ...$ pip install pylint
 ````
 
 ### Activate Ansible-Solace Collection Devel Env

@@ -1,0 +1,5 @@
+ansible
+pylint
+Sphinx
+sphinx-rtd-theme
+ansible-doc-extractor

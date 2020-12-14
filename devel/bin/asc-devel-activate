@@ -52,7 +52,7 @@ asc-devel-deactivate () {
 }
 
 export pythonSitePackages=$(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
-#export ANSIBLE_COLLECTIONS_PATH="$projectHome/src:$pythonSitePackages"
+export ANSIBLE_COLLECTIONS_PATH="$projectHome/src:$pythonSitePackages"
 export ANSIBLE_MODULE_UTILS="$projectHome/src/ansible_collections/solace/pubsub_plus/plugins/module_utils"
 export ANSIBLE_LIBRARY="$projectHome/src/ansible_collections/solace/pubsub_plus/plugins/modules"
 export ANSIBLE_DOC_FRAGMENT_PLUGINS="$projectHome/src/ansible_collections/solace/pubsub_plus/plugins/doc_fragments"
