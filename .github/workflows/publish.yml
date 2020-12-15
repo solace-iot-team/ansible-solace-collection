@@ -46,8 +46,9 @@ jobs:
           git branch -a
           # ls -la
           echo ">>> worktree ..."
+          git worktree add gh-pages gh-pages
           # git worktree add -B gh-pages origin/gh-pages
-          git worktree add --checkout gh-pages origin/gh-pages
+          # git worktree add --checkout gh-pages origin/gh-pages
           ls -la
           # git worktree add --track -b gh-pages gh-pages origin/gh-pages
           echo ">>> cd gh-pages ..."
