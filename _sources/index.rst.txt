@@ -12,6 +12,8 @@ some intro words:
 * update 2
 * update 3
 
+generated |today|.
+
 
 Collection is freely available on `Ansible Galaxy`_.
 
