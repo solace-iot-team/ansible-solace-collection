@@ -71,7 +71,14 @@ jobs:
           cd docs/build/html
           ls -la
 
-      # Publish pages 
+      # Publish pages
+      - name: Add Worktree
+        run: |
+          git worktree add gh-pages gh-pages
+          cd gh-pages
+          ls -la
+          git status
+
 
       # - name: Publish collection
       #   env:
