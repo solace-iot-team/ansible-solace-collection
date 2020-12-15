@@ -62,8 +62,7 @@ seealso:
 - module: solace_cloud_account_gather_facts
 - module: solace_cloud_get_service
 
-author:
-  - Ricardo Gomez-Ulmke (ricardo.gomez-ulmke@solace.com)
+author: Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''

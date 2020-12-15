@@ -38,13 +38,12 @@ options:
         - if service_id is not provided, name must.
 
 extends_documentation_fragment:
-- solace.solace_cloud_service_config
+- solace.pubsub_plus.solace.solace_cloud_service_config
 
 seealso:
 - module: solace_cloud_service
 
-author:
-- Ricardo Gomez-Ulmke (ricardo.gomez-ulmke@solace.com)
+author: Ricardo Gomez-Ulmke (@rjgu)
 
 '''
 

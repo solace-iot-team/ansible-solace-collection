@@ -47,10 +47,9 @@ options:
             - Use 'list' when you want to iterate over each service in your playbook.
 
 extends_documentation_fragment:
-- solace.solace_cloud_service_config
+- solace.pubsub_plus.solace.solace_cloud_service_config
 
-author:
-  - Ricardo Gomez-Ulmke (ricardo.gomez-ulmke@solace.com)
+author: Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''

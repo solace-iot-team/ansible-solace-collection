@@ -46,11 +46,10 @@ options:
     - for state=present (to create a service), provide at least: msgVpnName, datacenterId, serviceTypeId, serviceClassId.
 
 extends_documentation_fragment:
-- solace.solace_cloud_service_config
-- solace.state
+- solace.pubsub_plus.solace.solace_cloud_service_config
+- solace.pubsub_plus.solace.state
 
-author:
-  - Ricardo Gomez-Ulmke (ricardo.gomez-ulmke@solace.com)
+author: Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''

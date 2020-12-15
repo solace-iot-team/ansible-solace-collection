@@ -43,13 +43,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible
 
-      - name: Build and publish collection
-        env:
-          ANSIBLE_GALAXY_TOKEN: ${{ secrets.ANSIBLE_GALAXY_TOKEN }}
+      - name: Install docs make dependencies
         run: |
-          cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
-          ansible-galaxy collection build .
-          ansible-galaxy collection publish *.tar.gz --api-key $ANSIBLE_GALAXY_TOKEN
+          pip install -r devel/devel.requirements.txt
+
+      - name:     
+
+
+      # - name: Build and publish collection
+      #   env:
+      #     ANSIBLE_GALAXY_TOKEN: ${{ secrets.ANSIBLE_GALAXY_TOKEN }}
+      #   run: |
+      #     cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
+      #     ansible-galaxy collection build .
+      #     ansible-galaxy collection publish *.tar.gz --api-key $ANSIBLE_GALAXY_TOKEN
 
 
 ###

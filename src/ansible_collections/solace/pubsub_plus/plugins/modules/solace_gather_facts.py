@@ -29,14 +29,14 @@ notes:
 - "Reference Solace Cloud: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm) - Get Service / Connections Details."
 
 extends_documentation_fragment:
-- solace.broker
-- solace.solace_cloud_config
+- solace.pubsub_plus.solace.broker
+- solace.pubsub_plus.solace.solace_cloud_config
 
 seealso:
 - module: solace_get_facts
 
 author:
-  - Ricardo Gomez-Ulmke (ricardo.gomez-ulmke@solace.com)
+  - Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -102,14 +102,10 @@ if not sc.HAS_IMPORT_ERROR:
     import requests
     import xmltodict
 
+
 class SolaceGatherFactsTask(su.SolaceTask):
 
     def __init__(self, module):
-
-        import logging
-        logging.debug("hello, world")    
-
-
         sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
         su.SolaceTask.__init__(self, module)
         return
@@ -206,12 +202,12 @@ def make_get_request(solace_config, path_array):
 
     try:
         resp = requests.get(
-                    solace_config.vmr_url + path,
-                    json=None,
-                    auth=solace_config.vmr_auth,
-                    timeout=solace_config.vmr_timeout,
-                    headers={'x-broker-name': solace_config.x_broker},
-                    params=None
+            solace_config.vmr_url + path,
+            json=None,
+            auth=solace_config.vmr_auth,
+            timeout=solace_config.vmr_timeout,
+            headers={'x-broker-name': solace_config.x_broker},
+            params=None
         )
         if sc.ENABLE_LOGGING:
             sc.log_http_roundtrip(resp)
@@ -229,13 +225,13 @@ def make_sempv1_post_request(solace_config, xml_data):
         'x-broker-name': solace_config.x_broker
     }
     resp = requests.post(
-                solace_config.vmr_url + "/SEMP",
-                data=xml_data,
-                auth=solace_config.vmr_auth,
-                timeout=solace_config.vmr_timeout,
-                headers=headers,
-                params=None
-            )
+        solace_config.vmr_url + "/SEMP",
+        data=xml_data,
+        auth=solace_config.vmr_auth,
+        timeout=solace_config.vmr_timeout,
+        headers=headers,
+        params=None
+    )
     if sc.ENABLE_LOGGING:
         sc.log_http_roundtrip(resp)
     if resp.status_code != 200:

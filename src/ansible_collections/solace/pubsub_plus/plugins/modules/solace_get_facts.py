@@ -70,8 +70,7 @@ options:
 seealso:
 - module: solace_gather_facts
 
-author:
-  - Ricardo Gomez-Ulmke (ricardo.gomez-ulmke@solace.com)
+author: Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
