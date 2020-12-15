@@ -34,7 +34,7 @@ mkdir -p $LOG_DIR
 
 FAILED=0
 # $scriptDir/_run.sh > $LOG_DIR/$scriptLogName.out 2>&1
-$scriptDir/_run.sh
+$scriptDir/_run.integration.sh
 code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - $scriptLogName"; FAILED=1; fi
 
 ##############################################################################################################################

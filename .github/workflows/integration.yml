@@ -15,9 +15,9 @@ env:
   DEBUG_FLAG: ${{ true }}
 
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
-  TEST_TEST_RUNNER_SCRIPT: "test-runner/run.wf.sh"
-  TEST_TEST_RUNNER_LOGS_NAME: test-runner-logs
-  TEST_RUNNER_LOGS_DIR: logs
+  TEST_TEST_RUNNER_SCRIPT: "test-runner/run.integration.sh"
+  TEST_TEST_RUNNER_LOGS_NAME: test-runner-integration-logs
+  TEST_RUNNER_LOGS_DIR: integration-logs
 
 jobs:
   integration_test:
@@ -91,7 +91,6 @@ jobs:
           ansible --version
           ansible-galaxy --version
           pip show xmltodict
-          make --version
           ls -la ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
 
       - name: Build and install collection
@@ -106,8 +105,6 @@ jobs:
           pwd
           ls -la
           ansible-galaxy collection list -vvv solace.pubsub_plus
-          ansible-doc solace.pubsub_plus.solace_get_available
-
 
       - name: Run Tests
         run: |

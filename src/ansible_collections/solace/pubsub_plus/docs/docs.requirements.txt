@@ -1,4 +1,0 @@
-ansible
-Sphinx
-sphinx-rtd-theme
-ansible-doc-extractor

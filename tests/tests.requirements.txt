@@ -1,5 +1,1 @@
-ansible
 docker-compose
-Sphinx
-sphinx-rtd-theme
-ansible-doc-extractor

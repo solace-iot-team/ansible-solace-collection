@@ -1,5 +1,9 @@
 ansible
 pylint
+pycodestyle
+voluptuous
+yamllint
 Sphinx
 sphinx-rtd-theme
 ansible-doc-extractor
+docker-compose

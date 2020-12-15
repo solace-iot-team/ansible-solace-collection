@@ -23,8 +23,8 @@ description: >
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 
-author:
-  - Ricardo Gomez-Ulmke (ricardo.gomez-ulmke@solace.com)
+author: Ricardo Gomez-Ulmke (@rjgu)
+
 '''
 
 EXAMPLES = '''
@@ -56,9 +56,11 @@ RETURN = '''
 is_available:
     description: Flag indicating whether broker was reachable or not.
     type: bool
+    returned: always
 msg:
     description: The response from the HTTP call or error description.
     type: str
+    returned: error
 
 '''
 
@@ -67,6 +69,7 @@ import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils 
 from ansible.module_utils.basic import AnsibleModule
 if not sc.HAS_IMPORT_ERROR:
     import requests
+
 
 class SolaceGetAvailableTask(su.SolaceTask):
 
@@ -88,12 +91,12 @@ def make_get_request(solace_config, path_array):
 
     try:
         resp = requests.get(
-                    solace_config.vmr_url + path,
-                    json=None,
-                    auth=solace_config.vmr_auth,
-                    timeout=solace_config.vmr_timeout,
-                    headers={'x-broker-name': solace_config.x_broker},
-                    params=None
+            solace_config.vmr_url + path,
+            json=None,
+            auth=solace_config.vmr_auth,
+            timeout=solace_config.vmr_timeout,
+            headers={'x-broker-name': solace_config.x_broker},
+            params=None
         )
         if sc.ENABLE_LOGGING:
             sc.log_http_roundtrip(resp)
@@ -134,6 +137,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-###
-# The End.
