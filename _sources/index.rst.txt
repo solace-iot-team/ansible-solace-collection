@@ -7,7 +7,9 @@ Solace PubSub+ Ansible Collection
 =================================
 
 some intro words:
-- update 1
+
+* update 1
+* update 2
 
 
 Collection is freely available on `Ansible Galaxy`_.
