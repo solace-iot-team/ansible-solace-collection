@@ -23,7 +23,7 @@ source $PROJECT_HOME/.lib/functions.sh
 # Settings
 scriptLogName=$scriptName
 SOLACE_PUBSUB_PLUS_COLLECTION_PATH="$PROJECT_HOME/src/ansible_collections/solace/pubsub_plus"
-export ANSIBLE_DOC_FRAGMENT_PLUGINS="$SOLACE_PUBSUB_PLUS_COLLECTION_PATH/plugins/doc_fragments"
+# export ANSIBLE_DOC_FRAGMENT_PLUGINS="$SOLACE_PUBSUB_PLUS_COLLECTION_PATH/plugins/doc_fragments"
 
 ############################################################################################################################
 # Prepare
@@ -37,7 +37,7 @@ export ANSIBLE_DOC_FRAGMENT_PLUGINS="$SOLACE_PUBSUB_PLUS_COLLECTION_PATH/plugins
   echo "##############################################################################################################"
   echo "# make docs"
 
-  echo "ANSIBLE_DOC_FRAGMENT_PLUGINS=$ANSIBLE_DOC_FRAGMENT_PLUGINS"  
+  echo "ANSIBLE_DOC_FRAGMENT_PLUGINS=$ANSIBLE_DOC_FRAGMENT_PLUGINS"
 
 
   runScriptDir="$SOLACE_PUBSUB_PLUS_COLLECTION_PATH/docs"
