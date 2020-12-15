@@ -47,11 +47,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible
 
-      - name: Build collection
-        run: |
-          cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
-          ansible-galaxy collection build .
-
       - name: Build and install collection
         run: |
           cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
@@ -75,6 +70,8 @@ jobs:
           cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
           cd docs/build/html
           ls -la
+
+      # Publish pages 
 
       # - name: Publish collection
       #   env:
