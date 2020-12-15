@@ -81,7 +81,7 @@ jobs:
           rsync -av ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/docs/build/html/ gh-pages/
           cd gh-pages
           git add -A
-          git commit --allow-empty -F generated.txt
+          git commit --allow-empty -F ../generated.txt
           # git push -f -u origin gh-pages
           git push -u origin gh-pages
 
