@@ -74,10 +74,12 @@ jobs:
       # Publish pages
       - name: Add Worktree
         run: |
+          git status
+          git branch -a
           # git worktree add -B gh-pages origin/gh-pages
-          git worktree add --checkout gh-pages origin/gh-pages
-          cd gh-pages
-          ls -la
+          # git worktree add --checkout gh-pages origin/gh-pages
+          # cd gh-pages
+          # ls -la
           git status
 
 
