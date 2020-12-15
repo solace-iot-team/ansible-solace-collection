@@ -1,3 +1,3 @@
-# Ansible Collection - solace.pubsub_plus
+# Solace PubSub+ Ansible Collection
 
-Documentation for the collection.
+> :warning: **UNDER CONSTRUCTION**
