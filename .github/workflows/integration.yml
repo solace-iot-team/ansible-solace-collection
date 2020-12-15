@@ -106,6 +106,8 @@ jobs:
           pwd
           ls -la
           ansible-galaxy collection list -vvv solace.pubsub_plus
+          ansible-doc solace_get_available
+
 
       - name: Run Tests
         run: |
