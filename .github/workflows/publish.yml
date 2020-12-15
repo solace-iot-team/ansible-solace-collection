@@ -14,6 +14,7 @@ env:
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
   DOCS_MAKE_SCRIPT: "test-runner/run.make.docs.sh"
   TEST_RUNNER_LOGS_DIR: publish-logs
+  TEST_TEST_RUNNER_LOGS_NAME: test-runner-publish-logs
 
 jobs:
   publish:
@@ -71,6 +72,12 @@ jobs:
       #     ansible-galaxy collection build .
       #     ansible-galaxy collection publish *.tar.gz --api-key $ANSIBLE_GALAXY_TOKEN
 
-
+      - name: Archive logs
+        if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED != 'false' && github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.TEST_TEST_RUNNER_LOGS_NAME }}
+          path: ${{ github.workspace }}/${{ env.TEST_RUNNER_LOGS_DIR }}
+          if-no-files-found: error
 ###
 # The End.
