@@ -37,25 +37,25 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: TEST-TEST
-        run: |
-          git status
-          git branch -a
-          echo ">>>> git fetch origin gh-pages"
-          git fetch origin gh-pages
-          git branch -a
-          # ls -la
-          echo ">>> worktree ..."
-          git worktree add gh-pages gh-pages
-          # git worktree add -B gh-pages origin/gh-pages
-          # git worktree add --checkout gh-pages origin/gh-pages
-          ls -la
-          # git worktree add --track -b gh-pages gh-pages origin/gh-pages
-          echo ">>> cd gh-pages ..."
-          cd gh-pages
-          git status
-          ls -la
-          exit 1
+      # - name: TEST-TEST
+      #   run: |
+      #     git status
+      #     git branch -a
+      #     echo ">>>> git fetch origin gh-pages"
+      #     git fetch origin gh-pages
+      #     git branch -a
+      #     # ls -la
+      #     echo ">>> worktree ..."
+      #     git worktree add gh-pages gh-pages
+      #     # git worktree add -B gh-pages origin/gh-pages
+      #     # git worktree add --checkout gh-pages origin/gh-pages
+      #     ls -la
+      #     # git worktree add --track -b gh-pages gh-pages origin/gh-pages
+      #     echo ">>> cd gh-pages ..."
+      #     cd gh-pages
+      #     git status
+      #     ls -la
+      #     exit 1
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -91,17 +91,15 @@ jobs:
           cd docs/build/html
           ls -la
 
-      # Publish pages
-      - name: Add Worktree
+      - name: Publish gh-pages
         run: |
-          git status
-          git branch -a
-          # git worktree add -B gh-pages origin/gh-pages
-          # git worktree add --checkout gh-pages origin/gh-pages
-          # git worktree add --track -b gh-pages gh-pages origin/gh-pages
-          # cd gh-pages
-          # ls -la
-          git status
+          git fetch origin gh-pages
+          git worktree add gh-pages gh-pages
+          rsync -av ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/docs/build/html/ gh-pages/
+          cd gh-pages
+          git add -A
+          git commit -m "updating gh-pages"
+          git push -u origin gh-pages
 
 
       # - name: Publish collection
