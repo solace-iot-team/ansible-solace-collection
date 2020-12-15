@@ -1,0 +1,372 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>solace_get_facts – Provides convenience functions to access solace facts gathered with solace_gather_facts. &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="solace_get_available – Check if broker/service is reachable and responsive." href="solace_get_available.html" />
+    <link rel="prev" title="solace_gather_facts – Retrieve facts from the Solace event broker and set ‘ansible_facts.solace’." href="solace_gather_facts.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Solace PubSub+ Ansible Collection 
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Using Solace PubSub+ Ansible Collection</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Solace PubSub+</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts of Solace PubSub+</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../facts_and_general_modules.html#facts-general-module-reference">Facts &amp; General Module Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="solace_gather_facts.html">solace_gather_facts – Retrieve facts from the Solace event broker and set ‘ansible_facts.solace’.</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_facts – Provides convenience functions to access solace facts gathered with <span class="xref std std-ref">solace_gather_facts</span>.</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_available.html">solace_get_available – Check if broker/service is reachable and responsive.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_account_gather_facts.html">solace_cloud_account_gather_facts – Retrieves service info (facts) about all services available in the Solace Cloud Account.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_facts.html">solace_cloud_get_facts – Provides convenience functions to access solace facts gathered with <span class="xref std std-ref">solace_cloud_account_gather_facts</span>.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Solace PubSub+ Ansible Collection </a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../facts_and_general_modules.html">Fact &amp; General Modules</a> &raquo;</li>
+        
+      <li>solace_get_facts – Provides convenience functions to access solace facts gathered with <span class="xref std std-ref">solace_gather_facts</span>.</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_get_facts.py" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="solace-get-facts-provides-convenience-functions-to-access-solace-facts-gathered-with-solace-gather-facts">
+<span id="solace-get-facts-module"></span><h1>solace_get_facts – Provides convenience functions to access solace facts gathered with <a class="reference internal" href="solace_gather_facts.html#solace-gather-facts-module"><span class="std std-ref">solace_gather_facts</span></a>.<a class="headerlink" href="#solace-get-facts-provides-convenience-functions-to-access-solace-facts-gathered-with-solace-gather-facts" title="Permalink to this headline">¶</a></h1>
+<p>Provides convenience functions to access solace facts from ‘ansible_facts.solace’. Call <a class="reference internal" href="solace_gather_facts.html#solace-gather-facts-module"><span class="std std-ref">solace_gather_facts</span></a> first.</p>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Gather Solace Facts</span>
+  <span class="nt">solace_gather_facts</span><span class="p">:</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Get</span><span class="nv"> </span><span class="s">Host</span><span class="nv"> </span><span class="s">SMF</span><span class="nv"> </span><span class="s">Messaging</span><span class="nv"> </span><span class="s">Endpoints</span><span class="nv"> </span><span class="s">Facts:</span><span class="nv"> </span><span class="s">solace-cloud-1&quot;</span>
+  <span class="nt">solace_get_facts</span><span class="p">:</span>
+    <span class="nt">hostvars</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">hostvars</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace-cloud-1</span>
+    <span class="nt">fields</span><span class="p">:</span>
+    <span class="nt">field_funcs</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSMFMessagingEndpoints</span>
+  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace_cloud_1_smf_enpoints_facts</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Get</span><span class="nv"> </span><span class="s">Host</span><span class="nv"> </span><span class="s">Service</span><span class="nv"> </span><span class="s">Items:</span><span class="nv"> </span><span class="s">local&quot;</span>
+  <span class="nt">solace_get_facts</span><span class="p">:</span>
+    <span class="nt">hostvars</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">hostvars</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">local</span>
+    <span class="nt">fields</span><span class="p">:</span>
+    <span class="nt">field_funcs</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSmfPlainTextListenPort</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSmfCompressionListenPort</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSmfTlsListenPort</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_virtualRouterName</span>
+  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">local_service_facts</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Get</span><span class="nv"> </span><span class="s">Host</span><span class="nv"> </span><span class="s">Service</span><span class="nv"> </span><span class="s">Items:</span><span class="nv"> </span><span class="s">solace-cloud-1&quot;</span>
+  <span class="nt">solace_get_facts</span><span class="p">:</span>
+    <span class="nt">hostvars</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">hostvars</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace-cloud-1</span>
+    <span class="nt">field_funcs</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSmfPlainTextListenPort</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSmfCompressionListenPort</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSmfTlsListenPort</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_virtualRouterName</span>
+  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace_cloud_1_service_facts</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Show</span><span class="nv"> </span><span class="s">Host</span><span class="nv"> </span><span class="s">Service</span><span class="nv"> </span><span class="s">Facts&quot;</span>
+  <span class="nt">debug</span><span class="p">:</span>
+    <span class="nt">msg</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;local_service_facts:&quot;</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">local_service_facts</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;solace_cloud_1_service_facts:&quot;</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">solace_cloud_1_service_facts</span> <span class="cp">}}</span><span class="s">&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In order to access other hosts’ (other than the current ‘inventory_host’) facts, you must not use the ‘serial’ strategy for the playbook.</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="solace_gather_facts.html#solace-gather-facts-module"><span class="std std-ref">solace_gather_facts – Retrieve facts from the Solace event broker and set ‘ansible_facts.solace’.</span></a></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>field_funcs (optional)</dt><dd><p>List of pre-built field functions that retrieve values from hostvars.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>choices</strong>: get_serviceSmfPlainTextListenPort, get_serviceSmfCompressionListenPort, get_serviceSmfTlsListenPort, get_virtualRouterName, get_serviceSMFMessagingEndpoints, get_bridge_remoteMsgVpnLocations, get_allClientConnectionDetails</div>
+</div>
+<dl>
+<dt>get_allClientConnectionDetails (optional)</dt><dd><p>Retrieve all enabled client connection details for the various protocols for the service/broker.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>get_bridge_remoteMsgVpnLocations (optional)</dt><dd><p>Retrieve enabled remote message vpn locations (plain, secured, compressed) for the service/broker.</p>
+<p>For Solace Cloud: {hostname}:{port}.</p>
+<p>For broker: v:{virtualRouterName}.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt>fields (optional)</dt><dd><p>List of field names to retrieve from hostvars.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: list</div>
+</div>
+</dd>
+<dt>host (required)</dt><dd><p>The playbook host to retrieve the facts from.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>hostvars (required)</dt><dd><p>The playbook’s ‘hostvars’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="return-values">
+<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>facts</dt><dd><p>The facts requested.</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: success</div>
+<div class="line"><strong>type</strong>: dict</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
+  <span class="nt">&quot;facts&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;serviceSmfCompressionListenPort&quot;</span><span class="p">:</span> <span class="mi">55003</span><span class="p">,</span>
+    <span class="nt">&quot;serviceSmfPlainTextListenPort&quot;</span><span class="p">:</span> <span class="mi">55555</span><span class="p">,</span>
+    <span class="nt">&quot;serviceSmfTlsListenPort&quot;</span><span class="p">:</span> <span class="mi">55443</span><span class="p">,</span>
+    <span class="nt">&quot;virtualRouterName&quot;</span><span class="p">:</span> <span class="s2">&quot;single-aws-eu-west-6e-4ftdf&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="solace_get_available.html" class="btn btn-neutral float-right" title="solace_get_available – Check if broker/service is reachable and responsive." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="solace_gather_facts.html" class="btn btn-neutral float-left" title="solace_gather_facts – Retrieve facts from the Solace event broker and set ‘ansible_facts.solace’." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

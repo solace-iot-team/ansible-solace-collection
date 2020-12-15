@@ -1,0 +1,155 @@
+:github_url: https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_cloud_account_gather_facts.py
+
+.. _solace_cloud_account_gather_facts_module:
+
+solace_cloud_account_gather_facts -- Retrieves service info (facts) about all services available in the Solace Cloud Account.
+=============================================================================================================================
+
+Retrieves service info (facts) about all services available in the Solace Cloud Account. Stores the facts in: ['ansible_facts']['solace_cloud_accounts'][{service-name}]. Use to retrieve the SEMP endpoints for a Solace Cloud service as inputs for other modules.
+
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   - name: "Solace Cloud Account: Gather Facts as Dict"
+     solace_cloud_account_gather_facts:
+       api_token: "{{ api_token_all_permissions }}"
+       account_name: "{{ inventory_hostname }}"
+       return_format: dict
+     register: sca_facts_dict_result
+
+   - name: "Save Facts Dict: Solace Cloud Account"
+     local_action:
+       module: copy
+       content: "{{ sca_facts_dict_result | to_nice_json }}"
+       dest: "./tmp/facts.dict.solace_cloud_account.{{ inventory_hostname }}.json"
+
+   - name: "Set Fact as Dict: Solace Cloud Account Services"
+     set_fact:
+       sca_services_dict_facts: "{{ sca_facts_dict_result.ansible_facts.solace_cloud_accounts[inventory_hostname].services }}"
+     no_log: true
+
+   - name: "Solace Cloud Account: Gather Facts as List"
+     solace_cloud_account_gather_facts:
+       api_token: "{{ api_token_all_permissions }}"
+       account_name: "{{ inventory_hostname }}"
+       return_format: list
+     register: sca_facts_list_result
+
+   - name: "Save Facts List: Solace Cloud Account"
+     local_action:
+       module: copy
+       content: "{{ sca_facts_list_result | to_nice_json }}"
+       dest: "./tmp/facts.list.solace_cloud_account.{{ inventory_hostname }}.json"
+
+   - name: "Set Fact: Solace Cloud Account Services"
+     set_fact:
+       sca_services_list_facts: "{{ sca_facts_list_result.ansible_facts.solace_cloud_accounts[inventory_hostname].services }}"
+     no_log: true
+
+   - name: "Loop: Get Service for all Services By serviceId"
+     solace_cloud_get_service:
+       api_token: "{{ api_token_all_permissions }}"
+       service_id: "{{ sc_service.serviceId }}"
+     loop: "{{ sca_services_list_facts }}"
+     loop_control:
+       loop_var: sc_service
+       index_var: sc_service_i
+       label: "[by serviceId] Service: name={{ sc_service.name }}, id={{ sc_service.serviceId }}"
+
+
+
+
+
+Notes
+-----
+
+.. note::
+   Reference: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm.
+
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_cloud_get_facts_module`
+   - :ref:`solace_get_facts_module`
+
+
+
+Parameters
+----------
+
+account_name (required)
+  The host specified in the inventory. Represents the Solace Cloud Account.
+
+  | **type**: str
+
+api_token (required)
+  The API Token.
+
+  | **type**: str
+  | **default**: None
+
+return_format (required)
+  The format of the returned JSON. Either as a JSON object or a JSON array.
+
+
+  | **type**: str
+  | **choices**: dict, list
+
+timeout (optional)
+  Connection timeout in seconds for the http/s request.
+
+  | **type**: int
+  | **default**: 60
+
+
+
+
+
+Return Values
+-------------
+
+rc
+  return code, either 0 (ok), 1 (not ok)
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+msg
+  error message if not ok
+
+  | **returned**: always
+  | **type**: str
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+response
+  The response from the GET {serviceId} call. Differs depending on state of service.
+
+  | **returned**: always
+  | **type**: complex
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+

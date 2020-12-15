@@ -1,0 +1,172 @@
+:github_url: https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_gather_facts.py
+
+.. _solace_gather_facts_module:
+
+solace_gather_facts -- Retrieve facts from the Solace event broker and set 'ansible_facts.solace'.
+==================================================================================================
+
+Retrieves facts from the Solace event broker and set 'ansible_facts.solace'. Call at the beginning of the playbook so all subsequent tasks can use '{{ ansible_facts.solace.<path-to-fact> }}' or :ref:`solace_get_facts <solace_get_facts_module>` module. Supports Solace Cloud and brokers. Retrieves: service/broker info, about info, virtual router name, messaging endpoints, etc.
+
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   -
+     name: "Get Information about the broker / service"
+     hosts: "{{ brokers }}"
+     gather_facts: no
+     any_errors_fatal: true
+     collections:
+       - solace.pubsub_plus
+     module_defaults:
+       solace_gather_facts:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+
+     tasks:
+
+       - name: Gather Solace Facts
+         solace_gather_facts:
+
+       - name: "Save hostvars to ./hostvars.json"
+         local_action:
+           module: copy
+           content: "{{ hostvars | to_nice_json }}"
+           dest: ./hostvars.json
+
+
+
+
+Notes
+-----
+
+.. note::
+   In order to access other hosts' (other than the current 'inventory_host') facts, you must not use the 'serial' strategy for the playbook.
+
+   Reference about: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about.
+
+   Reference broker: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/all/getBroker.
+
+   Reference Solace Cloud: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm - Get Service / Connections Details.
+
+   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
+
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_get_facts_module`
+
+
+
+Parameters
+----------
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+
+solace_cloud_api_token (optional)
+  The API Token.
+
+  | **type**: str
+  | **default**: None
+
+solace_cloud_service_id (optional)
+  The service id in Solace Cloud.
+
+  | **type**: str
+  | **default**: None
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+ansible_facts.solace
+  The facts as returned from the APIs.
+
+  | **returned**: success
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "ansible_facts": {
+       "solace": {
+         "Server": "Solace_VMR/9.6.0.27",
+         "about": {
+           "api": {
+             "platform": "VMR",
+             "sempVersion": "2.17"
+           },
+           "user": {
+             "globalAccessLevel": "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER",
+             "msgVpns": [
+               {
+                 "accessLevel": "read-write",
+                 "msgVpnName": "default"
+               }
+             ]
+           }
+         },
+         "service_facts": null
+       }
+     }
+   }
+
+

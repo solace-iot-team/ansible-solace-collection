@@ -1,0 +1,187 @@
+:github_url: https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_cloud_get_facts.py
+
+.. _solace_cloud_get_facts_module:
+
+solace_cloud_get_facts -- Provides convenience functions to access solace facts gathered with :ref:`solace_cloud_account_gather_facts <solace_cloud_account_gather_facts_module>`.
+==================================================================================================================================================================================
+
+Provides convenience functions to access Solace Cloud service facts gathered with :ref:`solace_cloud_account_gather_facts <solace_cloud_account_gather_facts_module>`. Call :ref:`solace_cloud_account_gather_facts <solace_cloud_account_gather_facts_module>`.
+
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+
+       - name: "Get Service: {{ sc_service.name }}"
+         solace_cloud_get_service:
+           api_token: "{{ api_token_all_permissions }}"
+           service_id: "{{ sc_service.serviceId }}"
+         register: result
+
+       - name: "Set Fact: Solace Service Details"
+         set_fact:
+           sc_service_details: "{{ result.response }}"
+           - name: "Get Semp Management Endpoints for: {{ sc_service.name }}"
+             solace_cloud_get_facts:
+               from_dict: "{{ sc_service_details }}"
+               field_funcs:
+                 - get_serviceSEMPManagementEndpoints
+             register: semp_enpoints_facts
+
+       - name: "Save Solace Cloud Service SEMP Management Endpoints to File"
+         local_action:
+           module: copy
+           content: "{{ semp_enpoints_facts | to_nice_json }}"
+           dest: "./tmp/facts.solace_cloud_service.{{ sc_service.name }}.semp.json"
+
+       - name: "Set Fact: Solace Service SEMP"
+         set_fact:
+           sempv2_host: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.host }}"
+           sempv2_port: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.port }}"
+           sempv2_is_secure_connection: True
+           sempv2_username: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.username }}"
+           sempv2_password: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.password }}"
+           sempv2_timeout: 60
+
+       - name: "Gather Solace Facts from Service"
+         solace_gather_facts:
+           host: "{{ sempv2_host }}"
+           port: "{{ sempv2_port }}"
+           secure_connection: "{{ sempv2_is_secure_connection }}"
+           username: "{{ sempv2_username }}"
+           password: "{{ sempv2_password }}"
+           timeout: "{{ sempv2_timeout }}"
+           solace_cloud_api_token: "{{ api_token_all_permissions }}"
+           solace_cloud_service_id: "{{ sc_service.serviceId }}"
+
+       - name: "Show ansible_facts.solace"
+         debug:
+           msg:
+             - "ansible_facts.solace:"
+             - "{{ ansible_facts.solace }}"
+
+       - name: "Save Solace Cloud Service Facts to File"
+         local_action:
+           module: copy
+           content: "{{ ansible_facts.solace | to_nice_json }}"
+           dest: "./tmp/solace_facts.solace_cloud_service.{{ sc_service.name }}.json"
+
+       - name: "Get Host Inventory for: {{ sc_service.name }}"
+         solace_cloud_get_facts:
+           from_dict: "{{ sc_service_details }}"
+           get_formattedHostInventory:
+             host_entry: "{{ sc_service.name }}"
+             api_token: "{{ api_token_all_permissions }}"
+             meta:
+               service_name: "{{ sc_service_details.name }}"
+               service_id: "{{ sc_service_details.serviceId }}"
+               datacenterId: "{{ sc_service_details.datacenterId }}"
+               serviceTypeId: "{{ sc_service_details.serviceTypeId}}"
+               serviceClassId: "{{ sc_service_details.serviceClassId }}"
+               serviceClassDisplayedAttributes: "{{ sc_service_details.serviceClassDisplayedAttributes }}"
+         register: inv_results
+
+       - name: "Save Solace Cloud Service inventory to File"
+         local_action:
+           module: copy
+           content: "{{ inv_results.facts.formattedHostInventory | to_nice_json }}"
+           dest: "./tmp/inventory.{{ sc_service.name }}.json"
+
+
+
+
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_cloud_account_gather_facts_module`
+   - :ref:`solace_cloud_get_service_module`
+
+
+
+Parameters
+----------
+
+field_funcs (optional)
+  List of pre-built field functions that retrieve values from the 'from_dict'.
+
+  | **type**: list
+  | **choices**: get_serviceSEMPManagementEndpoints
+
+from_dict (required)
+  The JSON object (dict) which holds the facts. This is direct result from the GET {service} call.
+
+  | **type**: dict
+
+get_formattedHostInventory (optional)
+  Get the facts formatted as a JSON host inventory. Retrieve the inventory field by field or save to file and use in subsequent playbooks as an inventory.
+
+
+  | **type**: dict
+
+  api_token (required)
+    The API token to access the Solace Cloud Service API.
+
+    | **type**: str
+
+  host_entry (required)
+    The entry for this broker / service in the hosts file. Must be a valid JSON key.
+
+    | **type**: str
+
+  meta (required)
+    Additional meta data describing the service instance.
+
+    | **type**: dict
+
+
+
+
+
+
+Return Values
+-------------
+
+rc
+  return code, either 0 (ok), 1 (not ok)
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+msg
+  error message if not ok
+
+  | **returned**: always
+  | **type**: str
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+facts
+  The facts retrieved from the input.
+
+  | **returned**: always
+  | **type**: complex
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+

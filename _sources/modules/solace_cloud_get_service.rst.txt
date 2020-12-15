@@ -1,0 +1,120 @@
+:github_url: https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_cloud_get_service.py
+
+.. _solace_cloud_get_service_module:
+
+solace_cloud_get_service -- Get the Solace Cloud Service details.
+=================================================================
+
+Get the Solace Cloud Service details by name or serviceId.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+
+       - name: "Get service details"
+         solace_cloud_get_service:
+           api_token: "{{ api_token_all_permissions }}"
+           service_id: "{{ sc_service_created_id }}"
+         register: get_service_result
+
+       - set_fact:
+           sc_service_created_info: "{{ result.response }}"
+
+       - name: "Save Solace Cloud Service Facts to File"
+         local_action:
+           module: copy
+           content: "{{ sc_service_created_info | to_nice_json }}"
+           dest: "./tmp/facts.solace_cloud_service.{{ sc_service.name }}.json"
+
+
+
+
+Notes
+-----
+
+.. note::
+   Reference: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm.
+
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_cloud_service_module`
+
+
+
+Parameters
+----------
+
+api_token (required)
+  The API Token.
+
+  | **type**: str
+  | **default**: None
+
+name (optional)
+  The name of the service.
+
+  | **type**: str
+
+service_id (optional)
+  The service id.
+
+  | **type**: str
+
+timeout (optional)
+  Connection timeout in seconds for the http/s request.
+
+  | **type**: int
+  | **default**: 60
+
+
+
+
+
+Return Values
+-------------
+
+rc
+  return code, either 0 (ok), 1 (not ok)
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+msg
+  error message if not ok
+
+  | **returned**: always
+  | **type**: str
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+response
+  The response from the get call. Differs depending on state of service.
+
+  | **returned**: always
+  | **type**: complex
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+

@@ -1,0 +1,147 @@
+:github_url: https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_get_facts.py
+
+.. _solace_get_facts_module:
+
+solace_get_facts -- Provides convenience functions to access solace facts gathered with :ref:`solace_gather_facts <solace_gather_facts_module>`.
+================================================================================================================================================
+
+Provides convenience functions to access solace facts from 'ansible_facts.solace'. Call :ref:`solace_gather_facts <solace_gather_facts_module>` first.
+
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+
+       - name: Gather Solace Facts
+         solace_gather_facts:
+
+       - name: "Get Host SMF Messaging Endpoints Facts: solace-cloud-1"
+         solace_get_facts:
+           hostvars: "{{ hostvars }}"
+           host: solace-cloud-1
+           fields:
+           field_funcs:
+             - get_serviceSMFMessagingEndpoints
+         register: solace_cloud_1_smf_enpoints_facts
+
+       - name: "Get Host Service Items: local"
+         solace_get_facts:
+           hostvars: "{{ hostvars }}"
+           host: local
+           fields:
+           field_funcs:
+             - get_serviceSmfPlainTextListenPort
+             - get_serviceSmfCompressionListenPort
+             - get_serviceSmfTlsListenPort
+             - get_virtualRouterName
+         register: local_service_facts
+
+       - name: "Get Host Service Items: solace-cloud-1"
+         solace_get_facts:
+           hostvars: "{{ hostvars }}"
+           host: solace-cloud-1
+           field_funcs:
+             - get_serviceSmfPlainTextListenPort
+             - get_serviceSmfCompressionListenPort
+             - get_serviceSmfTlsListenPort
+             - get_virtualRouterName
+         register: solace_cloud_1_service_facts
+
+       - name: "Show Host Service Facts"
+         debug:
+           msg:
+             - "local_service_facts:"
+             - "{{ local_service_facts }}"
+             - "solace_cloud_1_service_facts:"
+             - "{{ solace_cloud_1_service_facts }}"
+
+
+
+Notes
+-----
+
+.. note::
+   In order to access other hosts' (other than the current 'inventory_host') facts, you must not use the 'serial' strategy for the playbook.
+
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_gather_facts_module`
+
+
+
+Parameters
+----------
+
+field_funcs (optional)
+  List of pre-built field functions that retrieve values from hostvars.
+
+  | **type**: list
+  | **choices**: get_serviceSmfPlainTextListenPort, get_serviceSmfCompressionListenPort, get_serviceSmfTlsListenPort, get_virtualRouterName, get_serviceSMFMessagingEndpoints, get_bridge_remoteMsgVpnLocations, get_allClientConnectionDetails
+
+  get_allClientConnectionDetails (optional)
+    Retrieve all enabled client connection details for the various protocols for the service/broker.
+
+    | **type**: str
+
+  get_bridge_remoteMsgVpnLocations (optional)
+    Retrieve enabled remote message vpn locations (plain, secured, compressed) for the service/broker.
+
+    For Solace Cloud: {hostname}:{port}.
+
+    For broker: v:{virtualRouterName}.
+
+    | **type**: str
+
+
+fields (optional)
+  List of field names to retrieve from hostvars.
+
+  | **type**: list
+
+host (required)
+  The playbook host to retrieve the facts from.
+
+  | **type**: str
+
+hostvars (required)
+  The playbook's 'hostvars'.
+
+  | **type**: dict
+
+
+
+
+
+Return Values
+-------------
+
+facts
+  The facts requested.
+
+  | **returned**: success
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "facts": {
+       "serviceSmfCompressionListenPort": 55003,
+       "serviceSmfPlainTextListenPort": 55555,
+       "serviceSmfTlsListenPort": 55443,
+       "virtualRouterName": "single-aws-eu-west-6e-4ftdf"
+     }
+   }
+
+

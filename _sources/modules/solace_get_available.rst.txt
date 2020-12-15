@@ -1,0 +1,128 @@
+:github_url: https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_get_available.py
+
+.. _solace_get_available_module:
+
+solace_get_available -- Check if broker/service is reachable and responsive.
+============================================================================
+
+Check if broker/service is reachable and responsive. Calls "GET /about" and sets "is_available=True/False".
+
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   -
+     name: "Check/wait until brokers available"
+     hosts: "{{ brokers }}"
+     gather_facts: no
+     any_errors_fatal: true
+     module_defaults:
+       solace_get_available:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+
+     tasks:
+
+       - name: "Pause Until Broker/Service available"
+         solace_get_available:
+         register: _result
+         until: "_result.is_available"
+         retries: 25 # 25 * 5 seconds
+         delay: 5 # Every 5 seconds
+
+
+
+Notes
+-----
+
+.. note::
+   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
+
+
+
+
+
+
+Parameters
+----------
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+is_available
+  Flag indicating whether broker was reachable or not.
+
+  | **returned**: always
+  | **type**: bool
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+msg
+  The response from the HTTP call or error description.
+
+  | **returned**: always
+  | **type**: str
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+

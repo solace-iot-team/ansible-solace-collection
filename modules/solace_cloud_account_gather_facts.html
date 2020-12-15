@@ -1,0 +1,376 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>solace_cloud_account_gather_facts – Retrieves service info (facts) about all services available in the Solace Cloud Account. &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="solace_cloud_get_facts – Provides convenience functions to access solace facts gathered with solace_cloud_account_gather_facts." href="solace_cloud_get_facts.html" />
+    <link rel="prev" title="solace_get_available – Check if broker/service is reachable and responsive." href="solace_get_available.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Solace PubSub+ Ansible Collection 
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Using Solace PubSub+ Ansible Collection</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Solace PubSub+</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts of Solace PubSub+</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../solace_cloud_modules.html#solace-cloud-module-reference">Solace Cloud Module Reference</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_cloud_account_gather_facts – Retrieves service info (facts) about all services available in the Solace Cloud Account.</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_facts.html">solace_cloud_get_facts – Provides convenience functions to access solace facts gathered with <span class="xref std std-ref">solace_cloud_account_gather_facts</span>.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_service.html">solace_cloud_get_service – Get the Solace Cloud Service details.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_service.html">solace_cloud_service – Create &amp; delete Solace Cloud services.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Solace PubSub+ Ansible Collection </a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../facts_and_general_modules.html">Fact &amp; General Modules</a> &raquo;</li>
+        
+      <li>solace_cloud_account_gather_facts – Retrieves service info (facts) about all services available in the Solace Cloud Account.</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_cloud_account_gather_facts.py" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="solace-cloud-account-gather-facts-retrieves-service-info-facts-about-all-services-available-in-the-solace-cloud-account">
+<span id="solace-cloud-account-gather-facts-module"></span><h1>solace_cloud_account_gather_facts – Retrieves service info (facts) about all services available in the Solace Cloud Account.<a class="headerlink" href="#solace-cloud-account-gather-facts-retrieves-service-info-facts-about-all-services-available-in-the-solace-cloud-account" title="Permalink to this headline">¶</a></h1>
+<p>Retrieves service info (facts) about all services available in the Solace Cloud Account. Stores the facts in: [‘ansible_facts’][‘solace_cloud_accounts’][{service-name}]. Use to retrieve the SEMP endpoints for a Solace Cloud service as inputs for other modules.</p>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Solace</span><span class="nv"> </span><span class="s">Cloud</span><span class="nv"> </span><span class="s">Account:</span><span class="nv"> </span><span class="s">Gather</span><span class="nv"> </span><span class="s">Facts</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">Dict&quot;</span>
+  <span class="nt">solace_cloud_account_gather_facts</span><span class="p">:</span>
+    <span class="nt">api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">api_token_all_permissions</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">account_name</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_hostname</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">return_format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dict</span>
+  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sca_facts_dict_result</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Save</span><span class="nv"> </span><span class="s">Facts</span><span class="nv"> </span><span class="s">Dict:</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Cloud</span><span class="nv"> </span><span class="s">Account&quot;</span>
+  <span class="nt">local_action</span><span class="p">:</span>
+    <span class="nt">module</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">copy</span>
+    <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sca_facts_dict_result</span> <span class="o">|</span> <span class="nf">to_nice_json</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./tmp/facts.dict.solace_cloud_account.</span><span class="cp">{{</span> <span class="nv">inventory_hostname</span> <span class="cp">}}</span><span class="s">.json&quot;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Set</span><span class="nv"> </span><span class="s">Fact</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">Dict:</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Cloud</span><span class="nv"> </span><span class="s">Account</span><span class="nv"> </span><span class="s">Services&quot;</span>
+  <span class="nt">set_fact</span><span class="p">:</span>
+    <span class="nt">sca_services_dict_facts</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sca_facts_dict_result.ansible_facts.solace_cloud_accounts</span><span class="o">[</span><span class="nv">inventory_hostname</span><span class="o">]</span><span class="nv">.services</span> <span class="cp">}}</span><span class="s">&quot;</span>
+  <span class="nt">no_log</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Solace</span><span class="nv"> </span><span class="s">Cloud</span><span class="nv"> </span><span class="s">Account:</span><span class="nv"> </span><span class="s">Gather</span><span class="nv"> </span><span class="s">Facts</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">List&quot;</span>
+  <span class="nt">solace_cloud_account_gather_facts</span><span class="p">:</span>
+    <span class="nt">api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">api_token_all_permissions</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">account_name</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_hostname</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">return_format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">list</span>
+  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sca_facts_list_result</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Save</span><span class="nv"> </span><span class="s">Facts</span><span class="nv"> </span><span class="s">List:</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Cloud</span><span class="nv"> </span><span class="s">Account&quot;</span>
+  <span class="nt">local_action</span><span class="p">:</span>
+    <span class="nt">module</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">copy</span>
+    <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sca_facts_list_result</span> <span class="o">|</span> <span class="nf">to_nice_json</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./tmp/facts.list.solace_cloud_account.</span><span class="cp">{{</span> <span class="nv">inventory_hostname</span> <span class="cp">}}</span><span class="s">.json&quot;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Set</span><span class="nv"> </span><span class="s">Fact:</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Cloud</span><span class="nv"> </span><span class="s">Account</span><span class="nv"> </span><span class="s">Services&quot;</span>
+  <span class="nt">set_fact</span><span class="p">:</span>
+    <span class="nt">sca_services_list_facts</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sca_facts_list_result.ansible_facts.solace_cloud_accounts</span><span class="o">[</span><span class="nv">inventory_hostname</span><span class="o">]</span><span class="nv">.services</span> <span class="cp">}}</span><span class="s">&quot;</span>
+  <span class="nt">no_log</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Loop:</span><span class="nv"> </span><span class="s">Get</span><span class="nv"> </span><span class="s">Service</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">all</span><span class="nv"> </span><span class="s">Services</span><span class="nv"> </span><span class="s">By</span><span class="nv"> </span><span class="s">serviceId&quot;</span>
+  <span class="nt">solace_cloud_get_service</span><span class="p">:</span>
+    <span class="nt">api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">api_token_all_permissions</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">service_id</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service.serviceId</span> <span class="cp">}}</span><span class="s">&quot;</span>
+  <span class="nt">loop</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sca_services_list_facts</span> <span class="cp">}}</span><span class="s">&quot;</span>
+  <span class="nt">loop_control</span><span class="p">:</span>
+    <span class="nt">loop_var</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sc_service</span>
+    <span class="nt">index_var</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sc_service_i</span>
+    <span class="nt">label</span><span class="p">:</span> <span class="s">&quot;[by</span><span class="nv"> </span><span class="s">serviceId]</span><span class="nv"> </span><span class="s">Service:</span><span class="nv"> </span><span class="s">name=</span><span class="cp">{{</span> <span class="nv">sc_service.name</span> <span class="cp">}}</span><span class="s">,</span><span class="nv"> </span><span class="s">id=</span><span class="cp">{{</span> <span class="nv">sc_service.serviceId</span> <span class="cp">}}</span><span class="s">&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Reference: <a class="reference external" href="https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm">https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm</a>.</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="solace_cloud_get_facts.html#solace-cloud-get-facts-module"><span class="std std-ref">solace_cloud_get_facts – Provides convenience functions to access solace facts gathered with solace_cloud_account_gather_facts.</span></a></p></li>
+<li><p><a class="reference internal" href="solace_get_facts.html#solace-get-facts-module"><span class="std std-ref">solace_get_facts – Provides convenience functions to access solace facts gathered with solace_gather_facts.</span></a></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>account_name (required)</dt><dd><p>The host specified in the inventory. Represents the Solace Cloud Account.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>api_token (required)</dt><dd><p>The API Token.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: None</div>
+</div>
+</dd>
+<dt>return_format (required)</dt><dd><p>The format of the returned JSON. Either as a JSON object or a JSON array.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>choices</strong>: dict, list</div>
+</div>
+</dd>
+<dt>timeout (optional)</dt><dd><p>Connection timeout in seconds for the http/s request.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 60</div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="return-values">
+<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>rc</dt><dd><p>return code, either 0 (ok), 1 (not ok)</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;{}&quot;</span>
+</pre></div>
+</div>
+</dd>
+<dt>msg</dt><dd><p>error message if not ok</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;{}&quot;</span>
+</pre></div>
+</div>
+</dd>
+<dt>response</dt><dd><p>The response from the GET {serviceId} call. Differs depending on state of service.</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: complex</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;{}&quot;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="solace_cloud_get_facts.html" class="btn btn-neutral float-right" title="solace_cloud_get_facts – Provides convenience functions to access solace facts gathered with solace_cloud_account_gather_facts." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="solace_get_available.html" class="btn btn-neutral float-left" title="solace_get_available – Check if broker/service is reachable and responsive." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

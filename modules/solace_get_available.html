@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>solace_get_available – Check if broker/service is reachable and responsive. &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="solace_cloud_account_gather_facts – Retrieves service info (facts) about all services available in the Solace Cloud Account." href="solace_cloud_account_gather_facts.html" />
+    <link rel="prev" title="solace_get_facts – Provides convenience functions to access solace facts gathered with solace_gather_facts." href="solace_get_facts.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Solace PubSub+ Ansible Collection 
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Using Solace PubSub+ Ansible Collection</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Solace PubSub+</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts of Solace PubSub+</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../facts_and_general_modules.html#facts-general-module-reference">Facts &amp; General Module Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="solace_gather_facts.html">solace_gather_facts – Retrieve facts from the Solace event broker and set ‘ansible_facts.solace’.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_facts.html">solace_get_facts – Provides convenience functions to access solace facts gathered with <span class="xref std std-ref">solace_gather_facts</span>.</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_available – Check if broker/service is reachable and responsive.</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_account_gather_facts.html">solace_cloud_account_gather_facts – Retrieves service info (facts) about all services available in the Solace Cloud Account.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_facts.html">solace_cloud_get_facts – Provides convenience functions to access solace facts gathered with <span class="xref std std-ref">solace_cloud_account_gather_facts</span>.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Solace PubSub+ Ansible Collection </a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../facts_and_general_modules.html">Fact &amp; General Modules</a> &raquo;</li>
+        
+      <li>solace_get_available – Check if broker/service is reachable and responsive.</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_get_available.py" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="solace-get-available-check-if-broker-service-is-reachable-and-responsive">
+<span id="solace-get-available-module"></span><h1>solace_get_available – Check if broker/service is reachable and responsive.<a class="headerlink" href="#solace-get-available-check-if-broker-service-is-reachable-and-responsive" title="Permalink to this headline">¶</a></h1>
+<p>Check if broker/service is reachable and responsive. Calls “GET /about” and sets “is_available=True/False”.</p>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Check/wait</span><span class="nv"> </span><span class="s">until</span><span class="nv"> </span><span class="s">brokers</span><span class="nv"> </span><span class="s">available&quot;</span>
+  <span class="nt">hosts</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">brokers</span> <span class="cp">}}</span><span class="s">&quot;</span>
+  <span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
+  <span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+  <span class="nt">module_defaults</span><span class="p">:</span>
+    <span class="nt">solace_get_available</span><span class="p">:</span>
+      <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
+
+  <span class="nt">tasks</span><span class="p">:</span>
+
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Pause</span><span class="nv"> </span><span class="s">Until</span><span class="nv"> </span><span class="s">Broker/Service</span><span class="nv"> </span><span class="s">available&quot;</span>
+      <span class="nt">solace_get_available</span><span class="p">:</span>
+      <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">_result</span>
+      <span class="nt">until</span><span class="p">:</span> <span class="s">&quot;_result.is_available&quot;</span>
+      <span class="nt">retries</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">25</span> <span class="c1"># 25 * 5 seconds</span>
+      <span class="nt">delay</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span> <span class="c1"># Every 5 seconds</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a>.</p>
+</div>
+</div>
+<div class="section" id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>host (optional)</dt><dd><p>Hostname of Solace Broker.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: localhost</div>
+</div>
+</dd>
+<dt>password (optional)</dt><dd><p>Administrator password for Solace Broker.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: admin</div>
+</div>
+</dd>
+<dt>port (optional)</dt><dd><p>Management port of Solace Broker.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 8080</div>
+</div>
+</dd>
+<dt>secure_connection (optional)</dt><dd><p>If true, use https rather than http.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>timeout (optional)</dt><dd><p>Connection timeout in seconds for the http request.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 10</div>
+</div>
+</dd>
+<dt>username (optional)</dt><dd><p>Administrator username for Solace Broker.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: admin</div>
+</div>
+</dd>
+<dt>x_broker (optional)</dt><dd><p>Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="return-values">
+<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>is_available</dt><dd><p>Flag indicating whether broker was reachable or not.</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;{}&quot;</span>
+</pre></div>
+</div>
+</dd>
+<dt>msg</dt><dd><p>The response from the HTTP call or error description.</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;{}&quot;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="solace_cloud_account_gather_facts.html" class="btn btn-neutral float-right" title="solace_cloud_account_gather_facts – Retrieves service info (facts) about all services available in the Solace Cloud Account." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="solace_get_facts.html" class="btn btn-neutral float-left" title="solace_get_facts – Provides convenience functions to access solace facts gathered with solace_gather_facts." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
