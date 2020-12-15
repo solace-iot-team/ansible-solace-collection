@@ -12,7 +12,7 @@ some intro words:
 * update 2
 * update 3
 
-generated on |date| at |time|.
+generated |today|.
 
 
 Collection is freely available on `Ansible Galaxy`_.
