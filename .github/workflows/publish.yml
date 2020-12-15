@@ -10,7 +10,10 @@ on:
     types: [created]
 
 env:
+  DEBUG_FLAG: ${{ true }}
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
+  DOCS_MAKE_SCRIPT: "test-runner/run.make.docs.sh"
+  TEST_RUNNER_LOGS_DIR: publish-logs
 
 jobs:
   publish:
@@ -47,8 +50,18 @@ jobs:
         run: |
           pip install -r devel/devel.requirements.txt
 
-      - name:     
+      - name: Make docs
+        run: |
+          export PROJECT_HOME="$GITHUB_WORKSPACE"
+          export LOG_DIR="$GITHUB_WORKSPACE/${TEST_RUNNER_LOGS_DIR}"
+          ./${DOCS_MAKE_SCRIPT}
 
+      - name: Check HTML dir
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
+          cd docs/build/html
+          ls -la
 
       # - name: Build and publish collection
       #   env:
