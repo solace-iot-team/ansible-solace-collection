@@ -33,7 +33,7 @@ jobs:
         uses: andymckay/cancel-action@0.2
 
       - name: Checkout Current Branch
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
         with:
           ref: ${{ github.ref }}
 
@@ -41,6 +41,10 @@ jobs:
         run: |
           git status
           git branch -a
+          echo "git fetch origin gh-pages"
+          git fetch origin gh-pages
+          git branch -a
+          ls -la
           # git worktree add -B gh-pages origin/gh-pages
           # git worktree add --checkout gh-pages origin/gh-pages
           # git worktree add --track -b gh-pages gh-pages origin/gh-pages
