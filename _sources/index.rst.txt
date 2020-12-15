@@ -10,6 +10,7 @@ some intro words:
 
 * update 1
 * update 2
+* update 3
 
 
 Collection is freely available on `Ansible Galaxy`_.
