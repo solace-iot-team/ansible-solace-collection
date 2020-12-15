@@ -37,26 +37,6 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      # - name: TEST-TEST
-      #   run: |
-      #     git status
-      #     git branch -a
-      #     echo ">>>> git fetch origin gh-pages"
-      #     git fetch origin gh-pages
-      #     git branch -a
-      #     # ls -la
-      #     echo ">>> worktree ..."
-      #     git worktree add gh-pages gh-pages
-      #     # git worktree add -B gh-pages origin/gh-pages
-      #     # git worktree add --checkout gh-pages origin/gh-pages
-      #     ls -la
-      #     # git worktree add --track -b gh-pages gh-pages origin/gh-pages
-      #     echo ">>> cd gh-pages ..."
-      #     cd gh-pages
-      #     git status
-      #     ls -la
-      #     exit 1
-
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
