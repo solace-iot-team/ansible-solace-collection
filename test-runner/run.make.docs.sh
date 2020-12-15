@@ -37,6 +37,9 @@ export ANSIBLE_DOC_FRAGMENT_PLUGINS="$SOLACE_PUBSUB_PLUS_COLLECTION_PATH/plugins
   echo "##############################################################################################################"
   echo "# make docs"
 
+  echo "ANSIBLE_DOC_FRAGMENT_PLUGINS=$ANSIBLE_DOC_FRAGMENT_PLUGINS"  
+
+
   runScriptDir="$SOLACE_PUBSUB_PLUS_COLLECTION_PATH/docs"
   runScript="./make.sh"
   logFile="$LOG_DIR/$scriptLogName.details.out"

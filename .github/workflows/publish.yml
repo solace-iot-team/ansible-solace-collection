@@ -55,6 +55,7 @@ jobs:
         run: |
           export PROJECT_HOME="$GITHUB_WORKSPACE"
           export LOG_DIR="$GITHUB_WORKSPACE/${TEST_RUNNER_LOGS_DIR}"
+          export RUN_FG=true
           ./${DOCS_MAKE_SCRIPT}
 
       - name: Check HTML dir
