@@ -48,10 +48,12 @@ jobs:
           echo ">>> worktree ..."
           # git worktree add -B gh-pages origin/gh-pages
           git worktree add --checkout gh-pages origin/gh-pages
+          ls -la
           # git worktree add --track -b gh-pages gh-pages origin/gh-pages
-          # cd gh-pages
-          # ls -la
-          # git status
+          echo ">>> cd gh-pages ..."
+          cd gh-pages
+          git status
+          ls -la
           exit 1
 
       - name: Set up Python
