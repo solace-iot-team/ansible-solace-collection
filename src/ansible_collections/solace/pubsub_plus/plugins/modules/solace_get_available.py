@@ -21,7 +21,7 @@ description: >
   Calls "GET /about" and sets "is_available=True/False".
 
 extends_documentation_fragment:
-- solace.broker
+- solace.pubsub_plus.solace.broker
 
 author:
   - Ricardo Gomez-Ulmke (ricardo.gomez-ulmke@solace.com)
