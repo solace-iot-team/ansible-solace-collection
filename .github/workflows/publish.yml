@@ -46,7 +46,7 @@ jobs:
           # git worktree add --track -b gh-pages gh-pages origin/gh-pages
           # cd gh-pages
           # ls -la
-          git status
+          # git status
           exit 1
 
       - name: Set up Python
