@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 ---
 module: solace_cloud_account_gather_facts
 
-short_description: Retrieves service info (facts) about all services available in the Solace Cloud Account.
+short_description: Facts from all services in Solace Cloud Account.
 
 description: >
   Retrieves service info (facts) about all services available in the Solace Cloud Account.
@@ -30,21 +30,23 @@ notes:
 
 options:
     account_name:
-        description: The host specified in the inventory. Represents the Solace Cloud Account.
+        description:
+            - The host specified in the inventory. Represents the Solace Cloud Account.
+            - "Note: Only used internally in the playbooks, so you can choose whichever name makes sense in your case."
         required: true
         type: str
-        notes:
-            - Only used internally in the playbooks, so you can choose whichever name makes sense in your case.
+        aliases:
+            - name
     return_format:
-        description: >
-            The format of the returned JSON. Either as a JSON object or a JSON array.
+        description:
+            - The format of the returned JSON. Either as a JSON object or a JSON array.
+            - "Note: Use 'dict' when you want to access the facts in a playbook by account_name (i.e. 'inventory_hostname') directly."
+            - "Note: Use 'list' when you want to iterate over each service in your playbook."
         required: true
+        type: str
         choices:
             - dict
             - list
-        notes:
-            - Use 'dict' when you want to access the facts in a playbook by account_name (i.e. 'inventory_hostname') directly.
-            - Use 'list' when you want to iterate over each service in your playbook.
 
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.solace_cloud_service_config
@@ -106,17 +108,23 @@ RETURN = '''
     rc:
         description: return code, either 0 (ok), 1 (not ok)
         type: int
+        returned: always
+        sample:
+            rc: 0
     msg:
         description: error message if not ok
         type: str
+        returned: error
     response:
         description: The response from the GET {serviceId} call. Differs depending on state of service.
-        type: complex
+        type: dict
+        returned: success
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
 from ansible.module_utils.basic import AnsibleModule
+
 
 class SolaceCloudAccountGatherFactsTask(scu.SolaceCloudTask):
 
@@ -186,7 +194,7 @@ class SolaceCloudAccountGatherFactsTask(scu.SolaceCloudTask):
                 services=[]
             )
         else:
-            raise ValueError("unknown return_format='{}'. pls raise an issue.".format(return_format))
+            raise ValueError(f"unknown return_format='{return_format}'. Pls raise an issue.")
 
         # waiting for Solace Cloud to enable the call...
         # ok, resp = self.get_data_centers()
@@ -241,6 +249,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-###
-# The End.

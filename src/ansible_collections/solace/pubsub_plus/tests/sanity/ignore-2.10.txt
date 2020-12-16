@@ -1,2 +1,12 @@
+plugins/module_utils/solace_cloud_utils.py compile-2.7!skip
+plugins/module_utils/solace_utils.py compile-2.7!skip
+plugins/module_utils/solace_utils.py pep8:E501
+plugins/module_utils/solace_common.py compile-2.7!skip
+plugins/module_utils/solace_common.py pylint!skip
+plugins/doc_fragments/solace.py pep8:E501
 plugins/modules/solace_get_facts.py pep8:E501
 plugins/modules/solace_get_facts.py compile-2.7!skip
+plugins/modules/solace_cloud_service.py compile-2.7!skip
+plugins/modules/solace_cloud_get_service.py compile-2.7!skip
+plugins/modules/solace_cloud_get_facts.py compile-2.7!skip
+plugins/modules/solace_cloud_account_gather_facts.py compile-2.7!skip

@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -8,6 +6,7 @@ __metaclass__ = type
 
 """Collection of utility classes and functions to aid the solace_* modules."""
 
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
 if not sc.HAS_IMPORT_ERROR:
     import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
@@ -15,7 +14,6 @@ if not sc.HAS_IMPORT_ERROR:
     import json
     import time
     from inspect import signature
-    from ansible.errors import AnsibleError
     import requests
 
 
@@ -100,7 +98,7 @@ class SolaceTask:
               or (not solace_cloud_api_token and not solace_cloud_service_id))
         if not ok:
             result = dict(changed=False, rc=1)
-            msg = "must provide either both or none for Solace Cloud: solace_cloud_api_token={}, solace_cloud_service_id={}.".format(solace_cloud_api_token, solace_cloud_service_id)
+            msg = f"must provide either both or none for Solace Cloud: solace_cloud_api_token={solace_cloud_api_token}, solace_cloud_service_id={solace_cloud_service_id}."
             self.module.fail_json(msg=msg, **result)
 
         if ok and solace_cloud_api_token and solace_cloud_service_id:
@@ -170,10 +168,10 @@ class SolaceTask:
                         result['response'] = dict(
                             invalid_keys=', '.join(bad_keys),
                             hint=[
-                                    "possible causes:",
-                                    "- wrong spelling or wrong key: check the SEMPv2 reference documentation",
-                                    "- module's 'whitelist' isn't up to date: raise an issue"
-                                ],
+                                "possible causes:",
+                                "- wrong spelling or wrong key: check the SEMPv2 reference documentation",
+                                "- module's 'whitelist' isn't up to date: raise an issue"
+                            ],
                             valid_keys=list(current_settings) + removed_keys
                         )
                         self.module.fail_json(msg=msg, **result)
@@ -254,22 +252,22 @@ class SolaceTask:
         return self.get_args() + [self.lookup_item()]
 
     def lookup_semp_version(self, semp_version):
-        raise AnsibleError("argument 'semp_version' not supported by module: {}. implement 'lookup_semp_version()' in module.".format(self.module._name))
+        raise SolaceError(f"argument 'semp_version' not supported by module: {self.module._name}. implement 'lookup_semp_version()' in module.")
 
     def get_semp_version_key(self, lookup_dict, lookup_vmr_semp_version, lookup_key):
         try:
             v = float(lookup_vmr_semp_version)
-        except ValueError:
-            raise ValueError("semp_version: '{}' cannot be converted to a float. see 'solace_get_facts' for examples of how to pass in the 'semp_version' argument.".format(lookup_vmr_semp_version))
+        except ValueError as e:
+            raise ValueError(f"semp_version: '{lookup_vmr_semp_version}' cannot be converted to a float. see 'solace_get_facts' for examples of how to pass in the 'semp_version' argument.") from e
         ok, version_key = self.lookup_semp_version(v)
         if not ok:
-            raise ValueError("unsupported semp_version: '{}'".format(lookup_vmr_semp_version))
+            raise ValueError(f"unsupported semp_version: '{lookup_vmr_semp_version}'")
 
         if version_key not in lookup_dict:
-            raise ValueError("version_key: '{}' not found in lookup_dict: {}".format(version_key, json.dumps(lookup_dict)))
+            raise ValueError(f"version_key: '{version_key}' not found in lookup_dict: {json.dumps(lookup_dict)}")
         version_lookup_dict = lookup_dict[version_key]
         if lookup_key not in version_lookup_dict:
-            raise ValueError("lookup_key: '{}' not found in lookup_dict['{}']: '{}'".format(lookup_key, version_key, json.dumps(version_lookup_dict)))
+            raise ValueError(f"lookup_key: '{lookup_key}' not found in lookup_dict['{version_key}']: '{json.dumps(version_lookup_dict)}'")
         return version_lookup_dict[lookup_key]
 
     def get_whitelist_keys(self):
@@ -322,12 +320,12 @@ class SolaceTask:
 
             try:
                 resp = requests.get(
-                            url,
-                            json=None,
-                            auth=self.solace_config.vmr_auth,
-                            timeout=self.solace_config.vmr_timeout,
-                            headers={'x-broker-name': self.solace_config.x_broker},
-                            params=None
+                    url,
+                    json=None,
+                    auth=self.solace_config.vmr_auth,
+                    timeout=self.solace_config.vmr_timeout,
+                    headers={'x-broker-name': self.solace_config.x_broker},
+                    params=None
                 )
 
                 if sc.ENABLE_LOGGING:
@@ -425,24 +423,27 @@ def arg_spec_crud():
 def arg_spec_get_list():
     return dict(
         api=dict(type='str', default='config', choices=['config', 'monitor']),
-        query_params=dict(type='dict',
-                          required=False,
-                          options=dict(
-                            select=dict(type='list', default=[], elements='str'),
-                            where=dict(type='list', default=[], elements='str')
-                          )
-                          )
+        query_params=dict(
+            type='dict',
+            required=False,
+            options=dict(
+                select=dict(type='list', default=[], elements='str'),
+                where=dict(type='list', default=[], elements='str')
+            )
+        )
     )
+
 
 def arg_spec_get_list_monitor():
     return dict(
-        query_params=dict(type='dict',
-                          required=False,
-                          options=dict(
-                            select=dict(type='list', default=[], elements='str'),
-                            where=dict(type='list', default=[], elements='str')
-                          )
-                          )
+        query_params=dict(
+            type='dict',
+            required=False,
+            options=dict(
+                select=dict(type='list', default=[], elements='str'),
+                where=dict(type='list', default=[], elements='str')
+            )
+        )
     )
 
 
@@ -456,10 +457,10 @@ def merge_dicts(*argv):
 
 def _build_config_dict(resp, key):
     if not type(resp) is dict:
-        raise TypeError("argument 'resp' is not a 'dict' but {}. Hint: check you are using Sempv2 GET single item call and not a list of items.".format(type(resp)))
+        raise TypeError(f"argument 'resp' is not a 'dict' but {type(resp)}. Hint: check you are using Sempv2 GET single item call and not a list of items.")
     # wrong LOOKUP_ITEM_KEY in module
     if key not in resp:
-        raise ValueError("wrong 'LOOKUP_ITEM_KEY' in module. semp GET response does not contain key='{}'".format(key))
+        raise ValueError(f"wrong 'LOOKUP_ITEM_KEY' in module. semp GET response does not contain key='{key}'")
     # resp is a single dict, not an array
     # return an array with 1 element
     d = dict()
@@ -523,19 +524,19 @@ def _wait_solace_cloud_request_completed(solace_config, request_resp):
     while not is_completed and try_count < retries:
         try:
             resp = requests.get(
-                        url,
-                        json=None,
-                        auth=auth,
-                        timeout=solace_config.vmr_timeout,
-                        headers={'x-broker-name': solace_config.x_broker},
-                        params=None
+                url,
+                json=None,
+                auth=auth,
+                timeout=solace_config.vmr_timeout,
+                headers={'x-broker-name': solace_config.x_broker},
+                params=None
             )
             if sc.ENABLE_LOGGING:
                 sc.log_http_roundtrip(resp)
             if resp.status_code != 200:
                 return False, resp
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
-            raise AnsibleError("Solace Cloud: GET request status error: {}".format(str(e)))
+            raise SolaceError(f"Solace Cloud: GET request status error: {str(e)}") from e
 
         if resp.text:
             resp_body = json.loads(resp.text)
@@ -547,7 +548,7 @@ def _wait_solace_cloud_request_completed(solace_config, request_resp):
                 if not ok:
                     return False, err
         else:
-            raise AnsibleError("Solace Cloud: GET request status error: no body found in response")
+            raise SolaceError("Solace Cloud: GET request status error: no body found in response")
         try_count += 1
         time.sleep(delay)
     # never gets here

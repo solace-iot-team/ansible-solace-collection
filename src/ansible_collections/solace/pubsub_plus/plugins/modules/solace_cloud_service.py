@@ -30,20 +30,21 @@ notes:
 
 options:
   name:
-    description: The name of the service to manage. Mandatory for state='present'.
+    description:
+        - The name of the service to manage. Mandatory for state='present'.
+        - "Note: The name must be a key, it is used as a YAML / JSON key. Use only ASCII, '-', or '_'. No whitespaces."
     type: str
     required: false
-    notes: The name must be a key, it is used as a YAML / JSON key. Use only ASCII, '-', or '_'. No whitespaces.
   service_id:
     description: The service-id of the service to manage. Allowed option for state='absent'.
     type: str
     required: false
   settings:
-    description: Additional settings for state=present. See Reference documentation output of M(solace_cloud_get_service) for details.
+    description:
+        - Additional settings for state=present. See Reference documentation output of M(solace_cloud_get_service) for details.
+        - "Note: For state=present, provide at least: msgVpnName, datacenterId, serviceTypeId, serviceClassId."
     type: dict
     required: false
-    notes:
-    - for state=present (to create a service), provide at least: msgVpnName, datacenterId, serviceTypeId, serviceClassId.
 
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.solace_cloud_service_config
@@ -54,43 +55,48 @@ author: Ricardo Gomez-Ulmke (@rjgu)
 
 EXAMPLES = '''
 
-- name: "Create Solace Cloud Service"
-  solace_cloud_service:
-    api_token: "{{ api_token_all_permissions }}"
-    name: "{{ sc_service.name }}"
-    settings:
-      msgVpnName: "{{ sc_service.msgVpnName}}"
-      datacenterId: "{{ sc_service.datacenterId }}"
-      serviceTypeId: "{{ sc_service.serviceTypeId}}"
-      serviceClassId: "{{ sc_service.serviceClassId }}"
-    state: present
+hosts: all
+gather_facts: no
+any_errors_fatal: true
+collections:
+    - solace.pubsub_plus
+tasks:
+  - name: "Create Solace Cloud Service"
+    solace_cloud_service:
+        api_token: "{{ api_token_all_permissions }}"
+        name: "{{ sc_service.name }}"
+        settings:
+        msgVpnName: "{{ sc_service.msgVpnName}}"
+        datacenterId: "{{ sc_service.datacenterId }}"
+        serviceTypeId: "{{ sc_service.serviceTypeId}}"
+        serviceClassId: "{{ sc_service.serviceClassId }}"
+        state: present
 
-- set_fact:
-    sc_service_created_interim_info: "{{ result.response }}"
-    sc_service_created_id: "{{ result.response.serviceId }}"
+  - set_fact:
+        sc_service_created_interim_info: "{{ result.response }}"
+        sc_service_created_id: "{{ result.response.serviceId }}"
 
-- name: "Print Solace Cloud Service: service id"
-  debug:
-    msg: "service_id = {{ sc_service_created_id }}"
+  - name: "Print Solace Cloud Service: service id"
+    debug:
+        msg: "service_id = {{ sc_service_created_id }}"
 
-- name: "Wait for Service Provisioning to Complete"
-  solace_cloud_get_service:
-    api_token: "{{ api_token_all_permissions }}"
-    service_id: "{{ sc_service_created_id }}"
-  register: get_service_result
-  until: "get_service_result.rc != 0 or get_service_result.response.creationState == 'completed'"
-  # wait max for 40 * 30 seconds, then give up
-  retries: 40
-  delay: 30 # Every 30 seconds
+  - name: "Wait for Service Provisioning to Complete"
+    solace_cloud_get_service:
+        api_token: "{{ api_token_all_permissions }}"
+        service_id: "{{ sc_service_created_id }}"
+    register: get_service_result
+    until: "get_service_result.rc != 0 or get_service_result.response.creationState == 'completed'"
+    retries: 40
+    delay: 30 # Every 30 seconds
 
-- set_fact:
-    sc_service_created_info: "{{ result.response }}"
+  - set_fact:
+        sc_service_created_info: "{{ result.response }}"
 
-- name: "Save New Solace Cloud Service Facts to File"
-  local_action:
-    module: copy
-    content: "{{ sc_service_created_info | to_nice_json }}"
-    dest: "./tmp/facts.solace_cloud_service.{{ sc_service.name }}.json"
+  - name: "Save New Solace Cloud Service Facts to File"
+    copy:
+        content: "{{ sc_service_created_info | to_nice_json }}"
+        dest: "./tmp/facts.solace_cloud_service.{{ sc_service.name }}.json"
+    delegate_to: localhost
 
 '''
 
@@ -99,18 +105,71 @@ RETURN = '''
 rc:
     description: return code, either 0 (ok), 1 (not ok)
     type: int
+    returned: always
+    sample:
+        rc: 0
 msg:
     description: error message if not ok
     type: str
+    returned: error
 response:
     description: the response from the create call.
     type: complex
-
+    returned: success
+    sample:
+        accountingLimits:
+        - id: NetworkUsage
+          thresholds:
+          - type: warning
+            value: '75'
+        unit: bytes
+        value: '50000000000'
+        adminState: start
+        attributes:
+        customizedMessagingPorts: {}
+        customizedResourceNames: {}
+        monitoring: {}
+        certificateAuthorities: []
+        clientProfiles: []
+        created: 1608128117689
+        creationState: pending
+        datacenterId: aws-eu-west-2a
+        locked: false
+        messagingStorage: 25
+        msgVpnAttributes: {}
+        msgVpnName: as_test_broker
+        name: ansible_solace_test_broker
+        serviceClassDisplayedAttributes:
+        Clients: '250'
+        High Availability: HA Group
+        Message Broker Tenancy: Dedicated
+        Network Speed: 450 Mbps
+        Network Usage: 50 GB per month
+        Queues: '250'
+        Storage: 25 GB
+        serviceClassId: enterprise-250-nano
+        serviceId: 1a2o94jfedl9
+        servicePackageId: DH-V13.0
+        serviceStage: generalavailability
+        serviceTypeId: enterprise
+        timestamp: 0
+        type: service
+        userId: xxx
+    contains:
+        serviceId:
+            description: The service Id of the created service
+            returned: "success for state=present"
+            type: str
+        adminState:
+            description: The state of the service
+            returned: success
+            type: str
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
 from ansible.module_utils.basic import AnsibleModule
+
 
 class SolaceCloudServiceTask(scu.SolaceCloudTask):
 
@@ -152,7 +211,7 @@ class SolaceCloudServiceTask(scu.SolaceCloudTask):
                 self.module.fail_json(msg=msg, **result)
         else:
             # should not be possible based on choices for state
-            raise ValueError("unknown state={}. pls raise an issue.".format(state))
+            raise ValueError(f"unknown state={state}. pls raise an issue.")
         return
 
     def validate_args(self, lookup_item_key, lookup_item_value):
@@ -173,13 +232,13 @@ class SolaceCloudServiceTask(scu.SolaceCloudTask):
                 if self.LOOKUP_ITEM_KEY_SERVICE_ID in resp:
                     service_id = resp[self.LOOKUP_ITEM_KEY_SERVICE_ID]
                 else:
-                    raise KeyError("Could not find key:'{}' in Solace Cloud GET services response. Pls raise an issue.".format(self.LOOKUP_ITEM_KEY_SERVICE_ID))
+                    raise KeyError(f"Could not find key:'{self.LOOKUP_ITEM_KEY_SERVICE_ID}' in Solace Cloud GET services response. Pls raise an issue.")
             else:
                 return True, None
         elif lookup_item_key == self.LOOKUP_ITEM_KEY_SERVICE_ID:
             service_id = lookup_item_value
         else:
-            raise ValueError("unknown lookup_item_key='{}'. pls raise an issue.".format(lookup_item_key))
+            raise ValueError(f"unknown lookup_item_key='{lookup_item_key}'. Pls raise an issue.")
 
         # not found
         if not service_id:
@@ -198,7 +257,7 @@ class SolaceCloudServiceTask(scu.SolaceCloudTask):
             result = dict(changed=False, rc=1)
             self.module.fail_json(msg="Create Service: " + fail_msg, **result)
         if lookup_item_key != self.LOOKUP_ITEM_KEY_NAME:
-            raise ValueError("lookup_item_key='{}' expected, but received '{}. pls raise an issue.".format(self.LOOKUP_ITEM_KEY_NAME, lookup_item_key))
+            raise ValueError(f"lookup_item_key='{self.LOOKUP_ITEM_KEY_NAME}' expected, but received '{lookup_item_key}. Pls raise an issue.")
 
         defaults = {
             'adminState': 'start',
@@ -214,7 +273,7 @@ class SolaceCloudServiceTask(scu.SolaceCloudTask):
         }
         missing_mandatory_keys = [k for k in mandatory if mandatory.get(k) is None]
         if missing_mandatory_keys:
-            fail_msg = "mandatory keys missing in 'settings': '{}'".format(str(missing_mandatory_keys))
+            fail_msg = f"mandatory keys missing in 'settings': '{str(missing_mandatory_keys)}'"
         if fail_msg:
             result = dict(changed=False, rc=1)
             self.module.fail_json(msg="Create Service: " + fail_msg, **result)
@@ -233,7 +292,7 @@ class SolaceCloudServiceTask(scu.SolaceCloudTask):
     def delete_func(self, sc_config, lookup_item_key, lookup_item_value):
         # DELETE https://api.solace.cloud/api/v0/services/{{serviceId}}
         if lookup_item_key != self.LOOKUP_ITEM_KEY_SERVICE_ID:
-            raise ValueError("lookup_item_key='{}' expected, but received '{}. pls raise an issue.".format(self.LOOKUP_ITEM_KEY_SERVICE_ID, lookup_item_key))
+            raise ValueError(f"lookup_item_key='{self.LOOKUP_ITEM_KEY_SERVICE_ID}' expected, but received '{lookup_item_key}. Pls raise an issue.")
         service_id = lookup_item_value
         path_array = [scu.SOLACE_CLOUD_API_SERVICES_BASE_PATH, service_id]
         return scu.make_delete_request(sc_config, path_array)
@@ -255,17 +314,17 @@ class SolaceCloudServiceTask(scu.SolaceCloudTask):
 
     def _find_service(self, resp, lookup_item_key, lookup_item_value):
         """Return a dict of object if found, otherwise None."""
-        if type(resp) is dict:
+        if isinstance(resp, dict):
             value = resp.get(lookup_item_key)
             if value == lookup_item_value:
                 return resp
-        elif type(resp) is list:
+        elif isinstance(resp, list):
             for item in resp:
                 value = item.get(lookup_item_key)
                 if value == lookup_item_value:
                     return item
         else:
-            raise TypeError("argument 'resp' is not a 'dict' nor 'list' but {}. Pls raise an issue.".format(type(resp)))
+            raise TypeError(f"argument 'resp' is not a 'dict' nor 'list' but {type(resp)}. Pls raise an issue.")
         return None
 
 
@@ -298,7 +357,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-###
-# The End.

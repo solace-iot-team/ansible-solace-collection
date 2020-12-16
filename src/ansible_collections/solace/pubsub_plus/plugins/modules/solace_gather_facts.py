@@ -76,7 +76,7 @@ ansible_facts.solace:
     description: The facts as returned from the APIs.
     type: dict
     returned: success
-    elements: complex
+    elements: dict
     sample:
         ansible_facts:
             solace:
@@ -93,11 +93,10 @@ ansible_facts.solace:
                 service_facts:
 
 '''
-
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
 from ansible.module_utils.basic import AnsibleModule
-from ansible.errors import AnsibleError
 if not sc.HAS_IMPORT_ERROR:
     import requests
     import xmltodict
@@ -235,7 +234,7 @@ def make_sempv1_post_request(solace_config, xml_data):
     if sc.ENABLE_LOGGING:
         sc.log_http_roundtrip(resp)
     if resp.status_code != 200:
-        raise AnsibleError("SEMP v1 call not successful. Pls check the log and raise an issue.")
+        raise SolaceError("SEMP v1 call not successful. Pls check the log and raise an issue.")
     # SEMP v1 always returns 200 (it seems)
     # error: rpc-reply.execute-result.@code != ok or missing
     # if error: rpc-reply ==> display
@@ -296,6 +295,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-###
-# The End.

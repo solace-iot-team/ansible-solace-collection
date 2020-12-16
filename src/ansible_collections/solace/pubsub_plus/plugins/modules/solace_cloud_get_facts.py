@@ -14,49 +14,48 @@ DOCUMENTATION = '''
 ---
 module: solace_cloud_get_facts
 
-short_description: Provides convenience functions to access solace facts gathered with M(solace_cloud_account_gather_facts).
+short_description: access solace facts from M(solace_cloud_account_gather_facts)
 
 description: >
     Provides convenience functions to access Solace Cloud service facts gathered with M(solace_cloud_account_gather_facts).
-    Call M(solace_cloud_account_gather_facts).
+    Call M(solace_cloud_account_gather_facts) first.
 
 options:
-  from_dict:
-    description: The JSON object (dict) which holds the facts. This is direct result from the GET {service} call.
-    required: True
-    type: dict
-  field_funcs:
-    description: List of pre-built field functions that retrieve values from the 'from_dict'.
-    required: false
-    type: list
-    default: []
-    elements: str
-    choices:
-      - get_serviceSEMPManagementEndpoints
-    functions:
-      get_serviceSEMPManagementEndpoints:
+    from_dict:
+        description: The JSON object (dict) which holds the facts. This is direct result from the GET {service} call.
+        required: True
+        type: dict
+    field_funcs:
+        description: List of pre-built field functions that retrieve values from the 'from_dict'.
+        required: false
+        type: list
+        default: []
+        elements: str
+        suboptions:
+            get_serviceSEMPManagementEndpoints:
+                description: Retrieves the SEMP management endpoint.
+                type: str
+                required: no
+    get_formattedHostInventory:
         description: >
-            Retrieves the SEMP management endpoint.
-  get_formattedHostInventory:
-    description: >
-        Get the facts formatted as a JSON host inventory.
-        Retrieve the inventory field by field or
-        save to file and use in subsequent playbooks as an inventory.
-    type: dict
-    required: false
-    suboptions:
-        host_entry:
-            description: The entry for this broker / service in the hosts file. Must be a valid JSON key.
-            type: str
-            required: true
-        api_token:
-            description: The API token to access the Solace Cloud Service API.
-            type: str
-            required: true
-        meta:
-            description: Additional meta data describing the service instance.
-            type: dict
-            required: true
+            Get the facts formatted as a JSON host inventory.
+            Retrieve the inventory field by field or
+            save to file and use in subsequent playbooks as an inventory.
+        type: dict
+        required: no
+        suboptions:
+            host_entry:
+                description: The entry for this broker / service in the hosts file. Must be a valid JSON key.
+                type: str
+                required: true
+            api_token:
+                description: The API token to access the Solace Cloud Service API.
+                type: str
+                required: true
+            meta:
+                description: Additional meta data describing the service instance.
+                type: dict
+                required: true
 
 seealso:
 - module: solace_cloud_account_gather_facts
@@ -67,27 +66,34 @@ author: Ricardo Gomez-Ulmke (@rjgu)
 
 EXAMPLES = '''
 
-    - name: "Get Service: {{ sc_service.name }}"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  tasks:
+    - name: "Get Service"
       solace_cloud_get_service:
-        api_token: "{{ api_token_all_permissions }}"
-        service_id: "{{ sc_service.serviceId }}"
+        api_token: "{{ api_token }}"
+        service_id: "{{ serviceId }}"
       register: result
 
     - name: "Set Fact: Solace Service Details"
       set_fact:
         sc_service_details: "{{ result.response }}"
-        - name: "Get Semp Management Endpoints for: {{ sc_service.name }}"
-          solace_cloud_get_facts:
-            from_dict: "{{ sc_service_details }}"
-            field_funcs:
-              - get_serviceSEMPManagementEndpoints
-          register: semp_enpoints_facts
+
+    - name: "Get Semp Management Endpoints"
+      solace_cloud_get_facts:
+        from_dict: "{{ sc_service_details }}"
+        field_funcs:
+            - get_serviceSEMPManagementEndpoints
+        register: semp_enpoints_facts
 
     - name: "Save Solace Cloud Service SEMP Management Endpoints to File"
-      local_action:
-        module: copy
+      copy:
         content: "{{ semp_enpoints_facts | to_nice_json }}"
-        dest: "./tmp/facts.solace_cloud_service.{{ sc_service.name }}.semp.json"
+        dest: "./tmp/facts.solace_cloud_service.semp.json"
+      delegate_to: localhost
 
     - name: "Set Fact: Solace Service SEMP"
       set_fact:
@@ -106,27 +112,21 @@ EXAMPLES = '''
         username: "{{ sempv2_username }}"
         password: "{{ sempv2_password }}"
         timeout: "{{ sempv2_timeout }}"
-        solace_cloud_api_token: "{{ api_token_all_permissions }}"
-        solace_cloud_service_id: "{{ sc_service.serviceId }}"
-
-    - name: "Show ansible_facts.solace"
-      debug:
-        msg:
-          - "ansible_facts.solace:"
-          - "{{ ansible_facts.solace }}"
+        solace_cloud_api_token: "{{ api_token }}"
+        solace_cloud_service_id: "{{ serviceId }}"
 
     - name: "Save Solace Cloud Service Facts to File"
-      local_action:
-        module: copy
+      copy:
         content: "{{ ansible_facts.solace | to_nice_json }}"
-        dest: "./tmp/solace_facts.solace_cloud_service.{{ sc_service.name }}.json"
+        dest: "./tmp/solace_facts.solace_cloud_service.json"
+      delegate_to: localhost
 
-    - name: "Get Host Inventory for: {{ sc_service.name }}"
+    - name: "Get Host Inventory"
       solace_cloud_get_facts:
         from_dict: "{{ sc_service_details }}"
         get_formattedHostInventory:
-          host_entry: "{{ sc_service.name }}"
-          api_token: "{{ api_token_all_permissions }}"
+          host_entry: "{{ sc_service_name }}"
+          api_token: "{{ api_token }}"
           meta:
             service_name: "{{ sc_service_details.name }}"
             service_id: "{{ sc_service_details.serviceId }}"
@@ -137,11 +137,10 @@ EXAMPLES = '''
       register: inv_results
 
     - name: "Save Solace Cloud Service inventory to File"
-      local_action:
-        module: copy
+      copy:
         content: "{{ inv_results.facts.formattedHostInventory | to_nice_json }}"
-        dest: "./tmp/inventory.{{ sc_service.name }}.json"
-
+        dest: "./tmp/inventory.{{ sc_service_name }}.json"
+      delegate_to: localhost
 '''
 
 RETURN = '''
@@ -149,22 +148,27 @@ RETURN = '''
     rc:
         description: return code, either 0 (ok), 1 (not ok)
         type: int
+        returned: always
+        sample:
+            rc: 0
     msg:
         description: error message if not ok
         type: str
+        returned: error
     facts:
         description: The facts retrieved from the input.
-        type: complex
+        type: dict
+        returned: success
 
 '''
-
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
 from ansible.module_utils.basic import AnsibleModule
-from ansible.errors import AnsibleError
 from urllib.parse import urlparse
 import json
 from json.decoder import JSONDecodeError
 import traceback
+
 
 class SolaceCloudGetFactsTask():
 
@@ -187,7 +191,7 @@ class SolaceCloudGetFactsTask():
             for field_func in field_funcs:
                 exists = (True if field_func in self.FIELD_FUNCS else False)
                 if not exists:
-                    return False, "Unknown field_func='{}'. Valid field functions are: {}.".format(field_func, str(self.FIELD_FUNCS))
+                    return False, f"Unknown field_func='{field_func}'. Valid field functions are: {self.FIELD_FUNCS}."
             has_get_funcs = True
 
         param_get_formattedHostInventory = self.module.params['get_formattedHostInventory']
@@ -211,16 +215,9 @@ class SolaceCloudGetFactsTask():
                 for field_func in field_funcs:
                     field, value = globals()[field_func](search_object)
                     facts[field] = value
-            except AnsibleError as e:
-                try:
-                    e_msg = json.loads(str(e))
-                except JSONDecodeError:
-                    e_msg = [str(e)]
-                ex_msg = [
-                    "field_func:'{}'".format(field_func),
-                    e_msg
-                ]
-                raise AnsibleError(json.dumps(ex_msg))
+            except SolaceError as e:
+                ex_msg_list = [f"field_func:'{field_func}'"] + e.to_list()
+                raise SolaceError(ex_msg_list) from e
 
         try:
             param_get_formattedHostInventory = self.module.params['get_formattedHostInventory']
@@ -229,13 +226,9 @@ class SolaceCloudGetFactsTask():
                                                           param_get_formattedHostInventory['host_entry'],
                                                           param_get_formattedHostInventory['api_token'],
                                                           param_get_formattedHostInventory['meta'])
-        except AnsibleError as e:
-            try:
-                e_msg = json.loads(str(e))
-            except JSONDecodeError:
-                e_msg = [str(e)]
-            ex_msg = ["get_formattedHostInventory():", e_msg]
-            raise AnsibleError(json.dumps(ex_msg))
+        except SolaceError as e:
+            ex_msg_list = ["get_formattedHostInventory():"] + e.to_list()
+            raise SolaceError(ex_msg_list) from e
 
         facts[field] = value
 
@@ -247,8 +240,8 @@ class SolaceCloudGetFactsTask():
 
 
 def get_formattedHostInventory(search_dict, host_entry, api_token, meta):
-    if not type(search_dict) is dict:
-        raise AnsibleError("input is not of type 'dict', but type='{}'.".format(type(search_dict)))
+    if not isinstance(search_dict, dict):
+        raise SolaceError(f"input is not of type 'dict', but type='{type(search_dict)}'.")
 
     _eps_field, eps_val = get_serviceSEMPManagementEndpoints(search_dict)
     inv = dict(
@@ -276,8 +269,8 @@ def get_formattedHostInventory(search_dict, host_entry, api_token, meta):
 
 
 def get_serviceSEMPManagementEndpoints(search_dict):
-    if not type(search_dict) is dict:
-        raise AnsibleError("input is not of type 'dict', but type='{}'.".format(type(search_dict)))
+    if not isinstance(search_dict, dict):
+        raise SolaceError(f"input is not of type 'dict', but type='{type(search_dict)}'.")
     eps = dict(
         SEMP=dict(
             SecuredSEMP=dict()
@@ -285,10 +278,10 @@ def get_serviceSEMPManagementEndpoints(search_dict):
     )
     mgmt_protocols_dict = _get_field(search_dict, 'managementProtocols')
     if mgmt_protocols_dict is None:
-        raise AnsibleError("Could not find '{}' in 'from_dict'.".format('managementProtocols'))
+        raise SolaceError("Could not find 'managementProtocols' in 'from_dict'.")
     semp_dict = _find_nested_dict(mgmt_protocols_dict, field="name", value='SEMP')
     if semp_dict is None:
-        raise AnsibleError("Could not find 'name={}' in 'managementProtocols' in 'from_dict'.".format('SEMP'))
+        raise SolaceError("Could not find 'name=SEMP' in 'managementProtocols' in 'from_dict'.")
     sec_semp_end_point_dict = _get_protocol_endpoint(semp_dict, field='name', value='Secured SEMP Config')
     sec_semp_uri = _get_protocol_endpoint_uri(sec_semp_end_point_dict)
     t = urlparse(sec_semp_uri)
@@ -316,13 +309,13 @@ def get_serviceSEMPManagementEndpoints(search_dict):
 def _get_protocol_endpoint(search_dict, field, value):
     element = 'endPoints'
     if element not in search_dict:
-        raise AnsibleError("Could not find '{}' in dict:{}.".format(element, json.dumps(search_dict)))
+        raise SolaceError(f"Could not find '{element}' in dict:{search_dict}.")
     end_points = search_dict[element]
     if len(end_points) == 0:
-        raise AnsibleError("Empty list:'{}' in dict:{}.".format(element, json.dumps(search_dict)))
+        raise SolaceError(f"Empty list:'{element}' in dict:{search_dict}.")
     end_point_dict = _find_nested_dict(end_points, field, value)
     if end_point_dict is None:
-        raise AnsibleError("Could not find end point with '{}={}'.".format(field, value))
+        raise SolaceError(f"Could not find end point with '{field}={value}'.")
     return end_point_dict
 
 
@@ -330,16 +323,16 @@ def _get_protocol_endpoint_uri(search_dict):
     element = 'uris'
     if element not in search_dict:
         errs = [
-            "Could not find '{}' in end point:".format(element),
-            search_dict
+            f"Could not find '{element}' in end point:",
+            f"{json.dumps(search_dict)}"
         ]
-        raise AnsibleError(json.dumps(errs))
+        raise SolaceError(errs)
     if len(search_dict['uris']) != 1:
         errs = [
-            "'{}' list contains != 1 elements in end point:".format(element),
-            "{}".format(json.dumps(search_dict))
+            f"'{element}' list contains != 1 elements in end point:",
+            f"{json.dumps(search_dict)}"
         ]
-        raise AnsibleError(errs)
+        raise SolaceError(errs)
     return search_dict['uris'][0]
 
 
@@ -408,13 +401,10 @@ def run_module():
         if not ok:
             result['rc'] = 1
             module.fail_json(msg=resp, **result)
-    except AnsibleError as e:
+    except SolaceError as e:
         ex = traceback.format_exc()
-        try:
-            ex_msg = json.loads(str(e))
-        except JSONDecodeError:
-            ex_msg = [str(e)]
-        msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg + ex.split('\n')
+        ex_msg_list = e.to_list()
+        msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
         module.fail_json(msg=msg, exception=ex)
 
     result['facts'] = resp
@@ -427,6 +417,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-###
-# The End.

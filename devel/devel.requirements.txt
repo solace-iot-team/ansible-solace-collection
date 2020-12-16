@@ -4,6 +4,7 @@ pycodestyle
 pyyaml
 voluptuous
 yamllint
+rstcheck
 Sphinx
 sphinx-rtd-theme
 ansible-doc-extractor

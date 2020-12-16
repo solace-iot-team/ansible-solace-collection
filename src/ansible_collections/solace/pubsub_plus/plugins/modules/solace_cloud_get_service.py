@@ -25,17 +25,17 @@ notes:
 
 options:
   name:
-    description: The name of the service.
+    description:
+        - The name of the service.
+        - "Note: If name is not provided, service_id must."
     required: false
     type: str
-    notes:
-        - if name is not provided, service_id must.
   service_id:
-    description: The service id.
+    description:
+        - The service id.
+        - "Note: If service_id is not provided, name must."
     required: false
     type: str
-    notes:
-        - if service_id is not provided, name must.
 
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.solace_cloud_service_config
@@ -48,7 +48,12 @@ author: Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
-
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  tasks:
     - name: "Get service details"
       solace_cloud_get_service:
         api_token: "{{ api_token_all_permissions }}"
@@ -59,11 +64,10 @@ EXAMPLES = '''
         sc_service_created_info: "{{ result.response }}"
 
     - name: "Save Solace Cloud Service Facts to File"
-      local_action:
-        module: copy
+      copy:
         content: "{{ sc_service_created_info | to_nice_json }}"
         dest: "./tmp/facts.solace_cloud_service.{{ sc_service.name }}.json"
-
+      delegate_to: localhost
 '''
 
 RETURN = '''
@@ -71,18 +75,32 @@ RETURN = '''
 rc:
     description: return code, either 0 (ok), 1 (not ok)
     type: int
+    returned: always
+    sample:
+        rc: 0
 msg:
     description: error message if not ok
     type: str
+    returned: error
 response:
     description: The response from the get call. Differs depending on state of service.
     type: complex
-
+    returned: success
+    contains:
+        serviceId:
+            description: The service Id of the created service
+            returned: if service exists
+            type: str
+        adminState:
+            description: The state of the service
+            returned: if service exists
+            type: str
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
 from ansible.module_utils.basic import AnsibleModule
+
 
 class SolaceCloudGetServiceTask(scu.SolaceCloudTask):
 
@@ -129,13 +147,13 @@ class SolaceCloudGetServiceTask(scu.SolaceCloudTask):
                 if self.LOOKUP_ITEM_KEY_SERVICE_ID in resp:
                     service_id = resp[self.LOOKUP_ITEM_KEY_SERVICE_ID]
                 else:
-                    raise KeyError("Could not find key:'{}' in Solace Cloud GET services response. Pls raise an issue.".format(self.LOOKUP_ITEM_KEY_SERVICE_ID))
+                    raise KeyError(f"Could not find key:'{self.LOOKUP_ITEM_KEY_SERVICE_ID}' in Solace Cloud GET services response. Pls raise an issue.")
             else:
                 return True, None
         elif lookup_item_key == self.LOOKUP_ITEM_KEY_SERVICE_ID:
             service_id = lookup_item_value
         else:
-            raise ValueError("unknown lookup_item_key='{}'. pls raise an issue.".format(lookup_item_key))
+            raise ValueError(f"unknown lookup_item_key='{lookup_item_key}'. pls raise an issue.")
 
         # not found
         if not service_id:
@@ -160,17 +178,17 @@ class SolaceCloudGetServiceTask(scu.SolaceCloudTask):
 
     def _find_service(self, resp, lookup_item_key, lookup_item_value):
         """Return a dict of object if found, otherwise None."""
-        if type(resp) is dict:
+        if isinstance(resp, dict):
             value = resp.get(lookup_item_key)
             if value == lookup_item_value:
                 return resp
-        elif type(resp) is list:
+        elif isinstance(resp, list):
             for item in resp:
                 value = item.get(lookup_item_key)
                 if value == lookup_item_value:
                     return item
         else:
-            raise TypeError("argument 'resp' is not a 'dict' nor 'list' but {}. Pls raise an issue.".format(type(resp)))
+            raise TypeError(f"argument 'resp' is not a 'dict' nor 'list' but {type(resp)}. Pls raise an issue.")
         return None
 
 
@@ -214,6 +232,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-###
-# The End.

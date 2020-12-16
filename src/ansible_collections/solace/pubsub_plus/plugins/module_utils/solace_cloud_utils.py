@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -95,10 +93,10 @@ class SolaceCloudTask:
                         result['response'] = dict(
                             invalid_keys=', '.join(bad_keys),
                             hint=[
-                                    "possible causes:",
-                                    "- wrong spelling or wrong key: check the Solace Cloud API reference documentation",
-                                    "- module's 'whitelist' isn't up to date: pls raise an issue"
-                                ],
+                                "possible causes:",
+                                "- wrong spelling or wrong key: check the Solace Cloud API reference documentation",
+                                "- module's 'whitelist' isn't up to date: pls raise an issue"
+                            ],
                             valid_keys=list(current_settings) + removed_keys
                         )
                         self.module.fail_json(msg=msg, **result)
@@ -225,10 +223,10 @@ def arg_spec_state():
 
 def _build_config_dict(resp, key):
     if not type(resp) is dict:
-        raise TypeError("argument 'resp' is not a 'dict' but {}.".format(type(resp)))
+        raise TypeError(f"argument 'resp' is not a 'dict' but {type(resp)}.")
     # wrong LOOKUP_ITEM_KEY in module
     if key not in resp:
-        raise ValueError("wrong 'LOOKUP_ITEM_KEY' in module. semp GET response does not contain key='{}'".format(key))
+        raise ValueError(f"wrong 'LOOKUP_ITEM_KEY' in module. semp GET response does not contain key='{key}'")
     # resp is a single dict, not an array
     # return an array with 1 element
     d = dict()

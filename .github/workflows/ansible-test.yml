@@ -51,6 +51,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install libyaml-dev
+          sudo apt-get install shellcheck
           python -m pip install --upgrade pip
           pip install "$ANSIBLE_VERSION"
           pip install -r requirements.txt
@@ -59,7 +60,7 @@ jobs:
       - name: Run ansible-test
         run: |
           cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
-          ansible-test sanity solace_get_facts
+          ansible-test sanity
 
 
 ###

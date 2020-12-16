@@ -1,7 +1,13 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
+ANSIBLE_METADATA = {'metadata_version': '1.1',
+                    'status': ['preview'],
+                    'supported_by': 'community'}
+
 
 class ModuleDocFragment(object):
 
@@ -59,32 +65,29 @@ options:
     SOLACE_CLOUD_CONFIG = r'''
 options:
   solace_cloud_api_token:
-    description: The API Token.
-    notes:
-    - Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
-    - Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+    description:
+      - The API Token.
+      - Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+      - Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
     type: str
     required: false
-    default: None
   solace_cloud_service_id:
-    description: The service id in Solace Cloud.
-    notes:
-    - Click on the service in Solace Cloud - the service id is in the URL.
-    - Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+    description:
+      - The service id in Solace Cloud.
+      - Click on the service in Solace Cloud - the service id is in the URL.
+      - Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
     type: str
     required: false
-    default: None
 '''
 
     SOLACE_CLOUD_SERVICE_CONFIG = r'''
 options:
   api_token:
-    description: The API Token.
-    notes:
-    - Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+    description:
+      - The API Token.
+      - Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
     type: str
     required: true
-    default: None
   timeout:
     description: Connection timeout in seconds for the http/s request.
     required: false
@@ -188,6 +191,3 @@ options:
           default: []
           elements: str
 '''
-
-###
-# The End.

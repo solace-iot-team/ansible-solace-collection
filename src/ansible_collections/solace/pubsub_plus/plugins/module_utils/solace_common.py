@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 # Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -12,7 +10,7 @@ HAS_IMPORT_ERROR = False
 IMPORT_ERR_TRACEBACK = None
 import traceback
 try:
-    import re  
+    import re
     import logging
     import json
     import os
@@ -23,7 +21,7 @@ try:
     import requests
     import xmltodict
     import urllib.parse
-    from ansible.errors import AnsibleError
+    from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError
 except ImportError:
     HAS_IMPORT_ERROR = True
     IMPORT_ERR_TRACEBACK = traceback.format_exc()
@@ -38,6 +36,7 @@ if not _PY3_MIN:
     )
     sys.exit(1)
 
+
 def module_fail_on_import_error(module, is_error, import_error_traceback=None):
     if is_error:
         if import_error_traceback is not None:
@@ -51,14 +50,15 @@ def module_fail_on_import_error(module, is_error, import_error_traceback=None):
 ################################################################################################
 # initialize logging
 
+
 ENABLE_LOGGING = False  # False to disable
 enableLoggingEnvVal = os.getenv('ANSIBLE_SOLACE_ENABLE_LOGGING')
 loggingPathEnvVal = os.getenv('ANSIBLE_SOLACE_LOG_PATH')
 if enableLoggingEnvVal is not None and enableLoggingEnvVal != '':
     try:
         ENABLE_LOGGING = bool(strtobool(enableLoggingEnvVal))
-    except ValueError:
-        raise ValueError("failed: invalid value for env var: 'ANSIBLE_SOLACE_ENABLE_LOGGING={}'. use 'true' or 'false' instead.".format(enableLoggingEnvVal))
+    except ValueError as e:
+        raise ValueError(f"failed: invalid value for env var: 'ANSIBLE_SOLACE_ENABLE_LOGGING={enableLoggingEnvVal}'. use 'true' or 'false' instead.") from e
 
 if ENABLE_LOGGING:
     logFile = './ansible-solace.log'
@@ -123,6 +123,7 @@ if not HAS_IMPORT_ERROR:
             r.headers["authorization"] = "Bearer " + self.token
             return r
 
+
 # solace cloud: cast everything to string
 # broker: cast strings to ints & floats, string booleans to boolean
 def type_conversion(d, is_solace_cloud):
@@ -153,13 +154,13 @@ def merge_dicts(*argv):
 
 def compose_path(path_array):
     if not type(path_array) is list:
-        raise TypeError("argument 'path_array' is not an array but {}".format(type(path_array)))
+        raise TypeError(f"argument 'path_array' is not an array but {type(path_array)}")
     # ensure elements are 'url encoded'
     # except first one: SEMP_V2_CONFIG or SOLACE_CLOUD_API_SERVICES_BASE_PATH
     paths = []
     for i, path_elem in enumerate(path_array):
         if path_elem == '':
-            raise ValueError("path_elem='{}' is empty in path_array='{}'.".format(path_elem, str(path_array)))
+            raise ValueError(f"path_elem='{path_elem}' is empty in path_array='{str(path_array)}'.")
         if i > 0:
             # deals with wildcards in topic strings
             # e.g. for MQTT subscriptions: '#' and '+'
@@ -196,17 +197,17 @@ def make_sempv1_post_request(solace_config, xml_data):
         'x-broker-name': solace_config.x_broker
     }
     resp = requests.post(
-                solace_config.vmr_url + "/SEMP",
-                data=xml_data,
-                auth=solace_config.vmr_auth,
-                timeout=solace_config.vmr_timeout,
-                headers=headers,
-                params=None
-            )
+        solace_config.vmr_url + "/SEMP",
+        data=xml_data,
+        auth=solace_config.vmr_auth,
+        timeout=solace_config.vmr_timeout,
+        headers=headers,
+        params=None
+    )
     if ENABLE_LOGGING:
         log_http_roundtrip(resp)
     if resp.status_code != 200:
-        raise AnsibleError("SEMP v1 call not successful. Pls check the log and raise an issue.")
+        raise SolaceError("SEMP v1 call not successful. Pls check the log and raise an issue.")
     # SEMP v1 always returns 200 (it seems)
     # error: rpc-reply.execute-result.@code != ok or missing
     # if error: rpc-reply ==> display
@@ -223,9 +224,9 @@ def make_sempv1_post_request(solace_config, xml_data):
 def execute_sempv1_get_list(solace_config, xml_dict, list_path_array):
 
     if not isinstance(xml_dict, dict):
-        raise TypeError("argument 'xml_dict' is not a dict, but {}".format(type(xml_dict)))
+        raise TypeError(f"argument 'xml_dict' is not a dict, but {type(xml_dict)}")
     if not isinstance(list_path_array, list):
-        raise TypeError("argument 'list_path_array' is not a list, but {}".format(type(list_path_array)))
+        raise TypeError(f"argument 'list_path_array' is not a list, but {type(list_path_array)}")
 
     xml_data = xmltodict.unparse(xml_dict)
 
@@ -257,7 +258,7 @@ def execute_sempv1_get_list(solace_config, xml_dict, list_path_array):
         elif isinstance(_d, list):
             resp = _d
         else:
-            raise ValueError("unknown SEMP v1 return type: {}".format(type(_d)))
+            raise ValueError(f"unknown SEMP v1 return type: {type(_d)}")
 
         result_list.extend(resp)
 
