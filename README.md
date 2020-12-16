@@ -2,6 +2,7 @@
 
 ![integration tests](https://github.com/solace-iot-team/ansible-solace-collection/workflows/integration%20tests/badge.svg)
 ![ansible-test](https://github.com/solace-iot-team/ansible-solace-collection/workflows/ansible-test/badge.svg)
+![docs](https://github.com/solace-iot-team/ansible-solace-collection/workflows/docs/badge.svg)
 
 > :warning: **UNDER CONSTRUCTION**
 
