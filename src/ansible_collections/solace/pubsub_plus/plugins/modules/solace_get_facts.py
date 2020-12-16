@@ -14,12 +14,11 @@ DOCUMENTATION = '''
 ---
 module: solace_get_facts
 
-short_description: Provides convenience functions to access solace facts gathered with M(solace_gather_facts).
+short_description: retrrieve facts from M(solace_gather_facts)
 
 description: >
-  Provides convenience functions to access solace facts from 'ansible_facts.solace'.
-  Call M(solace_gather_facts) first.
-
+  Provides convenience functions to access solace facts retrieved from broker service using M(solace_gather_facts) from 'ansible_facts.solace'.
+  
 notes:
 - In order to access other hosts' (other than the current 'inventory_host') facts, you must not use the 'serial' strategy for the playbook.
 
@@ -32,9 +31,12 @@ options:
     description: The playbook host to retrieve the facts from.
     required: True
     type: str
+  msg_vpn:
+    description: The message vpn.
+    required: False
+    type: str
   fields:
-    description: List of field names to retrieve from hostvars.
-    note: Retrieves the first occurrence of the field name only.
+    description: "List of field names to retrieve from hostvars. Note: Retrieves the first occurrence of the field name only."
     required: False
     type: list
     default: []
@@ -45,27 +47,39 @@ options:
     type: list
     default: []
     elements: str
-    choices:
-      - get_serviceSmfPlainTextListenPort
-      - get_serviceSmfCompressionListenPort
-      - get_serviceSmfTlsListenPort
-      - get_virtualRouterName
-      - get_serviceSMFMessagingEndpoints
-      - get_bridge_remoteMsgVpnLocations
-      - get_allClientConnectionDetails
     suboptions:
-      get_bridge_remoteMsgVpnLocations:
-        description:
-            - "Retrieve enabled remote message vpn locations (plain, secured, compressed) for the service/broker."
-            - "For Solace Cloud: {hostname}:{port}."
-            - "For broker: v:{virtualRouterName}."
-        type: str
-        required: no
-      get_allClientConnectionDetails:
-        description:
-            - "Retrieve all enabled client connection details for the various protocols for the service/broker."
-        type: str
-        required: no
+        get_serviceSmfPlainTextListenPort:
+            description: Retrieve the smf plain listen port
+            type: str
+            required: no
+        get_serviceSmfCompressionListenPort:
+            description: Retrieve the smf compressed listen port
+            type: str
+            required: no
+        get_serviceSmfTlsListenPort:
+            description: Retrieve the smf tls listen port
+            type: str
+            required: no
+        get_virtualRouterName:
+            description: Retrieve the virtual router name
+            type: str
+            required: no
+        get_serviceSMFMessagingEndpoints:
+            description: Retrieve the all smf messaging endpoints
+            type: str
+            required: no
+        get_bridge_remoteMsgVpnLocations:
+            description:
+                - "Retrieve enabled remote message vpn locations (plain, secured, compressed) for the service/broker."
+                - "For Solace Cloud: {hostname}:{port}."
+                - "For broker: v:{virtualRouterName}."
+            type: str
+            required: no
+        get_allClientConnectionDetails:
+            description:
+                - "Retrieve all enabled client connection details for the various protocols for the service/broker."
+            type: str
+            required: no
 
 seealso:
 - module: solace_gather_facts
@@ -75,6 +89,24 @@ author: Ricardo Gomez-Ulmke (@rjgu)
 
 EXAMPLES = '''
 
+  name: "Example for solace_get_facts"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+
+  tasks:
     - name: Gather Solace Facts
       solace_gather_facts:
 
@@ -125,7 +157,7 @@ facts:
     description: The facts requested.
     type: dict
     returned: success
-    elements: complex
+    elements: dict
     sample:
         facts:
             serviceSmfCompressionListenPort: 55003
@@ -134,14 +166,15 @@ facts:
             virtualRouterName: "single-aws-eu-west-6e-4ftdf"
 
 '''
-
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
 from ansible.module_utils.basic import AnsibleModule
-from ansible.errors import AnsibleError
 from urllib.parse import urlparse
 import json
 from json.decoder import JSONDecodeError
 import traceback
+
 
 class SolaceGetFactsTask():
 
@@ -169,19 +202,19 @@ class SolaceGetFactsTask():
 
         # get {host}.ansible_facts.solace from hostvars
         if host not in hostvars:
-            fail_reason = "Could not find host:'{}' in hostvars. Hint: Cross check spelling with inventory file.".format(host)
+            fail_reason = f"Could not find host:'{host}' in hostvars. Hint: Cross check spelling with inventory file."
             return False, fail_reason
         if 'ansible_facts' not in hostvars[host]:
-            fail_reason = "Could not find 'ansible_facts' hostvars['{}']. Hint: Call 'solace_gather_facts' module first.".format(host)
+            fail_reason = f"Could not find 'ansible_facts' hostvars['{host}']. Hint: Call 'solace_gather_facts' module first."
             return False, fail_reason
         if 'solace' not in hostvars[host]['ansible_facts']:
-            fail_reason = "Could not find 'solace' in hostvars['{}']['ansible_facts']. Hint: Call 'solace_gather_facts' module first.".format(host)
+            fail_reason = f"Could not find 'solace' in hostvars['{host}']['ansible_facts']. Hint: Call 'solace_gather_facts' module first."
             return False, fail_reason
 
         search_object = hostvars[host]['ansible_facts']['solace']
 
         if not _check_vpn_exists(search_object, vpn):
-            fail_reason = "Could not find vpn: '{}' in 'ansible_facts.solace' for host: '{}'.".format(vpn, host)
+            fail_reason = f"Could not find vpn: '{vpn}' in 'ansible_facts.solace' for host: '{host}'."
             return False, fail_reason
 
         facts = dict()
@@ -190,7 +223,7 @@ class SolaceGetFactsTask():
             for field in fields:
                 value = _get_field(search_object, field)
                 if value is None:
-                    fail_reason = "Could not find field: '{}' in 'ansible_facts.solace' for host: '{}'. Pls check spelling.".format(field, host)
+                    fail_reason = f"Could not find field: '{field}' in 'ansible_facts.solace' for host: '{host}'. Pls check spelling."
                     return False, fail_reason
                 facts[field] = value
 
@@ -212,22 +245,15 @@ class SolaceGetFactsTask():
                     elif field_func == 'get_allClientConnectionDetails':
                         field, value = _get_allClientConnectionDetails(search_object, vpn)
                     else:
-                        fail_reason = "Unknown field_func: '{}'. Pls check the documentation for supported field functions: 'ansible-doc solace_get_facts'.".format(field_func)
+                        fail_reason = f"Unknown field_func: '{field_func}'. Pls check the documentation for supported field functions."
                         return False, fail_reason
                     if field is None or value is None:
-                        fail_reason = "Function '{}()' could not find value in 'ansible_facts.solace' for host: '{}'. Pls raise an issue.".format(field_func, host)
+                        fail_reason = f"Function '{field_func}()' could not find value in 'ansible_facts.solace' for host: '{host}'. Pls raise an issue."
                         return False, fail_reason
                     facts[field] = value
-            except AnsibleError as e:
-                try:
-                    e_msg = json.loads(str(e))
-                except JSONDecodeError:
-                    e_msg = [str(e)]
-                ex_msg = [
-                    "field_func:'{}'".format(field_func),
-                    e_msg
-                ]
-                raise AnsibleError(json.dumps(ex_msg))
+            except SolaceError as e:
+                ex_msg_list = [f"field_func:'{field_func}'"] + e.to_list()
+                raise SolaceError(ex_msg_list) from e
 
         return True, facts
 
@@ -466,7 +492,7 @@ def _get_broker_service_dict(search_dict, field, value, strict=True):
     service_dict = _find_nested_dict(search_dict, field, value)
     if service_dict is None:
         if strict:
-            raise AnsibleError("Could not find '{}={}' in search_dict in broker service ansible_facts. Pls raise an issue.".format(field, value))
+            raise SolaceError(f"Could not find '{field}={value}' in search_dict in broker service ansible_facts.")
         else:
             service_dict = dict(enabled=False)
     return service_dict
@@ -476,7 +502,7 @@ def _get_sc_message_vpn_attributes_dict(search_dict):
     element = "msgVpnAttributes"
     message_vpn_attributes_dict = _get_field(search_dict, element)
     if message_vpn_attributes_dict is None:
-        raise AnsibleError("Could not find '{}' in Solace Cloud service ansible_facts. API may have changed. Pls raise an issue.".format(element))
+        raise SolaceError(f"Could not find '{element}' in Solace Cloud service ansible_facts. API may have changed.")
     return message_vpn_attributes_dict
 
 
@@ -484,7 +510,7 @@ def _get_sc_messaging_protocols_dict(search_dict):
     element = "messagingProtocols"
     messaging_protocols_dict = _get_field(search_dict, element)
     if messaging_protocols_dict is None:
-        raise AnsibleError("Could not find '{}' in Solace Cloud service ansible_facts. API may have changed. Pls raise an issue.".format(element))
+        raise SolaceError(f"Could not find '{element}' in Solace Cloud service ansible_facts. API may have changed.")
     return messaging_protocols_dict
 
 
@@ -505,17 +531,17 @@ def _get_sc_messaging_protocols_smf_dict(search_dict):
     search_value = 'SMF'
     smf_dict = _find_nested_dict(messaging_protocols_dict, field="name", value=search_value)
     if smf_dict is None:
-        raise AnsibleError("Could not find 'name={}' in messaging protocols in Solace Cloud service ansible_facts. Check if it is enabled.".format(search_value))
+        raise SolaceError(f"Could not find 'name={search_value}' in messaging protocols in Solace Cloud service ansible_facts. Check if it is enabled.")
     return smf_dict
 
 
 def _get_sc_messaging_protocol_endpoint(search_dict, field, value):
     element = 'endPoints'
     if element not in search_dict:
-        raise AnsibleError("Could not find '{}' in dict:{} messaging protocols in Solace Cloud service ansible_facts. API may have changed. Pls raise an issue.".format(element, json.dumps(search_dict)))
+        raise SolaceError(f"Could not find '{element}' in dict:{json.dumps(search_dict)} messaging protocols in Solace Cloud service ansible_facts. API may have changed.")
     end_points = search_dict[element]
     if len(end_points) == 0:
-        raise AnsibleError("List:'{}' in dict:{} in Solace Cloud service ansible_facts. API may have changed. Pls raise an issue.".format(element, json.dumps(search_dict)))
+        raise SolaceError(f"List:'{element}' in dict:{json.dumps(search_dict)} in Solace Cloud service ansible_facts. API may have changed.")
     end_point_dict = _find_nested_dict(end_points, field, value)
     # endPoint may not be enabled
     # if end_point_dict is None:
@@ -528,19 +554,18 @@ def _get_sc_messaging_protocol_endpoint_uri(search_dict):
     element = 'uris'
     if element not in search_dict:
         errs = [
-            "Could not find '{}' in messaging protocol end point:".format(element),
+            f"Could not find '{element}' in messaging protocol end point:",
             search_dict,
             "in Solace Cloud service ansible_facts."
         ]
         return dict()
-        # raise AnsibleError(json.dumps(errs))
     if len(search_dict['uris']) != 1:
         errs = [
-            "'{}' list contains != 1 elements in messaging protocol end point:".format(element),
-            "{}".format(json.dumps(search_dict)),
-            "in Solace Cloud service ansible_facts. API may have changed. Pls raise an issue.",
+            f"'{element}' list contains != 1 elements in messaging protocol end point:",
+            f"{json.dumps(search_dict)}",
+            "in Solace Cloud service ansible_facts. API may have changed.",
         ]
-        raise AnsibleError(errs)
+        raise SolaceError(errs)
     return search_dict['uris'][0]
 
 
@@ -590,9 +615,6 @@ def run_module():
         msg_vpn=dict(type='str', required=False, default=None)
     )
     arg_spec = dict()
-    # TODO: check if we need the msg_vpn with multi-vpn brokers
-    # arg_spec = su.arg_spec_vpn()
-    # module_args override standard arg_specs
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -612,13 +634,10 @@ def run_module():
         if not ok:
             result['rc'] = 1
             module.fail_json(msg=resp, **result)
-    except AnsibleError as e:
+    except SolaceError as e:
         ex = traceback.format_exc()
-        try:
-            ex_msg = json.loads(str(e))
-        except JSONDecodeError:
-            ex_msg = [str(e)]
-        msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg + ex.split('\n')
+        ex_msg_list = e.to_list()
+        msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
         module.fail_json(msg=msg, exception=ex)
 
     result['facts'] = resp
@@ -631,6 +650,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-###
-# The End.

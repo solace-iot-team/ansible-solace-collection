@@ -1,0 +1,2 @@
+plugins/modules/solace_get_facts.py pep8:E501
+plugins/modules/solace_get_facts.py compile-2.7!skip

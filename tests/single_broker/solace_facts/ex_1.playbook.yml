@@ -1,0 +1,57 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Ex_1: solace_facts"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+
+  tasks:
+    - name: "Ex_1: Gather Solace Facts"
+      solace_gather_facts:
+      no_log: true
+
+    - name: "Ex_1: wrong vpn"
+      solace_get_facts:
+        hostvars: "{{ hostvars }}"
+        host: "{{ inventory_hostname }}"
+        msg_vpn: "does_not_exist"
+        field_funcs:
+          - get_allClientConnectionDetails
+      register: result
+      failed_when: "result.rc != 1"
+      no_log: true
+    - assert:
+        that:
+          - "'Could not find vpn: \\'does_not_exist\\' in \\'ansible_facts.solace\\' for host' in result.msg"
+
+    - name: "Ex_1: unknown field func"
+      solace_get_facts:
+        hostvars: "{{ hostvars }}"
+        host: "{{ inventory_hostname }}"
+        field_funcs:
+          - unknown_field_func
+      register: result
+      failed_when: "result.rc != 1"
+      no_log: true
+    - assert:
+        that:
+          - "'Unknown field_func: \\'unknown_field_func\\'. Pls check the documentation for supported field functions' in result.msg"
+
+
+
+###
+# The End.

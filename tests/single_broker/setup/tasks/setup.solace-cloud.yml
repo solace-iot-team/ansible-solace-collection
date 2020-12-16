@@ -35,7 +35,7 @@
   register: result
   until: "result.rc != 0 or result.response.creationState == 'completed'"
   retries: 40
-  delay: 30
+  delay: 60
 
 - set_fact:
     sc_service_info: "{{ result.response }}"

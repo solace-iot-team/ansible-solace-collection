@@ -1,0 +1,89 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Main: solace_facts"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+
+    - name: "Gather Solace Facts"
+      solace_gather_facts:
+
+    - name: "Save 'ansible_facts.solace' to File"
+      copy:
+        content: "{{ ansible_facts.solace | to_nice_json }}"
+        dest: "{{ working_dir }}/facts.{{ inventory_hostname }}.json"
+      delegate_to: localhost
+      no_log: true
+
+    - name: "Get Facts: get_serviceSmfPlainTextListenPort"
+      solace_get_facts:
+        hostvars: "{{ hostvars }}"
+        host: "{{ inventory_hostname }}"
+        fields:
+        field_funcs:
+          - get_serviceSmfPlainTextListenPort
+          - get_serviceSmfCompressionListenPort
+          - get_serviceSmfTlsListenPort
+          - get_virtualRouterName
+          - get_serviceSMFMessagingEndpoints
+          - get_bridge_remoteMsgVpnLocations
+          - get_allClientConnectionDetails
+      register: result
+    - assert:
+        that:
+          - result.facts.serviceSmfPlainTextListenPort is defined
+          - result.facts.serviceSmfCompressionListenPort is defined
+          - result.facts.serviceSmfTlsListenPort is defined
+          - result.facts.virtualRouterName is defined
+          - result.facts.serviceMessagingEndpoints is defined
+          - result.facts.bridge_remoteMsgVpnLocations is defined
+          - result.facts.clientConnectionDetails is defined
+
+    - name: "Get Facts: get_allClientConnectionDetails"
+      solace_get_facts:
+        hostvars: "{{ hostvars }}"
+        host: "{{ inventory_hostname }}"
+        # msg_vpn: "{{ vpn }}"
+        fields:
+        field_funcs:
+          - get_allClientConnectionDetails
+      register: result
+
+    - set_fact:
+        client_connection_details: "{{ result.facts }}"
+
+    - name: "Print Facts: Client Connection Details"
+      debug:
+        msg:
+          - "Client Connection Details:"
+          - "{{ client_connection_details }}"
+
+    - name: "Save 'client_connection_details' to File"
+      copy:
+        content: "{{ client_connection_details | to_nice_json }}"
+        dest: "{{ working_dir }}/facts.{{ inventory_hostname }}.client_connection_details.json"
+      delegate_to: localhost
+      no_log: true
+
+
+###
+# The End.

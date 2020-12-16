@@ -389,7 +389,6 @@ def run_module():
                                         ))
     )
     arg_spec = dict()
-    # module_args override standard arg_specs
     arg_spec.update(module_args)
 
     module = AnsibleModule(
