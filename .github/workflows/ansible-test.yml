@@ -45,6 +45,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install lib yaml
+        run: |
+          sudo apt update
+          sudo apt install libyaml-dev
+
       - name: Install ansible and devel requirements
         env:
           ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
