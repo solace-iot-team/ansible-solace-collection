@@ -1,6 +1,7 @@
 ansible
 pylint
 pycodestyle
+pyyaml
 voluptuous
 yamllint
 Sphinx
