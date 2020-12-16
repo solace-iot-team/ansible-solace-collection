@@ -18,7 +18,7 @@ short_description: retrrieve facts from M(solace_gather_facts)
 
 description: >
   Provides convenience functions to access solace facts retrieved from broker service using M(solace_gather_facts) from 'ansible_facts.solace'.
-  
+
 notes:
 - In order to access other hosts' (other than the current 'inventory_host') facts, you must not use the 'serial' strategy for the playbook.
 
