@@ -120,6 +120,7 @@ options:
   semp_version:
     description: The Semp API version of the broker. See M(solace_get_facts) for info on how to retrieve the version from the broker.
     required: true
+    type: str
 '''
 
     STATE = r'''

@@ -1,0 +1,132 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: Create / Update ACL Profile with subscr & pub topic exceptions
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_acl_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_acl_subscribe_topic_exception:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_acl_publish_topic_exception:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_acl_client_connect_exception:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+        acl_profile_name: "test_ansible_solace"
+
+    - name: "Gather Solace Facts"
+      solace_gather_facts:
+    - set_fact:
+        semp_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
+
+    - name: "Delete ACL Profile"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        state: absent
+
+    - name: "Create ACL Profile"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        settings:
+          clientConnectDefaultAction: "disallow"
+          publishTopicDefaultAction: "disallow"
+          subscribeTopicDefaultAction: "disallow"
+        state: present
+
+    - name: "Update ACL Profile"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        settings:
+          clientConnectDefaultAction: "allow"
+        state: present
+
+    - name: "Add Subscribe Topic Exceptions to ACL Profile"
+      solace_acl_subscribe_topic_exception:
+        semp_version: "{{ semp_version }}"
+        acl_profile_name: "{{ acl_profile_name }}"
+        name: "test/ansible/solace"
+        state: present
+
+    - name: "Add Publish Topic Exceptions to ACL Profile"
+      solace_acl_publish_topic_exception:
+        semp_version: "{{ semp_version }}"
+        acl_profile_name: "{{ acl_profile_name }}"
+        name: "test/ansible/solace"
+        state: present
+
+    - name: "Add Client Connect Exception to ACL Profile"
+      solace_acl_client_connect_exception:
+        acl_profile_name: "{{ acl_profile_name }}"
+        name: "192.168.1.64/26"
+        state: present
+
+    - name: "Remove Client Connect Exception from ACL Profile"
+      solace_acl_client_connect_exception:
+        acl_profile_name: "{{ acl_profile_name }}"
+        name: "192.168.1.64/26"
+        state: absent
+
+    - name: "Delete Subscribe Topic Exceptions from ACL Profile"
+      solace_acl_subscribe_topic_exception:
+        semp_version: "{{ semp_version }}"
+        acl_profile_name: "{{ acl_profile_name }}"
+        name: "test/ansible/solace"
+        state: absent
+
+    - name: "Delete Publish Topic Exceptions from ACL Profile"
+      solace_acl_publish_topic_exception:
+        semp_version: "{{ semp_version }}"
+        acl_profile_name: "{{ acl_profile_name }}"
+        name: "test/ansible/solace"
+        state: absent
+
+    - name: "Delete ACL Profile"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        state: absent
+
+###
+# The End.

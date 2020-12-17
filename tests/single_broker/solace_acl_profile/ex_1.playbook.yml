@@ -1,0 +1,73 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "EX_1: ACL Profile Exceptions"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_acl_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_acl_subscribe_topic_exception:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_acl_publish_topic_exception:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_acl_client_connect_exception:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+
+  tasks:
+    - name: "EX_1: Check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+        acl_profile_name: "test_ansible_solace"
+
+    - name: "EX_1: Create ACL Profile"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        settings:
+          clientConnectDefaultAction: "disallow"
+          publishTopicDefaultAction: "disallow"
+          subscribeTopicDefaultAction: "disallow"
+        state: present
+
+    - name: "EX_1: missing semp_version"
+      solace_acl_subscribe_topic_exception:
+        acl_profile_name: "{{ acl_profile_name }}"
+        name: "test/ansible/solace"
+        state: present
+      failed_when: false
+      register: result
+    - assert:
+        that:
+          - "'missing required arguments: semp_version' in result.msg"
+
+
+###
+# The End.
