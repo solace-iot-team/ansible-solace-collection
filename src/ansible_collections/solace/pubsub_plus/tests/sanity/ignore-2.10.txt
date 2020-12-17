@@ -17,3 +17,4 @@ plugins/modules/solace_acl_subscribe_topic_exception.py compile-2.7!skip
 plugins/modules/solace_acl_subscribe_topic_exception.py pep8:E501
 plugins/modules/solace_acl_publish_topic_exception.py compile-2.7!skip
 plugins/modules/solace_acl_publish_topic_exception.py pep8:E501
+plugins/modules/solace_client_profile.py compile-2.7!skip

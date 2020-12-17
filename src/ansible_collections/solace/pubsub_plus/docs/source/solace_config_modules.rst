@@ -16,3 +16,4 @@ Solace Configuration Module Reference
    :maxdepth: 1
 
    modules/solace_acl_*
+   modules/solace_client_profile*

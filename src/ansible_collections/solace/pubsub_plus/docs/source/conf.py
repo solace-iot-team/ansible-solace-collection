@@ -43,6 +43,7 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 today_fmt = '%d %b %Y at %H:%M'
+html_last_updated_fmt = '%d %b %Y at %H:%M'
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

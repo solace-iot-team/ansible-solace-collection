@@ -1,0 +1,71 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "solace_client_profile: test exceptions."
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_client_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+
+  tasks:
+
+    - name: Client Profile - Wrong Params - 1
+      solace_client_profile:
+        solace_cloud_api_token: "xxx"
+        solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+        name: "test_ansible_solace"
+        state: present
+      register: result
+      failed_when: result.module_stderr is defined
+
+    - name: Client Profile - Wrong Params - 2
+      solace_client_profile:
+        solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+        solace_cloud_service_id: "xxx"
+        name: "test_ansible_solace"
+        state: present
+      register: result
+      failed_when: result.module_stderr is defined
+
+    - name: Client Profile - Wrong Params - 3
+      solace_client_profile:
+        solace_cloud_api_token: "{{ omit }}"
+        solace_cloud_service_id: "xxx"
+        name: "test_ansible_solace"
+        state: present
+      register: result
+      failed_when: result.module_stderr is defined
+
+    - name: Client Profile - Wrong Params - 4
+      solace_client_profile:
+        solace_cloud_api_token: "xxx"
+        solace_cloud_service_id: "{{ omit }}"
+        name: "test_ansible_solace"
+        state: present
+      register: result
+      failed_when: result.module_stderr is defined
+
+    - name: Client Profile - Wrong Params - 5
+      solace_client_profile:
+        solace_cloud_api_token: "{{ omit }}"
+        solace_cloud_service_id: "{{ omit }}"
+        name: "test_ansible_solace"
+        state: present
+      register: result
+      failed_when: result.module_stderr is defined
+
+###
+# The End.
