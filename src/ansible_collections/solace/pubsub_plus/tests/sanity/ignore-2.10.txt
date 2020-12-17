@@ -27,3 +27,10 @@ plugins/modules/solace_rdp_rest_consumer.py pep8:E501
 plugins/modules/solace_rdp_rest_consumer_trusted_cn.py compile-2.7!skip
 plugins/modules/solace_rdp_rest_consumer_trusted_cn.py pep8:E501
 plugins/modules/solace_get_queues.py compile-2.7!skip
+plugins/modules/solace_client_username.py compile-2.7!skip
+plugins/modules/solace_mqtt_session.py compile-2.7!skip
+plugins/modules/solace_get_mqtt_sessions.py compile-2.7!skip
+plugins/modules/solace_mqtt_session_subscription.py compile-2.7!skip
+plugins/modules/solace_get_mqtt_session_subscriptions.py compile-2.7!skip
+plugins/modules/solace_get_mqtt_session_subscriptions.py pep8:E501
+plugins/modules/solace_get_magic_queues.py compile-2.7!skip

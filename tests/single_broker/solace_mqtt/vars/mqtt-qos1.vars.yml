@@ -1,0 +1,40 @@
+
+---
+settings:
+  _gt_eq_2_14:
+    queueMaxMsgSize: 200000
+    queueMaxBindCount: 10
+mqtt_sessions:
+- client_id: ansible_solace_test_mqtt__1__
+  subscriptions:
+    # test URL encoding for get
+  - topic: "ansible_solace/test/__1__/topic/subscription/1/#"
+    qos: 1
+  - topic: "ansible_solace/test/__1__/topic/subscription/2/+"
+    qos: 1
+  - topic: "ansible_solace/test/__1__/topic/+/3/#"
+    qos: 1
+  - topic: "ansible_solace/test/__1__/topic/subscription/4/#"
+    qos: 1
+  - topic: "ansible_solace/test/__1__/topic/subscription/5/#"
+    qos: 1
+- client_id: ansible_solace_test_mqtt__2__
+  subscriptions:
+  - topic: "ansible_solace/test/__2__/topic/subscription/1/#"
+    qos: 0
+  - topic: "ansible_solace/test/__2__/topic/subscription/2/#"
+    qos: 0
+  - topic: "ansible_solace/test/__2__/topic/subscription/3/#"
+    qos: 1
+- client_id: ansible_solace_test_mqtt__3__
+  subscriptions:
+  - topic: "ansible_solace/test/__3__/topic/subscription/1/#"
+    qos: 1
+  - topic: "ansible_solace/test/__3__/topic/subscription/2/#"
+    qos: 1
+  - topic: "ansible_solace/test/__3__/topic/subscription/3/#"
+    qos: 0
+
+
+###
+# The End.

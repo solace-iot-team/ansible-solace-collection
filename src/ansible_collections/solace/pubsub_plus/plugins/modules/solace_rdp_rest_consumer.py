@@ -67,7 +67,7 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: Create RDP - Disabled
+  - name: Create RDP
     solace_rdp:
       name: "rdp"
       state: present

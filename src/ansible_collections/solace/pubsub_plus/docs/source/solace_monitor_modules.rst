@@ -14,3 +14,4 @@ Solace Monitor Module Reference
    :maxdepth: 1
 
    modules/solace_get_queues*
+   modules/solace_get_mqtt_session*

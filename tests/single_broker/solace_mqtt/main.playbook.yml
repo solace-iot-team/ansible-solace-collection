@@ -1,0 +1,131 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: mqtt"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_client_username:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_mqtt_session:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      virtual_router: "{{ virtual_router }}"
+    solace_mqtt_session_subscription:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      virtual_router: "{{ virtual_router }}"
+    solace_get_mqtt_sessions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_mqtt_session_subscriptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      virtual_router: "{{ virtual_router }}"
+
+  vars:
+    mqtt_client_username: "asc_test_mqtt_client_username"
+
+  tasks:
+
+    - name: Gather Solace Facts
+      solace_gather_facts:
+
+    - name: Create Client Username
+      solace_client_username:
+        name: "{{ mqtt_client_username }}"
+        state: present
+
+    - include_vars:
+        file: "mqtt.vars.yml"
+        name: mqtt
+
+    - name: Adding Mqtt Sessions
+      include_tasks: ./tasks/mqtt.tasks.yml
+      loop: "{{ mqtt.mqttSessions }}"
+      loop_control:
+        loop_var: mqtt_session_item
+
+    - name: Get Config List of MQTT Sessions
+      solace_get_mqtt_sessions:
+        query_params:
+          where:
+            - "mqttSessionClientId==ansible-solace_test_mqtt*"
+          select:
+            - "mqttSessionClientId"
+            - "mqttSessionVirtualRouter"
+            - "enabled"
+            - "owner"
+      register: get_sessions_result
+
+    - name: Fail when new sessions list count != 4
+      fail:
+        msg: "new mqtt sessions count != 4"
+      when: get_sessions_result.result_list_count != 4
+
+    - name: Get Monitor List of MQTT Sessions
+      solace_get_mqtt_sessions:
+        api: monitor
+        query_params:
+          where:
+            - "mqttSessionClientId==ansible-solace_test_mqtt*"
+          select:
+      register: get_sessions_monitor_result
+
+    - name: Print Monitor Result of MQTT Sessions
+      debug:
+        msg: "{{ get_sessions_monitor_result.result_list }}"
+
+    - name: Deleting Mqtt Sessions
+      solace_mqtt_session:
+        name: "{{ item.mqttSessionClientId }}"
+        state: absent
+      loop: "{{ mqtt.mqttSessions }}"
+
+    - name: Remove Client Username
+      solace_client_username:
+        name: "{{ mqtt_client_username }}"
+        state: absent
+
+
+###
+# The End.

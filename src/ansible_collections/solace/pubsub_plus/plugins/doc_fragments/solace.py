@@ -161,7 +161,7 @@ options:
           default: []
           elements: str
         where:
-          description: 
+          description:
             - Include in the response only objects where certain conditions are true. See the the documentation for the where parameter.
             - "Note: URL encoded automatically, you can safely use '/, <, <=, >, >=, != .. '"
           type: list
@@ -187,7 +187,7 @@ options:
           default: []
           elements: str
         where:
-          description: 
+          description:
             - Include in the response only objects where certain conditions are true. See the the documentation for the where parameter.
             - "Note: URL encoded automatically, you can safely use '/, <, <=, >, >=, != .. '"
           type: list
