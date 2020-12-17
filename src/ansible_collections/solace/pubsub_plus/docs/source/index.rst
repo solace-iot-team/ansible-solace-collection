@@ -38,3 +38,4 @@ Collection is freely available on `Ansible Galaxy`_.
    facts_and_general_modules
    solace_cloud_modules
    solace_config_modules
+   solace_monitor_modules

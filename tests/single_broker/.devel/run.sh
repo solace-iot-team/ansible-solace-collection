@@ -16,7 +16,8 @@ ansibleSolaceTests=(
   # "solace_get_available"
   # "solace_facts"
   # "solace_acl_profile"
-  "solace_client_profile"
+  # "solace_client_profile"
+  "solace_rdp"
   # "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"

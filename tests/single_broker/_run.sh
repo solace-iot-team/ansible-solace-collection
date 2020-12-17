@@ -22,6 +22,7 @@ source $PROJECT_HOME/.lib/functions.sh
       "solace_facts"
       "solace_acl_profile"
       "solace_client_profile"
+      "solace_rdp"
       "teardown"
     )
   fi

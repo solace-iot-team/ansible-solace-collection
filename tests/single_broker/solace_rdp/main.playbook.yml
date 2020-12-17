@@ -1,0 +1,122 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Test modules: solace_rdp, solace_rdp_rest_consumer, solace_rdp_rest_consumer_trust_cn, solace_rdp_queue_binding"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_rdp:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_rdp_rest_consumer:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_rdp_rest_consumer_trusted_cn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_rdp_queue_binding:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_queue:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+
+  tasks:
+
+    - name: Create RDP - Disabled
+      solace_rdp:
+        name: "rdp-test-ansible-solace"
+        settings:
+          enabled: false
+        state: present
+
+    - name: Create RDP RestConsumer - Disabled
+      solace_rdp_rest_consumer:
+        rdp_name: "rdp-test-ansible-solace"
+        name: "rdp-test-ansible-solace"
+        settings:
+          enabled: false
+          remoteHost: "host.domain.com"
+          remotePort: 443
+          tlsEnabled: true
+          outgoingConnectionCount: 10
+          maxPostWaitTime: 60
+          retryDelay: 5
+        state: present
+
+    - name: Add the TLS Trusted Common Name
+      solace_rdp_rest_consumer_trusted_cn:
+        rdp_name: "rdp-test-ansible-solace"
+        rest_consumer_name: "rdp-test-ansible-solace"
+        name: "*.domain.com"
+        state: present
+
+    - name: Create Queue
+      solace_queue:
+        name: "rdp-test-ansible-solace"
+        state: present
+
+    - name: Create a Queue Binding
+      solace_rdp_queue_binding:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        settings:
+          postRequestTarget: "/api/post/event?code=xxx"
+        state: present
+
+    - name: Enable RDP RestConsumer
+      solace_rdp_rest_consumer:
+        rdp_name: "rdp-test-ansible-solace"
+        name: "rdp-test-ansible-solace"
+        settings:
+          enabled: true
+        state: present
+
+    - name: Enable RDP
+      solace_rdp:
+        name: "rdp-test-ansible-solace"
+        settings:
+          enabled: true
+        state: present
+
+    - name: Remove RDP
+      solace_rdp:
+        name: "rdp-test-ansible-solace"
+        state: absent
+
+    - name: Remove Queue
+      solace_queue:
+        name: "rdp-test-ansible-solace"
+        state: absent
+
+###
+# The End.

@@ -17,3 +17,6 @@ Solace Configuration Module Reference
 
    modules/solace_acl_*
    modules/solace_client_profile*
+   modules/solace_rdp*
+   modules/solace_queue*
+   modules/solace_get_queues*

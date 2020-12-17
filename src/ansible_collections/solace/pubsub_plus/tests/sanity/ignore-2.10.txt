@@ -18,3 +18,12 @@ plugins/modules/solace_acl_subscribe_topic_exception.py pep8:E501
 plugins/modules/solace_acl_publish_topic_exception.py compile-2.7!skip
 plugins/modules/solace_acl_publish_topic_exception.py pep8:E501
 plugins/modules/solace_client_profile.py compile-2.7!skip
+plugins/modules/solace_queue.py compile-2.7!skip
+plugins/modules/solace_rdp.py compile-2.7!skip
+plugins/modules/solace_rdp_queue_binding.py compile-2.7!skip
+plugins/modules/solace_rdp_queue_binding.py pep8:E501
+plugins/modules/solace_rdp_rest_consumer.py compile-2.7!skip
+plugins/modules/solace_rdp_rest_consumer.py pep8:E501
+plugins/modules/solace_rdp_rest_consumer_trusted_cn.py compile-2.7!skip
+plugins/modules/solace_rdp_rest_consumer_trusted_cn.py pep8:E501
+plugins/modules/solace_get_queues.py compile-2.7!skip
