@@ -29,6 +29,7 @@ source $PROJECT_HOME/.lib/functions.sh
       "solace_client_username"
       "solace_get_vpn_clients"
       "solace_vpn"
+      "solace_cert_authority"
       "teardown"
     )
   fi

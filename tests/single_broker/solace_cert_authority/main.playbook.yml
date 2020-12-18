@@ -1,0 +1,57 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_cert_authority"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_cert_authority:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+
+  tasks:
+
+  - name: "end play for solace_cloud - doesn't support cert auths"
+    meta: end_host
+    when: broker_type == 'solace_cloud'
+
+  - name: "Check vars"
+    set_fact:
+      working_dir: "{{ WORKING_DIR }}"
+      cert_file: "{{ WORKING_DIR }}/cert.pem"
+
+  - name: create certificate
+    command: >
+      openssl req
+      -x509
+      -newkey
+      rsa:4096
+      -keyout {{ working_dir }}/key.pem
+      -out {{ cert_file }}
+      -days 365
+      -nodes
+      -subj "/C=UK/ST=London/L=London/O=Solace/OU=Org/CN=www.example.com"
+
+  - name: add
+    solace_cert_authority:
+      name: bar
+      cert_content: "{{ lookup('file', cert_file) }}"
+      settings:
+        revocationCheckEnabled: false
+      state: present
+
+  - name: remove
+    solace_cert_authority:
+      name: bar
+      state: absent
+
+###
+# The End.
