@@ -551,7 +551,10 @@ def _wait_solace_cloud_request_completed(solace_config, request_resp):
 
         if resp.text:
             resp_body = json.loads(resp.text)
-            is_completed = (resp_body['data']['adminProgress'] == 'completed')
+            is_completed = False
+            # if call is too fast, no adminProgress in response ==> not completed yet
+            if 'adminProgress' in resp_body['data']:
+                is_completed = (resp_body['data']['adminProgress'] == 'completed')
             if is_completed:
                 return True, resp_body
             else:
