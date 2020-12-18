@@ -1,0 +1,391 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_bridges"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_get_bridges:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_bridge_remote_vpns:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_client_username:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_queue:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_queue_subscription:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_bridge:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_bridge_remote_vpn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_bridge_tls_cn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_bridge_remote_subscription:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+
+  tasks:
+
+    - set_fact:
+        bridge_name: "ansible-solace__test_bridge"
+
+    - name: Gather Solace Facts
+      solace_gather_facts:
+
+    - name: "main: remove bridge to ensure test starts clean"
+      solace_bridge:
+        name: "{{ bridge_name }}"
+        virtual_router: auto
+        state: absent
+
+    - name: "main: get list of bridges"
+      solace_get_bridges:
+        query_params:
+          where:
+            - "bridgeName=={{ bridge_name }}"
+          select:
+      register: result
+
+    - name: "main: print bridges"
+      debug:
+        msg:
+          - "{{ result.result_list }}"
+          - "{{ result.result_list_count }}"
+
+    - assert: { that: "result.result_list_count == 0" }
+
+    - name: "main: Create Client Username"
+      solace_client_username:
+        name: "{{ bridge_name }}"
+        settings:
+          password: "{{ bridge_name }}"
+        state: present
+
+    - name: "main: Create Queue"
+      solace_queue:
+        name: "{{ bridge_name }}"
+        settings:
+          owner: "{{ bridge_name }}"
+          permission: consume
+          egressEnabled: true
+          ingressEnabled: true
+        state: present
+
+    - name: "main: Create Subscription on Queue"
+      solace_queue_subscription:
+        queue_name: "{{ bridge_name }}"
+        topic: "ansible/solace/test/bridge/queue/>"
+        state: present
+
+    - include_vars:
+        file: "bridges.topology.yml"
+        name: bridges_topology
+
+    - name: Create Bridge
+      solace_bridge:
+        name: "{{ bridge_name }}"
+        virtual_router: auto
+        settings:
+          enabled: false
+          remoteAuthenticationBasicClientUsername: "{{ bridge_name }}"
+          remoteAuthenticationBasicPassword: "{{ bridge_name }}"
+          remoteAuthenticationScheme: basic
+        state: present
+
+    - name: Get the Remote Host Settings for the Bridge
+      debug:
+        msg:
+          - "remote_host: {{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_host }}"
+          - "remote_vpn: {{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+
+    - name: "Get Remote Host Bridge Facts"
+      solace_get_facts:
+        hostvars: "{{ hostvars }}"
+        host: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_host }}"
+        fields:
+        field_funcs:
+          - get_bridge_remoteMsgVpnLocations
+      register: remote_host_bridge
+
+    - name: Print Remote Host Bridge Facts
+      debug:
+        msg:
+          - "remote host bridge facts:"
+          - "{{ remote_host_bridge.facts }}"
+
+    - name: Add Remote Message VPN to Bridge
+      solace_bridge_remote_vpn:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_msg_vpn_name: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+        # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
+        remote_vpn_location: "{{ remote_host_bridge.facts.bridge_remoteMsgVpnLocations.plain }}"
+        settings:
+          enabled: false
+          tlsEnabled: false
+          compressedDataEnabled: false
+        state: present
+
+    - name: Update Remote Message VPN of Bridge
+      solace_bridge_remote_vpn:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_msg_vpn_name: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+        # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
+        remote_vpn_location: "{{ remote_host_bridge.facts.bridge_remoteMsgVpnLocations.plain }}"
+        settings:
+          queueBinding: "ansible-solace__test_bridge"
+        state: present
+
+    - name: Enable Remote Message VPN of Bridge
+      solace_bridge_remote_vpn:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_msg_vpn_name: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+        # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
+        remote_vpn_location: "{{ remote_host_bridge.facts.bridge_remoteMsgVpnLocations.plain }}"
+        settings:
+          enabled: true
+        state: present
+
+    - name: Add Trusted Common Name to Bridge
+      solace_bridge_tls_cn:
+        name: foo
+        bridge_name: "{{ bridge_name }}"
+
+    - name: Add Remote Subscription DA to Bridge
+      solace_bridge_remote_subscription:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topic: "ansible/solace/test/bridge/da/>"
+        settings:
+          deliverAlwaysEnabled: true
+        state: present
+
+    - name: Add Remote Subscription P1 to Bridge
+      solace_bridge_remote_subscription:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topic: "ansible/solace/test/bridge/p1/>"
+        settings:
+          deliverAlwaysEnabled: false
+        state: present
+
+    - name: Enable Bridge
+      solace_bridge:
+        name: "{{ bridge_name }}"
+        virtual_router: auto
+        settings:
+          enabled: true
+        state: present
+
+    - name: "Check: Bridge Remote VPN is UP"
+      solace_get_bridge_remote_vpns:
+        bridge_name: "{{ bridge_name }}"
+        api: monitor
+        query_params:
+          where:
+          select:
+            - bridgeName
+            - remoteMsgVpnLocation
+            - enabled
+            - up
+            - lastConnectionFailureReason
+            - compressedDataEnabled
+            - tlsEnabled
+      register: bridge_remote_vpn_monitor_list
+
+    - name: Print Bridge Remote VPNs Monitoring Info
+      debug:
+        msg:
+          - "bridge remote VPN monitor info:"
+          - "{{ bridge_remote_vpn_monitor_list.result_list[0] }}"
+
+    - name: Assert Bridge Remote VPN Up
+      fail:
+        msg:
+          - "ERROR: Bridge Remote VPN not up."
+          - "remote vpn info:"
+          - "{{ bridge_remote_vpn_monitor_list.result_list[0] }}"
+      when: bridge_remote_vpn_monitor_list.result_list[0].up == false
+
+    - name: "Check & Retry: Bridge is UP"
+      solace_get_bridges:
+        api: monitor
+        query_params:
+          where:
+            - "bridgeName=={{ bridge_name }}"
+          select:
+            - inboundState
+            - inboundFailureReason
+            - outboundState
+      register: bridge_list
+      until:
+        - bridge_list.result_list[0].inboundState == 'ready-in-sync'
+        - bridge_list.result_list[0].outboundState == 'ready'
+      retries: 3
+      delay: 2
+      ignore_errors: yes
+
+    - name: Get Bridge Monitoring Info
+      solace_get_bridges:
+        api: monitor
+        query_params:
+          where:
+            - "bridgeName=={{ bridge_name }}"
+          select:
+            - boundToQueue
+            - bridgeName
+            - clientName
+            - compressed
+            - enabled
+            - encrypted
+            - establisher
+            - localInterface
+            - localQueueName
+            - inboundFailureReason
+            - inboundState
+            - outboundState
+            - remoteAddress
+            - remoteRouterName
+      register: bridge_list
+
+    - name: Print Bridge Monitoring Info
+      debug:
+        msg:
+          - "bridge_monitor:"
+          - "{{ bridge_list.result_list[0] }}"
+
+    - name: Assert Bridge Up
+      fail:
+        msg:
+          - "ERROR: bridge not up."
+          - "inboundState: {{ bridge_list.result_list[0].inboundState }}"
+          - "inboundFailureReason: {{ bridge_list.result_list[0].inboundFailureReason | default('') }}"
+          - "outboundState: {{ bridge_list.result_list[0].outboundState | default('') }}"
+      when: >
+        bridge_list.result_list[0].inboundState != 'ready-in-sync' or
+        bridge_list.result_list[0].outboundState != 'ready'
+
+
+  # Remove all the objects created
+
+    - name: Remove Remote Subscription DA from Bridge
+      solace_bridge_remote_subscription:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topic: "ansible/solace/test/bridge/da/>"
+        state: absent
+
+    - name: Remove Remote Subscription P1 from Bridge
+      solace_bridge_remote_subscription:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topic: "ansible/solace/test/bridge/p1/>"
+        state: absent
+
+    - name: Remove Queue Binding from Remote Message VPN of Bridge
+      solace_bridge_remote_vpn:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_msg_vpn_name: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+        # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
+        remote_vpn_location: "{{ remote_host_bridge.facts.bridge_remoteMsgVpnLocations.plain }}"
+        settings:
+          queueBinding: ""
+        state: present
+
+    - name: Remove Remote Message VPN from Bridge
+      solace_bridge_remote_vpn:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_msg_vpn_name: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+        # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
+        remote_vpn_location: "{{ remote_host_bridge.facts.bridge_remoteMsgVpnLocations.plain }}"
+        state: absent
+
+    - name: Remove Bridge
+      solace_bridge:
+        name: "{{ bridge_name }}"
+        virtual_router: auto
+        state: absent
+
+    - name: Remove Queue
+      solace_queue:
+        name: "{{ bridge_name }}"
+        state: absent
+
+    - name: Remove Client Username
+      solace_client_username:
+        name: "{{ bridge_name }}"
+        state: absent
+
+###
+# The End.

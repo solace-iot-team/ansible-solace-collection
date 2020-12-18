@@ -19,6 +19,7 @@ source $PROJECT_HOME/.lib/functions.sh
     export ANSIBLE_SOLACE_TESTS=(
       "setup"
       "solace_facts"
+      "solace_bridges"
       "teardown"
     )
   fi

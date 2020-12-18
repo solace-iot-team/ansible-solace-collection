@@ -56,15 +56,16 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: remove queue
-    solace_queue:
-      name: bar
-      state: absent
 
   - name: add queue
     solace_queue:
       name: bar
       state: present
+
+  - name: remove queue
+    solace_queue:
+      name: bar
+      state: absent
 '''
 
 RETURN = '''
