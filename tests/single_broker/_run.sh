@@ -25,6 +25,7 @@ source $PROJECT_HOME/.lib/functions.sh
       "solace_rdp"
       "solace_mqtt"
       "solace_queue"
+      "solace_topic_endpoint"
       "solace_client_username"
       "solace_get_vpn_clients"
       "solace_vpn"
