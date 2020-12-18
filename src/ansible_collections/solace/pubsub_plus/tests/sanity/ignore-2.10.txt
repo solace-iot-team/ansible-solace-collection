@@ -34,3 +34,8 @@ plugins/modules/solace_mqtt_session_subscription.py compile-2.7!skip
 plugins/modules/solace_get_mqtt_session_subscriptions.py compile-2.7!skip
 plugins/modules/solace_get_mqtt_session_subscriptions.py pep8:E501
 plugins/modules/solace_get_magic_queues.py compile-2.7!skip
+plugins/modules/solace_queue_subscription.py compile-2.7!skip
+plugins/modules/solace_get_client_profiles.py compile-2.7!skip
+plugins/modules/solace_get_client_usernames.py compile-2.7!skip
+plugins/modules/solace_get_vpn_clients.py compile-2.7!skip
+plugins/modules/solace_vpn.py compile-2.7!skip

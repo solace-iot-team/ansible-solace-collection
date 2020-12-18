@@ -58,16 +58,15 @@ EXAMPLES = '''
       solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 
-  tasks:
-
+  tasks:  
     - name: Gather Solace Facts
       solace_gather_facts:
 
     - name: "Save hostvars to ./hostvars.json"
-      local_action:
-        module: copy
+      copy:
         content: "{{ hostvars | to_nice_json }}"
         dest: ./hostvars.json
+      delegate_to: localhost  
 
 '''
 
@@ -80,6 +79,7 @@ ansible_facts.solace:
     sample:
         ansible_facts:
             solace:
+                isSolaceCloud: false
                 Server: "Solace_VMR/9.6.0.27"
                 about:
                     api:

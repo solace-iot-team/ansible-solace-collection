@@ -121,6 +121,17 @@ class SolaceTask:
         )
         return
 
+    def assert_is_not_solace_cloud(self):
+        # needs to make a call like solace_gather_facts
+        if self.solace_config.solace_cloud_config is None:
+            return
+        result = dict(
+            changed=False,
+            rc=1
+        )
+        _msg  =  "Error: cannot use module to manage/configure Solace Cloud service." 
+        self.module.fail_json(msg=_msg, **result)
+
     def do_task(self):
 
         result = dict(
@@ -590,8 +601,7 @@ def _create_hint_bad_response(meta):
         if meta['error']['code'] == 89:
             meta['hint'] = [
                 "This might be a Solace Cloud service.",
-                "If so, check the module's documentation on how to provide Solace Cloud parameters:",
-                "ansible-doc <module-name>"
+                "If so, check the module's documentation if applicable and on how to provide Solace Cloud parameters"
             ]
     return meta
 
@@ -627,7 +637,6 @@ def is_broker_solace_cloud(solace_config):
     if solace_config.solace_cloud_config is None:
         return False
     return True
-
 
 if not sc.HAS_IMPORT_ERROR:
     class BearerAuth(requests.auth.AuthBase):

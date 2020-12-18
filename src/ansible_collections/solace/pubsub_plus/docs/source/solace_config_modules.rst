@@ -17,9 +17,11 @@ Solace Configuration Module Reference
 
    modules/solace_acl_*
    modules/solace_client*
-   modules/solace_rdp*
-   modules/solace_queue*
    modules/solace_get_queues*
-   modules/solace_mqtt_session*
    modules/solace_get_mqtt_session*
    modules/solace_get_magic_queues*
+   modules/solace_get_client*
+   modules/solace_mqtt_session*
+   modules/solace_queue*
+   modules/solace_rdp*
+   modules/solace_vpn

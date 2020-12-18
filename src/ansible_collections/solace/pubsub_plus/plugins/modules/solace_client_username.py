@@ -22,6 +22,9 @@ description:
 notes:
   - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientUsername."
 
+seealso:
+- module: solace_get_client_usernames
+
 options:
   name:
     description: The client username. Maps to 'clientUsername' in the API.

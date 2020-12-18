@@ -1,0 +1,126 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_client_username"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_client_username:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_client_usernames:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+
+  tasks:
+
+    - name: "main: get pre-existing client usernames"
+      solace_get_client_usernames:
+        query_params:
+          where:
+            - "clientUsername==ansible-solace__test*"
+          select:
+            - "clientUsername"
+      register: pre_existing_list
+
+    - name: "main: print pre-existing list"
+      debug:
+        msg:
+          - "{{ pre_existing_list.result_list }}"
+          - "{{ pre_existing_list.result_list_count }}"
+
+    - name: "main: remove all found client usernames"
+      solace_client_username:
+        name: "{{ item.clientUsername }}"
+        state: absent
+      register: result
+      loop: "{{ pre_existing_list.result_list }}"
+
+    - include_vars:
+        file: "client_usernames.vars.json"
+        name: target_list
+
+    - name: "main: adding / updating client usernames"
+      solace_client_username:
+        name: "{{ item.name }}"
+        state: present
+      loop: "{{ target_list.clientUsernames }}"
+
+    - name: "main: get new client usernames"
+      solace_get_client_usernames:
+        query_params:
+          where:
+            - "clientUsername==ansible-solace__test*"
+          select:
+            - "clientUsername"
+      register: new_list_result
+
+    - name: "main: print new client username list"
+      debug:
+        msg:
+          - "{{ new_list_result.result_list }}"
+          - "{{ new_list_result.result_list_count }}"
+    - assert:
+        that:
+          - new_list_result.result_list_count == 4
+
+    - name: "get: config: new client usernames"
+      solace_get_client_usernames:
+        api: config
+        query_params:
+          where:
+            - "clientUsername==ansible-solace__test*"
+          select:
+      register: result
+
+    - name: "main: config: print"
+      debug:
+        msg:
+          - "{{ result.result_list }}"
+          - "{{ result.result_list_count }}"
+    - assert:
+        that:
+          - result.result_list_count == 4
+
+    - name: "get: monitor: new client usernames"
+      solace_get_client_usernames:
+        api: monitor
+        query_params:
+          where:
+            - "clientUsername==ansible-solace__test*"
+          select:
+      register: result
+
+    - name: "main: monitor: print"
+      debug:
+        msg:
+          - "{{ result.result_list }}"
+          - "{{ result.result_list_count }}"
+    - assert:
+        that:
+          - result.result_list_count == 4
+
+    - name: "main: remove all client usernames"
+      solace_client_username:
+        name: "{{ item.name }}"
+        state: absent
+      register: result
+      loop: "{{ target_list.clientUsernames }}"
+
+
+###
+# The End.

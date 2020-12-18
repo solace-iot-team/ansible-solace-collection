@@ -1,0 +1,117 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+-
+  name: "get: solace_get_queues"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_queue:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_queues:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+
+  tasks:
+
+    - name: "get: get all pre-existing queues"
+      solace_get_queues:
+        query_params:
+          where:
+            - "queueName==ansible-solace/test*"
+            - "ingressEnabled==true"
+            - "maxMsgSpoolUsage<2000"
+            - "eventMsgSpoolUsageThreshold.clearPercent<=60"
+          select:
+            - "queueName"
+            - "eventMsgSpoolUsageThreshold"
+      register: pre_existing_queues_result
+
+    - name: Print pre-existing queue list
+      debug:
+        msg: "{{ pre_existing_queues_result.result_list }}"
+
+    - name: Print count of pre-existing queue list
+      debug:
+        msg: "{{ pre_existing_queues_result.result_list_count }}"
+
+    - name: "get: remove all queues"
+      solace_queue:
+        name: "{{ item.queueName }}"
+        state: absent
+      register: result
+      loop: "{{ pre_existing_queues_result.result_list }}"
+
+    - include_vars:
+        file: "queues.vars.json"
+        name: target_result_list
+
+    - name: "get: call tasks"
+      include_tasks: ./tasks/queue.tasks.yml
+      register: result
+      loop: "{{ target_result_list.queues }}"
+      loop_control:
+        loop_var: queue_item
+
+    - name: "get: config: new queues"
+      solace_get_queues:
+        api: config
+        query_params:
+          where:
+            - "queueName==ansible-solace/test*"
+            - "ingressEnabled==true"
+            - "maxMsgSpoolUsage<101"
+            - "eventMsgSpoolUsageThreshold.clearPercent<=60"
+          select:
+            - "queueName"
+            - "eventMsgSpoolUsageThreshold"
+      register: new_queues_result
+
+    - name: "get: config: print new queue list"
+      debug:
+        msg:
+          - "{{ new_queues_result.result_list }}"
+          - "{{ new_queues_result.result_list_count }}"
+
+    - name: "get: config: fail when new queue list count != 4"
+      fail:
+        msg: "new queue count != 4"
+      when: new_queues_result.result_list_count != 4
+
+    - name: "get: monitor: new queues"
+      solace_get_queues:
+        api: monitor
+        query_params:
+          where:
+            - "queueName==ansible-solace/test*"
+          select:
+      register: new_queues_monitor_result
+
+    - name: "get: monitor: print queue list"
+      debug:
+        msg:
+          - "{{ new_queues_monitor_result.result_list }}"
+          - "{{ new_queues_result.result_list_count }}"
+
+    - name: "get: remove all queues"
+      solace_queue:
+        name: "{{ item.name }}"
+        state: absent
+      register: result
+      loop: "{{ target_result_list.queues }}"
+
+###
+# The End.

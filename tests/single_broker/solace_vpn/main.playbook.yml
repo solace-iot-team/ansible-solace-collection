@@ -1,0 +1,56 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_vpn"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_vpn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+
+  tasks:
+
+    - name: "main: gather facts"
+      solace_gather_facts:
+    - set_fact:
+        is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud}}"
+
+    - name: "main: create vpn"
+      solace_vpn:
+        name: ansible_test_vpn
+        settings:
+          enabled: true
+          authenticationBasicType: "none" # none, internal
+          maxMsgSpoolUsage: 100
+          serviceMqttPlainTextEnabled: true
+          serviceMqttMaxConnectionCount: 10
+          serviceMqttPlainTextListenPort: 1884
+        state: present
+      when: not is_solace_cloud
+
+    - name: "main: remove vpn"
+      solace_vpn:
+        name: ansible_test_vpn
+        state: absent
+      when: not is_solace_cloud
+
+###
+# The End.

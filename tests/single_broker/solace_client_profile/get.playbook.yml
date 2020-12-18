@@ -1,0 +1,108 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "get: solace_client_profiles"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_client_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_get_client_profiles:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+
+  tasks:
+
+    - name: "get: existing client profiles"
+      solace_get_client_profiles:
+        query_params:
+          where:
+            - "clientProfileName==ansible-solace__test*"
+          select:
+            - "clientProfileName"
+      register: pre_existing_list
+
+    - name: "get: print pre-existing list"
+      debug:
+        msg:
+          - "{{ pre_existing_list.result_list }}"
+          - "{{ pre_existing_list.result_list_count }}"
+
+    - name: "get: remove all found client profiles"
+      solace_client_profile:
+        name: "{{ item.clientProfileName }}"
+        state: absent
+      register: result
+      loop: "{{ pre_existing_list.result_list }}"
+
+    - include_vars:
+        file: "get.vars.json"
+        name: target_list
+
+    - name: "get: add client profiles"
+      solace_client_profile:
+        name: "{{ item.name }}"
+        state: present
+      loop: "{{ target_list.clientProfileNames }}"
+
+    - name: "get: config: get new client profiles"
+      solace_get_client_profiles:
+        query_params:
+          where:
+            - "clientProfileName==ansible-solace__test*"
+          select:
+            - "clientProfileName"
+      register: new_list_result
+
+    - name: "get: config: print new client profile list"
+      debug:
+        msg:
+          - "{{ new_list_result.result_list }}"
+          - "{{ new_list_result.result_list_count }}"
+
+    - name: "get: config: fail when new client profile list count != 4"
+      fail:
+        msg: "new client profile list count != 4"
+      when: new_list_result.result_list_count != 4
+
+    - name: "get: monitor: info of new client profiles"
+      solace_get_client_profiles:
+        api: monitor
+        query_params:
+          where:
+            - "clientProfileName==ansible-solace__test*"
+          select:
+      register: monitor_result
+
+    - name: "get: monitor: print list"
+      debug:
+        msg:
+          - "{{ monitor_result.result_list }}"
+          - "{{ monitor_result.result_list_count }}"
+
+    - name: "get: remove all client profiles"
+      solace_client_profile:
+        name: "{{ item.name }}"
+        state: absent
+      register: result
+      loop: "{{ target_list.clientProfileNames }}"
+
+###
+# The End.

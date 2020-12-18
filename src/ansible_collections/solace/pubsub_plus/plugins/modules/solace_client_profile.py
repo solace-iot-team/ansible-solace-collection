@@ -25,6 +25,9 @@ notes:
 - "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile)."
 - "Reference: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_client_profiles.htm)."
 
+seealso:
+- module: solace_get_client_profiles
+
 options:
   name:
     description: Name of the client profile. Maps to 'clientProfileName' in the API.

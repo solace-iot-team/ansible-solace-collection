@@ -13,5 +13,7 @@ Solace Monitor Module Reference
    :glob:
    :maxdepth: 1
 
-   modules/solace_get_queues*
+   modules/solace_get_client*
    modules/solace_get_mqtt_session*
+   modules/solace_get_queues*
+   modules/solace_get_vpn_clients*
