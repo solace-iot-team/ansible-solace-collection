@@ -58,7 +58,7 @@ EXAMPLES = '''
       solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 
-  tasks:  
+  tasks:
     - name: Gather Solace Facts
       solace_gather_facts:
 
@@ -66,7 +66,7 @@ EXAMPLES = '''
       copy:
         content: "{{ hostvars | to_nice_json }}"
         dest: ./hostvars.json
-      delegate_to: localhost  
+      delegate_to: localhost
 
 '''
 

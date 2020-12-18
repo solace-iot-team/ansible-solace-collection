@@ -12,32 +12,23 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: solace_bridge_tls_cn
+module: solace_dmr_cluster_link
 
-short_description: trusted common name for bridge
+short_description: Configure a link object on a DMR cluster.
 
 description:
-  - "Allows addition and removal of trusted commonn name objects on a bridge in an idempotent manner."
-  - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeTlsTrustedCommonName."
+  - "Allows addition, removal and configuration of link objects on a DMR cluster."
+  - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLink."
 
 options:
   name:
-    description: The trusted common name. Maps to 'tlsTrustedCommonName' in the API.
+    description: The name of the node at the remote end of the Link. Maps to 'remoteNodeName' in the API.
     required: true
     type: str
-  bridge_name:
-    description: The bridge.
+  dmr_cluster_name:
+    description: The name of the DMR cluster. Maps to 'dmrClusterName' in the API.
     required: true
     type: str
-  virtual_router:
-    description: The virtual router.
-    required: false
-    type: str
-    default: auto
-    choices:
-      - primary
-      - backup
-      - auto
 
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
@@ -56,7 +47,7 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-  solace_bridge_tls_cn:
+  solace_dmr_cluster_link:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -65,18 +56,22 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: Remove Trusted Common Name
-    solace_bridge_tls_cn:
-      name: foo
-      bridge_name: bar
-      virtual_router: auto
+  - name: remove
+    solace_dmr_cluster_link:
+      name: remoteNode
+      dmr_cluster_name: foo
       state: absent
 
-  - name: Add Trusted Common Name
-    solace_bridge_tls_cn:
-      name: foo
-      bridge_name: bar
-      virtual_router: auto
+  - name: add
+    solace_dmr_cluster_link:
+      name: remoteNode
+      dmr_cluster_name: foo
+      state: present
+      settings:
+        enabled: false
+        authenticationBasicPassword: secret_password
+        span: internal
+        initiator: local
 '''
 
 RETURN = '''
@@ -91,49 +86,47 @@ import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils 
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceBridgeTrustedCommonNamesTask(su.SolaceTask):
+class SolaceDMRLinkTask(su.SolaceTask):
 
-    LOOKUP_ITEM_KEY = 'tlsTrustedCommonName'
+    LOOKUP_ITEM_KEY = 'remoteNodeName'
 
     def __init__(self, module):
         su.SolaceTask.__init__(self, module)
 
-    def get_args(self):
-        return [self.module.params['msg_vpn'], self.module.params['virtual_router'], self.module.params['bridge_name']]
-
     def lookup_item(self):
         return self.module.params['name']
 
-    def get_func(self, solace_config, vpn, virtual_router, bridge_name, lookup_item_value):
-        bridge_uri = ','.join([bridge_name, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_TRUSTED_COMMON_NAMES, lookup_item_value]
+    def get_args(self):
+        return [self.module.params['dmr_cluster_name']]
+
+    def get_func(self, solace_config, dmr_cluster_name, lookup_item_value):
+        path_array = [su.SEMP_V2_CONFIG, su.DMR_CLUSTERS, dmr_cluster_name, su.LINKS, lookup_item_value]
         return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
 
-    def create_func(self, solace_config, vpn, virtual_router, bridge_name, trusted_common_name, settings=None):
+    def create_func(self, solace_config, dmr_cluster_name, link, settings=None):
         defaults = {
-            'msgVpnName': vpn,
-            'bridgeVirtualRouter': virtual_router
+            'dmrClusterName': dmr_cluster_name
         }
         mandatory = {
-            'bridgeName': bridge_name,
-            'tlsTrustedCommonName': trusted_common_name
+            'remoteNodeName': link
         }
         data = su.merge_dicts(defaults, mandatory, settings)
-        bridge_uri = ','.join([bridge_name, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_TRUSTED_COMMON_NAMES]
+        path_array = [su.SEMP_V2_CONFIG, su.DMR_CLUSTERS, dmr_cluster_name, su.LINKS]
         return su.make_post_request(solace_config, path_array, data)
 
-    def delete_func(self, solace_config, vpn, virtual_router, bridge_name, lookup_item_value):
-        bridge_uri = ','.join([bridge_name, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_TRUSTED_COMMON_NAMES, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array, None)
+    def update_func(self, solace_config, dmr, lookup_item_value, settings):
+        path_array = [su.SEMP_V2_CONFIG, su.DMR_CLUSTERS, dmr, su.LINKS, lookup_item_value]
+        return su.make_patch_request(solace_config, path_array, settings)
+
+    def delete_func(self, solace_config, dmr, lookup_item_value):
+        path_array = [su.SEMP_V2_CONFIG, su.DMR_CLUSTERS, dmr, su.LINKS, lookup_item_value]
+        return su.make_delete_request(solace_config, path_array)
 
 
 def run_module():
     module_args = dict(
         name=dict(type='str', required=True),
-        bridge_name=dict(type='str', required=True),
-        virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto'])
+        dmr_cluster_name=dict(type='str', required=True)
     )
     arg_spec = su.arg_spec_broker()
     arg_spec.update(su.arg_spec_vpn())
@@ -146,7 +139,7 @@ def run_module():
         supports_check_mode=True
     )
 
-    solace_task = SolaceBridgeTrustedCommonNamesTask(module)
+    solace_task = SolaceDMRLinkTask(module)
     result = solace_task.do_task()
 
     module.exit_json(**result)

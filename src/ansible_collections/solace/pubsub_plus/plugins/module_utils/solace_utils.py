@@ -129,7 +129,7 @@ class SolaceTask:
             changed=False,
             rc=1
         )
-        _msg  =  "Error: cannot use module to manage/configure Solace Cloud service." 
+        _msg = "Error: cannot use module to manage/configure Solace Cloud service."
         self.module.fail_json(msg=_msg, **result)
 
     def do_task(self):
@@ -637,6 +637,7 @@ def is_broker_solace_cloud(solace_config):
     if solace_config.solace_cloud_config is None:
         return False
     return True
+
 
 if not sc.HAS_IMPORT_ERROR:
     class BearerAuth(requests.auth.AuthBase):

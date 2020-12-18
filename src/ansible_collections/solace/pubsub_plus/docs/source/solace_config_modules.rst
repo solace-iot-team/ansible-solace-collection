@@ -19,6 +19,7 @@ Solace Configuration Module Reference
    modules/solace_bridge*
    modules/solace_client*
    modules/solace_cert_authority*
+   modules/solace_dmr_*
    modules/solace_get_bridge*
    modules/solace_get_queues*
    modules/solace_get_mqtt_session*
