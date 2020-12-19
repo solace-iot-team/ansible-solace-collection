@@ -1,41 +1,65 @@
-Quickstart for Solace PubSub+
-=============================
+Quickstart for Solace PubSub+ Ansible Collection
+================================================
 
-Installing the Solace PubSub+ Ansible Collection::
+Installation & Dependencies
+---------------------------
+
+Prerequisites:
+  - install python >=3.6
+  - install docker
+
+Download the python dependencies:
+:download:`requirements <../examples/requirements.txt>`:
+
+.. literalinclude:: ../examples/requirements.txt
+
+and the
+:download:`quickstart.requirements <../examples/quickstart/quickstart.requirements.txt>`:
+
+.. literalinclude:: ../examples/quickstart/quickstart.requirements.txt
+
+Install:
+
+.. code-block:: bash
+
+  # upgrade to latest pip3
+  $ python3 -m pip install --upgrade pip
+  $ pip install -r requirements.txt
+  $ pip install -r quickstart.requirements.txt
+  $ pip install ansible
+
+Install the Solace PubSub+ Ansible Collection::
 
   $ ansible-galaxy collection install solace.pubsub_plus
 
-.. Now we can set up a simple Sensu Go sandbox using the following
-.. :download:`playbook <../examples/quickstart/playbook-6.yaml>`:
-..
-.. .. literalinclude:: ../examples/quickstart/playbook-6.yaml
-..    :language: yaml
-..
-.. When we run it, Ansible will install and configure backend and agents on
-.. selected hosts, and then configure a ntp check that agents will execute twice
-.. a minute. Note that we do not need to inform agents explicitly where the
-.. backend is because the :doc:`agent role <roles/agent>` can obtain the
-.. backend's address from the inventory.
-..
-.. Now, before we can run this playbook, we need to prepare an inventory file.
-.. The inventory should contain two groups of hosts: *backends* and *agents*. A
-.. :download:`minimal inventory <../examples/quickstart/inventory.yaml>` with
-.. only two hosts will look somewhat like this:
-..
-.. .. literalinclude:: ../examples/quickstart/inventory.yaml
-..    :language: yaml
-..
-.. Replace the IP addresses with your own and make sure you can ssh into those
-.. hosts. If you need help with building your inventory file, consult `official
-.. documentation on inventory`_.
-..
-.. .. _official documentation on inventory:
-..    https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
-..
-.. All that we need to do now is to run the playbook::
-..
-..    $ ansible-playbook -i inventory.yaml playbook-6.yaml
-..
-.. And in a few minutes, things should be ready to go. And if we now visit
-.. http://192.168.50.4:3000 (replace that IP address with the address of your
-.. backend), we can log in and start exploring.
+
+Playbook & Inventory
+--------------------
+
+Our playbook requires the local broker
+:download:`inventory <../examples/quickstart/local.broker.inventory.yml>`:
+
+.. literalinclude:: ../examples/quickstart/local.broker.inventory.yml
+   :language: yaml
+
+Now we can create a few simple Broker Objects using the following
+:download:`playbook <../examples/quickstart/quickstart.playbook.yml>`:
+
+.. literalinclude:: ../examples/quickstart/quickstart.playbook.yml
+   :language: yaml
+
+When we run the playbook, Ansible will download the latest Solace PubSub+
+Standard Edition broker and start it on the local machine using Docker.
+It will then configure two simple objects: a queue and attach a subscription
+to the queue.
+
+Run
+---
+Run the playbook::
+
+  $ ansible-playbook -i local.broker.inventory.yml quickstart.playbook.yml
+
+Open a new private window in your browser and log into the Broker's admin
+console at http://localhost:8080 with credentials **admin/admin**.
+
+Navigate to Queues to see the queue created.
