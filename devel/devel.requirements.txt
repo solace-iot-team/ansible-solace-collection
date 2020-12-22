@@ -7,5 +7,6 @@ yamllint
 rstcheck
 Sphinx
 sphinx-rtd-theme
+sphinxcontrib-contentui
 ansible-doc-extractor
 docker-compose

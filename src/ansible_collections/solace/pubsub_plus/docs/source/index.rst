@@ -1,14 +1,11 @@
-.. Solace PubSub+ Ansible Collection documentation master file, created by
-   sphinx-quickstart on Mon Dec 14 10:11:54 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
 Solace PubSub+ Ansible Collection
 =================================
 
-**UNDER CONSTRUCTION**
+.. attention::
+  UNDER CONSTRUCTION
 
-The collection is freely available on `Ansible Galaxy`_.
+The collection is available on `Ansible Galaxy`_.
 
 .. _Ansible Galaxy:
   https://galaxy.ansible.com/solace/pubsub_plus
@@ -19,6 +16,7 @@ The collection is freely available on `Ansible Galaxy`_.
   :caption: Using Solace PubSub+ Ansible Collection
 
   quickstart
+  installation
 
 
 .. toctree::
@@ -36,3 +34,11 @@ The collection is freely available on `Ansible Galaxy`_.
   solace_config_modules
   solace_monitor_modules
   roles
+
+Repos
+-----
+
+`Ansible Solace Collection`_
+
+.. _Ansible Solace Collection:
+  https://github.com/solace-iot-team/ansible-solace-collection

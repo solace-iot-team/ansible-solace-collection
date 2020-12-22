@@ -2,11 +2,14 @@
 
 scriptDir=$(cd $(dirname "$0") && pwd);
 
+# set the python interpreter
+  export ANSIBLE_PYTHON_INTERPRETER=$(python3 -c "import sys; print(sys.executable)")
+
 # set the working dir
   WORKING_DIR="$scriptDir/tmp"
 
 # create broker service
-  ansible-playbook -i $scriptDir/inventory.yml $scriptDir/service.playbook.yml --extra-vars "WORKING_DIR=$WORKING_DIR"
+  ansible-playbook $scriptDir/service.playbook.yml --extra-vars "WORKING_DIR=$WORKING_DIR"
 
 # configure broker service
   # enable logging

@@ -1,6 +1,6 @@
 -
   name: Quickstart Playbook
-  hosts: all
+  hosts: localhost
   gather_facts: no
   any_errors_fatal: true
   tasks:
