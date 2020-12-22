@@ -17,10 +17,11 @@ The collection is available on `Ansible Galaxy`_.
 
   quickstart
   installation
+  tutorials
 
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 1
   :caption: Guides
 
   concepts
@@ -38,7 +39,11 @@ The collection is available on `Ansible Galaxy`_.
 Repos
 -----
 
-`Ansible Solace Collection`_
+- `Ansible Solace Collection`_
+- `Ansible Solace Tutorials and Projects`_
 
 .. _Ansible Solace Collection:
   https://github.com/solace-iot-team/ansible-solace-collection
+
+.. _Ansible Solace Tutorials and Projects:
+  https://github.com/solace-iot-team/ansible-solace
