@@ -1,0 +1,216 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_mqtt_session_subscriptions.py
+
+.. _solace_get_mqtt_session_subscriptions_module:
+
+solace_get_mqtt_session_subscriptions -- list of mqtt session subscriptions
+===========================================================================
+
+Get a list of MQTT Session Subscription Objects.
+
+Implements the config and monitor API.
+
+Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   hosts: all
+   gather_facts: no
+   any_errors_fatal: true
+   collections:
+   - solace.pubsub_plus
+   module_defaults:
+     solace_get_mqtt_session_subscriptions:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       msg_vpn: "{{ vpn }}"
+   tasks:
+
+     - name: get subscriptions
+       solace_get_mqtt_session_subscriptions:
+           api: config
+           client_id: client-id
+           query_params:
+             where:
+               - "subscriptionTopic==ansible-solace/test/*"
+             select:
+               - "mqttSessionClientId"
+               - "mqttSessionVirtualRouter"
+               - "subscriptionTopic"
+               - "subscriptionQos"
+       register: result
+
+     - name: result config api
+       debug:
+           msg:
+               - "{{ result.result_list }}"
+               - "{{ result.result_list_count }}"
+
+     - name: get subscriptions
+       solace_get_mqtt_session_subscriptions:
+           api: monitor
+           client_id: client-id
+           query_params:
+             where:
+               - "subscriptionTopic==ansible-solace/test/*"
+             select:
+               - "mqttSessionClientId"
+               - "mqttSessionVirtualRouter"
+               - "subscriptionTopic"
+               - "subscriptionQos"
+       register: result
+
+     - name: result monitor api
+       debug:
+           msg:
+               - "{{ result.result_list }}"
+               - "{{ result.result_list_count }}"
+
+
+
+Notes
+-----
+
+.. note::
+   Reference Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/mqttSession/getMsgVpnMqttSessionSubscriptions.
+
+   Reference Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/mqttSession/getMsgVpnMqttSessionSubscriptions.
+
+   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
+
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_mqtt_session_subscription_module`
+
+
+
+Parameters
+----------
+
+api (optional)
+  The API the query should run against.
+
+  | **type**: str
+  | **default**: config
+  | **choices**: config, monitor
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+mqtt_session_client_id (required)
+  The MQTT session client id. Maps to 'mqttSessionClientId' in the API.
+
+  | **type**: str
+
+msg_vpn (required)
+  The message vpn.
+
+  | **type**: str
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+query_params (optional)
+  The query parameters.
+
+  | **type**: dict
+
+  select (optional)
+    Include in the response only selected attributes of the object, or exclude from the response selected attributes of the object. See the documentation for the select parameter.
+
+    | **type**: list
+
+  where (optional)
+    Include in the response only objects where certain conditions are true. See the the documentation for the where parameter.
+
+    Note: URL encoded automatically, you can safely use '/, <, <=, >, >=, != .. '
+
+    | **type**: list
+
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+virtual_router (optional)
+  The virtual router.
+
+  | **type**: str
+  | **default**: primary
+  | **choices**: primary, backup
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+result_list
+  The list of objects found containing requested fields. Payload depends on API called.
+
+  | **returned**: success
+  | **type**: list
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+result_list_count
+  Number of items in result_list.
+
+  | **returned**: success
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+

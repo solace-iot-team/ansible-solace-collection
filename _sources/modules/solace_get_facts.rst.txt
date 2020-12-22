@@ -1,11 +1,11 @@
-:github_url: https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_get_facts.py
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_facts.py
 
 .. _solace_get_facts_module:
 
-solace_get_facts -- Provides convenience functions to access solace facts gathered with :ref:`solace_gather_facts <solace_gather_facts_module>`.
-================================================================================================================================================
+solace_get_facts -- get facts from :ref:`solace_gather_facts <solace_gather_facts_module>`
+==========================================================================================
 
-Provides convenience functions to access solace facts from 'ansible_facts.solace'. Call :ref:`solace_gather_facts <solace_gather_facts_module>` first.
+Provides convenience functions to access solace facts retrieved from broker service using :ref:`solace_gather_facts <solace_gather_facts_module>` from 'ansible_facts.solace'.
 
 
 
@@ -18,6 +18,24 @@ Examples
 
    
 
+     name: "Example for solace_get_facts"
+     hosts: all
+     gather_facts: no
+     any_errors_fatal: true
+     collections:
+       - solace.pubsub_plus
+     module_defaults:
+       solace_gather_facts:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+
+     tasks:
        - name: Gather Solace Facts
          solace_gather_facts:
 
@@ -87,7 +105,6 @@ field_funcs (optional)
   List of pre-built field functions that retrieve values from hostvars.
 
   | **type**: list
-  | **choices**: get_serviceSmfPlainTextListenPort, get_serviceSmfCompressionListenPort, get_serviceSmfTlsListenPort, get_virtualRouterName, get_serviceSMFMessagingEndpoints, get_bridge_remoteMsgVpnLocations, get_allClientConnectionDetails
 
   get_allClientConnectionDetails (optional)
     Retrieve all enabled client connection details for the various protocols for the service/broker.
@@ -103,9 +120,34 @@ field_funcs (optional)
 
     | **type**: str
 
+  get_serviceSmfCompressionListenPort (optional)
+    Retrieve the smf compressed listen port
+
+    | **type**: str
+
+  get_serviceSMFMessagingEndpoints (optional)
+    Retrieve the all smf messaging endpoints
+
+    | **type**: str
+
+  get_serviceSmfPlainTextListenPort (optional)
+    Retrieve the smf plain listen port
+
+    | **type**: str
+
+  get_serviceSmfTlsListenPort (optional)
+    Retrieve the smf tls listen port
+
+    | **type**: str
+
+  get_virtualRouterName (optional)
+    Retrieve the virtual router name
+
+    | **type**: str
+
 
 fields (optional)
-  List of field names to retrieve from hostvars.
+  List of field names to retrieve from hostvars. Note: Retrieves the first occurrence of the field name only.
 
   | **type**: list
 
@@ -118,6 +160,11 @@ hostvars (required)
   The playbook's 'hostvars'.
 
   | **type**: dict
+
+msg_vpn (optional)
+  The message vpn.
+
+  | **type**: str
 
 
 

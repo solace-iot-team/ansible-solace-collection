@@ -1,4 +1,4 @@
-:github_url: https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_gather_facts.py
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_gather_facts.py
 
 .. _solace_gather_facts_module:
 
@@ -36,15 +36,14 @@ Examples
          solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 
      tasks:
-
        - name: Gather Solace Facts
          solace_gather_facts:
 
        - name: "Save hostvars to ./hostvars.json"
-         local_action:
-           module: copy
+         copy:
            content: "{{ hostvars | to_nice_json }}"
            dest: ./hostvars.json
+         delegate_to: localhost
 
 
 
@@ -103,14 +102,20 @@ secure_connection (optional)
 solace_cloud_api_token (optional)
   The API Token.
 
+  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
   | **type**: str
-  | **default**: None
 
 solace_cloud_service_id (optional)
   The service id in Solace Cloud.
 
+  Click on the service in Solace Cloud - the service id is in the URL.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
   | **type**: str
-  | **default**: None
 
 timeout (optional)
   Connection timeout in seconds for the http request.
@@ -164,6 +169,7 @@ ansible_facts.solace
              ]
            }
          },
+         "isSolaceCloud": false,
          "service_facts": null
        }
      }

@@ -1,0 +1,157 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_acl_client_connect_exception.py
+
+.. _solace_acl_client_connect_exception_module:
+
+solace_acl_client_connect_exception -- client connect exception for acl profile
+===============================================================================
+
+Configure client connect exception objects for an ACL Profile.
+
+Allows addition and removal of client connect exception objects for ACL Profiles.
+
+Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfileClientConnectExceptions.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   hosts: all
+   gather_facts: no
+   any_errors_fatal: true
+   collections:
+   - solace.pubsub_plus
+   module_defaults:
+   solace_acl_client_connect_exception:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       msg_vpn: "{{ vpn }}"
+   tasks:
+     - name: Remove ACL Client Connect Exception
+       solace_acl_client_connect_exception:
+           name: "{{client_address}}"
+           acl_profile_name: "{{ acl_profile }}"
+           msg_vpn: "{{ msg_vpn }}"
+           state: absent
+
+     - name: Add ACL Client Connect Exception
+       solace_acl_client_connect_exception:
+           name: "{{client_address}}"
+           acl_profile_name: "{{ acl_profile }}"
+           msg_vpn: "{{ msg_vpn }}"
+           state: present
+
+
+
+Notes
+-----
+
+.. note::
+   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
+
+
+
+
+
+
+Parameters
+----------
+
+acl_profile_name (required)
+  The ACL Profile.
+
+  | **type**: str
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+msg_vpn (required)
+  The message vpn.
+
+  | **type**: str
+
+name (required)
+  Name of the client connect exception address. Maps to 'clientConnectExceptionAddress' in the API.
+
+  | **type**: str
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+
+settings (optional)
+  JSON dictionary of additional configuration, see Reference documentation.
+
+  | **type**: dict
+
+state (optional)
+  Target state.
+
+  | **type**: str
+  | **default**: present
+  | **choices**: present, absent
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+response
+  The response from the Solace Sempv2 request.
+
+  | **returned**: success
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "aclProfileName": "test_ansible_solace",
+     "clientConnectExceptionAddress": "192.168.1.64/26",
+     "msgVpnName": "default"
+   }
+
+

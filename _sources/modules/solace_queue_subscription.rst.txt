@@ -1,0 +1,162 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_queue_subscription.py
+
+.. _solace_queue_subscription_module:
+
+solace_queue_subscription -- subscription on a queue
+====================================================
+
+Configure a Subscription Object on a Queue.. Allows addition, removal and configuration of subscription objects on a queue.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   hosts: all
+   gather_facts: no
+   any_errors_fatal: true
+   collections:
+   - solace.pubsub_plus
+   module_defaults:
+       solace_queue:
+           host: "{{ sempv2_host }}"
+           port: "{{ sempv2_port }}"
+           secure_connection: "{{ sempv2_is_secure_connection }}"
+           username: "{{ sempv2_username }}"
+           password: "{{ sempv2_password }}"
+           timeout: "{{ sempv2_timeout }}"
+           msg_vpn: "{{ vpn }}"
+       solace_queue_subscription:
+           host: "{{ sempv2_host }}"
+           port: "{{ sempv2_port }}"
+           secure_connection: "{{ sempv2_is_secure_connection }}"
+           username: "{{ sempv2_username }}"
+           password: "{{ sempv2_password }}"
+           timeout: "{{ sempv2_timeout }}"
+           msg_vpn: "{{ vpn }}"
+   tasks:
+     - name: create queue
+       solace_queue:
+           name: foo
+           state: present
+
+     - name: add subscription
+       solace_queue_subscription:
+           queue: foo
+           name: "foo/bar"
+           state: present
+
+     - name: remove subscription
+       solace_queue_subscription:
+           queue: foo
+           name: "foo/bar"
+           state: absent
+
+
+
+Notes
+-----
+
+.. note::
+   Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/createMsgVpnQueueSubscription.
+
+   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
+
+
+
+
+
+
+Parameters
+----------
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+msg_vpn (required)
+  The message vpn.
+
+  | **type**: str
+
+name (required)
+  The subscription topic. Maps to 'subscriptionTopic' in the API.
+
+  | **type**: str
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+queue (required)
+  The queue. Maps to 'queueName' in the API.
+
+  | **type**: str
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+
+settings (optional)
+  JSON dictionary of additional configuration, see Reference documentation.
+
+  | **type**: dict
+
+state (optional)
+  Target state.
+
+  | **type**: str
+  | **default**: present
+  | **choices**: present, absent
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+response
+  The response from the Solace Sempv2 request.
+
+  | **returned**: success
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+

@@ -1,4 +1,4 @@
-:github_url: https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_get_available.py
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_available.py
 
 .. _solace_get_available_module:
 

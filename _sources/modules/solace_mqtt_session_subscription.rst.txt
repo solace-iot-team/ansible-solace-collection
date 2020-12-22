@@ -1,0 +1,188 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_mqtt_session_subscription.py
+
+.. _solace_mqtt_session_subscription_module:
+
+solace_mqtt_session_subscription -- subscription for mqtt session
+=================================================================
+
+Configure a MQTT Session Subscription object. Allows addition, removal and update of a MQTT Session Subscription object in an idempotent manner.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   hosts: all
+   gather_facts: no
+   any_errors_fatal: true
+   collections:
+   - solace.pubsub_plus
+   module_defaults:
+       solace_mqtt_session:
+           host: "{{ sempv2_host }}"
+           port: "{{ sempv2_port }}"
+           secure_connection: "{{ sempv2_is_secure_connection }}"
+           username: "{{ sempv2_username }}"
+           password: "{{ sempv2_password }}"
+           timeout: "{{ sempv2_timeout }}"
+           msg_vpn: "{{ vpn }}"
+       solace_mqtt_session_subscription:
+           host: "{{ sempv2_host }}"
+           port: "{{ sempv2_port }}"
+           secure_connection: "{{ sempv2_is_secure_connection }}"
+           username: "{{ sempv2_username }}"
+           password: "{{ sempv2_password }}"
+           timeout: "{{ sempv2_timeout }}"
+           msg_vpn: "{{ vpn }}"
+   tasks:
+     - name: create session
+       solace_mqtt_session:
+           name: foo
+           state: present
+
+     - name: add subscription
+       solace_mqtt_session_subscription:
+           virtual_router: "{{ virtual_router }}"
+           client_id: foo-client
+           topic: "test/v1/event/+"
+           state: present
+
+     - name: update subscription
+       solace_mqtt_session_subscription:
+           virtual_router: "{{ virtual_router }}"
+           client_id: foo-client
+           topic: "test/+/#"
+           settings:
+             subscriptionQos: 1
+           state: present
+
+     - name: delete subscription
+       solace_mqtt_session_subscription:
+           virtual_router: "{{ virtual_router }}"
+           client_id: "{{ mqtt_session_item.mqttSessionClientId }}"
+           topic: "test/v1/#"
+           state: absent
+
+     - name: delete session
+       solace_mqtt_session:
+           name: foo
+           state: absent
+
+
+
+Notes
+-----
+
+.. note::
+   Depending on the Broker version, a QoS=1 subscription results in the 'magic queue' ('#mqtt/{client_id}/{number}') to have ingress / egress ON or OFF. Module uses SEMP v1 <no><shutdown><full/> to ensure they are ON.
+
+
+   Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/mqttSession/createMsgVpnMqttSessionSubscription.
+
+   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
+
+
+
+
+
+
+Parameters
+----------
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+mqtt_session_client_id (required)
+  The MQTT session client id. Maps to 'mqttSessionClientId' in the API.
+
+  | **type**: str
+
+msg_vpn (required)
+  The message vpn.
+
+  | **type**: str
+
+name (required)
+  The subscription topic. Maps to 'subscriptionTopic' in the API.
+
+  | **type**: str
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+
+settings (optional)
+  JSON dictionary of additional configuration, see Reference documentation.
+
+  | **type**: dict
+
+state (optional)
+  Target state.
+
+  | **type**: str
+  | **default**: present
+  | **choices**: present, absent
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+virtual_router (optional)
+  The virtual router.
+
+  | **type**: str
+  | **default**: primary
+  | **choices**: primary, backup
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+response
+  The response from the Solace Sempv2 request.
+
+  | **returned**: success
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+

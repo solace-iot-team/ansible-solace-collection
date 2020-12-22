@@ -1,0 +1,143 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_topic_endpoint.py
+
+.. _solace_topic_endpoint_module:
+
+solace_topic_endpoint -- topic endpoint
+=======================================
+
+Allows addition, removal and configuration of topic endpoint objects.
+
+Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/topicEndpoint.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   hosts: all
+   gather_facts: no
+   any_errors_fatal: true
+   collections:
+   - solace.pubsub_plus
+   module_defaults:
+     solace_topic_endpoint:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       msg_vpn: "{{ vpn }}"
+   tasks:
+
+     - name: add
+       solace_topic_endpoint:
+         name: bar
+         state: present
+
+     - name: remove
+       solace_topic_endpoint:
+         name: bar
+         state: absent
+
+
+
+Notes
+-----
+
+.. note::
+   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
+
+
+
+
+
+
+Parameters
+----------
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+msg_vpn (required)
+  The message vpn.
+
+  | **type**: str
+
+name (required)
+  The topic endpoint name. Maps to 'topicEndpointName' in the API.
+
+  | **type**: str
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+
+settings (optional)
+  JSON dictionary of additional configuration, see Reference documentation.
+
+  | **type**: dict
+
+state (optional)
+  Target state.
+
+  | **type**: str
+  | **default**: present
+  | **choices**: present, absent
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+response
+  The response from the Solace Sempv2 request.
+
+  | **returned**: success
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     "{}"
+
+

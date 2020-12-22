@@ -1,9 +1,9 @@
-:github_url: https://github.com/sensu/sensu-go-ansible/blob/master/plugins/modules/solace_cloud_account_gather_facts.py
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_cloud_account_gather_facts.py
 
 .. _solace_cloud_account_gather_facts_module:
 
-solace_cloud_account_gather_facts -- Retrieves service info (facts) about all services available in the Solace Cloud Account.
-=============================================================================================================================
+solace_cloud_account_gather_facts -- Facts from all services in Solace Cloud Account.
+=====================================================================================
 
 Retrieves service info (facts) about all services available in the Solace Cloud Account. Stores the facts in: ['ansible_facts']['solace_cloud_accounts'][{service-name}]. Use to retrieve the SEMP endpoints for a Solace Cloud service as inputs for other modules.
 
@@ -91,17 +91,23 @@ Parameters
 account_name (required)
   The host specified in the inventory. Represents the Solace Cloud Account.
 
+  Note: Only used internally in the playbooks, so you can choose whichever name makes sense in your case.
+
   | **type**: str
 
 api_token (required)
   The API Token.
 
+  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+
   | **type**: str
-  | **default**: None
 
 return_format (required)
   The format of the returned JSON. Either as a JSON object or a JSON array.
 
+  Note: Use 'dict' when you want to access the facts in a playbook by account_name (i.e. 'inventory_hostname') directly.
+
+  Note: Use 'list' when you want to iterate over each service in your playbook.
 
   | **type**: str
   | **choices**: dict, list
@@ -128,12 +134,14 @@ rc
 
   .. code-block:: json
 
-     "{}"
+     {
+     "rc": 0
+   }
 
 msg
   error message if not ok
 
-  | **returned**: always
+  | **returned**: error
   | **type**: str
   | **sample**:
 
@@ -144,8 +152,8 @@ msg
 response
   The response from the GET {serviceId} call. Differs depending on state of service.
 
-  | **returned**: always
-  | **type**: complex
+  | **returned**: success
+  | **type**: dict
   | **sample**:
 
   .. code-block:: json
