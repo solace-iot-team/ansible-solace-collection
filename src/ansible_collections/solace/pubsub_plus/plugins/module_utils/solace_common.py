@@ -63,6 +63,9 @@ if enableLoggingEnvVal is not None and enableLoggingEnvVal != '':
 if ENABLE_LOGGING:
     logFile = './ansible-solace.log'
     if loggingPathEnvVal is not None and loggingPathEnvVal != '':
+        log_path = os.path.dirname(loggingPathEnvVal)
+        if not os.path.exists(log_path):
+            os.makedirs(log_path)
         logFile = loggingPathEnvVal
     logging.basicConfig(filename=logFile,
                         level=logging.DEBUG,

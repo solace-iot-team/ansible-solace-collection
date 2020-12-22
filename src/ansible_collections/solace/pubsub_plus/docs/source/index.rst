@@ -6,23 +6,19 @@
 Solace PubSub+ Ansible Collection
 =================================
 
-some intro words:
+**UNDER CONSTRUCTION**
 
-* update 1
-* update 2
-* update 3
-
-Collection is freely available on `Ansible Galaxy`_.
+The collection is freely available on `Ansible Galaxy`_.
 
 .. _Ansible Galaxy:
   https://galaxy.ansible.com/solace/pubsub_plus
 
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Using Solace PubSub+ Ansible Collection
+  :maxdepth: 1
+  :caption: Using Solace PubSub+ Ansible Collection
 
-   quickstart
+  quickstart
 
 
 .. toctree::
@@ -32,10 +28,11 @@ Collection is freely available on `Ansible Galaxy`_.
   concepts
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Modules
+  :maxdepth: 1
+  :caption: Modules & Roles
 
-   facts_and_general_modules
-   solace_cloud_modules
-   solace_config_modules
-   solace_monitor_modules
+  facts_and_general_modules
+  solace_cloud_modules
+  solace_config_modules
+  solace_monitor_modules
+  roles

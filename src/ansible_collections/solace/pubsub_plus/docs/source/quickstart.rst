@@ -33,33 +33,50 @@ Install the Solace PubSub+ Ansible Collection::
   $ ansible-galaxy collection install solace.pubsub_plus
 
 
-Playbook & Inventory
---------------------
+Playbooks
+---------
 
-Our playbook requires the local broker
-:download:`inventory <../examples/quickstart/local.broker.inventory.yml>`:
+We need to run two playbooks:
+  - ``service.playbook.yml``: creates a local broker service running in docker and the broker inventory file
+  - ``configure.playbook.yml``: configures the broker service we have just created
 
-.. literalinclude:: ../examples/quickstart/local.broker.inventory.yml
+:download:`service.playbook.yml <../examples/quickstart/service.playbook.yml>`:
+
+.. literalinclude:: ../examples/quickstart/service.playbook.yml
    :language: yaml
 
-Now we can create a few simple Broker Objects using the following
-:download:`playbook <../examples/quickstart/quickstart.playbook.yml>`:
+:download:`configure.playbook.yml <../examples/quickstart/configure.playbook.yml>`:
 
-.. literalinclude:: ../examples/quickstart/quickstart.playbook.yml
+.. literalinclude:: ../examples/quickstart/configure.playbook.yml
    :language: yaml
 
-When we run the playbook, Ansible will download the latest Solace PubSub+
-Standard Edition broker and start it on the local machine using Docker.
-It will then configure two simple objects: a queue and attach a subscription
-to the queue.
+We also need the initial
+:download:`inventory.yml <../examples/quickstart/inventory.yml>`:
+
+.. literalinclude:: ../examples/quickstart/inventory.yml
+  :language: yaml
 
 Run
 ---
-Run the playbook::
 
-  $ ansible-playbook -i local.broker.inventory.yml quickstart.playbook.yml
+When we run the first playbook, the role ``solace.pubsub_plus.broker_service``
+will download the latest Solace PubSub+ Standard Edition broker and start it on
+the local machine using Docker.
+It will also create the inventory file for newly created service in the ``$WORKING_DIR``.
+The second playbook will then configure two simple objects: a queue and a subscription
+to the queue.
+
+Run the playbooks using
+:download:`run.sh <../examples/quickstart/run.sh>`:
+
+.. literalinclude:: ../examples/quickstart/run.sh
+   :language: bash
 
 Open a new private window in your browser and log into the Broker's admin
 console at http://localhost:8080 with credentials **admin/admin**.
 
 Navigate to Queues to see the queue created.
+
+In the ``$WORKING_DIR`` you will find two files:
+  - ``ansible-solace.log`` - the log file of all SEMP requests / responses to/from the broker service
+  - ``broker.inventory.yml`` - the generated inventory for the created broker service

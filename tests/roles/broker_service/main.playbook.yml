@@ -1,0 +1,49 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: broker_service"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  pre_tasks:
+  - include_vars:
+      file: "env.vars.yml"
+      name: env
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        genenrated_inventory_file: "{{ WORKING_DIR }}/{{ env.broker_inventory_file_name }}"
+
+    - name: "Broker Service Delete"
+      include_role:
+        name: broker_service
+      vars:
+        service_type: docker_single_node
+        state: absent
+        project_name: test_roles_broker_service_single_node
+        generated_inventory_file: "{{ genenrated_inventory_file }}"
+
+    - name: "Broker Service Setup"
+      include_role:
+        name: broker_service
+      vars:
+        service_type: docker_single_node
+        state: present
+        project_name: test_roles_broker_service_single_node
+        container_name: "pubSubStandardSingleNode"
+        image: "{{ BROKER_DOCKER_IMAGE }}"
+        generated_inventory_file: "{{ genenrated_inventory_file }}"
+
+    - name: "Broker Service Delete"
+      include_role:
+        name: broker_service
+      vars:
+        service_type: docker_single_node
+        state: absent
+        project_name: test_roles_broker_service_single_node
+        generated_inventory_file: "{{ genenrated_inventory_file }}"
+
+
+###
+# The End.

@@ -1,0 +1,33 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+---
+- set_fact:
+    broker_url: "{{ 'https' if sempv2_is_secure_connection else 'http' }}://{{ sempv2_host }}:{{ sempv2_port }}"
+  when: service_type == 'docker_single_node'
+
+- name: "Wait for Broker Up"
+  uri:
+    url: "{{ broker_url }}"
+    return_content: yes
+    status_code: [200, -1]
+  register: result
+  until: result.status == 200
+  retries: 20
+  delay: 5
+  when: service_type == 'docker_single_node'
+
+- assert:
+    that: result.status == 200
+    fail_msg: "cannot reach broker on {{ broker_url }}"
+  when: service_type == 'docker_single_node'
+
+- name: create inventory
+  set_fact:
+    inventory: "{{ lookup('template', 'docker_single_node.j2') | from_json}}"
+  when: service_type == 'docker_single_node'
+
+- name: "Write Generated Test Spec Inventory"
+  copy:
+    content: "{{ inventory | to_nice_yaml(indent=2) }}"
+    dest: "{{ generated_inventory_file }}"
+  delegate_to: localhost

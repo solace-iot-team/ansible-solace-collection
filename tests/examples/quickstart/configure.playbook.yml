@@ -1,10 +1,5 @@
-# Quickstart Playbook
-# ..
-# ..
-#
----
 -
-  name: Quickstart playbook
+  name: Quickstart Playbook
   hosts: all
   gather_facts: no
   any_errors_fatal: true
@@ -27,13 +22,25 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-
   tasks:
 
-    # start broker
-    # add a queue
-    # add a subscripition
+    - name: create queue
+      solace_queue:
+        name: quickstart_queue
 
+    - name: add subscription
+      solace_queue_subscription:
+        queue: quickstart_queue
+        name: "quickstart/topic"
 
-###
-# The End.
+    # create user message
+    - set_fact:
+        broker_url: "{{ 'https' if sempv2_is_secure_connection else 'http' }}://{{ sempv2_host }}:{{ sempv2_port }}"
+    - name: message
+      debug:
+        msg:
+          - "open private browser window: {{ broker_url }}"
+          - "login: {{ sempv2_username }} / {{ sempv2_password }}"
+          - "vpn: default"
+          - "Queues: quickstart_queue"
+          - "Subscriptions: quickstart/topic"

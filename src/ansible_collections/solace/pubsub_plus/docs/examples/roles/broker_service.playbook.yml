@@ -1,0 +1,15 @@
+
+---
+-
+  name: Setup a Broker Service in Docker
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: "Broker Service Setup"
+      include_role:
+        name: broker_service
+      vars:
+        service_type: docker_single_node
+        state: present
+        project_name: broker_service_single_node
+        generated_inventory_file: "./tmp/local.broker.inventory.yml"

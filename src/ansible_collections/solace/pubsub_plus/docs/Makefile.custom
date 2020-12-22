@@ -1,7 +1,6 @@
 
 modules := $(wildcard ../plugins/modules/*.py)
 module_docs := $(modules:../plugins/modules/%.py=source/modules/%.rst)
-#module_docs := $(modules:$(COLLECTION_HOME)/plugins/modules/%.py=source/modules/%.rst)
 doc_fragments := $(wildcard ../plugins/doc_fragments/*.py)
 template := source/_templates/module.rst.j2
 
