@@ -13,6 +13,7 @@ export PROJECT_HOME=$projectHome
 
 ansibleSolaceTests=(
   "quickstart"
+  "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 

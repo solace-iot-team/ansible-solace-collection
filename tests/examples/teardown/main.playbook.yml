@@ -1,0 +1,20 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: teardown"
+  hosts: localhost
+  gather_facts: no
+  any_errors_fatal: true
+  tasks:
+    - name: "Broker Service Delete"
+      include_role:
+        name: broker_service
+      vars:
+        service_type: docker_single_node
+        state: absent
+        project_name: quickstart_broker_service_single_node
+        generated_inventory_file: "{{ WORKING_DIR }}/broker.inventory.yml"
+
+###
+# The End.
