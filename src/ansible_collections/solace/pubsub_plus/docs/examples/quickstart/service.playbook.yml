@@ -1,5 +1,5 @@
 -
-  name: Quickstart Playbook
+  name: Quickstart Service Playbook
   hosts: localhost
   gather_facts: no
   any_errors_fatal: true
