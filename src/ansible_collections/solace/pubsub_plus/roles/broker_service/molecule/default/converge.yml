@@ -1,8 +1,0 @@
----
-- name: Converge
-  hosts: all
-  gather_facts: no
-  tasks:
-    - name: "Include broker_service"
-      include_role:
-        name: "broker_service"
