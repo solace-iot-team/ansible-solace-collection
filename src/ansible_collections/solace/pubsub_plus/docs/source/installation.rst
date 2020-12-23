@@ -26,6 +26,20 @@ Install the Solace PubSub+ Ansible Collection::
 
   $ ansible-galaxy collection install solace.pubsub_plus
 
+.. note::
+
+   ``ansible-galaxy`` command will not overwrite the existing collection if it
+   is already installed. We can change this default behavior by adding a
+   ``--force`` command line switch::
+
+      $ ansible-galaxy collection install --force solace.pubsub_plus
+
+The official Ansible documentation contains more information about the
+installation options in the `Using collections`_ document.
+
+.. _Using collections:
+   https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#installing-collections
+
 Set the Python interpreter::
 
   $ export ANSIBLE_PYTHON_INTERPRETER={path-to-your-python-3-bin}
