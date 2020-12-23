@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/contentui.css" type="text/css" />
 
   
   
@@ -29,13 +30,14 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/contentui.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Concepts of Solace PubSub+" href="concepts.html" />
+    <link rel="next" title="Installation" href="installation.html" />
     <link rel="prev" title="Solace PubSub+ Ansible Collection" href="index.html" /> 
 </head>
 
@@ -89,10 +91,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#run">Run</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Guides</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts of Solace PubSub+</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts of Solace PubSub+ Ansible Collection</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Modules &amp; Roles</span></p>
 <ul>
@@ -213,7 +217,7 @@ $ pip install ansible
 <p><a class="reference download internal" download="" href="_downloads/6dedef375993359d20e75b923bae6800/service.playbook.yml"><code class="xref download docutils literal notranslate"><span class="pre">service.playbook.yml</span></code></a>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
   <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Quickstart Playbook</span>
-  <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
+  <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
   <span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
   <span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
   <span class="nt">tasks</span><span class="p">:</span>
@@ -224,7 +228,7 @@ $ pip install ansible
 
     <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Local</span><span class="nv"> </span><span class="s">Broker</span><span class="nv"> </span><span class="s">Setup&quot;</span>
       <span class="nt">include_role</span><span class="p">:</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">broker_service</span>
+        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.broker_service</span>
       <span class="nt">vars</span><span class="p">:</span>
         <span class="nt">service_type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">docker_single_node</span>
         <span class="nt">project_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">quickstart_broker_service_single_node</span>
@@ -280,15 +284,6 @@ $ pip install ansible
           <span class="p p-Indicator">-</span> <span class="s">&quot;Subscriptions:</span><span class="nv"> </span><span class="s">quickstart/topic&quot;</span>
 </pre></div>
 </div>
-<p>We also need the initial
-<a class="reference download internal" download="" href="_downloads/d058689db9742f4e789e9e20265c96f3/inventory.yml"><code class="xref download docutils literal notranslate"><span class="pre">inventory.yml</span></code></a>:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
-<span class="nt">all</span><span class="p">:</span>
-  <span class="nt">hosts</span><span class="p">:</span>
-    <span class="nt">localhost</span><span class="p">:</span>
-      <span class="nt">ansible_connection</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">local</span>
-</pre></div>
-</div>
 </div>
 <div class="section" id="run">
 <h2>Run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h2>
@@ -304,17 +299,20 @@ to the queue.</p>
 
 <span class="nv">scriptDir</span><span class="o">=</span><span class="k">$(</span><span class="nb">cd</span> <span class="k">$(</span>dirname <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="nb">pwd</span><span class="k">)</span><span class="p">;</span>
 
+<span class="c1"># set the python interpreter</span>
+  <span class="nb">export</span> <span class="nv">ANSIBLE_PYTHON_INTERPRETER</span><span class="o">=</span><span class="k">$(</span>python3 -c <span class="s2">&quot;import sys; print(sys.executable)&quot;</span><span class="k">)</span>
+
 <span class="c1"># set the working dir</span>
   <span class="nv">WORKING_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/tmp&quot;</span>
 
 <span class="c1"># create broker service</span>
-  ansible-playbook -i <span class="nv">$scriptDir</span>/inventory.yml <span class="nv">$scriptDir</span>/service.playbook.yml --extra-vars <span class="s2">&quot;WORKING_DIR=</span><span class="nv">$WORKING_DIR</span><span class="s2">&quot;</span>
+  ansible-playbook <span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/service.playbook.yml&quot;</span> --extra-vars <span class="s2">&quot;WORKING_DIR=</span><span class="nv">$WORKING_DIR</span><span class="s2">&quot;</span>
 
 <span class="c1"># configure broker service</span>
   <span class="c1"># enable logging</span>
     <span class="nb">export</span> <span class="nv">ANSIBLE_SOLACE_ENABLE_LOGGING</span><span class="o">=</span>True
     <span class="nb">export</span> <span class="nv">ANSIBLE_SOLACE_LOG_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$WORKING_DIR</span><span class="s2">/ansible-solace.log&quot;</span>
-  ansible-playbook -i <span class="nv">$WORKING_DIR</span>/broker.inventory.yml <span class="nv">$scriptDir</span>/configure.playbook.yml
+  ansible-playbook -i <span class="s2">&quot;</span><span class="nv">$WORKING_DIR</span><span class="s2">/broker.inventory.yml&quot;</span> <span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/configure.playbook.yml&quot;</span>
 </pre></div>
 </div>
 <p>Open a new private window in your browser and log into the Broker’s admin
@@ -338,7 +336,7 @@ console at <a class="reference external" href="http://localhost:8080">http://loc
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="concepts.html" class="btn btn-neutral float-right" title="Concepts of Solace PubSub+" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral float-left" title="Solace PubSub+ Ansible Collection" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -353,7 +351,7 @@ console at <a class="reference external" href="http://localhost:8080">http://loc
         
         &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
       <span class="lastupdated">
-        Last updated on 22 Dec 2020 at 14:01.
+        Last updated on 23 Dec 2020 at 10:54.
       </span>
 
     </p>

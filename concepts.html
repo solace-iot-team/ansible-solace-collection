@@ -7,12 +7,13 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Concepts of Solace PubSub+ &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  <title>Concepts of Solace PubSub+ Ansible Collection &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
   
 
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/contentui.css" type="text/css" />
 
   
   
@@ -29,6 +30,7 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/contentui.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -36,7 +38,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Fact &amp; General Modules" href="facts_and_general_modules.html" />
-    <link rel="prev" title="Quickstart for Solace PubSub+ Ansible Collection" href="quickstart.html" /> 
+    <link rel="prev" title="Tutorials &amp; Projects for Solace PubSub+ Ansible Collection" href="tutorials.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,10 +86,24 @@
               <p class="caption"><span class="caption-text">Using Solace PubSub+ Ansible Collection</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Guides</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Concepts of Solace PubSub+</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Concepts of Solace PubSub+ Ansible Collection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-basics">The Basics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#types-of-modules">Types of Modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#idempotency">Idempotency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ansible-hosts-are-not-hosts">Ansible Hosts are not Hosts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#facts-for-solace-brokers">Facts for Solace Brokers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#semp-v2-api-version">SEMP v2 API Version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#settings-for-ansible-solace-modules">Settings for ansible-solace modules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#specifying-solace-cloud-parameters-in-playbooks">Specifying Solace Cloud Parameters in Playbooks</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Modules &amp; Roles</span></p>
 <ul>
@@ -142,7 +158,7 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Concepts of Solace PubSub+</li>
+      <li>Concepts of Solace PubSub+ Ansible Collection</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -161,10 +177,169 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="concepts-of-solace-pubsub">
-<h1>Concepts of Solace PubSub+<a class="headerlink" href="#concepts-of-solace-pubsub" title="Permalink to this headline">¶</a></h1>
-<p>TODO: copy the concepts guide here
-(or include it as md)</p>
+  <div class="section" id="concepts-of-solace-pubsub-ansible-collection">
+<h1>Concepts of Solace PubSub+ Ansible Collection<a class="headerlink" href="#concepts-of-solace-pubsub-ansible-collection" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="the-basics">
+<h2>The Basics<a class="headerlink" href="#the-basics" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>ansible-solace</cite> modules mostly use the SEMP v2 Config API of the Broker. In some cases, to be backwards compatible with broker versions, they fall back on SEMP v1.
+In order to check the outcome of some of the configurations, some modules also use the SEMP v2 Monitor APIs.</p>
+<p>The modules follow the same naming convention as the SEMP v2 API calls so there is an easy mapping between the SEMP documentation and the <cite>ansible-solace</cite> module name.
+For example: SEMP v2 API: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientUsername">clientUsername</a> maps to <cite>solace_client_username</cite>.</p>
+<p>Some specific Solace Cloud APIs have modules as well, such as creating and deleting a service. They are named <cite>solace_cloud_{module}</cite>.</p>
+<div class="section" id="types-of-modules">
+<h3>Types of Modules<a class="headerlink" href="#types-of-modules" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Configuration modules: <cite>solace_{configuration-object}</cite>.
+- add/update/delete a configuration object
+- support the <strong>state</strong> parameter with <strong>values=[‘present’, ‘absent’]</strong></p></li>
+<li><p>Get modules: <cite>solace_get_{configuration_object}s</cite>.
+- retrieve a list of configuration objects</p></li>
+</ul>
+</div>
+<div class="section" id="idempotency">
+<h3>Idempotency<a class="headerlink" href="#idempotency" title="Permalink to this headline">¶</a></h3>
+<p>The configuration modules update/add Broker objects in an idempotent manner.</p>
+<dl class="simple">
+<dt><strong>state=’present’</strong>:</dt><dd><ul class="simple">
+<li><p>get the current object from the broker</p></li>
+<li><p>create a delta settings by comparing current object settings with requested settings</p></li>
+<li><p>update or create current object based on delta settings (or leave it if no delta found)</p></li>
+</ul>
+</dd>
+<dt><strong>state=’absent’</strong>:</dt><dd><ul class="simple">
+<li><p>check if the object exists</p></li>
+<li><p>if it does, delete it</p></li>
+<li><p>if not, do nothing</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="ansible-hosts-are-not-hosts">
+<h3>Ansible Hosts are not Hosts<a class="headerlink" href="#ansible-hosts-are-not-hosts" title="Permalink to this headline">¶</a></h3>
+<p>The Ansible concept of a host is that, a machine which Ansible logs into, transfers scripts, executes scripts, etc.</p>
+<p><strong>For `ansible-solace`, hosts are actually Brokers or Solace Cloud Accounts.</strong></p>
+<dl class="simple">
+<dt>Which means a few things:</dt><dd><ul class="simple">
+<li><p>Ansible cannot login and run it’s normal setup / fact gathering routines</p></li>
+<li><p>therefore, always use the following settings in your inventory / playbooks:</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ansible_connection</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">local</span>
+<span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="facts-for-solace-brokers">
+<h3>Facts for Solace Brokers<a class="headerlink" href="#facts-for-solace-brokers" title="Permalink to this headline">¶</a></h3>
+<p>In order to still be able to gather facts about the Broker / Service, the module</p>
+<blockquote>
+<div><p><cite>solace_gather_facts</cite></p>
+</div></blockquote>
+<p>exists.</p>
+<p>Call it at the beginning of your playbook, so all broker facts are available for the rest of the playbook.</p>
+<p><cite>solace_gather_facts</cite> places the facts gathered in <cite>ansible_facts.solace[inventory_hostname]</cite> as a JSON.
+You can save it to file, print it out and find where the fact you are interested in is located.
+Using <a class="reference external" href="https://palletsprojects.com/p/jinja/">jinja2</a>, you can dynamically retrieve facts based on certain settings.</p>
+<p>Here is a gotcha:</p>
+<p>When using modules that require acces to multiple brokers at the same time, for example <cite>solace_bridge_remote_vpn</cite>, we need to ensure that <cite>solace_gather_facts</cite> is executed for
+each host in the inventory BEFORE the <cite>solace_bridge_remote_vpn</cite> is called.
+The solution is to tell Ansible that by setting <strong>forks 1</strong> parameter for <cite>ansible-playbook</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook <span class="se">\</span>
+        --forks <span class="m">1</span> <span class="se">\</span>
+        -i inventory-with-two-brokers.yml <span class="se">\</span>
+        -i <span class="nv">$edgeBrokerInventory</span> <span class="se">\</span>
+        <span class="nv">$playbook</span>
+</pre></div>
+</div>
+<p>This tells Ansible to execute each task for all hosts BEFORE moving onto the next task.</p>
+<p>An additional convenience module is also supported: <cite>solace_get_facts</cite>.
+It implements a few functions to directly collect a set of facts without the need to understand the JSON structure.
+For example, to get the connection details of a newly created Solace Cloud service use the following in your playbook:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Gather</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Facts&quot;</span>
+  <span class="nt">solace_gather_facts</span><span class="p">:</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Get</span><span class="nv"> </span><span class="s">Facts:</span><span class="nv"> </span><span class="s">all</span><span class="nv"> </span><span class="s">client</span><span class="nv"> </span><span class="s">connection</span><span class="nv"> </span><span class="s">details&quot;</span>
+  <span class="nt">solace_get_facts</span><span class="p">:</span>
+    <span class="nt">hostvars</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">hostvars</span><span class="nv"> </span><span class="s">}}&quot;</span>
+    <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">inventory_hostname</span><span class="nv"> </span><span class="s">}}&quot;</span>
+    <span class="nt">field_funcs</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_allClientConnectionDetails</span>
+  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">set_fact</span><span class="p">:</span>
+    <span class="nt">client_connection_details</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">result.facts</span><span class="nv"> </span><span class="s">}}&quot;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Save</span><span class="nv"> </span><span class="s">&#39;client_connection_details&#39;</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">File&quot;</span>
+  <span class="nt">copy</span><span class="p">:</span>
+    <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">client_connection_details</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">to_nice_json</span><span class="nv"> </span><span class="s">}}&quot;</span>
+    <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./tmp/generated/{{</span><span class="nv"> </span><span class="s">inventory_hostname</span><span class="nv"> </span><span class="s">}}.client_connection_details.json&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="semp-v2-api-version">
+<h3>SEMP v2 API Version<a class="headerlink" href="#semp-v2-api-version" title="Permalink to this headline">¶</a></h3>
+<p>Across broker releases, the supported SEMP v2 API version evolves.
+Where this is the case, the modules affected implement different functionality based on the version and it needs to be passed as a parameter to the module. For example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Gather</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Facts&quot;</span>
+  <span class="nt">solace_gather_facts</span><span class="p">:</span>
+
+  <span class="c1"># ... create an ACL profile ...</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;ACL</span><span class="nv"> </span><span class="s">Profile</span><span class="nv"> </span><span class="s">Publish</span><span class="nv"> </span><span class="s">Topic</span><span class="nv"> </span><span class="s">Exception&quot;</span>
+  <span class="nt">solace_acl_publish_topic_exception</span><span class="p">:</span>
+    <span class="c1"># jinja2 expression to retrieve the semp version from the gathered facts:</span>
+    <span class="nt">semp_version</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ansible_facts.solace.about.api.sempVersion</span><span class="nv"> </span><span class="s">}}&quot;</span>
+    <span class="nt">acl_profile_name</span><span class="p">:</span> <span class="s">&quot;my-new-profile&quot;</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;t/v/a&quot;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="settings-for-ansible-solace-modules">
+<h3>Settings for ansible-solace modules<a class="headerlink" href="#settings-for-ansible-solace-modules" title="Permalink to this headline">¶</a></h3>
+<p>The settings are NOT documented in the modules.
+Instead, the documentation contains the URLs of the SEMP API call / Solace Cloud API call. Use the official documentation to find the settings for each module.</p>
+</div>
+</div>
+<div class="section" id="specifying-solace-cloud-parameters-in-playbooks">
+<h2>Specifying Solace Cloud Parameters in Playbooks<a class="headerlink" href="#specifying-solace-cloud-parameters-in-playbooks" title="Permalink to this headline">¶</a></h2>
+<p>Example inventory template including Solace Cloud API token and service id:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="nt">all</span><span class="p">:</span>
+  <span class="nt">hosts</span><span class="p">:</span>
+    <span class="nt">edge-broker</span><span class="p">:</span>
+      <span class="nt">ansible_connection</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">local</span>
+      <span class="nt">meta</span><span class="p">:</span>
+        <span class="nt">service_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Ansible-Solace-IoT-Assets-Edge-Broker-1</span>
+      <span class="nt">sempv2_host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">xxx.messaging.solace.cloud</span>
+      <span class="nt">sempv2_is_secure_connection</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+      <span class="nt">sempv2_password</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">xxxx</span>
+      <span class="nt">sempv2_port</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">943</span>
+      <span class="nt">sempv2_timeout</span><span class="p">:</span> <span class="s">&#39;60&#39;</span>
+      <span class="nt">sempv2_username</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">xxxx</span>
+      <span class="nt">solace_cloud_api_token</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">xxxx</span>
+      <span class="nt">solace_cloud_service_id</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">xxxx</span>
+      <span class="nt">virtual_router</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">primary</span>
+      <span class="nt">vpn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">xxxx</span>
+</pre></div>
+</div>
+<p>For example, the module <cite>solace_client_profile</cite> uses a different API for Brokers and Solace Cloud Services.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">solace_client_profile</span><span class="p">:</span>
+  <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_host</span><span class="nv"> </span><span class="s">}}&quot;</span>
+  <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_port</span><span class="nv"> </span><span class="s">}}&quot;</span>
+  <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_is_secure_connection</span><span class="nv"> </span><span class="s">}}&quot;</span>
+  <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_username</span><span class="nv"> </span><span class="s">}}&quot;</span>
+  <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_password</span><span class="nv"> </span><span class="s">}}&quot;</span>
+  <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_timeout</span><span class="nv"> </span><span class="s">}}&quot;</span>
+  <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vpn</span><span class="nv"> </span><span class="s">}}&quot;</span>
+  <span class="c1"># if inventory contains solace_cloud_api_token and solace_cloud_service_id, use it,</span>
+  <span class="c1"># otherwise set the parameter to None.</span>
+  <span class="nt">solace_cloud_api_token</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_cloud_api_token</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">default(omit)</span><span class="nv"> </span><span class="s">}}&quot;</span>
+  <span class="nt">solace_cloud_service_id</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_cloud_service_id</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">default(omit)</span><span class="nv"> </span><span class="s">}}&quot;</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -178,7 +353,7 @@
         <a href="facts_and_general_modules.html" class="btn btn-neutral float-right" title="Fact &amp; General Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quickstart for Solace PubSub+ Ansible Collection" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="tutorials.html" class="btn btn-neutral float-left" title="Tutorials &amp; Projects for Solace PubSub+ Ansible Collection" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -190,7 +365,7 @@
         
         &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
       <span class="lastupdated">
-        Last updated on 22 Dec 2020 at 14:01.
+        Last updated on 23 Dec 2020 at 10:54.
       </span>
 
     </p>

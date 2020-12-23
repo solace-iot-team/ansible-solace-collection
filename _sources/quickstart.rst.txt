@@ -50,12 +50,6 @@ We need to run two playbooks:
 .. literalinclude:: ../examples/quickstart/configure.playbook.yml
    :language: yaml
 
-We also need the initial
-:download:`inventory.yml <../examples/quickstart/inventory.yml>`:
-
-.. literalinclude:: ../examples/quickstart/inventory.yml
-  :language: yaml
-
 Run
 ---
 
