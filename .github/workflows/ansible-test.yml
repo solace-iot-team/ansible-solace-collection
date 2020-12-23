@@ -54,7 +54,7 @@ jobs:
           sudo apt-get install shellcheck
           python -m pip install --upgrade pip
           pip install "$ANSIBLE_VERSION"
-          pip install -r requirements.txt
+          pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
           pip install -r devel/devel.requirements.txt
 
       - name: Run ansible-test
