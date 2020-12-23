@@ -6,7 +6,7 @@
   tasks:
     - name: "Broker Service Setup"
       include_role:
-        name: broker_service
+        name: solace.pubsub_plus.broker_service
       vars:
         service_type: docker_single_node
         state: present
