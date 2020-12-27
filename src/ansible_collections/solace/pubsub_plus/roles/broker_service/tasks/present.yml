@@ -26,7 +26,7 @@
     inventory: "{{ lookup('template', 'docker_single_node.j2') | from_json}}"
   when: service_type == 'docker_single_node'
 
-- name: "Write Generated Test Spec Inventory"
+- name: "Write Generated Inventory"
   copy:
     content: "{{ inventory | to_nice_yaml(indent=2) }}"
     dest: "{{ generated_inventory_file }}"

@@ -13,11 +13,6 @@ Download the python dependencies:
 
 .. literalinclude:: ../examples/requirements.txt
 
-and the
-:download:`quickstart.requirements <../examples/quickstart/quickstart.requirements.txt>`:
-
-.. literalinclude:: ../examples/quickstart/quickstart.requirements.txt
-
 Install:
 
 .. code-block:: bash
@@ -25,7 +20,6 @@ Install:
   # upgrade to latest pip3
   $ python3 -m pip install --upgrade pip
   $ pip install -r requirements.txt
-  $ pip install -r quickstart.requirements.txt
   $ pip install ansible
 
 Install the Solace PubSub+ Ansible Collection::
