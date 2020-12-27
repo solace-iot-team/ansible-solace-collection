@@ -1,0 +1,32 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+---
+# role args
+- fail:
+    msg: "arg 'service_type={{ service_type }}' - invalid value. choices: [{{ args.service_type.options | join(', ') }}]"
+  when: not service_type in args.service_type.options
+
+- fail:
+    msg: "arg 'generated_inventory_file={{ generated_inventory_file }}' - must provide a valid path/filename.yml"
+  when: generated_inventory_file == args.__null__
+- set_fact:
+    generated_inventory_file_dir: "{{ generated_inventory_file | dirname }}"
+- stat:
+      path: "{{ generated_inventory_file_dir }}"
+  register: generated_inventory_file_dir_stat
+- fail:
+    msg: "arg 'generated_inventory_file={{ generated_inventory_file }}' - path='{{ generated_inventory_file_dir }}' does not exist"
+  when: not generated_inventory_file_dir_stat.stat.exists or not generated_inventory_file_dir_stat.stat.isdir
+
+# docker_compose args
+- fail:
+    msg: "arg 'state={{ state }}' - invalid value. choices: [{{ args.state.options | join(', ') }}]"
+  when: not state in args.state.options
+
+- fail:
+    msg: "arg 'restarted={{ restarted }}' - invalid value. choices: [{{ args.restarted.options | join(', ') }}]"
+  when: not restarted in args.restarted.options
+
+- fail:
+    msg: "arg 'project_name' - must not be empty"
+  when: project_name == args.__null__
