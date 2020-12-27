@@ -5,7 +5,8 @@
   solace_cloud_services:
     - name: "Ansible-Solace-Test-Service-1"
       msgVpnName: as-test-service-1
-      datacenterId: "aws-eu-west-2a"
+      # datacenterId: "aws-eu-west-2a"
+      datacenterId: "aws-ca-central-1a"
       serviceTypeId: "enterprise"
       serviceClassId: "enterprise-250-nano"
       attributes:
@@ -25,7 +26,8 @@
           serviceWebTlsListenPort: 0
     - name: "Ansible-Solace-Test-Service-2"
       msgVpnName: as-test-service-2
-      datacenterId: "aws-eu-west-2a"
+      # datacenterId: "aws-eu-west-2a"
+      datacenterId: "aws-ca-central-1a"
       serviceTypeId: "enterprise"
       serviceClassId: "enterprise-250-nano"
 

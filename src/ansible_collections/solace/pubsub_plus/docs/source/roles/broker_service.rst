@@ -8,7 +8,7 @@ Prerequisites
 
 - collections: community.general
   - docker_compose
-- python: docker-compose
+
 
 Example playbook
 ----------------
@@ -61,8 +61,8 @@ This playbook will:
 
   `community.general.docker_compose <https://docs.ansible.com/ansible/latest/collections/community/general/docker_compose_module.html>`_
 
-Full list of variables & defaults
----------------------------------
+Full list of variables & default values
+---------------------------------------
 
 .. literalinclude:: ../../../roles/broker_service/defaults/main.yml
    :language: yaml

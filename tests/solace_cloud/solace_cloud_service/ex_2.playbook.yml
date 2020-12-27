@@ -23,7 +23,8 @@
         name: "Ansible-Solace-Test-Service-1"
         settings:
           msgVpnName: as-test-service-1-u
-          datacenterId: "aws-eu-west-2a"
+          # datacenterId: "aws-eu-west-2a"
+          datacenterId: "aws-ca-central-1a"
           serviceTypeId: "enterprise"
           serviceClassId: "enterprise-250-nano"
         state: present

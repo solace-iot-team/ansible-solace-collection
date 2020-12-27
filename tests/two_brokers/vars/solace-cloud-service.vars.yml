@@ -4,7 +4,8 @@
 ---
   name: ansible_solace_test_broker
   msgVpnName: as_test_broker
-  datacenterId: "aws-eu-west-2a"
+  # datacenterId: "aws-eu-west-2a"
+  datacenterId: "aws-ca-central-1a"
   serviceTypeId: "enterprise"
   serviceClassId: "enterprise-250-nano"
   attributes:
