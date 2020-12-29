@@ -12,19 +12,19 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: solace_get_queues
+module: solace_get_rdps
 
-short_description: get list of queues
+short_description: get list of rdps
 
 description:
-- "Get a list of Queue objects."
+- "Get a list of Rest Delivery Point objects."
 
 notes:
-- "Reference Config: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/getMsgVpnQueues)."
-- "Reference Monitor: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/queue/getMsgVpnQueues)"
+- "Reference Config: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints)."
+- "Reference Monitor: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints)"
 
 seealso:
-- module: solace_queue
+- module: solace_rdp
 
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
@@ -42,7 +42,7 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-  solace_queue:
+  solace_rdp:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -50,7 +50,7 @@ module_defaults:
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
-  solace_get_queues:
+  solace_get_rdps:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -59,45 +59,37 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: Create Queue
-    solace_queue:
-      name: foo
+  - name: Create RDP - Disabled
+    solace_rdp:
+      name: "rdp-test-ansible-solace"
+      settings:
+        enabled: false
       state: present
 
-  - name: Get queues
-    solace_get_queues:
-      api: config
+  - name: Get List of RDPs - Config
+    solace_get_rdps:
       query_params:
         where:
-          - "queueName==foo*"
-      select:
-          - "queueName"
-          - "eventMsgSpoolUsageThreshold"
+          - "restDeliveryPointName==rdp-test-ansible*"
+
     register: result
 
   - name: Result Config API
     debug:
-        msg:
-          - "{{ result.result_list }}"
-          - "{{ result.result_list_count }}"
+      msg:
+        - "{{ result.result_list }}"
+        - "{{ result.result_list_count }}"
 
-  - name: Get queues
-    solace_get_queues:
+  - name: Get List of RDPs - Monitor
+    solace_get_rdps:
       api: monitor
-      query_params:
-        where:
-          - "queueName==foo*"
-      select:
-          - "queueName"
-          - "eventMsgSpoolUsageThreshold"
     register: result
 
   - name: Result Monitor API
     debug:
-        msg:
-          - "{{ result.result_list }}"
-          - "{{ result.result_list_count }}"
-
+      msg:
+        - "{{ result.result_list }}"
+        - "{{ result.result_list_count }}"
 '''
 
 RETURN = '''
@@ -109,41 +101,27 @@ result_list:
     sample:
         config_api:
             result_list:
-              - eventMsgSpoolUsageThreshold:
-                    clearPercent: 50
-                    setPercent: 60
-                queueName: foo
+              - clientProfileName: default
+                enabled: false
+                msgVpnName: default
+                restDeliveryPointName: rdp-test-ansible-solace
         monitor_api:
             result_list:
-              - accessType: exclusive
-                alreadyBoundBindFailureCount: 0
-                averageRxByteRate: 0
-                averageRxMsgRate: 0
-                averageTxByteRate: 0
-                averageTxMsgRate: 0
-                bindRequestCount: 0
-                bindSuccessCount: 0
-                bindTimeForwardingMode: store-and-forward
-                clientProfileDeniedDiscardedMsgCount: 0
-                consumerAckPropagationEnabled: true
-                createdByManagement: true
-                deadMsgQueue: "#DEAD_MSG_QUEUE"
-                deletedMsgCount: 0
-                destinationGroupErrorDiscardedMsgCount: 0
-                disabledBindFailureCount: 0
-                disabledDiscardedMsgCount: 0
-                durable: true
-                egressEnabled: true
-                eventBindCountThreshold:
-                    clearPercent: 60
-                    setPercent: 80
-
+              - clientName: #rdp/rdp-test-ansible-solace
+                clientProfileName: default
+                enabled: false
+                lastFailureReason: RDP Shutdown
+                lastFailureTime: 1609233281
+                msgVpnName: default
+                restDeliveryPointName: rdp-test-ansible-solace
+                timeConnectionsBlocked: 0
+                up: false
 result_list_count:
     description: Number of items in result_list.
     returned: success
     type: int
     sample:
-        result_list_count: 2
+        result_list_count: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
@@ -157,9 +135,9 @@ class SolaceGetQueuesTask(su.SolaceTask):
         su.SolaceTask.__init__(self, module)
 
     def get_list(self):
-        # GET /msgVpns/{msgVpnName}/queues
+        # GET /msgVpns/{msgVpnName}/restDeliveryPoints
         vpn = self.module.params['msg_vpn']
-        path_array = [su.MSG_VPNS, vpn, su.QUEUES]
+        path_array = [su.MSG_VPNS, vpn, su.RDP_REST_DELIVERY_POINTS]
         return self.execute_get_list(path_array)
 
 
@@ -169,7 +147,6 @@ def run_module():
     arg_spec = su.arg_spec_broker()
     arg_spec.update(su.arg_spec_vpn())
     arg_spec.update(su.arg_spec_get_list())
-    # module_args override standard arg_specs
     arg_spec.update(module_args)
 
     module = AnsibleModule(

@@ -98,6 +98,12 @@ class SolaceRdpRestConsumerTask(su.SolaceTask):
 
     LOOKUP_ITEM_KEY = 'restConsumerName'
 
+    REQUIRED_TOGETHER_KEYS = [
+        ['remotePort', 'tlsEnabled'],
+        ['authenticationClientCertPassword', 'authenticationClientCertContent'],
+        ['authenticationHttpBasicPassword', 'authenticationHttpBasicUsername']
+    ]
+
     def __init__(self, module):
         su.SolaceTask.__init__(self, module)
 

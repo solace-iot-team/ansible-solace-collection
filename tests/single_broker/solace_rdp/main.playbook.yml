@@ -17,6 +17,14 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
+    solace_get_rdps:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
     solace_rdp_rest_consumer:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
@@ -58,6 +66,18 @@
         settings:
           enabled: false
         state: present
+
+    - name: Get List of RDPs - Config
+      solace_get_rdps:
+        query_params:
+          where:
+            - "restDeliveryPointName==rdp-test-ansible*"
+      register: result
+
+    - name: Get List of RDPs - Monitor
+      solace_get_rdps:
+        api: monitor
+      register: result
 
     - name: Create RDP RestConsumer - Disabled
       solace_rdp_rest_consumer:

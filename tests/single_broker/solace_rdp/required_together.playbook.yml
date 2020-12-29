@@ -1,0 +1,77 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "RDP - Required Together"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_rdp:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_rdp_rest_consumer:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+
+  tasks:
+
+    - name: Create RDP - Disabled
+      solace_rdp:
+        name: "rdp-test-ansible-solace"
+        settings:
+          enabled: false
+        state: present
+
+    - name: Create RDP RestConsumer
+      solace_rdp_rest_consumer:
+        rdp_name: "rdp-test-ansible-solace"
+        name: "rdp-test-ansible-solace"
+        settings:
+          enabled: false
+          remotePort: 443
+          tlsEnabled: true
+        state: present
+
+    - name: Update RDP RestConsumer
+      solace_rdp_rest_consumer:
+        rdp_name: "rdp-test-ansible-solace"
+        name: "rdp-test-ansible-solace"
+        settings:
+          remotePort: 111
+        state: present
+      register: result
+      ignore_errors: true
+    - assert:
+        that:
+          - "'missing key' in result.msg"
+          - "'tlsEnabled' in result.msg"
+
+    - name: Update RDP RestConsumer
+      solace_rdp_rest_consumer:
+        rdp_name: "rdp-test-ansible-solace"
+        name: "rdp-test-ansible-solace"
+        settings:
+          authenticationHttpBasicUsername: 'username'
+        state: present
+      register: result
+      ignore_errors: true
+    - assert:
+        that:
+          - "'missing key' in result.msg"
+          - "'authenticationHttpBasicPassword' in result.msg"
+
+###
+# The End.
