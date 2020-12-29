@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>solace_get_bridges – get bridges &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  <title>solace_get_rdps – get list of rdps &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
   
 
   
@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="solace_get_queues – get list of queues" href="solace_get_queues.html" />
-    <link rel="prev" title="solace_get_bridge_remote_vpns – get remote vpns of bridge" href="solace_get_bridge_remote_vpns.html" /> 
+    <link rel="next" title="solace_mqtt_session – mqtt session" href="solace_mqtt_session.html" />
+    <link rel="prev" title="solace_get_client_usernames – get client usernames" href="solace_get_client_usernames.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -101,7 +101,14 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../solace_monitor_modules.html">Solace Monitor Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../solace_monitor_modules.html#solace-monitor-module-reference">Solace Monitor Module Reference</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="solace_get_bridge_remote_vpns.html">solace_get_bridge_remote_vpns – get remote vpns of bridge</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_bridges – get bridges</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_bridges.html">solace_get_bridges – get bridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_client_profiles.html">solace_get_client_profiles – get client profiles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_client_usernames.html">solace_get_client_usernames – get client usernames</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_session_subscriptions.html">solace_get_mqtt_session_subscriptions – list of mqtt session subscriptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_sessions.html">solace_get_mqtt_sessions – list of mqtt sessions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_queues.html">solace_get_queues – get list of queues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_vpn_clients.html">solace_get_vpn_clients – list of vpn clients</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_rdps – get list of rdps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
@@ -109,13 +116,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_client_profiles.html">solace_get_client_profiles – get client profiles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_client_usernames.html">solace_get_client_usernames – get client usernames</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_session_subscriptions.html">solace_get_mqtt_session_subscriptions – list of mqtt session subscriptions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_sessions.html">solace_get_mqtt_sessions – list of mqtt sessions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_queues.html">solace_get_queues – get list of queues</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_vpn_clients.html">solace_get_vpn_clients – list of vpn clients</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_rdps.html">solace_get_rdps – get list of rdps</a></li>
 </ul>
 </li>
 </ul>
@@ -171,7 +171,7 @@
         
           <li><a href="../solace_config_modules.html">Solace Configuration Modules</a> &raquo;</li>
         
-      <li>solace_get_bridges – get bridges</li>
+      <li>solace_get_rdps – get list of rdps</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -179,7 +179,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_bridges.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_rdps.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -193,9 +193,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="solace-get-bridges-get-bridges">
-<span id="solace-get-bridges-module"></span><h1>solace_get_bridges – get bridges<a class="headerlink" href="#solace-get-bridges-get-bridges" title="Permalink to this headline">¶</a></h1>
-<p>Get a list of Bridge objects.</p>
+  <div class="section" id="solace-get-rdps-get-list-of-rdps">
+<span id="solace-get-rdps-module"></span><h1>solace_get_rdps – get list of rdps<a class="headerlink" href="#solace-get-rdps-get-list-of-rdps" title="Permalink to this headline">¶</a></h1>
+<p>Get a list of Rest Delivery Point objects.</p>
 <p>Implements the config and monitor API.</p>
 <p>Retrieves all objects that match the criteria defined in the ‘where’ clause and returns the fields defined in the ‘select’ parameter.</p>
 <div class="section" id="examples">
@@ -206,7 +206,7 @@
 <span class="nt">collections</span><span class="p">:</span>
 <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span>
 <span class="nt">module_defaults</span><span class="p">:</span>
-  <span class="nt">solace_bridge</span><span class="p">:</span>
+  <span class="nt">solace_rdp</span><span class="p">:</span>
     <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
@@ -214,7 +214,7 @@
     <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
-  <span class="nt">solace_get_bridges</span><span class="p">:</span>
+  <span class="nt">solace_get_rdps</span><span class="p">:</span>
     <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
@@ -223,25 +223,37 @@
     <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="nt">tasks</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Create RDP - Disabled</span>
+    <span class="nt">solace_rdp</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;rdp-test-ansible-solace&quot;</span>
+      <span class="nt">settings</span><span class="p">:</span>
+        <span class="nt">enabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">add</span>
-    <span class="nt">solace_bridge</span><span class="p">:</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
-        <span class="nt">virtual_router</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">auto</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Get List of RDPs - Config</span>
+    <span class="nt">solace_get_rdps</span><span class="p">:</span>
+      <span class="nt">query_params</span><span class="p">:</span>
+        <span class="nt">where</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="s">&quot;restDeliveryPointName==rdp-test-ansible*&quot;</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get list config</span>
-    <span class="nt">solace_get_bridges</span><span class="p">:</span>
-        <span class="nt">api</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">config</span>
-        <span class="nt">query_params</span><span class="p">:</span>
-            <span class="nt">where</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;bridgeName==foo&quot;</span>
+    <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get list monitor</span>
-    <span class="nt">solace_get_bridges</span><span class="p">:</span>
-        <span class="nt">api</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">monitor</span>
-        <span class="nt">query_params</span><span class="p">:</span>
-            <span class="nt">where</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;bridgeName==foo&quot;</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Result Config API</span>
+    <span class="nt">debug</span><span class="p">:</span>
+      <span class="nt">msg</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Get List of RDPs - Monitor</span>
+    <span class="nt">solace_get_rdps</span><span class="p">:</span>
+      <span class="nt">api</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">monitor</span>
+    <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Result Monitor API</span>
+    <span class="nt">debug</span><span class="p">:</span>
+      <span class="nt">msg</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -249,8 +261,8 @@
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Reference Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/getMsgVpnBridges">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/getMsgVpnBridges</a>.</p>
-<p>Reference Monitor: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/bridge/getMsgVpnBridges">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/bridge/getMsgVpnBridges</a>.</p>
+<p>Reference Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints</a>.</p>
+<p>Reference Monitor: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints</a></p>
 <p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a>.</p>
 </div>
 </div>
@@ -259,7 +271,7 @@
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="solace_bridge.html#solace-bridge-module"><span class="std std-ref">solace_bridge – bridge</span></a></p></li>
+<li><p><a class="reference internal" href="solace_rdp.html#solace-rdp-module"><span class="std std-ref">solace_rdp – rest delivery point</span></a></p></li>
 </ul>
 </div>
 </div>
@@ -347,7 +359,33 @@
 <div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;{}&quot;</span>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
+  <span class="nt">&quot;config_api&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;result_list&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;clientProfileName&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nt">&quot;msgVpnName&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;restDeliveryPointName&quot;</span><span class="p">:</span> <span class="s2">&quot;rdp-test-ansible-solace&quot;</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;monitor_api&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;result_list&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;clientName&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;clientProfileName&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nt">&quot;lastFailureReason&quot;</span><span class="p">:</span> <span class="s2">&quot;RDP Shutdown&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;lastFailureTime&quot;</span><span class="p">:</span> <span class="mi">1609233281</span><span class="p">,</span>
+        <span class="nt">&quot;msgVpnName&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;restDeliveryPointName&quot;</span><span class="p">:</span> <span class="s2">&quot;rdp-test-ansible-solace&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;timeConnectionsBlocked&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="nt">&quot;up&quot;</span><span class="p">:</span> <span class="kc">false</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </dd>
@@ -357,7 +395,9 @@
 <div class="line"><strong>type</strong>: int</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;{}&quot;</span>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
+  <span class="nt">&quot;result_list_count&quot;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </dd>
@@ -373,10 +413,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="solace_get_queues.html" class="btn btn-neutral float-right" title="solace_get_queues – get list of queues" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="solace_mqtt_session.html" class="btn btn-neutral float-right" title="solace_mqtt_session – mqtt session" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="solace_get_bridge_remote_vpns.html" class="btn btn-neutral float-left" title="solace_get_bridge_remote_vpns – get remote vpns of bridge" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="solace_get_client_usernames.html" class="btn btn-neutral float-left" title="solace_get_client_usernames – get client usernames" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -115,6 +115,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_vpn_clients.html">solace_get_vpn_clients – list of vpn clients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_rdps.html">solace_get_rdps – get list of rdps</a></li>
 </ul>
 </li>
 </ul>
@@ -232,34 +233,34 @@
       <span class="nt">api</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">config</span>
       <span class="nt">query_params</span><span class="p">:</span>
         <span class="nt">where</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;queueName==foo*&quot;</span>
+          <span class="p p-Indicator">-</span> <span class="s">&quot;queueName==foo*&quot;</span>
       <span class="nt">select</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;queueName&quot;</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;eventMsgSpoolUsageThreshold&quot;</span>
+          <span class="p p-Indicator">-</span> <span class="s">&quot;queueName&quot;</span>
+          <span class="p p-Indicator">-</span> <span class="s">&quot;eventMsgSpoolUsageThreshold&quot;</span>
     <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
 
   <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Result Config API</span>
     <span class="nt">debug</span><span class="p">:</span>
         <span class="nt">msg</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span>
+          <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span>
+          <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span>
 
   <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Get queues</span>
     <span class="nt">solace_get_queues</span><span class="p">:</span>
       <span class="nt">api</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">monitor</span>
       <span class="nt">query_params</span><span class="p">:</span>
         <span class="nt">where</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;queueName==foo*&quot;</span>
+          <span class="p p-Indicator">-</span> <span class="s">&quot;queueName==foo*&quot;</span>
       <span class="nt">select</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;queueName&quot;</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;eventMsgSpoolUsageThreshold&quot;</span>
+          <span class="p p-Indicator">-</span> <span class="s">&quot;queueName&quot;</span>
+          <span class="p p-Indicator">-</span> <span class="s">&quot;eventMsgSpoolUsageThreshold&quot;</span>
     <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
 
   <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Result Monitor API</span>
     <span class="nt">debug</span><span class="p">:</span>
         <span class="nt">msg</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span>
-            <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span>
+          <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span>
+          <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -449,7 +450,7 @@
         
         &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
       <span class="lastupdated">
-        Last updated on 23 Dec 2020 at 10:54.
+        Last updated on 29 Dec 2020 at 09:53.
       </span>
 
     </p>

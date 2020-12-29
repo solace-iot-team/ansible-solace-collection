@@ -29,11 +29,11 @@ Examples
            api_token: "{{ api_token_all_permissions }}"
            name: "{{ sc_service.name }}"
            settings:
-           msgVpnName: "{{ sc_service.msgVpnName}}"
-           datacenterId: "{{ sc_service.datacenterId }}"
-           serviceTypeId: "{{ sc_service.serviceTypeId}}"
-           serviceClassId: "{{ sc_service.serviceClassId }}"
-           state: present
+               msgVpnName: "{{ sc_service.msgVpnName}}"
+               datacenterId: "{{ sc_service.datacenterId }}"
+               serviceTypeId: "{{ sc_service.serviceTypeId}}"
+               serviceClassId: "{{ sc_service.serviceClassId }}"
+               state: present
 
      - set_fact:
            sc_service_created_interim_info: "{{ result.response }}"

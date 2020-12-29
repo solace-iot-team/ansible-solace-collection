@@ -185,18 +185,13 @@
 <a class="reference download internal" download="" href="_downloads/ab15a71be27ff501ebbc5d5f4a820751/requirements.txt"><code class="xref download docutils literal notranslate"><span class="pre">requirements</span></code></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">requests</span><span class="o">&gt;=</span><span class="mf">2.25</span><span class="o">.</span><span class="mi">0</span>
 <span class="n">xmltodict</span><span class="o">&gt;=</span><span class="mf">0.12</span><span class="o">.</span><span class="mi">0</span>
-</pre></div>
-</div>
-<p>and the
-<a class="reference download internal" download="" href="_downloads/edf5c6c96b9e777a6df962a47b4b8958/quickstart.requirements.txt"><code class="xref download docutils literal notranslate"><span class="pre">quickstart.requirements</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span>
+<span class="n">docker</span><span class="o">-</span><span class="n">compose</span>
 </pre></div>
 </div>
 <p>Install:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># upgrade to latest pip3</span>
 $ python3 -m pip install --upgrade pip
 $ pip install -r requirements.txt
-$ pip install -r quickstart.requirements.txt
 $ pip install ansible
 </pre></div>
 </div>
@@ -216,7 +211,7 @@ $ pip install ansible
 </dl>
 <p><a class="reference download internal" download="" href="_downloads/6dedef375993359d20e75b923bae6800/service.playbook.yml"><code class="xref download docutils literal notranslate"><span class="pre">service.playbook.yml</span></code></a>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Quickstart Playbook</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Quickstart Service Playbook</span>
   <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
   <span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
   <span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
@@ -228,7 +223,7 @@ $ pip install ansible
 
     <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Local</span><span class="nv"> </span><span class="s">Broker</span><span class="nv"> </span><span class="s">Setup&quot;</span>
       <span class="nt">include_role</span><span class="p">:</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.broker_service</span>
+        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span>
       <span class="nt">vars</span><span class="p">:</span>
         <span class="nt">service_type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">docker_single_node</span>
         <span class="nt">project_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">quickstart_broker_service_single_node</span>
@@ -237,7 +232,7 @@ $ pip install ansible
 </div>
 <p><a class="reference download internal" download="" href="_downloads/1dfe6a37e9d4f72ef7e6a19f577b5c8c/configure.playbook.yml"><code class="xref download docutils literal notranslate"><span class="pre">configure.playbook.yml</span></code></a>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Quickstart Playbook</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Quickstart Configure Playbook</span>
   <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
   <span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
   <span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
@@ -287,7 +282,7 @@ $ pip install ansible
 </div>
 <div class="section" id="run">
 <h2>Run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h2>
-<p>When we run the first playbook, the role <code class="docutils literal notranslate"><span class="pre">solace.pubsub_plus.broker_service</span></code>
+<p>When we run the first playbook, the role <code class="docutils literal notranslate"><span class="pre">solace.pubsub_plus.solace_broker_service</span></code>
 will download the latest Solace PubSub+ Standard Edition broker and start it on
 the local machine using Docker.
 It will also create the inventory file for newly created service in the <code class="docutils literal notranslate"><span class="pre">$WORKING_DIR</span></code>.
@@ -302,6 +297,9 @@ to the queue.</p>
 <span class="c1"># set the python interpreter</span>
   <span class="nb">export</span> <span class="nv">ANSIBLE_PYTHON_INTERPRETER</span><span class="o">=</span><span class="k">$(</span>python3 -c <span class="s2">&quot;import sys; print(sys.executable)&quot;</span><span class="k">)</span>
 
+<span class="c1"># set verbosity</span>
+  <span class="nb">export</span> <span class="nv">ANSIBLE_VERBOSITY</span><span class="o">=</span><span class="m">3</span>
+    
 <span class="c1"># set the working dir</span>
   <span class="nv">WORKING_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/tmp&quot;</span>
 
@@ -351,7 +349,7 @@ console at <a class="reference external" href="http://localhost:8080">http://loc
         
         &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
       <span class="lastupdated">
-        Last updated on 23 Dec 2020 at 10:54.
+        Last updated on 29 Dec 2020 at 09:53.
       </span>
 
     </p>

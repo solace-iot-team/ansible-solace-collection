@@ -2,9 +2,6 @@
 Solace PubSub+ Ansible Collection
 =================================
 
-.. attention::
-  UNDER CONSTRUCTION
-
 The collection is available on `Ansible Galaxy`_.
 
 .. _Ansible Galaxy:

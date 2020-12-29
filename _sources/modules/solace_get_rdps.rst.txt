@@ -1,11 +1,11 @@
-:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_queues.py
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_rdps.py
 
-.. _solace_get_queues_module:
+.. _solace_get_rdps_module:
 
-solace_get_queues -- get list of queues
-=======================================
+solace_get_rdps -- get list of rdps
+===================================
 
-Get a list of Queue objects.
+Get a list of Rest Delivery Point objects.
 
 Implements the config and monitor API.
 
@@ -26,7 +26,7 @@ Examples
    collections:
    - solace.pubsub_plus
    module_defaults:
-     solace_queue:
+     solace_rdp:
        host: "{{ sempv2_host }}"
        port: "{{ sempv2_port }}"
        secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -34,7 +34,7 @@ Examples
        password: "{{ sempv2_password }}"
        timeout: "{{ sempv2_timeout }}"
        msg_vpn: "{{ vpn }}"
-     solace_get_queues:
+     solace_get_rdps:
        host: "{{ sempv2_host }}"
        port: "{{ sempv2_port }}"
        secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -43,45 +43,37 @@ Examples
        timeout: "{{ sempv2_timeout }}"
        msg_vpn: "{{ vpn }}"
    tasks:
-     - name: Create Queue
-       solace_queue:
-         name: foo
+     - name: Create RDP - Disabled
+       solace_rdp:
+         name: "rdp-test-ansible-solace"
+         settings:
+           enabled: false
          state: present
 
-     - name: Get queues
-       solace_get_queues:
-         api: config
+     - name: Get List of RDPs - Config
+       solace_get_rdps:
          query_params:
            where:
-             - "queueName==foo*"
-         select:
-             - "queueName"
-             - "eventMsgSpoolUsageThreshold"
+             - "restDeliveryPointName==rdp-test-ansible*"
+
        register: result
 
      - name: Result Config API
        debug:
-           msg:
-             - "{{ result.result_list }}"
-             - "{{ result.result_list_count }}"
+         msg:
+           - "{{ result.result_list }}"
+           - "{{ result.result_list_count }}"
 
-     - name: Get queues
-       solace_get_queues:
+     - name: Get List of RDPs - Monitor
+       solace_get_rdps:
          api: monitor
-         query_params:
-           where:
-             - "queueName==foo*"
-         select:
-             - "queueName"
-             - "eventMsgSpoolUsageThreshold"
        register: result
 
      - name: Result Monitor API
        debug:
-           msg:
-             - "{{ result.result_list }}"
-             - "{{ result.result_list_count }}"
-
+         msg:
+           - "{{ result.result_list }}"
+           - "{{ result.result_list_count }}"
 
 
 
@@ -89,9 +81,9 @@ Notes
 -----
 
 .. note::
-   Reference Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/getMsgVpnQueues.
+   Reference Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints.
 
-   Reference Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/queue/getMsgVpnQueues
+   Reference Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints
 
    Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
 
@@ -102,7 +94,7 @@ See Also
 
 .. seealso::
 
-   - :ref:`solace_queue_module`
+   - :ref:`solace_rdp_module`
 
 
 
@@ -199,40 +191,25 @@ result_list
      "config_api": {
        "result_list": [
          {
-           "eventMsgSpoolUsageThreshold": {
-             "clearPercent": 50,
-             "setPercent": 60
-           },
-           "queueName": "foo"
+           "clientProfileName": "default",
+           "enabled": false,
+           "msgVpnName": "default",
+           "restDeliveryPointName": "rdp-test-ansible-solace"
          }
        ]
      },
      "monitor_api": {
        "result_list": [
          {
-           "accessType": "exclusive",
-           "alreadyBoundBindFailureCount": 0,
-           "averageRxByteRate": 0,
-           "averageRxMsgRate": 0,
-           "averageTxByteRate": 0,
-           "averageTxMsgRate": 0,
-           "bindRequestCount": 0,
-           "bindSuccessCount": 0,
-           "bindTimeForwardingMode": "store-and-forward",
-           "clientProfileDeniedDiscardedMsgCount": 0,
-           "consumerAckPropagationEnabled": true,
-           "createdByManagement": true,
-           "deadMsgQueue": "#DEAD_MSG_QUEUE",
-           "deletedMsgCount": 0,
-           "destinationGroupErrorDiscardedMsgCount": 0,
-           "disabledBindFailureCount": 0,
-           "disabledDiscardedMsgCount": 0,
-           "durable": true,
-           "egressEnabled": true,
-           "eventBindCountThreshold": {
-             "clearPercent": 60,
-             "setPercent": 80
-           }
+           "clientName": null,
+           "clientProfileName": "default",
+           "enabled": false,
+           "lastFailureReason": "RDP Shutdown",
+           "lastFailureTime": 1609233281,
+           "msgVpnName": "default",
+           "restDeliveryPointName": "rdp-test-ansible-solace",
+           "timeConnectionsBlocked": 0,
+           "up": false
          }
        ]
      }
@@ -248,7 +225,7 @@ result_list_count
   .. code-block:: json
 
      {
-     "result_list_count": 2
+     "result_list_count": 1
    }
 
 
