@@ -210,7 +210,10 @@ is already installed. We can change this default behavior by adding a
 <p>The official Ansible documentation contains more information about the
 installation options in the <a class="reference external" href="https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#installing-collections">Using collections</a> document.</p>
 <p>Set the Python interpreter:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export ANSIBLE_PYTHON_INTERPRETER={path-to-your-python-3-bin}
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> # manually
+$ export ANSIBLE_PYTHON_INTERPRETER={path-to-your-python-3-bin}
+ # dynamically
+$ export ANSIBLE_PYTHON_INTERPRETER=$(python3 -c &quot;import sys; print(sys.executable)&quot;)
 </pre></div>
 </div>
 </div>
@@ -364,7 +367,7 @@ $ ansible-galaxy collection list
         
         &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
       <span class="lastupdated">
-        Last updated on 29 Dec 2020 at 09:53.
+        Last updated on 29 Dec 2020 at 11:10.
       </span>
 
     </p>

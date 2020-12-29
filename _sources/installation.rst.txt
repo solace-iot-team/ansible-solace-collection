@@ -42,7 +42,10 @@ installation options in the `Using collections`_ document.
 
 Set the Python interpreter::
 
+   # manually
   $ export ANSIBLE_PYTHON_INTERPRETER={path-to-your-python-3-bin}
+   # dynamically
+  $ export ANSIBLE_PYTHON_INTERPRETER=$(python3 -c "import sys; print(sys.executable)")
 
 
 Example Installation: MacOs
