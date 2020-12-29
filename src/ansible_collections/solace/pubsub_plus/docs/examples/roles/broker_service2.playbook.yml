@@ -1,9 +1,12 @@
 ---
 -
-  name: Setup a Broker Service in Docker
+  name: Setup a Broker Service in Docker using a docker compose file
   hosts: all
   gather_facts: no
   tasks:
+    - set_fact:
+        broker_docker_compose_file: "{path}/docker_compose_file.yml"
+
     - name: "Broker Service Setup"
       include_role:
         name: solace.pubsub_plus.solace_broker_service
@@ -12,3 +15,4 @@
         state: present
         project_name: broker_service_single_node
         generated_inventory_file: "./tmp/local.broker.inventory.yml"
+        definition: "{{ lookup('file', broker_docker_compose_file) | from_yaml }}"

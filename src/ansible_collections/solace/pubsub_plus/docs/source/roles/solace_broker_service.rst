@@ -1,5 +1,5 @@
-broker_service - Manage a Broker Service
-========================================
+solace_broker_service - Manage a Broker Service
+===============================================
 
 Manage a Broker Service running in Docker.
 
@@ -10,17 +10,23 @@ Prerequisites
   - docker_compose
 
 
-Example playbook
-----------------
-
-.. literalinclude:: ../../examples/roles/broker_service.playbook.yml
-   :language: yaml
+Example playbooks
+-----------------
 
 This playbook will:
   - download the latest Solace PubSub+ standard edition image from docker hub
   - start the docker container
   - wait until the broker service is up and running
   - create the inventory file in the ``.tmp`` directory
+  - uses the default ```definition`` values for ``docker-compose``
+
+.. literalinclude:: ../../examples/roles/broker_service.playbook.yml
+   :language: yaml
+
+This playbook uses a docker-compose file to start the service:
+
+.. literalinclude:: ../../examples/roles/broker_service2.playbook.yml
+   :language: yaml
 
 **List of select variables:**
 
@@ -64,5 +70,5 @@ This playbook will:
 Full list of variables & default values
 ---------------------------------------
 
-.. literalinclude:: ../../../roles/broker_service/defaults/main.yml
+.. literalinclude:: ../../../roles/solace_broker_service/defaults/main.yml
    :language: yaml

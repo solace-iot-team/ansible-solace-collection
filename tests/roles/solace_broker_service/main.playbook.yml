@@ -17,7 +17,7 @@
 
     - name: "Broker Service Delete"
       include_role:
-        name: solace.pubsub_plus.broker_service
+        name: solace.pubsub_plus.solace_broker_service
       vars:
         service_type: docker_single_node
         state: absent
@@ -26,7 +26,7 @@
 
     - name: "Broker Service Setup"
       include_role:
-        name: solace.pubsub_plus.broker_service
+        name: solace.pubsub_plus.solace_broker_service
       vars:
         service_type: docker_single_node
         state: present
@@ -37,7 +37,7 @@
 
     - name: "Broker Service Delete"
       include_role:
-        name: solace.pubsub_plus.broker_service
+        name: solace.pubsub_plus.solace_broker_service
       vars:
         service_type: docker_single_node
         state: absent

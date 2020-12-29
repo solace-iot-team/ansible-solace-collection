@@ -2,4 +2,4 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - broker_service
+    - solace_broker_service

@@ -47,7 +47,7 @@ We need to run two playbooks:
 Run
 ---
 
-When we run the first playbook, the role ``solace.pubsub_plus.broker_service``
+When we run the first playbook, the role ``solace.pubsub_plus.solace_broker_service``
 will download the latest Solace PubSub+ Standard Edition broker and start it on
 the local machine using Docker.
 It will also create the inventory file for newly created service in the ``$WORKING_DIR``.
