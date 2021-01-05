@@ -59,3 +59,5 @@ docs/examples/quickstart/run.sh shellcheck:SC2155
 docs/examples/quickstart/run.sh shellcheck:SC2046
 plugins/modules/solace_get_rdps.py compile-2.7!skip
 plugins/modules/solace_get_rdps.py pep8:E501
+plugins/modules/solace_get_available.py compile-2.7!skip
+plugins/modules/solace_acl_subscribe_share_name_exception.py pep8:E501

@@ -52,6 +52,13 @@ options:
     description: Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
     required: false
     type: str
+  sempv2_version:
+    description:
+      - The SEMP V2 API version of the broker. See M(solace_get_facts) for info on how to retrieve the version from the broker.
+      - "Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'."
+    required: false
+    type: str
+    aliases: [semp_version]
 '''
 
     VPN = r'''
@@ -113,14 +120,6 @@ options:
     description: JSON dictionary of additional configuration, see Reference documentation.
     required: false
     type: dict
-'''
-
-    SEMP_VERSION = r'''
-options:
-  semp_version:
-    description: The Semp API version of the broker. See M(solace_get_facts) for info on how to retrieve the version from the broker.
-    required: true
-    type: str
 '''
 
     STATE = r'''

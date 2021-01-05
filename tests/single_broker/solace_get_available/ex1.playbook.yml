@@ -1,0 +1,56 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Check/wait until brokers available"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  serial: 1
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_get_available:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+
+  tasks:
+    - name: "Wrong host"
+      solace_get_available:
+        host: "unknown.host.com"
+      register: result
+      ignore_errors: true
+    - assert:
+        that: result.rc == 1
+
+    - name: "Wrong SSL"
+      solace_get_available:
+        secure_connection: "{{ False if sempv2_is_secure_connection else True }}"
+      register: result
+      ignore_errors: true
+    - assert:
+        that: result.rc == 1
+
+    - name: "Wrong password"
+      solace_get_available:
+        password: "unknown_password"
+      register: result
+      ignore_errors: true
+    - assert:
+        that: result.rc == 0
+
+    - name: "Wrong username"
+      solace_get_available:
+        username: "unknown_username"
+      register: result
+      ignore_errors: true
+    - assert:
+        that: result.rc == 0
+
+
+###
+# The End.

@@ -87,63 +87,78 @@ response:
         publishTopicDefaultAction: disallow
         subscribeShareNameDefaultAction: allow
         subscribeTopicDefaultAction: disallow
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sempv2_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceACLProfileTask(su.SolaceTask):
+class SolaceACLProfileTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'aclProfileName'
+    OBJECT_KEY = 'aclProfileName'
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
+
+    def validate_params(self):
+        name = self.get_module().params['name']
+        if len(name) > 32:
+            raise SolaceParamsValidationError('name', name, f"length={len(name)}, must not be longer than 32 chars")
 
     def get_args(self):
-        return [self.module.params['msg_vpn']]
+        params = self.get_module().params
+        return [params['msg_vpn'], params['name']]
 
-    def lookup_item(self):
-        # aclProfileName <= 32 chars; create a 'nicer' hint here
-        lookup_item = self.module.params['name']
-        if len(lookup_item) > 32:
-            raise ValueError(f"argument 'name' ({self.LOOKUP_ITEM_KEY}) longer than 32 chars:'{lookup_item}'")
-        return lookup_item
-
-    def get_func(self, solace_config, vpn, lookup_item_value):
+    def get_func(self, vpn_name, acl_profile_name):
         # GET /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.ACL_PROFILES, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def create_func(self, solace_config, vpn, acl_profile, settings=None):
-        defaults = {
-            'msgVpnName': vpn,
+    def create_func(self, vpn_name, acl_profile_name, settings=None):
+        # POST /msgVpns/{msgVpnName}/aclProfiles
+        data = {
+            'msgVpnName': vpn_name,
+            self.OBJECT_KEY: acl_profile_name
         }
-        mandatory = {
-            self.LOOKUP_ITEM_KEY: acl_profile
-        }
-        data = su.merge_dicts(defaults, mandatory, settings)
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.ACL_PROFILES]
-        return su.make_post_request(solace_config, path_array, data)
+        data.update(settings if settings else {})
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def update_func(self, solace_config, vpn, lookup_item_value, settings=None):
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.ACL_PROFILES, lookup_item_value]
-        return su.make_patch_request(solace_config, path_array, settings)
+    def update_func(self, vpn_name, acl_profile_name, settings=None):
+        # PATCH /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name]
+        return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
-    def delete_func(self, solace_config, vpn, lookup_item_value):
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.ACL_PROFILES, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array)
+    def delete_func(self, vpn_name, acl_profile_name):
+        # DELETE /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
-    """Entrypoint to module."""
     module_args = dict(
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_crud())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -152,13 +167,10 @@ def run_module():
     )
 
     solace_task = SolaceACLProfileTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():
-    """Standard boilerplate"""
     run_module()
 
 
