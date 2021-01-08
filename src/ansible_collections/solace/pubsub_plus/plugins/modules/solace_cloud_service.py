@@ -13,22 +13,24 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_cloud_service
-
-version_added: "2.9.11"
-
 short_description: "Create & delete Solace Cloud services."
-
 description: >
     Create & delete Solace Cloud services.
     Note that you can't change a service once it has been created.
     Only option: delete & re-create.
-
 notes:
 - "The Solace Cloud API does not support updates to a service. Hence, changes are not supported here."
+TODO
 - "Creating a service in Solace Cloud is a long-running process. See examples for checking until completed."
 - "Reference: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm)."
 
 options:
+
+wait_timeout_minutes:
+    = 0 ==> no waiting
+    > 0 ==> waiting, polling every 30 seconds
+
+
   name:
     description:
         - The name of the service to manage. Mandatory for state='present'.
@@ -54,7 +56,6 @@ author: Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
-
 hosts: all
 gather_facts: no
 any_errors_fatal: true
@@ -63,18 +64,20 @@ collections:
 tasks:
   - name: "Create Solace Cloud Service"
     solace_cloud_service:
-        api_token: "{{ api_token_all_permissions }}"
-        name: "{{ sc_service.name }}"
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+        name: "foo"
         settings:
-            msgVpnName: "{{ sc_service.msgVpnName}}"
-            datacenterId: "{{ sc_service.datacenterId }}"
-            serviceTypeId: "{{ sc_service.serviceTypeId}}"
-            serviceClassId: "{{ sc_service.serviceClassId }}"
+            msgVpnName: "foo"
+            datacenterId: "aws-ca-central-1a"
+            serviceTypeId: "enterprise"
+            serviceClassId: "enterprise-250-nano"
             state: present
 
   - set_fact:
         sc_service_created_interim_info: "{{ result.response }}"
         sc_service_created_id: "{{ result.response.serviceId }}"
+
+TODO
 
   - name: "Print Solace Cloud Service: service id"
     debug:
@@ -95,26 +98,28 @@ tasks:
   - name: "Save New Solace Cloud Service Facts to File"
     copy:
         content: "{{ sc_service_created_info | to_nice_json }}"
-        dest: "./tmp/facts.solace_cloud_service.{{ sc_service.name }}.json"
+        dest: "./tmp/facts.solace_cloud_service.foo.json"
     delegate_to: localhost
 
 '''
 
 RETURN = '''
-
 rc:
-    description: return code, either 0 (ok), 1 (not ok)
+    description: Return code. rc=0 on success, rc=1 on error.
     type: int
     returned: always
     sample:
-        rc: 0
+        success:
+            rc: 0
+        error:
+            rc: 1
 msg:
     description: error message if not ok
     type: str
     returned: error
 response:
-    description: the response from the create call.
-    type: complex
+    description: the response from the call
+    type: dict
     returned: success
     sample:
         accountingLimits:
@@ -155,188 +160,107 @@ response:
         timestamp: 0
         type: service
         userId: xxx
-    contains:
-        serviceId:
-            description: The service Id of the created service
-            returned: "success for state=present"
-            type: str
-        adminState:
-            description: The state of the service
-            returned: success
-            type: str
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceCloudCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceCloudApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError, SolaceError
 from ansible.module_utils.basic import AnsibleModule
+import logging, json
 
 
-class SolaceCloudServiceTask(scu.SolaceCloudTask):
+class SolaceCloudServiceTask(SolaceCloudCRUDTask):
 
-    LOOKUP_ITEM_KEY_SERVICE_ID = 'serviceId'
-    LOOKUP_ITEM_KEY_NAME = 'name'
+    KEY_SERVICE_ID = 'serviceId'
+    KEY_NAME = 'name'
 
     def __init__(self, module):
-        sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
-        scu.SolaceCloudTask.__init__(self, module)
-        self._service_id = None
-        self.validate_args(*(self.get_args() + self.lookup_item_kv()))
-        return
+        super().__init__(module)
+        self.solace_cloud_api = SolaceCloudApi(module)
 
-    def lookup_item_kv(self):
-        # state=present: name is required, return key=name, value=name
-        # state=absent: name or service_id required. service_id takes precedence. return k,v depending on presence
-        # return [k, v]
-        # fail module on error
-        # exception on code error
-        state = self.module.params['state']
-        if state == 'present':
-            if self.module.params['name'] is not None:
-                return [self.LOOKUP_ITEM_KEY_NAME, self.module.params['name']]
-            else:
-                msg = "Key 'name' not specified. Mandatory for state='present'."
-                result = dict(changed=False, rc=1)
-                self.module.fail_json(msg=msg, **result)
-        elif state == 'absent':
-            if self.module.params['service_id'] is not None:
-                return [self.LOOKUP_ITEM_KEY_SERVICE_ID, self.module.params['service_id']]
-            elif self._service_id is not None:
-                # after get_func, self._service_id is set
-                return [self.LOOKUP_ITEM_KEY_SERVICE_ID, self._service_id]
-            elif self.module.params['name'] is not None:
-                return [self.LOOKUP_ITEM_KEY_NAME, self.module.params['name']]
-            else:
-                msg = "Neither key specified: 'service_id' nor 'name'. At least one is required for state='absent'."
-                result = dict(changed=False, rc=1)
-                self.module.fail_json(msg=msg, **result)
+    def validate_params(self):
+        # state=present: name is required
+        # state=absent: name or service_id required
+        params = self.get_module().params
+        name = params.get('name', None)
+        service_id = params.get(self.get_config().PARAM_SERVICE_ID, None)
+        state = params['state']
+        if state == 'present' and not name:
+            raise SolaceParamsValidationError('name', name, f"required for state='present'")
+        if state == 'absent' and not name and not service_id:
+            raise SolaceParamsValidationError(f"name, {self.get_config().PARAM_SERVICE_ID}", name, f"at least one is required for state='absent'")
+
+    def get_args(self):
+        params = self.get_module().params
+        service_id = params.get(self.get_config().PARAM_SERVICE_ID, None)
+        if service_id:
+            return self.KEY_SERVICE_ID, service_id
+        name = params['name']
+        return [self.KEY_NAME, name]
+
+    def get_func(self, key, value):
+        if key == self.KEY_NAME:
+            services = self.solace_cloud_api.get_services(self.get_config())
+            service = self.solace_cloud_api.find_service_by_name_in_services(services, value)
+            if not service:
+                return None
+            service_id = service[self.KEY_SERVICE_ID]
         else:
-            # should not be possible based on choices for state
-            raise ValueError(f"unknown state={state}. pls raise an issue.")
-        return
+            service_id = value
 
-    def validate_args(self, lookup_item_key, lookup_item_value):
-        return
-
-    def get_func(self, sc_config, lookup_item_key, lookup_item_value):
-        """Return ok flag and dict of the object if found, otherwise None."""
-        service_id = None
-        if lookup_item_key == self.LOOKUP_ITEM_KEY_NAME:
-            # GET https://api.solace.cloud/api/v0/services
-            # retrieves a list of services (either 'owned by me' or 'owned by org', depending on permissions)
-            path_array = [scu.SOLACE_CLOUD_API_SERVICES_BASE_PATH]
-            ok, resp = self.get_configuration(sc_config, path_array, lookup_item_key, lookup_item_value)
-            if not ok:
-                return False, resp
-            # if found, retrieve the full configuration
-            if resp is not None:
-                if self.LOOKUP_ITEM_KEY_SERVICE_ID in resp:
-                    service_id = resp[self.LOOKUP_ITEM_KEY_SERVICE_ID]
-                else:
-                    raise KeyError(f"Could not find key:'{self.LOOKUP_ITEM_KEY_SERVICE_ID}' in Solace Cloud GET services response. Pls raise an issue.")
-            else:
-                return True, None
-        elif lookup_item_key == self.LOOKUP_ITEM_KEY_SERVICE_ID:
-            service_id = lookup_item_value
-        else:
-            raise ValueError(f"unknown lookup_item_key='{lookup_item_key}'. Pls raise an issue.")
-
-        # not found
-        if not service_id:
-            return True, None
         # save service_id
         self._service_id = service_id
-        # GET https://api.solace.cloud/api/v0/services/{{serviceId}}
-        # retrieves a single service
-        path_array = [scu.SOLACE_CLOUD_API_SERVICES_BASE_PATH, service_id]
-        return self.get_configuration(sc_config, path_array)
 
-    def create_func(self, sc_config, lookup_item_key, lookup_item_value, settings=None):
-        # POST https://api.solace.cloud/api/v0/services
+        service = self.solace_cloud_api.get_service(self.get_config(), self._service_id)
+        if not service:
+            return None
+
+        if service['creationState'] == 'failed':
+            logging.debug("solace cloud service in failed state - deleting ...")
+            _resp = self.solace_cloud_api.delete_service(self.get_config(), self._service_id)
+            return None
+
+        wait_timeout_minutes = self.get_module().params['wait_timeout_minutes']
+        if service['creationState'] != 'completed' and wait_timeout_minutes > 0:
+            logging.debug(f"solace cloud service creationState not completed (creationState={service['creationState']}) - waiting to complete ...")
+            service = self.solace_cloud_api.wait_for_service_create_completion(self.get_config(), wait_timeout_minutes, self._service_id)
+
+        return service
+
+    def create_func(self, key, name, settings=None):
         if not settings:
-            fail_msg = "mandatory 'settings' missing or empty"
-            result = dict(changed=False, rc=1)
-            self.module.fail_json(msg="Create Service: " + fail_msg, **result)
-        if lookup_item_key != self.LOOKUP_ITEM_KEY_NAME:
-            raise ValueError(f"lookup_item_key='{self.LOOKUP_ITEM_KEY_NAME}' expected, but received '{lookup_item_key}. Pls raise an issue.")
-
-        defaults = {
+            raise SolaceParamsValidationError('settings', settings, f"required for creating a service")
+        data = {
             'adminState': 'start',
-            'partitionId': 'default'
+            'partitionId': 'default',
+            'name': name
         }
-        fail_msg = None
-        mandatory = {
-            'name': lookup_item_value,
-            'msgVpnName': settings.get('msgVpnName'),
-            'datacenterId': settings.get('datacenterId'),
-            'serviceClassId': settings.get('serviceClassId'),
-            'serviceTypeId': settings.get('serviceTypeId')
-        }
-        missing_mandatory_keys = [k for k in mandatory if mandatory.get(k) is None]
-        if missing_mandatory_keys:
-            fail_msg = f"mandatory keys missing in 'settings': '{str(missing_mandatory_keys)}'"
-        if fail_msg:
-            result = dict(changed=False, rc=1)
-            self.module.fail_json(msg="Create Service: " + fail_msg, **result)
+        data.update(settings)
+        return self.solace_cloud_api.create_service(self.get_config(), self.get_module().params['wait_timeout_minutes'], data)
 
-        # this de-dups it again, settings override mandatory
-        data = sc.merge_dicts(defaults, mandatory, settings)
-        path_array = [scu.SOLACE_CLOUD_API_SERVICES_BASE_PATH]
-        return scu.make_post_request(sc_config, path_array, data)
+    def update_func(self, key, value, settings=None, delta_settings=None):
+        msg = [
+            f"Solace Cloud Service '{key}={value}' already exists.",
+            "You cannot update an existing service. Only option: delete & re-create.",
+            "changes requested:",
+            delta_settings
+        ]
+        raise SolaceError(msg)
 
-    def update_func(self, sc_config, lookup_item_key, lookup_item_value, delta_settings=None):
-        resp = dict(
-            error="Solace Cloud Service already exists. You can't update a Solace Cloud Service. Only option: delete & re-create."
-        )
-        return False, resp
-
-    def delete_func(self, sc_config, lookup_item_key, lookup_item_value):
-        # DELETE https://api.solace.cloud/api/v0/services/{{serviceId}}
-        if lookup_item_key != self.LOOKUP_ITEM_KEY_SERVICE_ID:
-            raise ValueError(f"lookup_item_key='{self.LOOKUP_ITEM_KEY_SERVICE_ID}' expected, but received '{lookup_item_key}. Pls raise an issue.")
-        service_id = lookup_item_value
-        path_array = [scu.SOLACE_CLOUD_API_SERVICES_BASE_PATH, service_id]
-        return scu.make_delete_request(sc_config, path_array)
-
-    def get_configuration(self, sc_config, path_array, lookup_item_key=None, lookup_item_value=None):
-        """Return ok flag and dict of object if found, otherwise None."""
-
-        ok, resp = scu.make_get_request(sc_config, path_array)
-        # not found: ok=False, resp['status_code']==404
-        if not ok:
-            if resp['status_code'] == 404:
-                return True, None
-            return False, resp
-        if lookup_item_key and lookup_item_value:
-            service = self._find_service(resp, lookup_item_key, lookup_item_value)
-        else:
-            service = resp
-        return True, service
-
-    def _find_service(self, resp, lookup_item_key, lookup_item_value):
-        """Return a dict of object if found, otherwise None."""
-        if isinstance(resp, dict):
-            value = resp.get(lookup_item_key)
-            if value == lookup_item_value:
-                return resp
-        elif isinstance(resp, list):
-            for item in resp:
-                value = item.get(lookup_item_key)
-                if value == lookup_item_value:
-                    return item
-        else:
-            raise TypeError(f"argument 'resp' is not a 'dict' nor 'list' but {type(resp)}. Pls raise an issue.")
-        return None
+    def delete_func(self, key, value):
+        return self.solace_cloud_api.delete_service(self.get_config(), self._service_id)
 
 
 def run_module():
-    """Entrypoint to module."""
     module_args = dict(
         name=dict(type='str', required=False, default=None),
-        service_id=dict(type='str', required=False, default=None)
+        wait_timeout_minutes=dict(type='int', required=False, default=10)
     )
-    arg_spec = scu.arg_spec_solace_cloud()
-    arg_spec.update(scu.arg_spec_state())
-    arg_spec.update(scu.arg_spec_settings())
+    arg_spec = SolaceTaskSolaceCloudConfig.arg_spec_solace_cloud()
+    arg_spec.update(SolaceTaskSolaceCloudConfig.arg_spec_state())
+    arg_spec.update(SolaceTaskSolaceCloudConfig.arg_spec_settings())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -345,13 +269,10 @@ def run_module():
     )
 
     solace_task = SolaceCloudServiceTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():
-
     run_module()
 
 

@@ -73,34 +73,23 @@ rc:
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sempv2_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceGetAvailableTask(SolaceBrokerTask):
+class SolaceGetAvailableTask(SolaceBrokerGetTask):
 
     def __init__(self, module):
         super().__init__(module)
         self.sempv2_api = SolaceSempV2Api(module)
 
     def do_task(self):
-
-        # # TODO: testing
-        # _sempv2_version = self.get_sempv2_version()
-        
-        # if True:
-        #     raise SolaceInternalError("testing solace internal error")
-
-        # ok, resp = self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + ["about"])
         resp = self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + ["about"])
         result = self.create_result()
         result.update({'is_available': True})
         return resp, result
-        # if not ok:
-        #     return resp, result
-        # return None, result
 
 
 def run_module():

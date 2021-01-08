@@ -11,7 +11,8 @@ import urllib.parse
 import json
 import logging
 import re
-
+import copy
+from json.decoder import JSONDecodeError
 
 SOLACE_UTILS_HAS_IMPORT_ERROR = False
 SOLACE_UTILS_IMPORT_ERR_TRACEBACK = None
@@ -69,3 +70,55 @@ class SolaceUtils(object):
                 elif t == dict:
                     d[k] = SolaceUtils.type_conversion(i, is_solace_cloud)
         return d
+
+    @staticmethod
+    def deep_dict_diff(new: dict, old: dict, changes: dict=dict()):
+        for k in new.keys():
+            if not isinstance(new[k], dict):
+                if new[k] != old.get(k, None):
+                    changes[k] = new[k]
+            else:
+                # changes[k] = dict()
+                if k in old:
+                    c = SolaceUtils.deep_dict_diff(new[k], old[k], dict())
+                    # logging.debug("\n\nc=\n{}\n\n".format(json.dumps(c, indent=2)))
+                    if c:
+                        # logging.debug("\n\nc not empty: c=\n{}\n\n".format(json.dumps(c, indent=2)))
+                        changes[k] = c
+                        # changes[k].update(c)
+                else:
+                    changes[k] = copy.deepcopy(new[k])
+        # logging.debug("\n\nreturning changes =\n{}\n\n".format(json.dumps(changes, indent=2)))
+        return changes        
+
+    # @staticmethod
+    # def do_deep_compare(new, old, changes=dict()):
+    #     for k in new.keys():
+    #         if not isinstance(new[k], dict):
+    #             if new[k] != old.get(k, None):
+    #                 changes[k] = new[k]
+    #         else:
+    #             # changes[k] = dict()
+    #             if k in old:
+    #                 c = do_deep_compare(new[k], old[k], dict())
+    #                 # logging.debug("\n\nc=\n{}\n\n".format(json.dumps(c, indent=2)))
+    #                 if c:
+    #                     # logging.debug("\n\nc not empty: c=\n{}\n\n".format(json.dumps(c, indent=2)))
+    #                     changes[k] = c
+    #                     # changes[k].update(c)
+    #             else:
+    #                 changes[k] = copy.deepcopy(new[k])
+    #     # logging.debug("\n\nreturning changes =\n{}\n\n".format(json.dumps(changes, indent=2)))
+    #     return changes                
+
+    @staticmethod
+    def parse_response_body(resp_text: str):
+        try:
+            body = json.loads(resp_text)
+        except JSONDecodeError:
+            try:
+                body = xmltodict.parse(resp_text)
+            except Exception:
+                # print as text at least
+                body = resp_text
+        return body

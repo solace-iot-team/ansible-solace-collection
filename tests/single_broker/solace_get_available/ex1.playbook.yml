@@ -25,7 +25,7 @@
       register: result
       ignore_errors: true
     - assert:
-        that: result.rc == 1
+        that: result.rc == 1 and "ConnectionPool(host='unknown.host.com'" in result.msg
 
     - name: "Wrong SSL"
       solace_get_available:
@@ -33,7 +33,11 @@
       register: result
       ignore_errors: true
     - assert:
-        that: result.rc == 1
+        that: result.rc == 1 and 'SSLError' in result.msg
+      when: sempv2_is_secure_connection == False
+    - assert:
+        that: result.rc == 1 and 'The plain HTTP request was sent to HTTPS port' in result.msg.body
+      when: sempv2_is_secure_connection == True
 
     - name: "Wrong password"
       solace_get_available:

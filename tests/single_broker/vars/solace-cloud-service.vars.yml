@@ -2,8 +2,8 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 ---
-  name: ansible_solace_test_broker
-  msgVpnName: as_test_broker
+  name: asc_test
+  msgVpnName: asc_test
   # datacenterId: "aws-eu-west-2a"
   datacenterId: "aws-ca-central-1a"
   serviceTypeId: "enterprise"

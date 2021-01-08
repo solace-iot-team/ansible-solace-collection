@@ -45,6 +45,17 @@ class SolaceTaskConfig(object):
     def get_headers(self) -> dict:
         raise SolaceInternalErrorAbstractMethod()
 
+    @staticmethod
+    def arg_spec_state():
+        return dict(
+            state=dict(type='str', default='present', choices=['absent', 'present'])
+        )
+
+    @staticmethod
+    def arg_spec_settings():
+        return dict(
+            settings=dict(type='dict', required=False)
+        )
 
 class SolaceTaskBrokerConfig(SolaceTaskConfig):
     def __init__(self, module: AnsibleModule):
@@ -88,10 +99,10 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
 
     def get_url(self, path: str) -> str:
         return self.url + path
-
+    
     def get_auth(self) -> str:
         return self.auth
-    
+
     def get_timeout(self) -> float:
         return self.timeout
 
@@ -125,18 +136,6 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         )
 
     @staticmethod
-    def arg_spec_settings():
-        return dict(
-            settings=dict(type='dict', required=False)
-        )
-
-    @staticmethod
-    def arg_spec_state():
-        return dict(
-            state=dict(type='str', default='present', choices=['absent', 'present'])
-        )
-
-    @staticmethod
     def arg_spec_name():
         return dict(
             name=dict(type='str', required=True)
@@ -148,3 +147,40 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         arg_spec.update(SolaceTaskBrokerConfig.arg_spec_settings())
         arg_spec.update(SolaceTaskBrokerConfig.arg_spec_state())
         return arg_spec
+
+
+class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
+    
+    PARAM_SERVICE_ID = 'solace_cloud_service_id'
+    PARAM_API_TOKEN = 'solace_cloud_api_token'
+
+    def __init__(self, module: AnsibleModule):
+        super().__init__(module)
+        self.solace_cloud_api_token = module.params[self.PARAM_API_TOKEN]
+        self.solace_cloud_service_id = module.params.get(self.PARAM_SERVICE_ID, None)
+        self.timeout = float(module.params['timeout'])
+        self.auth = BearerAuth(self.solace_cloud_api_token)
+
+    def is_solace_cloud(self) -> bool:
+        return True
+
+    def get_url(self, path: str) -> str:
+        return path    
+
+    def get_auth(self) -> str:
+        return self.auth
+    
+    def get_timeout(self) -> float:
+        return self.timeout
+
+    def get_headers(self) -> dict:
+        return dict()
+
+    @staticmethod
+    def arg_spec_solace_cloud() -> dict:
+        return dict(
+            solace_cloud_api_token=dict(type='str', required=True, no_log=True, default=None, aliases=['api_token']),
+            solace_cloud_service_id=dict(type='str', required=False, default=None, aliases=['service_id']),
+            timeout=dict(type='int', default='60', required=False)
+        )
+

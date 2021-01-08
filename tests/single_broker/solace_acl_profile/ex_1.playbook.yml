@@ -90,12 +90,30 @@
     - assert:
         that:
           - result.rc == 1
-          - "'cannot be converted to a float' in result.msg[0]"
+          - "'value cannot be converted to a float' in result.msg[1]"
 
-    - name: "EX_1: Create ACL Profile"
+    - name: "EX_1: Delete ACL Profile"
       solace_acl_profile:
         name: "{{ acl_profile_name }}"
         state: absent
+
+    - name: "EX_1: Wrong password"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        password: "unknown_password"
+      register: result
+      ignore_errors: true
+    - assert:
+        that: result.rc == 1 and result.msg.reason == 'Unauthorized'
+
+    - name: "EX_1: Wrong username"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        username: "unknown_username"
+      register: result
+      ignore_errors: true
+    - assert:
+        that: result.rc == 1 and result.msg.reason == 'Unauthorized'
 
 ###
 # The End.

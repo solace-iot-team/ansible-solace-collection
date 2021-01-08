@@ -128,7 +128,7 @@ rc:
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sempv2_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
 from ansible.module_utils.basic import AnsibleModule
