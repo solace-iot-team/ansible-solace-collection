@@ -29,7 +29,12 @@
           serviceClassId: "enterprise-giga"
         state: present
       register: result
-      failed_when: "result.rc != 1"
+
+
+
+      # failed_when: "result.rc != 1"
+
+    - meta: end_play  
 
     - name: "Exception_Test: no name, state=absent"
       solace_cloud_service:

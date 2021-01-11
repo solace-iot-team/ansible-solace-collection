@@ -164,7 +164,7 @@ response:
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceCloudCRUDTask
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudServiceConfig
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceCloudApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError, SolaceError
 from ansible.module_utils.basic import AnsibleModule
@@ -258,9 +258,9 @@ def run_module():
         name=dict(type='str', required=False, default=None),
         wait_timeout_minutes=dict(type='int', required=False, default=10)
     )
-    arg_spec = SolaceTaskSolaceCloudConfig.arg_spec_solace_cloud()
-    arg_spec.update(SolaceTaskSolaceCloudConfig.arg_spec_state())
-    arg_spec.update(SolaceTaskSolaceCloudConfig.arg_spec_settings())
+    arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service()
+    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_state())
+    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_settings())
     arg_spec.update(module_args)
 
     module = AnsibleModule(

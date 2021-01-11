@@ -110,12 +110,8 @@ class SolaceCloudGetServiceTask(SolaceCloudGetTask):
         super().__init__(module)
 
     def do_task(self):
-        service_id = self.get_module().params['service_id']
-        service = self.get_solace_cloud_api().get_service(self.get_config(), service_id)
-        result = self.create_result()
-        result.update(dict(
-            service=service
-        ))
+        services = self.get_solace_cloud_api().get_services(self.get_config())
+        result = self.create_result_with_list(services)
         return None, result
 
 
@@ -124,7 +120,6 @@ def run_module():
     module_args = dict(
     )
     arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud()
-    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service())
     arg_spec.update(module_args)
 
     module = AnsibleModule(

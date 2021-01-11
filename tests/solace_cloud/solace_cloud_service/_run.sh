@@ -30,10 +30,10 @@ source $PROJECT_HOME/.lib/functions.sh
   solaceCloudAccInventory=$(assertFile $scriptLogName $SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE) || exit
 
   playbooks=(
-    "$scriptDir/facts.playbook.yml"
+    # "$scriptDir/facts.playbook.yml"
     "$scriptDir/ex_1.playbook.yml"
-    "$scriptDir/ex_2.playbook.yml"
-    "$scriptDir/ex_3.playbook.yml"
+    # "$scriptDir/ex_2.playbook.yml"
+    # "$scriptDir/ex_3.playbook.yml"
   )
 
   for playbook in ${playbooks[@]}; do

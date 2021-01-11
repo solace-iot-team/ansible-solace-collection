@@ -14,6 +14,8 @@ DOCUMENTATION = '''
 ---
 module: solace_cloud_account_gather_facts
 
+TODO: re-work documentation
+
 short_description: Facts from all services in Solace Cloud Account.
 
 description: >
@@ -115,103 +117,66 @@ RETURN = '''
         description: error message if not ok
         type: str
         returned: error
-    response:
+    
+    response: - not correct
         description: The response from the GET {serviceId} call. Differs depending on state of service.
         type: dict
         returned: success
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceCloudGetTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceCloudApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError, SolaceInternalError
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceCloudAccountGatherFactsTask(scu.SolaceCloudTask):
+class SolaceCloudAccountGatherFactsTask(SolaceCloudGetTask):
 
     def __init__(self, module):
-        sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
-        scu.SolaceCloudTask.__init__(self, module)
+        super().__init__(module)
+
+    def validate_params(self):
         return
 
-    def get_services(self):
-        # GET https://api.solace.cloud/api/v0/services
-        path_array = [scu.SOLACE_CLOUD_API_SERVICES_BASE_PATH]
-        ok, resp = scu.make_get_request(self.sc_config, path_array)
-        if not ok:
-            return False, resp
-        # get full config for all services
-        # if creationState == 'completed'
-        # return error, if any found that are not completed yet
-        ac_services = resp
-
-        return_format = self.module.params['return_format']
-        if return_format == 'dict':
-            services = dict()
-        else:
-            services = []
-
-        for ac_service in ac_services:
-            service_id = ac_service['serviceId']
-            name = ac_service['name']
-            if ac_service['creationState'] != "completed":
-                resp = dict(
-                    error="Service not fully started yet.",
-                    name=ac_service['name'],
-                    serviceId=ac_service['serviceId'],
-                    creationState=ac_service['creationState']
-                )
-                return False, resp
-            else:
-                # GET https://api.solace.cloud/api/v0/services/{{serviceId}}
-                path_array = [scu.SOLACE_CLOUD_API_SERVICES_BASE_PATH, service_id]
-                ok, resp = scu.make_get_request(self.sc_config, path_array)
-                if not ok:
-                    return False, resp
-            if return_format == 'dict':
-                services[name] = resp
-            else:
-                services.append(resp)
-        return True, services
-
-    # Note: current API does not allow this, fix expected soon (2020-08-11)
-    def get_data_centers(self):
-        # GET /api/v0/datacenters
-        path_array = [scu.SOLACE_CLOUD_API_DATA_CENTERS]
-        return scu.make_get_request(self.sc_config, path_array)
-
-    def gather_facts(self):
-        account_name = self.module.params['account_name']
+    def do_task(self):
+        self.validate_params()
+        account_name = self.get_module().params['account_name']
         return_format = self.module.params['return_format']
         facts = dict()
         if return_format == 'dict':
-            facts[account_name] = dict(
+            facts = dict(
                 data_centers=dict(),
                 services=dict()
             )
         elif return_format == 'list':
-            facts[account_name] = dict(
+            facts = dict(
                 data_centers=[],
                 services=[]
             )
         else:
-            raise ValueError(f"unknown return_format='{return_format}'. Pls raise an issue.")
+            raise SolaceInternalError(f"arg 'return_format={return_format}' invalid")
 
-        # waiting for Solace Cloud to enable the call...
-        # ok, resp = self.get_data_centers()
-        # if not ok:
-        #     return False, resp
-        # ...
+        services = self.get_solace_cloud_api().get_services_with_details(self.get_config())
+        data_centers = self.get_solace_cloud_api().get_data_centers(self.get_config())
+        
+        if return_format == 'dict':
+            for service in services:
+                    name = service['name']
+                    facts['services'][name] = service
+            for data_center in data_centers:
+                    id = data_center['id']
+                    facts['data_centers'][id] = data_center
+        else:
+            facts['services'] = services
+            facts['data_centers'] = data_centers
 
-        ok, resp = self.get_services()
-        if not ok:
-            return False, resp
-        facts[account_name]['services'] = resp
-        # if return_format == 'dict':
-        #     facts[account_name]['services'] = resp
-        # else:
-        #     facts[account_name]['services'] = resp
-
-        return True, facts
+        result = self.create_result()
+        result.update(dict(
+            solace_cloud_account = { account_name: facts }
+        ))
+        return None, result
 
 
 def run_module():
@@ -219,8 +184,7 @@ def run_module():
         account_name=dict(type='str', required=True, aliases=['name']),
         return_format=dict(type='str', required=True, choices=['dict', 'list'])
     )
-    arg_spec = scu.arg_spec_solace_cloud()
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskSolaceCloudConfig.arg_spec_solace_cloud()
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -228,19 +192,8 @@ def run_module():
         supports_check_mode=True
     )
 
-    result = dict(
-        changed=False,
-        ansible_facts=dict()
-    )
-
     solace_task = SolaceCloudAccountGatherFactsTask(module)
-    ok, resp = solace_task.gather_facts()
-    if not ok:
-        result['rc'] = 1
-        module.fail_json(msg=resp, **result)
-
-    result['ansible_facts']['solace_cloud_accounts'] = resp
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():

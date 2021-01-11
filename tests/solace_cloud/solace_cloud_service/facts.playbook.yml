@@ -24,6 +24,8 @@
         account_name: "{{ sc_account_name }}"
         return_format: dict
       register: sca_facts_dict_result
+    - assert:
+        that: sca_facts_dict_result.rc == 0 and sca_facts_dict_result.changed == False
 
     - name: "Save Facts Dict: Solace Cloud Account"
       copy:
@@ -34,7 +36,7 @@
 
     - name: "Set Fact as Dict: Solace Cloud Account Services"
       set_fact:
-        sca_services_dict_facts: "{{ sca_facts_dict_result.ansible_facts.solace_cloud_accounts[sc_account_name].services }}"
+        sca_services_dict_facts: "{{ sca_facts_dict_result.solace_cloud_account[sc_account_name].services }}"
       no_log: true
 
     - name: "Solace Cloud Account: Gather Facts as List"
@@ -53,7 +55,7 @@
 
     - name: "Set Fact: Solace Cloud Account Services"
       set_fact:
-        sca_services_list_facts: "{{ sca_facts_list_result.ansible_facts.solace_cloud_accounts[sc_account_name].services }}"
+        sca_services_list_facts: "{{ sca_facts_list_result.solace_cloud_account[sc_account_name].services }}"
       no_log: true
 
     - name: "Loop: Get Service for all Services By serviceId"
@@ -66,25 +68,32 @@
         index_var: sc_service_i
         label: "[by serviceId] Service: name={{ sc_service.name }}, id={{ sc_service.serviceId }}"
 
-    - name: "Loop: Get Service for all Services By name"
+    - name: "solace_cloud_get_services"
+      solace_cloud_get_services:
+        api_token: "{{ api_token }}"
+      register: result
+    - assert:
+        that: result.rc == 0 and result.changed == False
+    - assert:
+        that: (result.result_list_count is defined) and (result.result_list_count | type_debug == "int")
+    - assert:
+        that: (result.result_list is defined) and (result.result_list | type_debug == "list")
+    - set_fact:
+        sc_service_list: "{{ result.result_list }}"
+
+    - name: "Loop: Get Service for all Services By serviceId"
       solace_cloud_get_service:
         api_token: "{{ api_token }}"
-        name: "{{ sc_service.name }}"
-      loop: "{{ sca_services_list_facts }}"
+        service_id: "{{ service.serviceId }}"
+      loop: "{{ sc_service_list }}"
       loop_control:
-        loop_var: sc_service
-        index_var: sc_service_i
-        label: "[by name] Service: name={{ sc_service.name }}, id={{ sc_service.serviceId }}"
+        loop_var: service
+        index_var: service_i
+        label: "[by serviceId] Service: name={{ service.name }}, id={{ service.serviceId }}"
 
     - name: "Loop: Get Semp Connection Params for each Service in the Solace Cloud Account"
-      include_tasks: ./tasks/get-semp-con-params.tasks.yml
-      loop: "{{ sca_services_list_facts }}"
-      loop_control:
-        loop_var: sc_service
-
-    - name: "Loop: Get Client Connection Params for each Service in the Solace Cloud Account"
-      include_tasks: ./tasks/get-client-con-params.tasks.yml
-      loop: "{{ sca_services_list_facts }}"
+      include_tasks: ./tasks/get-details.tasks.yml
+      loop: "{{ sc_service_list }}"
       loop_control:
         loop_var: sc_service
 

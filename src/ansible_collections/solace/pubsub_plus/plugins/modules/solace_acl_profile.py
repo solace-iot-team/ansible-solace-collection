@@ -142,7 +142,7 @@ class SolaceACLProfileTask(SolaceBrokerCRUDTask):
         path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def update_func(self, vpn_name, acl_profile_name, settings=None):
+    def update_func(self, vpn_name, acl_profile_name, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}
         path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)

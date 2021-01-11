@@ -167,7 +167,7 @@ facts:
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceGetFactsTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceReadFactsTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError, SolaceParamsValidationError
 from ansible.module_utils.basic import AnsibleModule
 from urllib.parse import urlparse
@@ -175,7 +175,7 @@ import json
 from json.decoder import JSONDecodeError
 
 
-class SolaceCloudGetFactsTask(SolaceGetFactsTask):
+class SolaceCloudGetFactsTask(SolaceReadFactsTask):
 
     FIELD_FUNCS = [
         "get_serviceSEMPManagementEndpoints"
@@ -196,14 +196,15 @@ class SolaceCloudGetFactsTask(SolaceGetFactsTask):
         if service_state != 'completed':
             raise SolaceParamsValidationError("service creationState", service_state, f"is not 'completed'") 
 
-        field_funcs = params['field_funcs']
-        has_get_funcs = False
-        if field_funcs and len(field_funcs) > 0:
-            for field_func in field_funcs:
-                exists = (True if field_func in self.FIELD_FUNCS else False)
-                if not exists:
-                    raise SolaceParamsValidationError("field_funcs", field_func, f"unknown, valid field functions are: {self.FIELD_FUNCS}.")
-            has_get_funcs = True
+        has_get_funcs = self.validate_param_field_funcs(self.FIELD_FUNCS, params['field_funcs'])
+        # field_funcs = params['field_funcs']
+        # has_get_funcs = False
+        # if field_funcs and len(field_funcs) > 0:
+        #     for field_func in field_funcs:
+        #         exists = (True if field_func in self.FIELD_FUNCS else False)
+        #         if not exists:
+        #             raise SolaceParamsValidationError("field_funcs", field_func, f"unknown, valid field functions are: {self.FIELD_FUNCS}.")
+        #     has_get_funcs = True
 
         param_get_formattedHostInventory = params.get('get_formattedHostInventory', None)
         if param_get_formattedHostInventory:
@@ -221,7 +222,7 @@ class SolaceCloudGetFactsTask(SolaceGetFactsTask):
         facts = dict()
         if field_funcs and len(field_funcs) > 0:
             for field_func in field_funcs:
-                field, value = globals()[field_func](search_dict)
+                field, value = self.call_dynamic_func(field_func, search_dict)
                 facts[field] = value
 
         param_get_formattedHostInventory = params['get_formattedHostInventory']

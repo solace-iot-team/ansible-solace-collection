@@ -30,6 +30,12 @@ class SolaceApi(object):
         SolaceUtils.module_fail_on_import_error(module, SOLACE_API_HAS_IMPORT_ERROR, SOLACE_API_IMPORT_ERR_TRACEBACK)
         return
 
+    def get_auth(self, config: SolaceTaskConfig) -> str:
+        raise SolaceInternalErrorAbstractMethod()
+
+    def get_url(self, config: SolaceTaskConfig, path: str) -> str:
+        raise SolaceInternalErrorAbstractMethod()
+
     def make_get_request(self, config: SolaceTaskConfig, path_array: list):
         return self.make_request(config, requests.get, path_array)
 
@@ -59,11 +65,11 @@ class SolaceApi(object):
 
     def make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json=None):
         path = SolaceApi.compose_path(path_array)
-        url = config.get_url(path)
+        url = self.get_url(config, path)
         resp = request_func(
             url, 
             json=json,
-            auth=config.get_auth(),
+            auth=self.get_auth(config),
             timeout=config.get_timeout(),
             headers=config.get_headers(),
             params=None)
@@ -152,6 +158,12 @@ class SolaceSempV2Api(SolaceApi):
         super().__init__(module)
         return
 
+    def get_auth(self, config: SolaceTaskBrokerConfig) -> str:
+        return config.get_semp_auth()
+
+    def get_url(self, config: SolaceTaskBrokerConfig, path: str) -> str:
+        return config.get_semp_url(path) 
+
     def get_sempv2_version(self, config: SolaceTaskBrokerConfig) -> str:
         resp = self.make_get_request(config, [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + ["about", "api"])
         return SolaceUtils.get_key(resp, "sempVersion")
@@ -196,6 +208,12 @@ class SolaceCloudApi(SolaceApi):
         super().__init__(module)
         return
 
+    def get_auth(self, config: SolaceTaskBrokerConfig) -> str:
+        return config.get_solace_cloud_auth()
+
+    def get_url(self, config: SolaceTaskBrokerConfig, path: str) -> str:
+        return config.get_solace_cloud_url(path)
+
     def handle_response(self, resp):
         # POST: https://api.solace.cloud/api/v0/services: returns 201
         if not resp.status_code in [200, 201]:
@@ -216,18 +234,23 @@ class SolaceCloudApi(SolaceApi):
                             )
         raise SolaceApiError(_resp)
 
-    def get_services(self, config: SolaceTaskSolaceCloudConfig) -> dict:
+    def get_data_centers(self, config: SolaceTaskSolaceCloudConfig) -> list:
+        # GET /api/v0/datacenters
+        resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_DATA_CENTERS])
+        return resp
+
+    def get_services(self, config: SolaceTaskSolaceCloudConfig) -> list:
         # GET https://api.solace.cloud/api/v0/services
-        # retrieves a list of services (either 'owned by me' or 'owned by org', depending on permissions)
-        # returns dict() for 1 service, list for many, or None if not found
         try:
             resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES])
         except SolaceApiError as e:
             resp = e.get_resp()
             # TODO: what is the code if solace cloud account has 0 services?
             if resp['status_code'] == 404:
-                return None
+                return []
             raise SolaceApiError(resp)
+        if isinstance(resp, dict):
+            return [resp]
         return resp
 
     def find_service_by_name_in_services(self, services, name):
@@ -253,6 +276,14 @@ class SolaceCloudApi(SolaceApi):
                 return None
             raise SolaceApiError(resp)
         return resp
+
+    def get_services_with_details(self, config: SolaceTaskSolaceCloudConfig) -> list:
+        # get services, then for each service, get details
+        _services = self.get_services(config)
+        services = []
+        for _service in _services:
+            services.append(self.get_service(config, _service['serviceId']))
+        return services
 
     def create_service(self, config: SolaceTaskSolaceCloudConfig, wait_timeout_minutes: int, data: dict, try_count=0) -> dict:        
         # POST https://api.solace.cloud/api/v0/services
