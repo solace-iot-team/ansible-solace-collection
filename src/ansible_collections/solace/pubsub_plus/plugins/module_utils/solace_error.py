@@ -36,11 +36,15 @@ class SolaceParamsValidationError(Exception):
         super().__init__(f"arg '{param}={value}': {msg}")
 
 class SolaceError(Exception):
-    def __init__(self, message):
+    def __init__(self, message, result_update: dict = None):
         self.message = message
+        self.result_update = result_update
         super().__init__(self.message)
 
     def to_list(self):
         if isinstance(self.message, list):
             return self.message
         return [str(self.message)]
+    
+    def get_result_update(self):
+        return self.result_update

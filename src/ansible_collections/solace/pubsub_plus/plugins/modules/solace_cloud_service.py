@@ -244,10 +244,9 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
         msg = [
             f"Solace Cloud Service '{key}={value}' already exists.",
             "You cannot update an existing service. Only option: delete & re-create.",
-            "changes requested:",
-            delta_settings
+            "changes requested: see 'delta'"
         ]
-        raise SolaceError(msg)
+        raise SolaceError(msg, dict(delta=delta_settings))
 
     def delete_func(self, key, value):
         return self.solace_cloud_api.delete_service(self.get_config(), self._service_id)
@@ -258,7 +257,8 @@ def run_module():
         name=dict(type='str', required=False, default=None),
         wait_timeout_minutes=dict(type='int', required=False, default=10)
     )
-    arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service()
+    arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud()
+    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service())
     arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_state())
     arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_settings())
     arg_spec.update(module_args)

@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "Exception_Test_2: solace_cloud_service: various"
+  name: "ex_2: solace_cloud_service: various"
   hosts: all
   gather_facts: no
   any_errors_fatal: true
@@ -17,24 +17,25 @@
         api_token_restriced: "{{ SOLACE_CLOUD_API_TOKEN_RESTRICTED }}"
         sc_account_name: "{{ inventory_hostname }}"
 
-    - name: "Ex 2: update service"
+    - name: "ex_2: update service"
       solace_cloud_service:
         api_token: "{{ api_token }}"
-        name: "Ansible-Solace-Test-Service-1"
+        name: asc_test_1
         settings:
-          msgVpnName: as-test-service-1-u
-          # datacenterId: "aws-eu-west-2a"
+          msgVpnName: change_me
           datacenterId: "aws-ca-central-1a"
           serviceTypeId: "enterprise"
           serviceClassId: "enterprise-250-nano"
         state: present
       register: result
-      failed_when: result.rc != 1 or result.delta == None
+      ignore_errors: yes
+    - assert:
+        that: result.rc == 1 and 'Solace Cloud Service \'name=asc_test_1\' already exists' in result.msg | string and result.delta.msgVpnName == 'change_me'
 
-    - name: "Ex 2: Delete by Service Id & name"
+    - name: "ex_2: Delete by service_id & name - service_id takes precedence"
       solace_cloud_service:
         api_token: "{{ api_token }}"
-        name: "Ansible-Solace-Test-Service-1"
+        name: asc_test_1
         service_id: "xxxxx"
         state: absent
       register: result

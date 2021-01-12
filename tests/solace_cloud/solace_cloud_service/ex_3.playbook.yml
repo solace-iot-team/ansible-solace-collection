@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "Ex 3_3: solace_cloud_service: test for Delta Changes"
+  name: "ex_3: solace_cloud_service: test for Delta Changes"
   hosts: all
   gather_facts: no
   any_errors_fatal: true
@@ -23,10 +23,11 @@
 
     - set_fact:
         sc_service: "{{ sc_services.solace_cloud_services[0] }}"
-        sc_service_name: as-test-delta-settings
-        sc_service_vpn: as-test-delta-settings
+    - set_fact:
+        sc_service_name: "{{ sc_service.name }}"
+        sc_service_vpn: "{{ sc_service.msgVpnName }}"
 
-    - name: "Ex 3: Create New Service"
+    - name: "ex_3: Create New Service"
       solace_cloud_service:
         api_token: "{{ api_token }}"
         name: "{{ sc_service_name }}"
@@ -46,18 +47,16 @@
     - set_fact:
         sc_service_id: "{{ result.response.serviceId }}"
 
-    - name: "Ex 3: Wait for Service Provisioning to Complete"
+    - name: "ex_3: Wait for Service Provisioning to Complete"
       solace_cloud_get_service:
         api_token: "{{ api_token }}"
         service_id: "{{ sc_service_id }}"
       register: result
-      until: "result.rc != 0 or result.response.creationState == 'completed'"
-      # wait max for 40 * 30 seconds, then give up
-      retries: 40
+      until: "result.rc != 0 or result.service.creationState == 'completed'"
+      retries: 3
       delay: 30 # Every 30 seconds
-      no_log: true
 
-    - name: "Ex 3: No Update"
+    - name: "ex_3: No Update"
       solace_cloud_service:
         api_token: "{{ api_token }}"
         name: "{{ sc_service.name }}"
@@ -68,8 +67,10 @@
           serviceClassId: "{{ sc_service.serviceClassId }}"
         state: present
       register: result
+    - assert:
+        that:  result.rc == 0 and result.changed == False
 
-    - name: "Ex 3: Update msgVpnName"
+    - name: "ex_3: Update msgVpnName"
       solace_cloud_service:
         api_token: "{{ api_token }}"
         name: "{{ sc_service_name }}"
@@ -80,9 +81,11 @@
           serviceClassId: "{{ sc_service.serviceClassId }}"
         state: present
       register: result
-      failed_when: result.rc != 1 or result.delta == None or result.delta.msgVpnName == None
+      ignore_errors: yes
+    - assert:
+        that: result.rc == 1 and 'already exists' in result.msg | string and result.delta.msgVpnName == 'asc_test_1-update'
 
-    - name: "Ex 3: Update Ports"
+    - name: "ex_3: Update Ports"
       solace_cloud_service:
         api_token: "{{ api_token }}"
         name: "{{ sc_service_name }}"
@@ -96,22 +99,9 @@
               serviceSmfPlainTextListenPort: 1111
         state: present
       register: result
-      failed_when: result.rc != 1 or result.delta.attributes.customizedMessagingPorts.serviceSmfPlainTextListenPort == None
+      ignore_errors: yes
+    - assert:
+        that: result.rc == 1 and 'already exists' in result.msg | string and result.delta.attributes.customizedMessagingPorts.serviceSmfPlainTextListenPort == 1111
 
-    - name: "Ex 3: Delete by Service Id"
-      solace_cloud_service:
-        api_token: "{{ api_token }}"
-        service_id: "{{ sc_service_id }}"
-        state: absent
-      register: result
-      failed_when: result.rc != 0
-
-    - name: "Ex 3: Delete by Service Id"
-      solace_cloud_service:
-        api_token: "{{ api_token }}"
-        service_id: "{{ sc_service_id }}"
-        state: absent
-      register: result
-      failed_when: result.rc != 0
 ###
 # The End.

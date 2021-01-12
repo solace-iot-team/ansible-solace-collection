@@ -60,6 +60,7 @@ class SolaceTask(object):
             self.module.exit_json(msg=msg, **result)
         except SolaceError as e:
             result = self.create_result(rc=1, changed=self.changed)
+            result.update(e.get_result_update())
             self.module.exit_json(msg=e.to_list(), **result)
         except SolaceApiError as e:
             result = self.create_result(rc=1, changed=self.changed)
