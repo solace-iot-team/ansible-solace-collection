@@ -8,7 +8,7 @@ import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError, SolaceError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudServiceConfig, SolaceTaskSolaceCloudConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceApi, SolaceSempV2Api, SolaceCloudApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceApi, SolaceSempV2Api, SolaceCloudApi, SolaceSempV2PagingGetApi
 from ansible.module_utils.basic import AnsibleModule
 import logging
 
@@ -273,13 +273,31 @@ class SolaceGetTask(SolaceTask):
         ))
         return result
 
+
 class SolaceBrokerGetTask(SolaceGetTask):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
         self.config = SolaceTaskBrokerConfig(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
     def get_config(self) -> SolaceTaskBrokerConfig:
         return self.config
+
+    def get_sempv2_api(self) -> SolaceSempV2Api:
+        return self.sempv2_api    
+
+
+class SolaceBrokerGetPagingTask(SolaceGetTask):
+    def __init__(self, module: AnsibleModule):
+        super().__init__(module)
+        self.config = SolaceTaskBrokerConfig(module)
+        self.sempv2_get_paging_api = SolaceSempV2PagingGetApi(module)
+
+    def get_config(self) -> SolaceTaskBrokerConfig:
+        return self.config
+
+    def get_sempv2_get_paging_api(self) -> SolaceSempV2Api:
+        return self.sempv2_get_paging_api    
 
 
 class SolaceCloudGetTask(SolaceGetTask):

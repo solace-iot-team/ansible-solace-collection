@@ -13,10 +13,11 @@ export PROJECT_HOME=$projectHome
 
 ansibleSolaceTests=(
 # DONE
-  "setup"
-  "solace_get_available"
-  "solace_acl_profile"
+  # "setup"
+  # "solace_get_available"
+  # "solace_acl_profile"
 # TODO
+  "solace_vpn"
   # "solace_facts"
   # "solace_client_profile"
   # "solace_rdp"
@@ -25,7 +26,6 @@ ansibleSolaceTests=(
   # "solace_topic_endpoint"
   # "solace_client_username"
   # "solace_get_vpn_clients"
-  # "solace_vpn"
   # "solace_cert_authority"
   # "teardown"
 )
@@ -34,7 +34,7 @@ export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 # local broker
   export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.7.0.29"
-  export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.3.1.28"
+  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.3.1.28"
   export BROKER_TYPE="local"
   export LOCAL_BROKER_INVENTORY_FILE="$projectHome/test-runner/files/local.broker.inventory.yml"
   export BROKER_DOCKER_COMPOSE_FILE="$projectHome/test-runner/files/PubSubStandard_singleNode.yml"

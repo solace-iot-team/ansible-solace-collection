@@ -22,7 +22,6 @@
   tasks:
     - name: "Ex_1: Gather Solace Facts"
       solace_gather_facts:
-      no_log: true
 
     - name: "Ex_1: wrong vpn"
       solace_get_facts:
@@ -32,8 +31,7 @@
         field_funcs:
           - get_allClientConnectionDetails
       register: result
-      failed_when: "result.rc != 1"
-      no_log: true
+
     - assert:
         that:
           - "'Could not find vpn: \\'does_not_exist\\' in \\'ansible_facts.solace\\' for host' in result.msg"

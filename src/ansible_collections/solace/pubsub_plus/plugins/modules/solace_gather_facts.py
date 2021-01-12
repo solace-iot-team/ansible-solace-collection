@@ -104,7 +104,7 @@ ansible_facts.solace:
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetTask
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi, SolaceSempV1Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
@@ -114,6 +114,7 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
     def __init__(self, module):
         super().__init__(module)
         self.sempv2_api = SolaceSempV2Api(module)
+        self.sempv1_api = SolaceSempV1Api(module)
         self.solace_cloud_api = SolaceCloudApi(module)
 
     def add_path_value(self, dictionary, path_array, value):
@@ -142,37 +143,17 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
         about_info['isSolaceCloud'] = self.get_config().is_solace_cloud()
         return about_info
 
-
-  # def _get_service_info_broker(self):
-    #     # GET /
-    #     # issue: not much info for brokers with semp api version < 2.17
-    #     # ok, resp, headers = make_get_request(self.solace_config, [su.SEMP_V2_CONFIG] + [''])
-    #     # if not ok:
-    #     #     return False, resp
-    #     # get service info via SEMP v1
-    #     xml_post_cmd = "<rpc><show><service></service></show></rpc>"
-    #     ok, resp_service = make_sempv1_post_request(self.solace_config, xml_post_cmd)
-    #     if not ok:
-    #         resp_service['hint'] = "this could be a Solace Cloud service, but not configured as such."
-    #         return False, resp_service
-    #     resp = resp_service['rpc-reply']['rpc']['show']['service']['services']
-    #     # get the virutal router name via SEMP v1
-    #     xml_post_cmd = "<rpc><show><router-name></router-name></show></rpc>"
-    #     ok, resp_virtual_router = make_sempv1_post_request(self.solace_config, xml_post_cmd)
-    #     if not ok:
-    #         resp_virtual_router['hint'] = "this could be a Solace Cloud service, but not configured as such."
-    #         return False, resp_virtual_router
-    #     resp['virtualRouterName'] = resp_virtual_router['rpc-reply']['rpc']['show']['router-name']['router-name']
-
-    #     return ok, resp
-
     def get_service_info(self):
-
-        if self.get_config().is_solace_cloud:
+        if self.get_config().is_solace_cloud():
             return self.solace_cloud_api.get_service(self.get_config(), self.get_module().params['solace_cloud_service_id'])
         else:
-            raise NotImplementedError("implement sempv1_api ...")
-            # return self.sempv1_api.get_service(...)
+            xml_post_cmd = "<rpc><show><service></service></show></rpc>"
+            resp_service = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd)
+            resp = resp_service['rpc-reply']['rpc']['show']['service']['services']
+            xml_post_cmd = "<rpc><show><router-name></router-name></show></rpc>"
+            resp_virtual_router = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd)
+            resp['virtualRouterName'] = resp_virtual_router['rpc-reply']['rpc']['show']['router-name']['router-name']
+            return resp
 
     def do_task(self):
 
@@ -191,37 +172,6 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
             ansible_facts=ansible_facts
         ))
         return None, result
-
-
-# def make_sempv1_post_request(solace_config, xml_data):
-#     headers = {
-#         'Content-Type': 'application/xml',
-#         'x-broker-name': solace_config.x_broker
-#     }
-#     resp = requests.post(
-#         solace_config.vmr_url + "/SEMP",
-#         data=xml_data,
-#         auth=solace_config.vmr_auth,
-#         timeout=solace_config.vmr_timeout,
-#         headers=headers,
-#         params=None
-#     )
-#     if sc.ENABLE_LOGGING:
-#         sc.log_http_roundtrip(resp)
-#     if resp.status_code != 200:
-#         raise SolaceError("SEMP v1 call not successful. Pls check the log and raise an issue.")
-#     # SEMP v1 always returns 200 (it seems)
-#     # error: rpc-reply.execute-result.@code != ok or missing
-#     # if error: rpc-reply ==> display
-#     resp_body = xmltodict.parse(resp.text)
-#     try:
-#         code = resp_body['rpc-reply']['execute-result']['@code']
-#     except KeyError:
-#         return False, resp_body
-#     if code != "ok":
-#         return False, resp_body
-#     return True, resp_body
-
 
 
 def run_module():

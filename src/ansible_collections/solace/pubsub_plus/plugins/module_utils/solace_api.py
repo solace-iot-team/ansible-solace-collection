@@ -36,6 +36,9 @@ class SolaceApi(object):
     def get_url(self, config: SolaceTaskConfig, path: str) -> str:
         raise SolaceInternalErrorAbstractMethod()
 
+    def get_headers(self, config: SolaceTaskConfig) -> dict:
+        return config.get_headers()
+
     def make_get_request(self, config: SolaceTaskConfig, path_array: list):
         return self.make_request(config, requests.get, path_array)
 
@@ -71,7 +74,7 @@ class SolaceApi(object):
             json=json,
             auth=self.get_auth(config),
             timeout=config.get_timeout(),
-            headers=config.get_headers(),
+            headers=self.get_headers(config),
             params=None)
         SolaceApi.log_http_roundtrip(resp)
         return self.handle_response(resp)
@@ -162,7 +165,7 @@ class SolaceSempV2Api(SolaceApi):
         return config.get_semp_auth()
 
     def get_url(self, config: SolaceTaskBrokerConfig, path: str) -> str:
-        return config.get_semp_url(path) 
+        return config.get_semp_url(path)
 
     def get_sempv2_version(self, config: SolaceTaskBrokerConfig) -> str:
         resp = self.make_get_request(config, [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + ["about", "api"])
@@ -196,6 +199,114 @@ class SolaceSempV2Api(SolaceApi):
                         return None
             raise SolaceApiError(resp)
         return resp
+
+
+class SolaceSempV2PagingGetApi(SolaceSempV2Api):
+
+    def __init__(self, module: AnsibleModule):
+        super().__init__(module)
+        self.next_url = None
+        self.query = None
+        return
+
+    def get_url(self, config: SolaceTaskBrokerConfig, path: str) -> str:
+        if self.next_url:
+            return self.next_url
+        return config.get_semp_url(path) + ("?" + self.query if self.query else '')
+
+    def handle_good_response(self, resp):
+        if resp.text:
+            return resp.json()
+        return dict()
+
+    def get_objects(self, config: SolaceTaskBrokerConfig, path_array: list) -> list:
+        api = config.get_params()['api']
+        query_params = config.get_params()['query_params']
+        query = "count=1"
+        if query_params:
+            if ("select" in query_params
+                    and query_params['select'] is not None
+                    and len(query_params['select']) > 0):
+                query += ('&' if query != '' else '')
+                query += "select=" + ','.join(query_params['select'])
+            if ("where" in query_params
+                    and query_params['where'] is not None
+                    and len(query_params['where']) > 0):
+                where_array = []
+                for _i, where_elem in enumerate(query_params['where']):
+                    where_array.append(where_elem.replace('/', '%2F'))
+                query += ('&' if query != '' else '')
+                query += "where=" + ','.join(where_array)
+
+        api_base = self.API_BASE_SEMPV2_CONFIG
+        if api == 'monitor':
+            api_base = self.API_BASE_SEMPV2_MONITOR
+        path_array = [api_base] + path_array
+        result_list = []
+        hasNextPage = True
+        self.query = query
+        while hasNextPage:
+            body = self.make_get_request(config, path_array)
+            if "data" in body.keys():
+                data_list = body['data']
+                result_list.extend(data_list)
+            # cursor seems to have a bug ==> test first if any data returned
+            if len(data_list) == 0:
+                hasNextPage = False                    
+            elif "meta" not in body:
+                hasNextPage = False
+            elif "paging" not in body["meta"]:
+                hasNextPage = False
+            elif "nextPageUri" not in body["meta"]["paging"]:
+                hasNextPage = False
+            else:
+                self.next_url = body["meta"]["paging"]["nextPageUri"]
+        self.next_url = None
+        self.query = None
+        return result_list
+
+
+class SolaceSempV1Api(SolaceApi):
+
+    API_BASE_SEMPV1="/SEMP"
+
+    def __init__(self, module: AnsibleModule):
+        super().__init__(module)
+        return
+
+    def get_headers(self, config: SolaceTaskConfig) -> dict:
+        headers = {
+            'Content-Type': 'application/xml'
+        }
+        headers.update(config.get_headers())
+        return headers
+
+    def handle_response(self, resp):
+        # SEMP v1 always returns 200 (it seems)
+        # error: rpc-reply.execute-result.@code != ok or missing
+        if resp.status_code != 200:
+            raise SolaceInternalError("SEMP v1 call not successful")
+        resp_body = xmltodict.parse(resp.text)
+        try:
+            code = resp_body['rpc-reply']['execute-result']['@code']
+        except KeyError:
+            raise SolaceApiError(resp_body)
+        if code != "ok":
+            raise SolaceApiError(resp_body)
+        return resp_body    
+
+    def make_post_request(self, config: SolaceTaskConfig, xml_data: str):
+        url = config.get_semp_url(self.API_BASE_SEMPV1)
+        resp = requests.post(
+            url,
+            data=xml_data,
+            auth=config.get_semp_auth(),
+            timeout=config.get_timeout(),
+            headers=self.get_headers(config),
+            params=None
+        )
+        SolaceApi.log_http_roundtrip(resp)
+        return self.handle_response(resp)
 
 
 class SolaceCloudApi(SolaceApi):

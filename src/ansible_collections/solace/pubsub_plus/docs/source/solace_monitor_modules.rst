@@ -17,5 +17,5 @@ Solace Monitor Module Reference
    modules/solace_get_client*
    modules/solace_get_mqtt_session*
    modules/solace_get_queues*
-   modules/solace_get_vpn_clients*
    modules/solace_get_rdp*
+   modules/solace_get_vpn*

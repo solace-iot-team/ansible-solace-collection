@@ -1,0 +1,18 @@
+---
+vpns:
+- name: asc_test_vpn_1
+  settings:
+    enabled: true
+    authenticationBasicType: none
+    maxMsgSpoolUsage: 100
+    serviceMqttPlainTextEnabled: true
+    serviceMqttMaxConnectionCount: 10
+    serviceMqttPlainTextListenPort: 1884
+- name: asc_test_vpn_2
+  settings:
+    enabled: true
+    authenticationBasicType: none
+    maxMsgSpoolUsage: 100
+    serviceMqttPlainTextEnabled: true
+    serviceMqttMaxConnectionCount: 10
+    serviceMqttPlainTextListenPort: 1885

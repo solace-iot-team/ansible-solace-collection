@@ -33,6 +33,9 @@ class SolaceTaskConfig(object):
     def __init__(self, module: AnsibleModule):
         self.module = module
 
+    def get_params(self) -> list:
+        return self.module.params
+
     def get_timeout(self) -> float:
         raise SolaceInternalErrorAbstractMethod()
 
@@ -150,6 +153,33 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         arg_spec.update(SolaceTaskBrokerConfig.arg_spec_settings())
         arg_spec.update(SolaceTaskBrokerConfig.arg_spec_state())
         return arg_spec
+
+    @staticmethod
+    def arg_spec_get_object_list_config_montor():
+        return dict(
+            api=dict(type='str', default='config', choices=['config', 'monitor']),
+            query_params=dict(
+                type='dict',
+                required=False,
+                options=dict(
+                    select=dict(type='list', default=[], elements='str'),
+                    where=dict(type='list', default=[], elements='str')
+                )
+            )
+        )
+
+    @staticmethod
+    def arg_spec_get_object_list_monitor():
+        return dict(
+            query_params=dict(
+                type='dict',
+                required=False,
+                options=dict(
+                    select=dict(type='list', default=[], elements='str'),
+                    where=dict(type='list', default=[], elements='str')
+                )
+            )
+        )
 
 
 class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):

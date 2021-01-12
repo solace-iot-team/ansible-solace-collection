@@ -18,27 +18,48 @@
       timeout: "{{ sempv2_timeout }}"
       solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-
+    solace_vpn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
   tasks:
-    - name: "Check vars"
+    - name: "main: Check vars"
       set_fact:
         working_dir: "{{ WORKING_DIR }}"
 
-    - name: "Gather Solace Facts"
+    - name: "main: create vpn for local broker"
+      solace_vpn:
+        name: asc_test_vpn
+        settings:
+          enabled: true
+          authenticationBasicType: "none" # none, internal
+          maxMsgSpoolUsage: 100
+          serviceMqttPlainTextEnabled: true
+          serviceMqttMaxConnectionCount: 10
+          serviceMqttPlainTextListenPort: 1884
+        state: present
+      when: broker_type == 'local'
+
+    - name: "main: Gather Solace Facts"
       solace_gather_facts:
 
-    - name: "Save 'ansible_facts.solace' to File"
+    - name: "main: Save 'ansible_facts.solace' to File"
       copy:
         content: "{{ ansible_facts.solace | to_nice_json }}"
         dest: "{{ working_dir }}/facts.{{ inventory_hostname }}.json"
       delegate_to: localhost
-      no_log: true
+      # no_log: true
 
-    - name: "Get Facts: get_serviceSmfPlainTextListenPort"
+
+    - meta: end_play
+
+    - name: "main: Get Facts: get_serviceSmfPlainTextListenPort"
       solace_get_facts:
         hostvars: "{{ hostvars }}"
         host: "{{ inventory_hostname }}"
-        fields:
         field_funcs:
           - get_serviceSmfPlainTextListenPort
           - get_serviceSmfCompressionListenPort
@@ -48,6 +69,10 @@
           - get_bridge_remoteMsgVpnLocations
           - get_allClientConnectionDetails
       register: result
+    - debug:
+        msg:
+          - facts
+          - "{{ result.facts }}"
     - assert:
         that:
           - result.facts.serviceSmfPlainTextListenPort is defined
@@ -58,12 +83,10 @@
           - result.facts.bridge_remoteMsgVpnLocations is defined
           - result.facts.clientConnectionDetails is defined
 
-    - name: "Get Facts: get_allClientConnectionDetails"
+    - name: "main: Get Facts: get_allClientConnectionDetails"
       solace_get_facts:
         hostvars: "{{ hostvars }}"
         host: "{{ inventory_hostname }}"
-        # msg_vpn: "{{ vpn }}"
-        fields:
         field_funcs:
           - get_allClientConnectionDetails
       register: result
@@ -71,13 +94,13 @@
     - set_fact:
         client_connection_details: "{{ result.facts }}"
 
-    - name: "Print Facts: Client Connection Details"
+    - name: "main: Print Facts: Client Connection Details"
       debug:
         msg:
           - "Client Connection Details:"
           - "{{ client_connection_details }}"
 
-    - name: "Save 'client_connection_details' to File"
+    - name: "main: Save 'client_connection_details' to File"
       copy:
         content: "{{ client_connection_details | to_nice_json }}"
         dest: "{{ working_dir }}/facts.{{ inventory_hostname }}.client_connection_details.json"
