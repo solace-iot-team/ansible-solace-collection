@@ -219,10 +219,10 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
             return resp.json()
         return dict()
 
-    def get_objects(self, config: SolaceTaskBrokerConfig, path_array: list) -> list:
-        api = config.get_params()['api']
-        query_params = config.get_params()['query_params']
-        query = "count=1"
+    def get_objects(self, config: SolaceTaskBrokerConfig, api: str, path_array: list, query_params: dict = None) -> list:
+        # api = config.get_params()['api']
+        # query_params = config.get_params()['query_params']
+        query = "count=100"
         if query_params:
             if ("select" in query_params
                     and query_params['select'] is not None

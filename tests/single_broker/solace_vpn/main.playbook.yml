@@ -70,10 +70,12 @@
 
     - name: "main: remove vpn"
       solace_vpn:
-        name: asc_test_vpn
+        name: "{{ vpn.name }}"
         state: absent
+      loop: "{{ vpns }}"
+      loop_control:
+        loop_var: vpn
       when: not is_solace_cloud
-
 
     - name: "main: create vpn for solace cloud"
       block:

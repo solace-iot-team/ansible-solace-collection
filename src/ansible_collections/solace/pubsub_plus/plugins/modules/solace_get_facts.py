@@ -206,6 +206,17 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         has_get_funcs = self.validate_param_field_funcs(self.FIELD_FUNCS, params['field_funcs'])
         if not has_get_funcs:
             raise SolaceParamsValidationError("field_funcs", params['field_funcs'], "no get functions found - specify at least one")        
+        # check vpn exists 
+        search_dict = hostvars[host]['ansible_facts']['solace']
+        vpn_name = params['msg_vpn']
+        vpns = self.get_vpns(search_dict)
+        if not vpn_name:
+            if len(vpns) == 1:
+                self.get_module().params['msg_vpn'] = vpns[0]
+            else:    
+                raise SolaceParamsValidationError("msg_vpn", params['msg_vpn'], f"select one of {vpns}")     
+        if not self.get_module().params['msg_vpn'] in vpns:
+            raise SolaceParamsValidationError("msg_vpn", params['msg_vpn'], f"vpn does not exist - select one of {vpns}")     
 
     def do_task(self):    
         self.validate_params()
@@ -213,114 +224,22 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         params = self.get_module().params
         hostvars = params['hostvars']
         host = params['host']
+        vpn_name = params['msg_vpn']
         search_dict = hostvars[host]['ansible_facts']['solace']
         field_funcs = params['field_funcs']
         facts = dict()
 
         if field_funcs and len(field_funcs) > 0:
             for field_func in field_funcs:
-                field, value = self.call_dynamic_func(field_func, search_dict)
+                field, value = self.call_dynamic_func(field_func, search_dict, vpn_name)
                 facts[field] = value
 
         result = self.create_result(rc=0, changed=False)
         result['facts'] = facts
-        return "TODO: implement me", result
+        return None, result
 
-#     def get_facts(self):
-
-#         hostvars = self.module.params['hostvars']
-#         host = self.module.params['host']
-#         vpn = self.module.params['msg_vpn']
-#         fields = self.module.params['fields']
-#         field_funcs = self.module.params['field_funcs']
-#         # either fields or field_funcs must have at least one element
-#         field_params_ok = False
-#         if fields is not None and len(fields) > 0:
-#             field_params_ok = True
-#         if not field_params_ok and field_funcs is not None and len(field_funcs) > 0:
-#             field_params_ok = True
-#         if not field_params_ok:
-#             fail_reason = "Either 'fields' or 'field_funcs' must be provided."
-#             return False, fail_reason
-
-#         # get {host}.ansible_facts.solace from hostvars
-#         if host not in hostvars:
-#             fail_reason = f"Could not find host:'{host}' in hostvars. Hint: Cross check spelling with inventory file."
-#             return False, fail_reason
-#         if 'ansible_facts' not in hostvars[host]:
-#             fail_reason = f"Could not find 'ansible_facts' hostvars['{host}']. Hint: Call 'solace_gather_facts' module first."
-#             return False, fail_reason
-#         if 'solace' not in hostvars[host]['ansible_facts']:
-#             fail_reason = f"Could not find 'solace' in hostvars['{host}']['ansible_facts']. Hint: Call 'solace_gather_facts' module first."
-#             return False, fail_reason
-
-#         search_object = hostvars[host]['ansible_facts']['solace']
-
-#         if not _check_vpn_exists(search_object, vpn):
-#             fail_reason = f"Could not find vpn: '{vpn}' in 'ansible_facts.solace' for host: '{host}'."
-#             return False, fail_reason
-
-#         facts = dict()
-
-#         if fields is not None and len(fields) > 0:
-#             for field in fields:
-#                 value = _get_field(search_object, field)
-#                 if value is None:
-#                     fail_reason = f"Could not find field: '{field}' in 'ansible_facts.solace' for host: '{host}'. Pls check spelling."
-#                     return False, fail_reason
-#                 facts[field] = value
-
-#         if field_funcs is not None and len(field_funcs) > 0:
-#             try:
-#                 for field_func in field_funcs:
-#                     if field_func == 'get_serviceSmfPlainTextListenPort':
-#                         field, value = _get_serviceSmfPlainTextListenPort(search_object)
-#                     elif field_func == 'get_serviceSmfCompressionListenPort':
-#                         field, value = _get_serviceSmfCompressionListenPort(search_object)
-#                     elif field_func == 'get_serviceSmfTlsListenPort':
-#                         field, value = _get_serviceSmfTlsListenPort(search_object)
-#                     elif field_func == 'get_virtualRouterName':
-#                         field, value = _get_virtualRouterName(search_object)
-#                     elif field_func == 'get_serviceSMFMessagingEndpoints':
-#                         field, value = _get_serviceSMFMessagingEndpoints(search_object)
-#                     elif field_func == 'get_bridge_remoteMsgVpnLocations':
-#                         field, value = _get_bridge_remoteMsgVpnLocations(search_object)
-#                     elif field_func == 'get_allClientConnectionDetails':
-#                         field, value = _get_allClientConnectionDetails(search_object, vpn)
-#                     else:
-#                         fail_reason = f"Unknown field_func: '{field_func}'. Pls check the documentation for supported field functions."
-#                         return False, fail_reason
-#                     if field is None or value is None:
-#                         fail_reason = f"Function '{field_func}()' could not find value in 'ansible_facts.solace' for host: '{host}'. Pls raise an issue."
-#                         return False, fail_reason
-#                     facts[field] = value
-#             except SolaceError as e:
-#                 ex_msg_list = [f"field_func:'{field_func}'"] + e.to_list()
-#                 raise SolaceError(ex_msg_list) from e
-
-#         return True, facts
-
-# #
-# # field funcs
-# #
-
-
-# def _check_vpn_exists(search_dict, search_vpn):
-#     if not search_vpn:
-#         return True
-#     if search_dict['isSolaceCloud']:
-#         message_vpn_attributes_dict = _get_sc_message_vpn_attributes_dict(search_dict)
-#         vpn = message_vpn_attributes_dict['vpnName']
-#         return (vpn == search_vpn)
-#     else:
-#         # for SEMPv1:
-#         vpns = search_dict['about']['user']['msgVpns']
-#         for vpn in vpns:
-#             if vpn['msgVpnName'] == search_vpn:
-#                 return True
-#         # TODO: for SEMPv2:
-#         # once solace_gather_facts is extended
-#     return False
+    def get_vpns(self, search_dict: dict) -> list:
+        return list(search_dict['vpns'].keys())
 
     def get_broker_service_dict(self, search_dict: dict, field: str, value: str, strict=True):
         service_dict = self.get_nested_dict(search_dict, field, value)
@@ -352,7 +271,7 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
             protocol_dict['enabled'] = True
         return protocol_dict
 
-    def get_allClientConnectionDetails(self, search_dict: dict):
+    def get_allClientConnectionDetails(self, search_dict: dict, vpn: str):
         ccds = dict()
         if search_dict['isSolaceCloud']:
             messaging_protocols = self.get_sc_messaging_protocols(search_dict)
@@ -369,17 +288,47 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
                 raise SolaceInternalError(f"Could not find 'msgVpnAttributes' in 'ansible_facts.solace'. API may have changed.")
             trust_store_uri = vpn_attributes['truststoreUri']
         else:
-            # logging.debug("\n\n broker: search_dict=\n%s\n\n", json.dumps(search_dict, indent=2))
-            # TODO: needs to find it for all vpns: "vpn-name": "default",
-            # TODO: only retrieve if vpn-name exists (relevant for AMQP)
-
-            smf_dict = self.get_broker_service_dict(search_dict, field="name", value='SMF', strict=False)
-            mqtt_dict = self.get_broker_service_dict(search_dict, field="name", value='MQTT', strict=False)
-            amqp_dict = self.get_broker_service_dict(search_dict, field="name", value='AMQP', strict=False)
-            rest_dict = self.get_broker_service_dict(search_dict, field="name", value='REST', strict=False)
-
-            # using SEMPv1: assuming same as SMF, check with SEMPv2
-            # jms_dict = _get_broker_service_dict(search_dict, field="name", value='JMS', strict=False)
+            vpn_dict = search_dict['vpns'][vpn]
+            _smf_dict = self.get_broker_service_dict(search_dict, field="name", value='SMF', strict=False)
+            smf_dict = dict(
+                serviceSmfMaxConnectionCount=vpn_dict['serviceSmfMaxConnectionCount'],
+                serviceSmfPlainTextEnabled=vpn_dict['serviceSmfPlainTextEnabled'],
+                serviceSmfTlsEnabled=vpn_dict['serviceSmfTlsEnabled'],
+                serviceSmfCompressionEnabled=int(_smf_dict['compression-listen-port']) > 0,
+                serviceSmfPlainTextListenPort=int(_smf_dict['listen-port']),
+                serviceSmfCompressionListenPort=int(_smf_dict['compression-listen-port']),
+                serviceSmfTlsListenPort=int(_smf_dict['ssl']['listen-port'])
+            )
+            # mqtt_dict = self.get_broker_service_dict(search_dict, field="name", value='MQTT', strict=False)
+            mqtt_dict = dict(
+                serviceMqttMaxConnectionCount=vpn_dict['serviceMqttMaxConnectionCount'],
+                serviceMqttPlainTextEnabled=vpn_dict['serviceMqttPlainTextEnabled'],
+                serviceMqttPlainTextListenPort=vpn_dict['serviceMqttPlainTextListenPort'],
+                serviceMqttTlsEnabled=vpn_dict['serviceMqttTlsEnabled'],
+                serviceMqttTlsListenPort=vpn_dict['serviceMqttTlsListenPort'],
+                serviceMqttTlsWebSocketEnabled=vpn_dict['serviceMqttTlsWebSocketEnabled'],
+                serviceMqttTlsWebSocketListenPort=vpn_dict['serviceMqttTlsWebSocketListenPort'],
+                serviceMqttWebSocketEnabled=vpn_dict['serviceMqttWebSocketEnabled'],
+                serviceMqttWebSocketListenPort=vpn_dict['serviceMqttWebSocketListenPort']
+            )
+            # amqp_dict = self.get_broker_service_dict(search_dict, field="name", value='AMQP', strict=False)
+            amqp_dict = dict(
+                serviceAmqpMaxConnectionCount=vpn_dict['serviceAmqpMaxConnectionCount'],
+                serviceAmqpPlainTextEnabled=vpn_dict['serviceAmqpPlainTextEnabled'],
+                serviceAmqpPlainTextListenPort=vpn_dict['serviceAmqpPlainTextListenPort'],
+                serviceAmqpTlsEnabled=vpn_dict['serviceAmqpTlsEnabled'],
+                serviceAmqpTlsListenPort=vpn_dict['serviceAmqpTlsListenPort']
+            )
+            # rest_dict = self.get_broker_service_dict(search_dict, field="name", value='REST', strict=False)
+            rest_dict = dict(
+                serviceRestIncomingMaxConnectionCount=vpn_dict['serviceRestIncomingMaxConnectionCount'],
+                serviceRestIncomingPlainTextEnabled=vpn_dict['serviceRestIncomingPlainTextEnabled'],
+                serviceRestIncomingPlainTextListenPort=vpn_dict['serviceRestIncomingPlainTextListenPort'],
+                serviceRestIncomingTlsEnabled=vpn_dict['serviceRestIncomingTlsEnabled'],
+                serviceRestIncomingTlsListenPort=vpn_dict['serviceRestIncomingTlsListenPort'],
+                serviceRestMode=vpn_dict['serviceRestMode'],
+                serviceRestOutgoingMaxConnectionCount=vpn_dict['serviceRestOutgoingMaxConnectionCount']
+            )
             jms_dict = None
             web_dict = self.get_broker_service_dict(search_dict, field="name", value='WEB', strict=False)
             trust_store_uri = None
@@ -394,17 +343,14 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
             ccds['TrustStore'] = dict(uri=trust_store_uri)
         return 'clientConnectionDetails', ccds
 
-    def get_bridge_remoteMsgVpnLocations(self, search_dict: dict):
+    def get_bridge_remoteMsgVpnLocations(self, search_dict: dict, vpn: str=None):
         locs = dict(
             plain=None,
             compressed=None,
             secured=None
         )
         if search_dict['isSolaceCloud']:
-            messaging_protocols = self.get_sc_messaging_protocols(search_dict)
-            smf_dict    = self.get_sc_messaging_protocol_dict(messaging_protocols, 'SMF')
-            end_points = self.get_field(smf_dict, "endPoints")
-            smf_end_point_dict = self.get_nested_dict(end_points, field='name', value='SMF')
+            _f, smf_end_point_dict = self.get_serviceSMFMessagingEndpoints(search_dict)
             if smf_end_point_dict['SMF']['SMF']['uriComponents']['host']:
                 locs['plain'] = (str(smf_end_point_dict['SMF']['SMF']['uriComponents']['host'])
                                 + ":" + str(smf_end_point_dict['SMF']['SMF']['uriComponents']['port']))
@@ -421,7 +367,7 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
             else:
                 locs['secured'] = None
         else:
-            _f, virtual_router = self.get_virtualRouterName(search_dict)
+            _f, virtual_router = self.get_virtualRouterName(search_dict, vpn)
             loc = "v:" + virtual_router
             locs['plain'] = loc
             locs['compressed'] = loc
@@ -429,7 +375,7 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
 
         return 'bridge_remoteMsgVpnLocations', locs
 
-    def get_serviceSMFMessagingEndpoints(self, search_dict: dict):
+    def get_serviceSMFMessagingEndpoints(self, search_dict: dict, vpn: str=None):
         eps = dict(
             SMF=dict(
                 SMF=dict(),
@@ -476,9 +422,9 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
                 cmp_smf_protocol = t.scheme
                 cmp_smf_host = t.hostname
 
-        _f, smf_port = self.get_serviceSmfPlainTextListenPort(search_dict)
-        _f, sec_smf_port = self.get_serviceSmfTlsListenPort(search_dict)
-        _f, cmp_smf_port = self.get_serviceSmfCompressionListenPort(search_dict)
+        _f, smf_port = self.get_serviceSmfPlainTextListenPort(search_dict, vpn)
+        _f, sec_smf_port = self.get_serviceSmfTlsListenPort(search_dict, vpn)
+        _f, cmp_smf_port = self.get_serviceSmfCompressionListenPort(search_dict, vpn)
         # put the dict together
         # smf
         smf = dict()
@@ -510,7 +456,7 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         return 'serviceMessagingEndpoints', eps
 
 
-    def get_serviceSmfPlainTextListenPort(self, search_dict: dict):
+    def get_serviceSmfPlainTextListenPort(self, search_dict: dict, vpn: str):
         if search_dict['isSolaceCloud']:
             messaging_protocols = self.get_sc_messaging_protocols(search_dict)
             smf_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'SMF')
@@ -525,7 +471,7 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
             value = smf_dict['listen-port']
         return 'serviceSmfPlainTextListenPort', value
 
-    def get_serviceSmfCompressionListenPort(self, search_dict: dict):
+    def get_serviceSmfCompressionListenPort(self, search_dict: dict, vpn: str):
         if search_dict['isSolaceCloud']:
             messaging_protocols = self.get_sc_messaging_protocols(search_dict)
             smf_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'SMF')
@@ -540,7 +486,7 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
             value = smf_dict['compression-listen-port']
         return 'serviceSmfCompressionListenPort', value
 
-    def get_serviceSmfTlsListenPort(self, search_dict: dict):
+    def get_serviceSmfTlsListenPort(self, search_dict: dict, vpn: str):
         if search_dict['isSolaceCloud']:
             messaging_protocols = self.get_sc_messaging_protocols(search_dict)
             smf_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'SMF')
@@ -555,7 +501,7 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
             value = smf_dict['ssl']['listen-port']
         return 'serviceSmfTlsListenPort', value
 
-    def get_virtualRouterName(self, search_dict: dict):
+    def get_virtualRouterName(self, search_dict: dict, vpn: str):
         if search_dict['isSolaceCloud']:
             value = self.get_field(search_dict, 'primaryRouterName')
         else:
@@ -563,38 +509,13 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         return 'virtualRouterName', value
 
 
-# #
-# # field func helpers
-# #
-
-
-
-# def _get_sc_message_vpn_attributes_dict(search_dict):
-#     element = "msgVpnAttributes"
-#     message_vpn_attributes_dict = _get_field(search_dict, element)
-#     if message_vpn_attributes_dict is None:
-#         raise SolaceError(f"Could not find '{element}' in Solace Cloud service ansible_facts. API may have changed.")
-#     return message_vpn_attributes_dict
-
-
-
-
-# def _get_sc_messaging_protocols_smf_dict(search_dict):
-#     messaging_protocols_dict = _get_sc_messaging_protocols_dict(search_dict)
-#     search_value = 'SMF'
-#     smf_dict = _find_nested_dict(messaging_protocols_dict, field="name", value=search_value)
-#     if smf_dict is None:
-#         raise SolaceError(f"Could not find 'name={search_value}' in messaging protocols in Solace Cloud service ansible_facts. Check if it is enabled.")
-#     return smf_dict
-
-
 def run_module():
     module_args = dict(
         hostvars=dict(type='dict', required=True),
         host=dict(type='str', required=True),
-        field_funcs=dict(type='list', required=False, default=[], elements='str')
+        field_funcs=dict(type='list', required=False, default=[], elements='str'),
         # fields=dict(type='list', required=False, default=[], elements='str'),
-        # msg_vpn=dict(type='str', required=False, default=None)
+        msg_vpn=dict(type='str', required=False, default=None)
     )
     arg_spec = dict()
     arg_spec.update(module_args)
@@ -606,20 +527,6 @@ def run_module():
 
     solace_task = SolaceGetFactsTask(module)
     solace_task.execute()
-
-    # try:
-    #     ok, resp = solace_task.get_facts()
-    #     if not ok:
-    #         result['rc'] = 1
-    #         module.fail_json(msg=resp, **result)
-    # except SolaceError as e:
-    #     ex = traceback.format_exc()
-    #     ex_msg_list = e.to_list()
-    #     msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
-    #     module.fail_json(msg=msg, exception=ex)
-
-    # result['facts'] = resp
-    # module.exit_json(**result)
 
 
 def main():

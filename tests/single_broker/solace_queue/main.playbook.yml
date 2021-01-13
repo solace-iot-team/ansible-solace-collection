@@ -37,7 +37,6 @@
 
     - name: "main: call tasks: adding/updating queues"
       include_tasks: ./tasks/queue.tasks.yml
-      register: result
       loop: "{{ target_queue_list.queues }}"
       loop_control:
         loop_var: queue_item

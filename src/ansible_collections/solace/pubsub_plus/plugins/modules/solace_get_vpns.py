@@ -154,7 +154,7 @@ from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_con
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceGetVpnssTask(SolaceBrokerGetPagingTask):
+class SolaceGetVpnsTask(SolaceBrokerGetPagingTask):
 
     def __init__(self, module):
         super().__init__(module)
@@ -162,7 +162,9 @@ class SolaceGetVpnssTask(SolaceBrokerGetPagingTask):
     def do_task(self):
         # GET /msgVpns
         path_array = ['msgVpns']
-        vpns = self.get_sempv2_get_paging_api().get_objects(self.get_config(), path_array)
+        api = self.get_config().get_params()['api']
+        query_params = self.get_config().get_params()['query_params']
+        vpns = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, path_array, query_params)
         result = self.create_result_with_list(vpns)
         return None, result
 
@@ -179,7 +181,7 @@ def run_module():
         supports_check_mode=True
     )
 
-    solace_task = SolaceGetVpnssTask(module)
+    solace_task = SolaceGetVpnsTask(module)
     solace_task.execute()
 
 

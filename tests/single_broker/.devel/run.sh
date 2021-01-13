@@ -16,10 +16,10 @@ ansibleSolaceTests=(
   # "setup"
   # "solace_get_available"
   # "solace_acl_profile"
-# TODO
-  "solace_vpn"
+  # "solace_vpn"
   # "solace_facts"
-  # "solace_client_profile"
+# TODO
+  "solace_client_profile"
   # "solace_rdp"
   # "solace_mqtt"
   # "solace_queue"

@@ -104,7 +104,7 @@ ansible_facts.solace:
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetTask
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi, SolaceSempV1Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi, SolaceSempV1Api, SolaceSempV2PagingGetApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
@@ -115,6 +115,7 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
         super().__init__(module)
         self.sempv2_api = SolaceSempV2Api(module)
         self.sempv1_api = SolaceSempV1Api(module)
+        # self.sempv2_paging_api = SolaceSempV2PagingGetApi(module)
         self.solace_cloud_api = SolaceCloudApi(module)
 
     def add_path_value(self, dictionary, path_array, value):
@@ -143,29 +144,44 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
         about_info['isSolaceCloud'] = self.get_config().is_solace_cloud()
         return about_info
 
-    def get_service_info(self):
+    def get_service_info(self) -> dict:
+        resp = dict(
+            vpns = dict()
+        )
+        msg_vpns = self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, "about", "user", "msgVpns"])            
+        for msg_vpn in msg_vpns:
+            # GET /msgVpns/{msgVpnName}
+            vpn_name = msg_vpn['msgVpnName']
+            path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name]
+            msg_vpn_info = self.sempv2_api.get_object_settings(self.get_config(), path_array)
+            resp['vpns'].update({vpn_name: msg_vpn_info})
+
         if self.get_config().is_solace_cloud():
-            return self.solace_cloud_api.get_service(self.get_config(), self.get_module().params['solace_cloud_service_id'])
+            resp['service'] = self.solace_cloud_api.get_service(self.get_config(), self.get_module().params['solace_cloud_service_id'])
+            resp['virtualRouterName'] = "n/a"
+            # is this the potential virutal router?
+            # 'primaryRouterName'
         else:
+            # get service  
             xml_post_cmd = "<rpc><show><service></service></show></rpc>"
             resp_service = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd)
-            resp = resp_service['rpc-reply']['rpc']['show']['service']['services']
+            resp['service'] = resp_service['rpc-reply']['rpc']['show']['service']['services']
+            # get virtual router
             xml_post_cmd = "<rpc><show><router-name></router-name></show></rpc>"
             resp_virtual_router = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd)
             resp['virtualRouterName'] = resp_virtual_router['rpc-reply']['rpc']['show']['router-name']['router-name']
-            return resp
+
+        return resp
 
     def do_task(self):
 
+        ansible_facts = dict(
+            solace=dict()
+        )
         about_info = self.get_about_info()
         service_info = self.get_service_info()
-
-        ansible_facts = dict(
-            solace=dict(
-                service=service_info
-            )
-        )
         ansible_facts['solace'].update(about_info)
+        ansible_facts['solace'].update(service_info)
         
         result = self.create_result()
         result.update(dict(

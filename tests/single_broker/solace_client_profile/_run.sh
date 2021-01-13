@@ -24,9 +24,9 @@ inventory=$(assertFile $scriptLogName $INVENTORY_FILE) || exit
 
 playbooks=(
   "$scriptDir/main.playbook.yml"
-  "$scriptDir/update.playbook.yml"
-  "$scriptDir/ex.playbook.yml"
-  "$scriptDir/get.playbook.yml"
+  # "$scriptDir/update.playbook.yml"
+  # "$scriptDir/ex.playbook.yml"
+  # "$scriptDir/get.playbook.yml"
 )
 
 ##############################################################################################################################
