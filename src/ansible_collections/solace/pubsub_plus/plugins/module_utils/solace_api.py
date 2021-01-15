@@ -220,8 +220,6 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
         return dict()
 
     def get_objects(self, config: SolaceTaskBrokerConfig, api: str, path_array: list, query_params: dict = None) -> list:
-        # api = config.get_params()['api']
-        # query_params = config.get_params()['query_params']
         query = "count=100"
         if query_params:
             if ("select" in query_params
@@ -314,6 +312,7 @@ class SolaceCloudApi(SolaceApi):
     API_BASE_PATH = "https://api.solace.cloud/api/v0"
     API_DATA_CENTERS = "datacenters"
     API_SERVICES = "services"
+    API_REQUESTS = "requests"
     
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
@@ -327,8 +326,11 @@ class SolaceCloudApi(SolaceApi):
 
     def handle_response(self, resp):
         # POST: https://api.solace.cloud/api/v0/services: returns 201
-        if not resp.status_code in [200, 201]:
+        # POST: ../requests returns 202: accepted if long running request
+        if not resp.status_code in [200, 201, 202]:
             self.handle_bad_response(resp)
+        # if resp.status_code == 202:
+        #     return self.wait_for_request_completion(resp)
         # TODO: test for deleting service (failed state)
         import logging
         logging.debug(f">>>>> handling good response, resp.status_code={resp.status_code}")    
@@ -456,3 +458,59 @@ class SolaceCloudApi(SolaceApi):
         # DELETE https://api.solace.cloud/api/v0/services/{{serviceId}}
         path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id]
         return self.make_delete_request(config, path_array)
+
+    def get_object_settings(self, config: SolaceTaskBrokerConfig, path_array: list) -> dict:
+        # returns settings or None if not found
+        try:
+            resp = self.make_get_request(config, path_array)
+        except SolaceApiError as e:
+            resp = e.get_resp()
+            if resp.status_code == 404:
+                return None
+            raise SolaceApiError(resp)
+        return resp
+
+    def compose_request_body(self, operation: str, operation_type: str, settings: dict) -> dict:
+        return {
+            'operation': operation,
+            operation_type: settings
+        }
+
+    def get_service_request_status(self, config: SolaceTaskBrokerConfig, service_id: str, request_id: str):
+        # GET https://api.solace.cloud/api/v0/services/{paste-your-serviceId-here}/requests/{{requestId}}
+        path_array = [self.API_BASE_PATH, self.API_SERVICES, service_id, self.API_REQUESTS, request_id]
+        return self.make_get_request(config, path_array)
+
+    def make_service_post_request(self, config: SolaceTaskBrokerConfig, path_array: list, service_id: str, json=None):
+        resp = self.make_request(config, requests.post, path_array, json)
+        
+        import logging, json
+        logging.debug(f"resp (make_request) = \n{json.dumps(resp, indent=2)}")
+        
+        request_id = resp['id']
+
+        timeout_minutes = 2
+        is_completed = False
+        is_failed = False
+        try_count = -1
+        delay = 5  # seconds
+        max_retries = (timeout_minutes * 60) // delay
+
+        while not is_completed and not is_failed and try_count < max_retries:
+            resp = self.get_service_request_status(config, service_id, request_id)
+
+            import logging, json
+            logging.debug(f"resp (get_service_request_status)= \n{json.dumps(resp, indent=2)}")
+
+            is_completed = (resp['adminProgress'] == 'completed')
+            is_failed = (resp['adminProgress'] == 'failed')
+            try_count += 1
+            if timeout_minutes > 0:
+                time.sleep(delay)
+        
+        if is_failed:
+            raise SolaceApiError(resp)
+        if not is_completed:
+            msg = [ f"timeout service post request - not completed, state={resp['adminProgress']}", str(resp)]
+            raise SolaceInternalError(msg)
+        return resp
