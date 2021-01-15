@@ -154,14 +154,16 @@ from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_con
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceGetVpnsTask(SolaceBrokerGetPagingTask):
+class SolaceGetAclProfilesTask(SolaceBrokerGetPagingTask):
 
     def __init__(self, module):
         super().__init__(module)
 
     def do_task(self):
-        # GET /msgVpns
-        path_array = ['msgVpns']
+        # GET /msgVpns/{msgVpnName}/aclProfiles
+        params = self.get_config().get_params()
+        vpn_name = params['msg_vpn']
+        path_array = ['msgVpns', vpn_name, 'aclProfiles']
         api = self.get_config().get_params()['api']
         query_params = self.get_config().get_params()['query_params']
         objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, path_array, query_params)
@@ -173,6 +175,7 @@ def run_module():
     module_args = dict(
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_get_object_list_config_montor())
     arg_spec.update(module_args)
 
@@ -181,7 +184,7 @@ def run_module():
         supports_check_mode=True
     )
 
-    solace_task = SolaceGetVpnsTask(module)
+    solace_task = SolaceGetAclProfilesTask(module)
     solace_task.execute()
 
 

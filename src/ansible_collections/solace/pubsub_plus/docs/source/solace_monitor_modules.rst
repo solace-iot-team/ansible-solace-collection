@@ -13,6 +13,7 @@ Solace Monitor Module Reference
    :glob:
    :maxdepth: 1
 
+   modules/solace_get_acl*
    modules/solace_get_bridge*
    modules/solace_get_client*
    modules/solace_get_mqtt_session*
