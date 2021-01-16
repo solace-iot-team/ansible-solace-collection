@@ -14,6 +14,8 @@ DOCUMENTATION = '''
 ---
 module: solace_cert_authority
 
+TODO: re-work doc
+
 short_description: certificate authority
 
 description:

@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_rdp_rest_consumer_trusted_cn
-
+TODO: rework docs
 short_description: trusted common name for rest consumer
 
 description:
@@ -108,57 +108,56 @@ response:
     returned: success
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceRdpRestConsumerTrustedCommonNameTask(su.SolaceTask):
+class SolaceRdpRestConsumerTrustedCommonNameTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'tlsTrustedCommonName'
+    OBJECT_KEY = 'tlsTrustedCommonName'
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
-
-    def lookup_item(self):
-        return self.module.params['name']
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
     def get_args(self):
-        return [self.module.params['msg_vpn'], self.module.params['rdp_name'], self.module.params['rest_consumer_name']]
+        params = self.get_module().params
+        return [params['msg_vpn'], params['rdp_name'], params['rest_consumer_name'], params['name']]
 
-    def get_func(self, solace_config, vpn, rdp_name, rest_consumer_name, lookup_item_value):
+    def get_func(self, vpn_name, rdp_name, rest_consumer_name, trusted_cn):
         # GET /msgVpns/{msgVpnName}/restDeliveryPoints/{restDeliveryPointName}/restConsumers/{restConsumerName}/tlsTrustedCommonNames/{tlsTrustedCommonName}
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.RDP_REST_DELIVERY_POINTS, rdp_name, su.RDP_REST_CONSUMERS, rest_consumer_name, su.RDP_TLS_TRUSTED_COMMON_NAMES, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name, 'restConsumers', rest_consumer_name, 'tlsTrustedCommonNames', trusted_cn]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def create_func(self, solace_config, vpn, rdp_name, rest_consumer_name, name, settings=None):
+    def create_func(self, vpn_name, rdp_name, rest_consumer_name, trusted_cn, settings=None):
         # POST /msgVpns/{msgVpnName}/restDeliveryPoints/{restDeliveryPointName}/restConsumers/{restConsumerName}/tlsTrustedCommonNames
-        defaults = {}
-        mandatory = {
-            'msgVpnName': vpn,
-            'restConsumerName': rest_consumer_name,
+        data = {
+            'msgVpnName': vpn_name,
             'restDeliveryPointName': rdp_name,
-            'tlsTrustedCommonName': name
+            'restConsumerName': rest_consumer_name,
+            self.OBJECT_KEY: trusted_cn
         }
-        data = su.merge_dicts(defaults, mandatory, settings)
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.RDP_REST_DELIVERY_POINTS, rdp_name, su.RDP_REST_CONSUMERS, rest_consumer_name, su.RDP_TLS_TRUSTED_COMMON_NAMES]
-        return su.make_post_request(solace_config, path_array, data)
+        data.update(settings if settings else {})
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name, 'restConsumers', rest_consumer_name, 'tlsTrustedCommonNames']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def delete_func(self, solace_config, vpn, rdp_name, rest_consumer_name, lookup_item_value):
+    def delete_func(self, vpn_name, rdp_name, rest_consumer_name, trusted_cn):
         # DELETE /msgVpns/{msgVpnName}/restDeliveryPoints/{restDeliveryPointName}/restConsumers/{restConsumerName}/tlsTrustedCommonNames/{tlsTrustedCommonName}
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.RDP_REST_DELIVERY_POINTS, rdp_name, su.RDP_REST_CONSUMERS, rest_consumer_name, su.RDP_TLS_TRUSTED_COMMON_NAMES, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name, 'restConsumers', rest_consumer_name, 'tlsTrustedCommonNames', trusted_cn]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
         rdp_name=dict(type='str', required=True),
-        rest_consumer_name=dict(type='str', required=True),
+        rest_consumer_name=dict(type='str', required=True)
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_crud())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -167,9 +166,7 @@ def run_module():
     )
 
     solace_task = SolaceRdpRestConsumerTrustedCommonNameTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():

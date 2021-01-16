@@ -291,7 +291,10 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
         self.config = SolaceTaskBrokerConfig(module)
-        self.sempv2_get_paging_api = SolaceSempV2PagingGetApi(module)
+        self.sempv2_get_paging_api = SolaceSempV2PagingGetApi(module, self.is_supports_paging())
+
+    def is_supports_paging(self):
+        return True
 
     def get_config(self) -> SolaceTaskBrokerConfig:
         return self.config
@@ -299,6 +302,16 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
     def get_sempv2_get_paging_api(self) -> SolaceSempV2Api:
         return self.sempv2_get_paging_api    
 
+    def get_path_array(self, params: dict) -> list:
+        raise SolaceInternalErrorAbstractMethod()
+
+    def do_task(self):
+        params = self.get_config().get_params()
+        api = params['api']
+        query_params = params['query_params']
+        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, self.get_path_array(params), query_params)
+        result = self.create_result_with_list(objects)
+        return None, result
 
 class SolaceCloudGetTask(SolaceGetTask):
     def __init__(self, module: AnsibleModule):

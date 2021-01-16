@@ -203,10 +203,11 @@ class SolaceSempV2Api(SolaceApi):
 
 class SolaceSempV2PagingGetApi(SolaceSempV2Api):
 
-    def __init__(self, module: AnsibleModule):
+    def __init__(self, module: AnsibleModule, is_supports_paging: bool = True):
         super().__init__(module)
         self.next_url = None
         self.query = None
+        self.is_supports_paging = is_supports_paging
         return
 
     def get_url(self, config: SolaceTaskBrokerConfig, path: str) -> str:
@@ -220,7 +221,9 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
         return dict()
 
     def get_objects(self, config: SolaceTaskBrokerConfig, api: str, path_array: list, query_params: dict = None) -> list:
-        query = "count=100"
+        query=""
+        if self.is_supports_paging:
+            query = "count=100"
         if query_params:
             if ("select" in query_params
                     and query_params['select'] is not None
