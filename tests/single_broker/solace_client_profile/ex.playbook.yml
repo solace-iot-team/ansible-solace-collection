@@ -43,16 +43,26 @@
         name: "test_ansible_solace"
         state: present
       register: result
-      failed_when: result.rc != 1
+      ignore_errors: yes
+    - assert:
+        that:
+          - result.rc == 1
+          - "'Your permissions have changed' in result.msg | string"
+      when: is_solace_cloud
 
     - name: "ex: Client Profile - Wrong Params - 2"
       solace_client_profile:
-        solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+        solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
         solace_cloud_service_id: "xxx"
         name: "test_ansible_solace"
         state: present
       register: result
-      failed_when: result.rc != 1
+      ignore_errors: yes
+    - assert:
+        that:
+          - result.rc == 1
+          - result.msg.status_code == 404
+      when: is_solace_cloud
 
     - name: "ex: Client Profile - Wrong Params - 3"
       solace_client_profile:
@@ -61,7 +71,11 @@
         name: "test_ansible_solace"
         state: present
       register: result
-      failed_when: result.rc != 1
+      ignore_errors: yes
+    - assert:
+        that:
+          - result.rc == 1
+          - "'must provide either both or none for Solace Cloud' in result.msg | string"
 
     - name: "ex: Client Profile - Wrong Params - 4"
       solace_client_profile:
@@ -70,7 +84,11 @@
         name: "test_ansible_solace"
         state: present
       register: result
-      failed_when: result.rc != 1
+      ignore_errors: yes
+    - assert:
+        that:
+          - result.rc == 1
+          - "'must provide either both or none for Solace Cloud' in result.msg | string"
 
     - name: "ex: Client Profile - Wrong Params - 5"
       solace_client_profile:
@@ -79,7 +97,12 @@
         name: "test_ansible_solace"
         state: present
       register: result
-      when: not is_solace_cloud
+      ignore_errors: yes
+    - assert:
+        that:
+          - result.rc == 1
+          - "'UNAUTHORIZED' in result.msg | string"
+      when: is_solace_cloud
 
     - name: "ex: Delete Client Profile"
       solace_client_profile:

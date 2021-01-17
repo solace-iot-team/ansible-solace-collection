@@ -105,7 +105,6 @@ import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -132,6 +131,12 @@ class SolaceClientProfileTask(SolaceBrokerCRUDTask):
         params = self.get_module().params
         return [params['msg_vpn'], params['name']]
 
+    def _compose_request_body(self, operation: str, operation_type: str, settings: dict) -> dict:
+        return {
+            'operation': operation,
+            operation_type: settings
+        }
+
     def _get_func_solace_cloud(self, vpn_name, client_profile_name):
         # GET services/{paste-your-serviceId-here}/clientProfiles/{{clientProfileName}}
         service_id = self.get_config().get_params()['solace_cloud_service_id']
@@ -152,7 +157,7 @@ class SolaceClientProfileTask(SolaceBrokerCRUDTask):
         }
         data.update(self.SOLACE_CLOUD_DEFAULTS)
         data.update(settings if settings else {})
-        body = self.solace_cloud_api.compose_request_body(operation='create', operation_type=self.OPERATION, settings=data)
+        body = self._compose_request_body(operation='create', operation_type=self.OPERATION, settings=data)
         service_id = self.get_config().get_params()['solace_cloud_service_id']
         path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'clientProfileRequests']
         return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)
@@ -186,7 +191,7 @@ class SolaceClientProfileTask(SolaceBrokerCRUDTask):
         data = current_settings        
         data.update(mandatory)
         data.update(settings if settings else {})
-        body = self.solace_cloud_api.compose_request_body(operation='update', operation_type=self.OPERATION, settings=data)
+        body = self._compose_request_body(operation='update', operation_type=self.OPERATION, settings=data)
         service_id = self.get_config().get_params()['solace_cloud_service_id']
         path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'clientProfileRequests']
         return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)
@@ -203,7 +208,7 @@ class SolaceClientProfileTask(SolaceBrokerCRUDTask):
         data = {
             self.OBJECT_KEY: client_profile_name
         }
-        body = self.solace_cloud_api.compose_request_body(operation='delete', operation_type=self.OPERATION, settings=data)
+        body = self._compose_request_body(operation='delete', operation_type=self.OPERATION, settings=data)
         service_id = self.get_config().get_params()['solace_cloud_service_id']
         path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'clientProfileRequests']
         return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)

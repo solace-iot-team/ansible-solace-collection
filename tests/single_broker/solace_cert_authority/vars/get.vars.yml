@@ -1,0 +1,6 @@
+---
+where_pattern: ansible_solace__test*
+cert_authority_names:
+- name: ansible_solace__test__1__
+- name: ansible_solace__test__2__
+- name: ansible_solace__test__3__

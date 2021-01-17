@@ -340,14 +340,11 @@ class SolaceCloudApi(SolaceApi):
         return self.handle_good_response(resp)   
 
     def handle_bad_response(self, resp):
-        _resp = dict()
-        if not resp.text:
-            _resp = resp
-        else:
-            _resp = dict(status_code=resp.status_code,
-                            reason=resp.reason,
-                            body=json.loads(resp.text)
-                            )
+        _resp = dict(status_code=resp.status_code,
+                    reason=resp.reason
+                )
+        if resp.text:
+            _resp.update({'body': json.loads(resp.text)})
         raise SolaceApiError(_resp)
 
     def get_data_centers(self, config: SolaceTaskSolaceCloudConfig) -> list:
@@ -468,16 +465,10 @@ class SolaceCloudApi(SolaceApi):
             resp = self.make_get_request(config, path_array)
         except SolaceApiError as e:
             resp = e.get_resp()
-            if resp.status_code == 404:
+            if resp['status_code'] == 404:
                 return None
             raise SolaceApiError(resp)
         return resp
-
-    def compose_request_body(self, operation: str, operation_type: str, settings: dict) -> dict:
-        return {
-            'operation': operation,
-            operation_type: settings
-        }
 
     def get_service_request_status(self, config: SolaceTaskBrokerConfig, service_id: str, request_id: str):
         # GET https://api.solace.cloud/api/v0/services/{paste-your-serviceId-here}/requests/{{requestId}}
