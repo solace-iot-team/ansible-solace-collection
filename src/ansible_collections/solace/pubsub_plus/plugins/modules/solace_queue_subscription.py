@@ -14,6 +14,8 @@ DOCUMENTATION = '''
 ---
 module: solace_queue_subscription
 
+TODO: rework doc
+
 short_description: subscription on a queue
 
 description:

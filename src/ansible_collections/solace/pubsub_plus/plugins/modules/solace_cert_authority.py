@@ -16,6 +16,8 @@ module: solace_cert_authority
 
 TODO: re-work doc
 
+Note: uses deprecated API, since 2.19: clientCertAuthority & domainCertAuthority - raise an issue if you need those instead
+
 short_description: certificate authority
 
 description:
@@ -235,7 +237,6 @@ def run_module():
 
 
 def main():
-
     run_module()
 
 

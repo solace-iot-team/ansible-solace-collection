@@ -25,11 +25,16 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
   pre_tasks:
   - include_vars:
       file: "get.vars.yml"
       name: target_list
   tasks:
+
+    - set_fact:
+        working_dir: "{{ WORKING_DIR }}"
 
     - name: "get: solace_cert_authority: delete"
       solace_cert_authority:
@@ -48,11 +53,13 @@
     - assert:
         that: result.result_list_count == 0
 
-    - name: "get: solace_cert_authority: add"
-      solace_cert_authority:
-        name: "{{ item.name }}"
-        state: present
+    - name: "get: include add tasks"
+      include_tasks: ./tasks/add.tasks.yml
       loop: "{{ target_list.cert_authority_names }}"
+
+    - name: "get: config: solace_get_cert_authorities: list"
+      solace_get_cert_authorities:
+      register: result
 
     - name: "get: config: solace_get_cert_authorities: list"
       solace_get_cert_authorities:

@@ -13,8 +13,8 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_queue
-TODO: re-work doc
-
+TODO: rework doc
+ 
 short_description: queue
 
 description:

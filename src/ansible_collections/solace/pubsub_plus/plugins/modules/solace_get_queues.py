@@ -14,6 +14,8 @@ DOCUMENTATION = '''
 ---
 module: solace_get_queues
 
+TODO: rework doc
+
 short_description: get list of queues
 
 description:

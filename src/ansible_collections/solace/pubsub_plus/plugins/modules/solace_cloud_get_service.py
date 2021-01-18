@@ -110,7 +110,7 @@ class SolaceCloudGetServiceTask(SolaceCloudGetTask):
         super().__init__(module)
 
     def do_task(self):
-        service_id = self.get_module().params['service_id']
+        service_id = self.get_module().params['solace_cloud_service_id']
         service = self.get_solace_cloud_api().get_service(self.get_config(), service_id)
         result = self.create_result()
         result.update(dict(
