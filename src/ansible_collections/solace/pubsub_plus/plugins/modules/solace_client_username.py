@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_client_username
-
+TODO: re-work doc
 short_description: client username
 
 description:
@@ -82,70 +82,64 @@ response:
     returned: success
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceClientTask(su.SolaceTask):
+class SolaceClientUsernameTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'clientUsername'
+    OBJECT_KEY = 'clientUsername'
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
     def get_args(self):
-        return [self.module.params['msg_vpn']]
+        params = self.get_module().params
+        return [params['msg_vpn'], params['name']]
 
-    def lookup_item(self):
-        return self.module.params['name']
-
-    def get_func(self, solace_config, vpn, lookup_item_value):
+    def get_func(self, vpn_name, client_username):
         # GET /msgVpns/{msgVpnName}/clientUsernames/{clientUsername}
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.CLIENT_USERNAMES, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientUsernames', client_username]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def create_func(self, solace_config, vpn, client, settings=None):
+    def create_func(self, vpn_name, client_username, settings=None):
         # POST /msgVpns/{msgVpnName}/clientUsernames
-        defaults = {
-            'enabled': True
+        data = {
+            self.OBJECT_KEY: client_username
         }
-        mandatory = {
-            'clientUsername': client,
-        }
-        data = su.merge_dicts(defaults, mandatory, settings)
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.CLIENT_USERNAMES]
-        return su.make_post_request(solace_config, path_array, data)
+        data.update(settings if settings else {})
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientUsernames']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def update_func(self, solace_config, vpn, lookup_item_value, settings=None):
+    def update_func(self, vpn_name, client_username, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/clientUsernames/{clientUsername}
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.CLIENT_USERNAMES, lookup_item_value]
-        return su.make_patch_request(solace_config, path_array, settings)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientUsernames', client_username]
+        return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
-    def delete_func(self, solace_config, vpn, lookup_item_value):
+    def delete_func(self, vpn_name, client_username):
         # DELETE /msgVpns/{msgVpnName}/clientUsernames/{clientUsername}
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.CLIENT_USERNAMES, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array, None)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientUsernames', client_username]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_crud())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
         argument_spec=arg_spec,
         supports_check_mode=True
     )
-
-    solace_task = SolaceClientTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task = SolaceClientUsernameTask(module)
+    solace_task.execute()
 
 
 def main():

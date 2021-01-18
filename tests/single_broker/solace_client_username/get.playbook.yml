@@ -1,8 +1,7 @@
 # Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-
 -
-  name: "main: solace_client_username"
+  name: "get: solace_get_queues"
   hosts: all
   gather_facts: no
   any_errors_fatal: true
@@ -31,63 +30,78 @@
       name: target_list
   tasks:
 
-    - name: "main: solace_client_username: remove all - start"
+    - name: "main: solace_client_username: remove all"
       solace_client_username:
         name: "{{ item.name }}"
         state: absent
       loop: "{{ target_list.clientUsernames }}"
 
-    - name: "main: solace_client_username: creating all"
-      solace_client_username:
-        name: "{{ item.name }}"
-        state: present
-      loop: "{{ target_list.clientUsernames }}"
-
-    - name: "main: solace_client_username: updating all"
-      solace_client_username:
-        name: "{{ item.name }}"
-        settings:
-          enabled: true
-          guaranteedEndpointPermissionOverrideEnabled: true
-        state: present
-      loop: "{{ target_list.clientUsernames }}"
-
-    - name: "main: solace_get_client_usernames(config) - check updates ok"
+    - name: "get: solace_get_client_usernames(config, all)"
       solace_get_client_usernames:
-        query_params:
-          where:
-            - "clientUsername=={{ target_list.search_pattern }}"
-            - "enabled==true"
-            - "guaranteedEndpointPermissionOverrideEnabled==true"
-          select:
-            - "clientUsername"
-            - enabled
-            - guaranteedEndpointPermissionOverrideEnabled
       register: result
     - assert:
         that:
-          - result.result_list_count == 3
-          - result.result_list[0].enabled == True and result.result_list[0].guaranteedEndpointPermissionOverrideEnabled == True
-          - result.result_list[1].enabled == True and result.result_list[1].guaranteedEndpointPermissionOverrideEnabled == True
-          - result.result_list[2].enabled == True and result.result_list[2].guaranteedEndpointPermissionOverrideEnabled == True
+          - result.rc==0
+          - result.result_list | length > 0
+          - result.result_list_count > 0
 
-    - name: "main: solace_client_username: remove all - end"
+    - name: "get: solace_get_client_usernames(config, target_list)"
+      solace_get_client_usernames:
+        query_params:
+          where:
+            - "clientUsername=={{ target_list.search_pattern }}"
+      register: result
+    - assert:
+        that:
+          - result.rc==0
+          - result.result_list==[]
+          - result.result_list_count==0
+
+    - name: "get: solace_client_username: creating all"
+      solace_client_username:
+        name: "{{ item.name }}"
+        state: present
+      loop: "{{ target_list.clientUsernames }}"
+
+    - name: "get: solace_get_client_usernames(config, target_list)"
+      solace_get_client_usernames:
+        query_params:
+          where:
+            - "clientUsername=={{ target_list.search_pattern }}"
+      register: result
+    - assert:
+        that:
+          - result.rc==0
+          - result.result_list | length == 3
+          - result.result_list_count==3
+
+    - name: "get: solace_get_client_usernames(monitor, target_list)"
+      solace_get_client_usernames:
+        api: monitor
+        query_params:
+          where:
+            - "clientUsername=={{ target_list.search_pattern }}"
+      register: result
+    - assert:
+        that:
+          - result.rc==0
+          - result.result_list | length == 3
+          - result.result_list_count==3
+
+    - name: "main: solace_client_username: remove all"
       solace_client_username:
         name: "{{ item.name }}"
         state: absent
       loop: "{{ target_list.clientUsernames }}"
 
-    - name: "main: solace_get_client_usernames(config) - check none exist"
+    - name: "get: solace_get_client_usernames(config, all)"
       solace_get_client_usernames:
-        query_params:
-          where:
-            - "clientUsername=={{ target_list.search_pattern }}"
-          select:
-            - "clientUsername"
       register: result
     - assert:
-        that: result.result_list_count == 0
-
+        that:
+          - result.rc==0
+          - result.result_list | length > 0
+          - result.result_list_count > 0
 
 ###
 # The End.
