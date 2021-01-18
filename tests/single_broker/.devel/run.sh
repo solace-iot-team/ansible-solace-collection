@@ -21,11 +21,11 @@ ansibleSolaceTests=(
   # "solace_acl_profile"
   # "solace_rdp"
   # "solace_cert_authority"
+  # "solace_queue"
 # TODO
-  "solace_queue"
+  "solace_client_username"
   # "solace_mqtt"
   # "solace_topic_endpoint"
-  # "solace_client_username"
   # "solace_get_vpn_clients"
   # "teardown"
 )

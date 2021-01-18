@@ -20,11 +20,10 @@
 
     - name: "queue: add/update subscriptions"
       solace_queue_subscription:
-        queue: "{{ queue_item.name }}"
         name: "{{ item }}"
+        queue_name: "{{ queue_item.name }}"
         state: present
       loop: "{{ queue_item.subscriptions }}"
-      when: is_add_subscriptions|default(False)
 
     - name: "queue: enable egress"
       solace_queue:

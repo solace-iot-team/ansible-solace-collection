@@ -25,19 +25,14 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-
+  pre_tasks:
+  - include_vars:
+      file: "queues.vars.yml"
+      name: target_list
   tasks:
-
-    - include_vars:
-        file: "queues.vars.json"
-        name: target_queue_list
-
-    - set_fact:
-        is_add_subscriptions: True
-
     - name: "main: call tasks: adding/updating queues"
       include_tasks: ./tasks/queue.tasks.yml
-      loop: "{{ target_queue_list.queues }}"
+      loop: "{{ target_list.queues }}"
       loop_control:
         loop_var: queue_item
 
@@ -45,7 +40,7 @@
       solace_queue:
         name: "{{ item.name }}"
         state: absent
-      loop: "{{ target_queue_list.queues }}"
+      loop: "{{ target_list.queues }}"
 
 
 ###

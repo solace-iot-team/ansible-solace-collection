@@ -75,6 +75,9 @@
         name: "{{ mqtt_client_username }}"
         state: present
 
+    - fail:
+        msg: continue here
+
     - include_vars:
         file: "mqtt.vars.yml"
         name: mqtt

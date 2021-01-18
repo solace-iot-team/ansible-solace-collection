@@ -28,6 +28,12 @@
 
   tasks:
 
+    list of client usernames
+
+    - fail:
+        msg: continue here
+
+
     - name: "main: get pre-existing client usernames"
       solace_get_client_usernames:
         query_params:
