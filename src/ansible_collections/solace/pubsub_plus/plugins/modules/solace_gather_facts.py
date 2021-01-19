@@ -115,7 +115,6 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
         super().__init__(module)
         self.sempv2_api = SolaceSempV2Api(module)
         self.sempv1_api = SolaceSempV1Api(module)
-        # self.sempv2_paging_api = SolaceSempV2PagingGetApi(module)
         self.solace_cloud_api = SolaceCloudApi(module)
 
     def add_path_value(self, dictionary, path_array, value):

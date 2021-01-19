@@ -26,7 +26,6 @@ playbooks=(
   "$scriptDir/main.playbook.yml"
   "$scriptDir/qos1-clean.playbook.yml"
   "$scriptDir/qos1.playbook.yml"
-  "$scriptDir/qos1.playbook.yml" # run twice to test idempotency
   "$scriptDir/qos1-clean.playbook.yml"
 )
 
@@ -38,8 +37,8 @@ for playbook in ${playbooks[@]}; do
   ansible-playbook \
                   -i $inventory \
                   $playbook \
-                  --extra-vars "WORKING_DIR=$WORKING_DIR"
-
+                  --extra-vars "WORKING_DIR=$WORKING_DIR" \
+                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN"
   code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
 done

@@ -141,6 +141,12 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             msg_vpn=dict(type='str', required=True)
         )
 
+    @staticmethod    
+    def arg_spec_virtual_router():
+        return dict(
+            virtual_router=dict(type='str', default='primary', choices=['primary', 'backup'])
+        )
+        
     @staticmethod
     def arg_spec_name():
         return dict(

@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_magic_queues
-
+TODO: rework doc
 short_description: get 'magic' queues
 
 description:
@@ -118,66 +118,64 @@ result_list_count:
 
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceGetTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV1PagingGetApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceGetMagicQueuesTask(su.SolaceTask):
+class SolaceGetMagicQueuesTask(SolaceGetTask):
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
+        super().__init__(module)
+        self.config = SolaceTaskBrokerConfig(module)
+        self.sempv1_get_paging_api = SolaceSempV1PagingGetApi(module)
+
+    def get_config(self) -> SolaceTaskBrokerConfig:
+        return self.config
 
     def get_list(self):
-        # SEMP v1
+        params = self.get_config().get_params()
         request = {
             'rpc': {
                 'show': {
                     'queue': {
-                        'name': self.module.params['where_name'],
-                        'vpn-name': self.module.params['msg_vpn'],
-                        # not found tests
+                        'name': params['where_name'],
+                        'vpn-name': params['msg_vpn'],
+                        # test: not found
                         # 'name': "does-not-exist",
                         # 'vpn-name': "does-not-exist",
-                        # keep for paging test
+                        # test: paging
                         # 'count': '',
                         # 'num-elements': 1
                     }
                 }
             }
         }
-        list_path_array = ['rpc-reply', 'rpc', 'show', 'queue', 'queues', 'queue']
-        return sc.execute_sempv1_get_list(self.solace_config, request, list_path_array)
+        response_list_path_array = ['rpc-reply', 'rpc', 'show', 'queue', 'queues', 'queue']
+        return self.sempv1_get_paging_api.get_objects(self.get_config(), request, response_list_path_array)
+
+    def do_task(self):
+        objects = self.get_list()
+        result = self.create_result_with_list(objects)
+        return None, result
 
 
 def run_module():
     module_args = dict(
         where_name=dict(type='str', required=True)
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
         argument_spec=arg_spec,
         supports_check_mode=True
     )
-
-    result = dict(
-        rc=0,
-        changed=False
-    )
-
     solace_task = SolaceGetMagicQueuesTask(module)
-    ok, resp_or_list = solace_task.get_list()
-    if not ok:
-        result['rc'] = 1
-        module.fail_json(msg=resp_or_list, **result)
-
-    result['result_list'] = resp_or_list
-    result['result_list_count'] = len(resp_or_list)
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():

@@ -309,6 +309,44 @@ class SolaceSempV1Api(SolaceApi):
         SolaceApi.log_http_roundtrip(resp)
         return self.handle_response(resp)
 
+class SolaceSempV1PagingGetApi(SolaceSempV1Api):
+
+    def __init__(self, module: AnsibleModule):
+        super().__init__(module)
+        return
+
+    def get_objects(self, config: SolaceTaskBrokerConfig, request: dict, reponse_list_path_array: list) -> list:
+        xml_data = xmltodict.unparse(request)
+        result_list = []
+        hasNextPage = True
+        while hasNextPage:
+            semp_resp = self.make_post_request(config, xml_data)
+            # extract the list
+            _d = semp_resp
+            for path in reponse_list_path_array:
+                if _d and path in _d:
+                    _d = _d[path]
+                else:
+                    # empty list / not found
+                    return []
+            if isinstance(_d, dict):
+                resp = [_d]
+            elif isinstance(_d, list):
+                resp = _d
+            else:
+                raise SolaceInternalError(f"unknown SEMP v1 return type: {type(_d)}")
+            result_list.extend(resp)
+            # see if there is more
+            more_cookie = None
+            if 'more-cookie' in semp_resp['rpc-reply']:
+                more_cookie = semp_resp['rpc-reply']['more-cookie']
+            if more_cookie:
+                xml_data = xmltodict.unparse(more_cookie)
+                hasNextPage = True
+            else:
+                hasNextPage = False
+        return result_list
+
 
 class SolaceCloudApi(SolaceApi):
 

@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_mqtt_session_subscriptions
-
+TODO: rework doc
 short_description: list of mqtt session subscriptions
 
 description:
@@ -115,58 +115,41 @@ result_list_count:
 
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetPagingTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceGetMqttSessionSubscritionsTask(su.SolaceTask):
+class SolaceGetMqttSessionSubscritionsTask(SolaceBrokerGetPagingTask):
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
+        super().__init__(module)
 
-    def get_list(self):
+    def get_path_array(self, params: dict) -> list:
         # GET /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}/subscriptions
-
-        vpn = self.module.params['msg_vpn']
-        client_id = self.module.params['mqtt_session_client_id']
-        virtual_router = self.module.params['virtual_router']
-
+        client_id = params['mqtt_session_client_id']
+        virtual_router = params['virtual_router']
         uri_ext = ','.join([client_id, virtual_router])
-
-        path_array = [su.MSG_VPNS, vpn, su.MQTT_SESSIONS, uri_ext, su.MQTT_SESSION_SUBSCRIPTIONS]
-
-        return self.execute_get_list(path_array)
+        return ['msgVpns', params['msg_vpn'], 'mqttSessions', uri_ext, 'subscriptions']
 
 
 def run_module():
     module_args = dict(
         mqtt_session_client_id=dict(type='str', aliases=['client_id', 'client'], required=True),
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_virtual_router())
-    arg_spec.update(su.arg_spec_get_list())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_virtual_router())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_get_object_list_config_montor())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
         argument_spec=arg_spec,
         supports_check_mode=True
     )
-
-    result = dict(
-        changed=False
-    )
-
     solace_task = SolaceGetMqttSessionSubscritionsTask(module)
-    ok, resp_or_list = solace_task.get_list()
-    if not ok:
-        module.fail_json(msg=resp_or_list, **result)
-
-    result['result_list'] = resp_or_list
-    result['result_list_count'] = len(resp_or_list)
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():
