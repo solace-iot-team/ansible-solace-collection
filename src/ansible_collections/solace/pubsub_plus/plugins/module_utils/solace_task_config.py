@@ -146,7 +146,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         return dict(
             virtual_router=dict(type='str', default='primary', choices=['primary', 'backup'])
         )
-        
+
     @staticmethod
     def arg_spec_name():
         return dict(
@@ -161,9 +161,8 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         return arg_spec
 
     @staticmethod
-    def arg_spec_get_object_list_config_montor():
+    def _arg_spec_get_query_params():
         return dict(
-            api=dict(type='str', default='config', choices=['config', 'monitor']),
             query_params=dict(
                 type='dict',
                 required=False,
@@ -175,17 +174,20 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         )
 
     @staticmethod
-    def arg_spec_get_object_list_monitor():
-        return dict(
-            query_params=dict(
-                type='dict',
-                required=False,
-                options=dict(
-                    select=dict(type='list', default=[], elements='str'),
-                    where=dict(type='list', default=[], elements='str')
-                )
-            )
+    def arg_spec_get_object_list_config_montor():
+        d = dict(
+            api=dict(type='str', default='config', choices=['config', 'monitor'])
         )
+        d.update(SolaceTaskBrokerConfig._arg_spec_get_query_params())
+        return d
+
+    @staticmethod
+    def arg_spec_get_object_list_monitor():
+        d = dict(
+            api=dict(type='str', default='monitor', choices=['monitor']),
+        )
+        d.update(SolaceTaskBrokerConfig._arg_spec_get_query_params())
+        return d
 
 
 class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):

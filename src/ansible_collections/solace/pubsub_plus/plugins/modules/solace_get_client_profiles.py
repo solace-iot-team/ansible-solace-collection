@@ -121,15 +121,19 @@ class SolaceGetClientProfilesTask(SolaceBrokerGetPagingTask):
     def __init__(self, module):
         super().__init__(module)
 
-    def do_task(self):
+    def get_path_array(self, params: dict) -> list:
         # GET /msgVpns/{msgVpnName}/clientProfiles
-        vpn_name = self.get_module().params['msg_vpn']
-        path_array = ['msgVpns', vpn_name, 'clientProfiles']
-        api = self.get_config().get_params()['api']
-        query_params = self.get_config().get_params()['query_params']
-        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, path_array, query_params)
-        result = self.create_result_with_list(objects)
-        return None, result
+        return ['msgVpns', params['msg_vpn'], 'clientProfiles']
+
+    # def do_task(self):
+    #     # GET /msgVpns/{msgVpnName}/clientProfiles
+    #     vpn_name = self.get_module().params['msg_vpn']
+    #     path_array = ['msgVpns', vpn_name, 'clientProfiles']
+    #     api = self.get_config().get_params()['api']
+    #     query_params = self.get_config().get_params()['query_params']
+    #     objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, path_array, query_params)
+    #     result = self.create_result_with_list(objects)
+    #     return None, result
 
 
 def run_module():

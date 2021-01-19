@@ -24,9 +24,9 @@ ansibleSolaceTests=(
   # "solace_queue"
   # "solace_client_username"
   # "solace_mqtt"
-# TODO
-  "solace_topic_endpoint"
+  # "solace_topic_endpoint"
   # "solace_get_vpn_clients"
+# TODO
   # "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
