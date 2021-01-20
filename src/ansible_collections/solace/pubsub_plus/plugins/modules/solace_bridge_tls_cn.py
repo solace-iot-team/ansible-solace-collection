@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_bridge_tls_cn
-
+TODO: re-work doc
 short_description: trusted common name for bridge
 
 description:
@@ -86,59 +86,59 @@ response:
     returned: success
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceBridgeTrustedCommonNamesTask(su.SolaceTask):
+class SolaceBridgeTrustedCommonNameTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'tlsTrustedCommonName'
+    OBJECT_KEY = 'tlsTrustedCommonName'
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
     def get_args(self):
-        return [self.module.params['msg_vpn'], self.module.params['virtual_router'], self.module.params['bridge_name']]
+        params = self.get_module().params
+        return [params['msg_vpn'], params['bridge_virtual_router'], params['bridge_name'], params['name']]
 
-    def lookup_item(self):
-        return self.module.params['name']
+    def get_func(self, vpn_name, bridge_virtual_router, bridge_name, tls_trusted_cn):
+        # GET /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/tlsTrustedCommonNames/{tlsTrustedCommonName}
+        bridge_uri = ','.join([bridge_name, bridge_virtual_router])
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'bridges', bridge_uri, 'tlsTrustedCommonNames', tls_trusted_cn]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def get_func(self, solace_config, vpn, virtual_router, bridge_name, lookup_item_value):
-        bridge_uri = ','.join([bridge_name, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_TRUSTED_COMMON_NAMES, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
-
-    def create_func(self, solace_config, vpn, virtual_router, bridge_name, trusted_common_name, settings=None):
-        defaults = {
-            'msgVpnName': vpn,
-            'bridgeVirtualRouter': virtual_router
-        }
-        mandatory = {
+    def create_func(self, vpn_name, bridge_virtual_router, bridge_name, tls_trusted_cn, settings=None):
+        # POST /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/tlsTrustedCommonNames
+        data = {
+            'bridgeVirtualRouter': bridge_virtual_router,
             'bridgeName': bridge_name,
-            'tlsTrustedCommonName': trusted_common_name
+            self.OBJECT_KEY: tls_trusted_cn
         }
-        data = su.merge_dicts(defaults, mandatory, settings)
-        bridge_uri = ','.join([bridge_name, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_TRUSTED_COMMON_NAMES]
-        return su.make_post_request(solace_config, path_array, data)
+        data.update(settings if settings else {})
+        bridge_uri = ','.join([bridge_name, bridge_virtual_router])
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'bridges', bridge_uri, 'tlsTrustedCommonNames']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def delete_func(self, solace_config, vpn, virtual_router, bridge_name, lookup_item_value):
-        bridge_uri = ','.join([bridge_name, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_TRUSTED_COMMON_NAMES, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array, None)
+    def delete_func(self, vpn_name, bridge_virtual_router, bridge_name, tls_trusted_cn):
+        #  DELETE /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/tlsTrustedCommonNames/{tlsTrustedCommonName}
+        bridge_uri = ','.join([bridge_name, bridge_virtual_router])
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'bridges', bridge_uri, 'tlsTrustedCommonNames', tls_trusted_cn]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
         name=dict(type='str', required=True),
         bridge_name=dict(type='str', required=True),
-        virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto'])
+        bridge_virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto'])
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_crud())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -146,11 +146,8 @@ def run_module():
         supports_check_mode=True
     )
 
-    solace_task = SolaceBridgeTrustedCommonNamesTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
-
+    solace_task = SolaceBridgeTrustedCommonNameTask(module)
+    solace_task.execute()
 
 def main():
     run_module()

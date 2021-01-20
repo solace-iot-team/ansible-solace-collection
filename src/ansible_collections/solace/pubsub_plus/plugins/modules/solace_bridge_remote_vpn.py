@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_bridge_remote_vpn
-
+TODO: re-work doc
 short_description: bridge remote vpn
 
 description:
@@ -104,86 +104,70 @@ response:
     returned: success
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceBridgeRemoteVpnTask(su.SolaceTask):
+class SolaceBridgeRemoteVpnTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'remoteMsgVpnName'
+    OBJECT_KEY = 'remoteMsgVpnName'
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
-        self.validate_args()
-
-    def validate_args(self):
-        rvl = self.module.params['remote_vpn_location']
-        if rvl == '':
-            result = dict(rc=1, changed=False)
-            msg = f"missing parameter: remote_vpn_location='{rvl}'"
-            self.module.fail_json(msg=msg, **result)
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
     def get_args(self):
-        return [self.module.params['msg_vpn'],
-                self.module.params['bridge_virtual_router'],
-                self.module.params['bridge_name'],
-                self.module.params['remote_vpn_location'],
-                self.module.params['remote_vpn_interface']]
+        params = self.get_module().params
+        return [params['msg_vpn'], params['bridge_virtual_router'], params['bridge_name'], params['remote_vpn_location'], params['remote_vpn_interface'], params['name']]
 
-    def lookup_item(self):
-        return self.module.params['name']
-
-    def get_func(self, solace_config, vpn, bridge_virtual_router, bridge_name, remote_vpn_location, remote_vpn_interface, lookup_item_value):
+    def get_func(self, vpn_name, bridge_virtual_router, bridge_name, remote_vpn_location, remote_vpn_interface, remote_msg_vpn_name):
         # GET /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteMsgVpns/{remoteMsgVpnName},{remoteMsgVpnLocation},{remoteMsgVpnInterface}
         bridge_uri = ','.join([bridge_name, bridge_virtual_router])
-        remote_vpn_uri = ','.join([lookup_item_value, remote_vpn_location]) + ',' + (remote_vpn_interface if remote_vpn_interface is not None else '')
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_REMOTE_MSG_VPNS, remote_vpn_uri]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
+        remote_vpn_uri = ','.join([remote_msg_vpn_name, remote_vpn_location]) + ',' + (remote_vpn_interface if remote_vpn_interface is not None else '')
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'bridges', bridge_uri, 'remoteMsgVpns', remote_vpn_uri]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def create_func(self, solace_config, vpn, bridge_virtual_router, bridge_name, remote_vpn_location, remote_vpn_interface, remote_vpn, settings=None):
+    def create_func(self, vpn_name, bridge_virtual_router, bridge_name, remote_vpn_location, remote_vpn_interface, remote_msg_vpn_name, settings=None):
         # POST /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteMsgVpns
-        defaults = {
-            'msgVpnName': vpn,
-            'remoteMsgVpnLocation': remote_vpn_location,
-            **({'remoteMsgVpnInterface': remote_vpn_interface} if remote_vpn_interface is not None else {})
-        }
-        mandatory = {
+        data = {
             'bridgeName': bridge_name,
-            self.LOOKUP_ITEM_KEY: remote_vpn
+            'remoteMsgVpnLocation': remote_vpn_location,
+            **({'remoteMsgVpnInterface': remote_vpn_interface} if remote_vpn_interface is not None else {}),
+            self.OBJECT_KEY: remote_msg_vpn_name
         }
-        data = su.merge_dicts(defaults, mandatory, settings)
+        data.update(settings if settings else {})
         bridge_uri = ','.join([bridge_name, bridge_virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_REMOTE_MSG_VPNS]
-        return su.make_post_request(solace_config, path_array, data)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'bridges', bridge_uri, 'remoteMsgVpns']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def update_func(self, solace_config, vpn, bridge_virtual_router, bridge_name, remote_vpn_location, remote_vpn_interface, lookup_item_value, settings=None):
+    def update_func(self, vpn_name, bridge_virtual_router, bridge_name, remote_vpn_location, remote_vpn_interface, remote_msg_vpn_name, settings=None, delta_settings=None):
         # PATH /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteMsgVpns/{remoteMsgVpnName},{remoteMsgVpnLocation},{remoteMsgVpnInterface}
         bridge_uri = ','.join([bridge_name, bridge_virtual_router])
-        remote_vpn_uri = ','.join([lookup_item_value, remote_vpn_location]) + ',' + (remote_vpn_interface if remote_vpn_interface is not None else '')
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_REMOTE_MSG_VPNS, remote_vpn_uri]
-        return su.make_patch_request(solace_config, path_array, settings)
+        remote_vpn_uri = ','.join([remote_msg_vpn_name, remote_vpn_location]) + ',' + (remote_vpn_interface if remote_vpn_interface is not None else '')
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'bridges', bridge_uri, 'remoteMsgVpns', remote_vpn_uri]
+        return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
-    def delete_func(self, solace_config, vpn, bridge_virtual_router, bridge_name, remote_vpn_location, remote_vpn_interface, lookup_item_value):
-        # DELETE /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteMsgVpns/{remoteMsgVpnName},{remoteMsgVpnLocation},{remoteMsgVpnInterface}
+    def delete_func(self, vpn_name, bridge_virtual_router, bridge_name, remote_vpn_location, remote_vpn_interface, remote_msg_vpn_name):
+        #  DELETE /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteMsgVpns/{remoteMsgVpnName},{remoteMsgVpnLocation},{remoteMsgVpnInterface}
         bridge_uri = ','.join([bridge_name, bridge_virtual_router])
-        remote_vpn_uri = ','.join([lookup_item_value, remote_vpn_location]) + ',' + (remote_vpn_interface if remote_vpn_interface is not None else '')
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_REMOTE_MSG_VPNS, remote_vpn_uri]
-        return su.make_delete_request(solace_config, path_array, None)
+        remote_vpn_uri = ','.join([remote_msg_vpn_name, remote_vpn_location]) + ',' + (remote_vpn_interface if remote_vpn_interface is not None else '')
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'bridges', bridge_uri, 'remoteMsgVpns', remote_vpn_uri]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True, aliases=['remote_msg_vpn_name']),
         bridge_name=dict(type='str', required=True),
-        bridge_virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto'], aliases=['virtual_router']),
+        bridge_virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto']),
         remote_vpn_location=dict(type='str', required=True),
         remote_vpn_interface=dict(type='str', default=None, required=False)
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_crud())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -192,9 +176,7 @@ def run_module():
     )
 
     solace_task = SolaceBridgeRemoteVpnTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():

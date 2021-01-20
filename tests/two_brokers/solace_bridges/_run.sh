@@ -14,7 +14,8 @@ source $PROJECT_HOME/.lib/functions.sh
 
   if [ -z "$LOG_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
   if [ -z "$WORKING_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
-  if [ -z "$SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS"; exit 1; fi
+  # if [ -z "$SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS"; exit 1; fi
+  if [ -z "$SOLACE_CLOUD_API_TOKEN" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN"; exit 1; fi
 
 ##############################################################################################################################
 # Settings
@@ -41,7 +42,8 @@ source $PROJECT_HOME/.lib/functions.sh
                   -i $localBrokerInventory \
                   -i $solaceCloudInventory \
                   $playbook \
-                  --extra-vars "WORKING_DIR=$WORKING_DIR"
+                  --extra-vars "WORKING_DIR=$WORKING_DIR" \
+                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN"                  
     code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
   done

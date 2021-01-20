@@ -153,7 +153,6 @@ def run_module():
         argument_spec=arg_spec,
         supports_check_mode=True
     )
-
     solace_task = SolaceGetRdpRestConsumersTask(module)
     solace_task.execute()
 

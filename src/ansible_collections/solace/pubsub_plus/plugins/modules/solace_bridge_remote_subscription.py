@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_bridge_remote_subscription
-
+TODO: re-work doc
 short_description: remote subscription on a bridge.
 
 description:
@@ -92,52 +92,48 @@ response:
     returned: success
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceBridgeRemoteSubscriptionsTask(su.SolaceTask):
+class SolaceBridgeRemoteSubscriptionsTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'remoteSubscriptionTopic'
+    OBJECT_KEY = 'remoteSubscriptionTopic'
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
     def get_args(self):
-        return [self.module.params['msg_vpn'],
-                self.module.params['bridge_virtual_router'],
-                self.module.params['bridge_name']]
+        params = self.get_module().params
+        return [params['msg_vpn'], params['bridge_virtual_router'], params['bridge_name'], params['name']]
 
-    def lookup_item(self):
-        return self.module.params['name']
-
-    def get_func(self, solace_config, vpn, virtual_router, bridge_name, lookup_item_value):
+    def get_func(self, vpn_name, bridge_virtual_router, bridge_name, remote_subscription_topic):
         # GET /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteSubscriptions/{remoteSubscriptionTopic}
-        bridge_uri = ','.join([bridge_name, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_REMOTE_SUBSCRIPTIONS, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
+        bridge_uri = ','.join([bridge_name, bridge_virtual_router])
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'bridges', bridge_uri, 'remoteSubscriptions', remote_subscription_topic]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def create_func(self, solace_config, vpn, virtual_router, bridge_name, topic, settings=None):
+    def create_func(self, vpn_name, bridge_virtual_router, bridge_name, remote_subscription_topic, settings=None):
         # POST /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteSubscriptions
-        defaults = {
-        }
-        mandatory = {
-            'msgVpnName': vpn,
+        data = {
             'bridgeName': bridge_name,
-            'bridgeVirtualRouter': virtual_router,
-            self.LOOKUP_ITEM_KEY: topic
+            'bridgeVirtualRouter': bridge_virtual_router,
+            self.OBJECT_KEY: remote_subscription_topic
         }
-        data = su.merge_dicts(defaults, mandatory, settings)
-        bridge_uri = ','.join([bridge_name, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_REMOTE_SUBSCRIPTIONS]
-        return su.make_post_request(solace_config, path_array, data)
+        data.update(settings if settings else {})
+        bridge_uri = ','.join([bridge_name, bridge_virtual_router])
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'bridges', bridge_uri, 'remoteSubscriptions']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def delete_func(self, solace_config, vpn, virtual_router, bridge_name, lookup_item_value):
-        # DELETE /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteSubscriptions/{remoteSubscriptionTopic}
-        bridge_uri = ','.join([bridge_name, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.BRIDGES, bridge_uri, su.BRIDGES_REMOTE_SUBSCRIPTIONS, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array, None)
+    def delete_func(self, vpn_name, bridge_virtual_router, bridge_name, remote_subscription_topic):
+        #  DELETE /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteSubscriptions/{remoteSubscriptionTopic}
+        bridge_uri = ','.join([bridge_name, bridge_virtual_router])
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'bridges', bridge_uri, 'remoteSubscriptions', remote_subscription_topic]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
@@ -146,10 +142,9 @@ def run_module():
         bridge_name=dict(type='str', required=True),
         bridge_virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto'], aliases=['virtual_router'])
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_crud())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -158,9 +153,7 @@ def run_module():
     )
 
     solace_task = SolaceBridgeRemoteSubscriptionsTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():

@@ -16,7 +16,7 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 
   tasks:
@@ -29,36 +29,11 @@
         hostvars: "{{ hostvars }}"
         host: local_broker
       register: result
-      failed_when: result.rc != 1
-
+      ignore_errors: yes
     - assert:
         that:
-          - "'Either \\'fields\\' or \\'field_funcs\\' must be provided.' in result.msg"
-
-    - name: "Get Facts: empty field list"
-      solace_get_facts:
-        hostvars: "{{ hostvars }}"
-        host: local_broker
-        fields:
-      register: result
-      failed_when: result.rc != 1
-
-    - assert:
-        that:
-          - "'Either \\'fields\\' or \\'field_funcs\\' must be provided.' in result.msg"
-
-    - name: "Get Facts: unknown field"
-      solace_get_facts:
-        hostvars: "{{ hostvars }}"
-        host: local_broker
-        fields:
-          - unknown_field
-      register: result
-      failed_when: result.rc != 1
-
-    - assert:
-        that:
-          - "'Could not find field: \\'unknown_field\\' in \\'ansible_facts.solace\\' for host:' in result.msg"
+          - "result.rc == 1"
+          - "'no get functions found - specify at least one' in result.msg | string"
 
     - name: "Get Facts: unknown field function"
       solace_get_facts:
@@ -67,26 +42,26 @@
         field_funcs:
           - unknown_field_function
       register: result
-      failed_when: result.rc != 1
-
+      ignore_errors: yes
     - assert:
         that:
-          - "'Unknown field_func: \\'unknown_field_function\\'. Pls check the documentation for supported field functions' in result.msg"
+          - "result.rc == 1"
+          - "'field_funcs=unknown_field_function\\': unknown, valid field functions' in result.msg | string"
 
     - name: "Get Facts: unkown-host"
       solace_get_facts:
         hostvars: "{{ hostvars }}"
         host: unknown-host
-        fields:
-          - serviceSmfPlainTextListenPort
-          - serviceSmfCompressionListenPort
-          - serviceSmfTlsListenPort
+        field_funcs:
+          - get_serviceSmfPlainTextListenPort
       register: result
-      failed_when: result.rc != 1
-
+      ignore_errors: yes
     - assert:
         that:
-          - "'Could not find host:\\'unknown-host\\' in hostvars. Hint: Cross check spelling with inventory file.' in result.msg"
+          - "result.rc == 1"
+          - "'hostvars, host=unknown-host\\': cannot find host=unknown-host in hostvars' in result.msg | string"
+
+
 
 ###
 # The End.

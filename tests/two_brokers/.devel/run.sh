@@ -12,10 +12,12 @@ export PROJECT_HOME=$projectHome
 
 
 ansibleSolaceTests=(
-  # "setup"
-  # "solace_facts"
+  "setup"
+  "solace_facts"
   "solace_bridges"
-  # "teardown"
+  # TODO
+  # "solace_dmr"
+  "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
@@ -29,7 +31,7 @@ export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 # solace cloud broker
   export SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE="$projectHome/test-runner/files/solace-cloud-account.inventory.yml"
   export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
-  export TEARDOWN_SOLACE_CLOUD=False
+  # export TEARDOWN_SOLACE_CLOUD=False
 
 export CLEAN_WORKING_DIR=False
 
