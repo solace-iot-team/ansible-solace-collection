@@ -38,25 +38,6 @@ source $PROJECT_HOME/.lib/functions.sh
                     --extra-vars "SOLACE_CLOUD_SERVICE_INVENTORY_FILE_NAME_EXT=$SOLACE_CLOUD_SERVICE_INVENTORY_FILE_NAME_EXT"
   code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
-exit 1
-
-
-  playbooks=(
-    "$scriptDir/create-services.playbook.yml"
-  )
-
-  for playbook in ${playbooks[@]}; do
-
-    playbook=$(assertFile $scriptLogName $playbook) || exit
-    ansible-playbook \
-                      -i $solaceCloudAccInventory \
-                      $playbook \
-                      --extra-vars "WORKING_DIR=$WORKING_DIR" \
-                      --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS" \
-                      --extra-vars "SOLACE_CLOUD_INVENTORY_FILE_NAME=$SOLACE_CLOUD_INVENTORY_FILE_NAME"
-    code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
-
-  done
 
 echo ">>> SUCCESS: $scriptLogName"
 
