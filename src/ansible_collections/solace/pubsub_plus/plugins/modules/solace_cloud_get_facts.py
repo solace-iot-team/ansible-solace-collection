@@ -254,7 +254,7 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
             "sempv2_username": eps_val['SEMP']['username'],
             "sempv2_password": eps_val['SEMP']['password'],
             "sempv2_timeout": "60",
-            "vpn": search_dict['msgVpnName'],
+            "vpn": self.get_vpn(search_dict),
             "virtual_router": "primary"
         }
         if api_token:
@@ -262,7 +262,6 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
 
         inv['all']['hosts'] = hosts
         return 'formattedHostInventory', inv
-
 
     def get_serviceSEMPManagementEndpoints(self, search_dict: dict):
         eps = dict(
@@ -294,6 +293,15 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
         eps['SEMP']['username'] = semp_dict['username']
         eps['SEMP']['password'] = semp_dict['password']
         return 'serviceManagementEndpoints', eps
+
+    def get_vpn(self, search_dict: dict) -> str:
+        vpn_attributes = search_dict.get('msgVpnAttributes', None)
+        if not vpn_attributes:
+            raise SolaceError(f"Could not find 'msgVpnAttributes' in dict:{search_dict}.")
+        vpn_name = vpn_attributes.get('vpnName', None)
+        if not vpn_name:
+            raise SolaceError(f"Could not find 'vpnName' in dict:{search_dict}.")
+        return vpn_name
 
     def get_protocol_endpoint(self, search_dict: dict, field: str, value: str):
         element = 'endPoints'

@@ -13,22 +13,13 @@ export PROJECT_HOME=$projectHome
 
 ansibleSolaceTests=(
   "setup"
-  "solace_facts"
-  "solace_bridges"
+  # "single_cluster"
   "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
-# local broker
-  export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
-  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.7.0.29"
-  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.3.1.28"
-  export LOCAL_BROKER_INVENTORY_FILE="$projectHome/test-runner/files/local.broker.inventory.yml"
-  export BROKER_DOCKER_COMPOSE_FILE="$projectHome/test-runner/files/PubSubStandard_singleNode.yml"
-
 # solace cloud broker
   export SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE="$projectHome/test-runner/files/solace-cloud-account.inventory.yml"
-  export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
   # export TEARDOWN_SOLACE_CLOUD=False
 
 export CLEAN_WORKING_DIR=False
