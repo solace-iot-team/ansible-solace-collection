@@ -80,6 +80,9 @@ options:
                 - "Retrieve all enabled client connection details for the various protocols for the service/broker."
             type: str
             required: no
+        get_dmrClusterConnectionDetails:
+        
+
 
 seealso:
 - module: solace_gather_facts
@@ -185,7 +188,8 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         "get_virtualRouterName",
         "get_serviceSMFMessagingEndpoints",
         "get_bridge_remoteMsgVpnLocations",
-        "get_allClientConnectionDetails"
+        "get_allClientConnectionDetails",
+        "get_dmrClusterConnectionDetails"
     ]
 
     def __init__(self, module):
@@ -455,7 +459,6 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         eps['SMF']['CompressedSMF'] = cmp_smf
         return 'serviceMessagingEndpoints', eps
 
-
     def get_serviceSmfPlainTextListenPort(self, search_dict: dict, vpn: str):
         if search_dict['isSolaceCloud']:
             messaging_protocols = self.get_sc_messaging_protocols(search_dict)
@@ -508,6 +511,12 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
             value = self.get_field(search_dict, 'virtualRouterName')
         return 'virtualRouterName', value
 
+    def get_dmrClusterConnectionDetails(self, search_dict: dict, vpn: str):
+        if search_dict['isSolaceCloud']:
+            value = self.get_field(search_dict, 'cluster')
+        else:
+            raise SolaceInternalError('standalone broker not supported, only solace cloud.')
+        return 'dmrClusterConnectionDetails', value
 
 def run_module():
     module_args = dict(
