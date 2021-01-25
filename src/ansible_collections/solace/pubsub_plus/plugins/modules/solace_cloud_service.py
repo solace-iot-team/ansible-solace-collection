@@ -255,7 +255,7 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
 def run_module():
     module_args = dict(
         name=dict(type='str', required=False, default=None),
-        wait_timeout_minutes=dict(type='int', required=False, default=10)
+        wait_timeout_minutes=dict(type='int', required=False, default=20)
     )
     arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud()
     arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service())

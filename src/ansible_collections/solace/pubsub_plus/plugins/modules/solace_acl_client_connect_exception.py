@@ -13,14 +13,11 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_acl_client_connect_exception
-
 short_description: client connect exception for acl profile
-
 description:
 - "Configure client connect exception objects for an ACL Profile."
 - "Allows addition and removal of client connect exception objects for ACL Profiles."
 - "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfileClientConnectExceptions)."
-
 options:
   name:
     description: Name of the client connect exception address. Maps to 'clientConnectExceptionAddress' in the API.
@@ -30,13 +27,11 @@ options:
     description: The ACL Profile.
     required: true
     type: str
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.state
 - solace.pubsub_plus.solace.settings
-
 author:
   - Mark Street (@mkst)
   - Swen-Helge Huber (@ssh)

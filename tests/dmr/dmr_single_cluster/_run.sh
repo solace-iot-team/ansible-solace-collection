@@ -35,9 +35,6 @@ source $PROJECT_HOME/.lib/functions.sh
   done
   # echo $inventory_line
 
-  # TEST
-  # inventory_line="-i $WORKING_DIR/asc_dmr_cluster_1_node_1.service.inventory.yml"
-
   playbooks=(
     "$scriptDir/main.playbook.yml"
   )

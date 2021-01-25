@@ -2,11 +2,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 ---
-  # services:
-  #   - name: asc_dmr_cluster_1_node_1
-  #   - name: asc_dmr_cluster_1_node_2
-  #   - name: asc_dmr_cluster_1_node_3
-  #
   settings:
     # datacenterId: "aws-eu-west-2a"
     datacenterId: "aws-ca-central-1a"

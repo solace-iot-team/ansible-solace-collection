@@ -443,13 +443,18 @@ class SolaceCloudApi(SolaceApi):
         if wait_timeout_minutes > 0:
             res = self.wait_for_service_create_completion(config, wait_timeout_minutes, resp['serviceId'])
             if "failed" in res:
+
+                import logging
+                logging.debug("***** SERVICE CREATION FAILED HANDLING STARTING ******")
+
+
                 if try_count < 3:
-                    import logging
-                    logging.debug("solace cloud service in failed state - deleting ...")
+                    logging.debug(f"solace cloud service in failed state - deleting service_id={_service_id} ...")
                     _resp = self.delete_service(config, _service_id)
                     logging.debug("creating solace cloud service again ...")
                     _resp = self.create_service(config, wait_timeout_minutes, data, try_count+1)
-                    return self.wait_for_service_create_completion(config, wait_timeout_minutes, resp['serviceId'])
+                    logging.debug(f"new service_id={_resp['serviceId']}")
+                    return self.wait_for_service_create_completion(config, wait_timeout_minutes, _resp['serviceId'])
                 else:
                     r = dict(
                         msg=f"create service: Solace Cloud API failed to create service after {try_count} attempts",
