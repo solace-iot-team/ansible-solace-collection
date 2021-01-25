@@ -1,0 +1,80 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "check.ext-link.tasks: check vars"
+  assert:
+    that:
+      - remote_host_name is defined
+      - dmr_cluster_name is defined
+    fail_msg: "one or more variables not defined"
+
+- name: "setup.ext-link.tasks: solace_get_facts: get_dmrClusterConnectionDetails & get_msgVpnAttributes"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    host: "{{ remote_host_name }}"
+    field_funcs:
+      - get_dmrClusterConnectionDetails
+      - get_msgVpnAttributes
+  register: result
+  no_log: true
+
+- set_fact:
+    remote_address: "{{ result.facts.dmrClusterConnectionDetails.remoteAddress }}"
+    remote_node_name: "{{ result.facts.dmrClusterConnectionDetails.primaryRouterName }}"
+    remote_msg_vpn_name: "{{ result.facts.msgVpnAttributes.vpnName }}"
+
+- name: "setup.ext-link.tasks: solace_get_dmr_cluster_links: monitor - check if up"
+  solace_get_dmr_cluster_links:
+    api: monitor
+    dmr_cluster_name: "{{ dmr_cluster_name }}"
+    query_params:
+      where:
+        - "remoteNodeName=={{ remote_node_name }}"
+  register: result
+  until:
+    - result.result_list[0].up
+  retries: 10
+  delay: 10
+
+- name: "setup.ext-link.tasks: solace_get_dmr_cluster_link_remote_addresses: config"
+  solace_get_dmr_cluster_link_remote_addresses:
+    dmr_cluster_name: "{{ dmr_cluster_name }}"
+    remote_node_name: "{{ remote_node_name }}"
+  register: result
+- assert:
+    that:
+      - result.rc == 0
+      - result.result_list | length == 1
+      - result.result_list_count == 1
+      - result.result_list[0].remoteAddress == "{{ remote_address }}"
+
+- name: "setup.ext-link.tasks: solace_get_dmr_cluster_link_trusted_cns: config"
+  solace_get_dmr_cluster_link_trusted_cns:
+    dmr_cluster_name: "{{ dmr_cluster_name }}"
+    remote_node_name: "{{ remote_node_name }}"
+  register: result
+- assert:
+    that:
+      - result.rc == 0
+      - result.result_list | length == 1
+      - result.result_list_count == 1
+      - result.result_list[0].tlsTrustedCommonName == "{{ dmr_cluster_link_trusted_cn }}"
+
+- name: "setup.ext-link.tasks: solace_get_dmr_bridges: monitor"
+  solace_get_dmr_bridges:
+    api: monitor
+    query_params:
+      where:
+        - "remoteNodeName=={{ remote_node_name }}"
+        - "remoteMsgVpnName=={{ remote_msg_vpn_name }}"
+  register: result
+- assert:
+    that:
+      - result.rc == 0
+      - result.result_list | length == 1
+      - result.result_list_count == 1
+      - result.result_list[0].up
+
+###
+# The End.

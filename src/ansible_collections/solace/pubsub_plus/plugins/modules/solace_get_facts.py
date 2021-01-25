@@ -189,7 +189,8 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         "get_serviceSMFMessagingEndpoints",
         "get_bridge_remoteMsgVpnLocations",
         "get_allClientConnectionDetails",
-        "get_dmrClusterConnectionDetails"
+        "get_dmrClusterConnectionDetails",
+        "get_msgVpnAttributes"
     ]
 
     def __init__(self, module):
@@ -517,6 +518,13 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         else:
             raise SolaceInternalError('standalone broker not supported, only solace cloud.')
         return 'dmrClusterConnectionDetails', value
+
+    def get_msgVpnAttributes(self, search_dict: dict, vpn: str):
+        if search_dict['isSolaceCloud']:
+            value = self.get_field(search_dict, 'msgVpnAttributes')
+        else:
+            raise SolaceInternalError('standalone broker not supported, only solace cloud.')
+        return 'msgVpnAttributes', value
 
 def run_module():
     module_args = dict(

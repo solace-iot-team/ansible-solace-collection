@@ -152,7 +152,7 @@ class SolaceRdpRestConsumerTrustedCommonNameTask(SolaceBrokerCRUDTask):
 
 def run_module():
     module_args = dict(
-        rdp_name=dict(type='str', required=True),
+        rdp_name=dict(type='str', required=True, aliases=['tls_trusted_common_name']),
         rest_consumer_name=dict(type='str', required=True)
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()

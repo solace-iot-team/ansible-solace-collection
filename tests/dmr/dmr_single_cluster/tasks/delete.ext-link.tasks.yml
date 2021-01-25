@@ -2,14 +2,14 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 ---
-- name: "setup.ext-link.tasks: check vars"
+- name: "delete.ext-link.tasks: check vars"
   assert:
     that:
       - remote_host_name is defined
       - dmr_cluster_name is defined
     fail_msg: "one or more variables not defined"
 
-- name: "setup.ext-link.tasks: solace_get_facts: get_dmrClusterConnectionDetails & get_msgVpnAttributes"
+- name: "delete.ext-link.tasks: solace_get_facts: get_dmrClusterConnectionDetails & get_msgVpnAttributes"
   solace_get_facts:
     hostvars: "{{ hostvars }}"
     host: "{{ remote_host_name }}"
@@ -25,47 +25,38 @@
     remote_node_name: "{{ result.facts.dmrClusterConnectionDetails.primaryRouterName }}"
     remote_msg_vpn_name: "{{ result.facts.msgVpnAttributes.vpnName }}"
 
-- name: "setup.ext-link.tasks: solace_dmr_cluster_link: create external link"
+- name: "delete.ext-link.tasks: solace_dmr_cluster_link: disable"
   solace_dmr_cluster_link:
     remote_node_name: "{{ remote_node_name }}"
     dmr_cluster_name: "{{ dmr_cluster_name }}"
     settings:
       enabled: false
-      span: external
-      authenticationScheme: basic
-      authenticationBasicPassword: "{{ remote_password }}"
-      # initiator: local
     state: present
 
-- name: "setup.ext-link.tasks: solace_dmr_cluster_link_remote_address: add"
-  solace_dmr_cluster_link_remote_address:
-    remote_address: "{{ remote_address }}"
+- name: "delete.ext-link.tasks: solace_dmr_bridge: delete"
+  solace_dmr_bridge:
     remote_node_name: "{{ remote_node_name }}"
-    dmr_cluster_name: "{{ dmr_cluster_name }}"
-    state: present
+    state: absent
 
-- name: "setup.ext-link.tasks: solace_dmr_cluster_link_trusted_cn: add"
+- name: "delete.ext-link.tasks: solace_dmr_cluster_link_trusted_cn: delete"
   solace_dmr_cluster_link_trusted_cn:
     name: "{{ dmr_cluster_link_trusted_cn }}"
     remote_node_name: "{{ remote_node_name }}"
     dmr_cluster_name: "{{ dmr_cluster_name }}"
-    state: present
+    state: absent
 
-- name: "setup.ext-link.tasks: solace_dmr_bridge: create"
-  solace_dmr_bridge:
+- name: "delete.ext-link.tasks: solace_dmr_cluster_link_remote_address: add"
+  solace_dmr_cluster_link_remote_address:
+    remote_address: "{{ remote_address }}"
     remote_node_name: "{{ remote_node_name }}"
-    settings:
-      remoteMsgVpnName: "{{ remote_msg_vpn_name }}"
-    state: present
+    dmr_cluster_name: "{{ dmr_cluster_name }}"
+    state: absent
 
-- name: "setup.ext-link.tasks: solace_dmr_cluster_link: enable"
+- name: "delete.ext-link.tasks: solace_dmr_cluster_link: delete"
   solace_dmr_cluster_link:
     remote_node_name: "{{ remote_node_name }}"
     dmr_cluster_name: "{{ dmr_cluster_name }}"
-    settings:
-      enabled: true
-    state: present
-
+    state: absent
 
 ###
 # The End.
