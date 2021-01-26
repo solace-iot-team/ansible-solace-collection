@@ -71,6 +71,9 @@ See Also
 {%     if spec.choices %}
   {{ "  " * level }}| **choices**: {{ ", ".join(spec.choices) }}
 {%     endif %}
+{%     if spec.aliases %}
+  {{ "  " * level }}| **aliases**: {{ ", ".join(spec.aliases) }}
+{%     endif %}
 
 {%     if spec.suboptions %}
 {{ option_desc(spec.suboptions, level + 1) }}

@@ -74,7 +74,7 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-    solace_bridge_tls_cn:
+    solace_bridge_trusted_cn:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -208,8 +208,8 @@
           enabled: true
         state: present
 
-    - name: "main: solace_bridge_tls_cn: add"
-      solace_bridge_tls_cn:
+    - name: "main: solace_bridge_trusted_cn: add"
+      solace_bridge_trusted_cn:
         name: foo
         bridge_name: "{{ bridge_name }}"
 

@@ -218,7 +218,7 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
     @staticmethod
     def arg_spec_solace_cloud() -> dict:
         return dict(
-            solace_cloud_api_token=dict(type='str', required=True, no_log=True, default=None, aliases=['api_token']),
+            solace_cloud_api_token=dict(type='str', required=True, no_log=True, aliases=['api_token']),
             timeout=dict(type='int', default='60', required=False)
         )
 

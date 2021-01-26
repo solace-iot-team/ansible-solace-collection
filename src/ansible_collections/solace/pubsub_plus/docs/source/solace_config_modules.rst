@@ -17,8 +17,8 @@ Solace Configuration Module Reference
 
    modules/solace_acl_*
    modules/solace_bridge*
-   modules/solace_client*
    modules/solace_cert_authority*
+   modules/solace_client*
    modules/solace_dmr_*
    modules/solace_get_acl*
    modules/solace_get_bridge*

@@ -69,7 +69,7 @@ options:
     type: str
 '''
 
-    SOLACE_CLOUD_CONFIG = r'''
+    BROKER_CONFIG_SOLACE_CLOUD = r'''
 options:
   solace_cloud_api_token:
     description:
@@ -85,6 +85,22 @@ options:
       - Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
     type: str
     required: false
+'''
+
+    SOLACE_CLOUD_CONFIG_SOLACE_CLOUD = r'''
+options:
+  solace_cloud_api_token:
+    description:
+      - The API Token.
+      - Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+    type: str
+    required: true
+    aliases: [api_token]
+  timeout:
+    description: Connection timeout in seconds for the http request.
+    required: false
+    default: 60
+    type: int
 '''
 
     SOLACE_CLOUD_SERVICE_CONFIG = r'''
