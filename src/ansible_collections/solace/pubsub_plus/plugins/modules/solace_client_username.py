@@ -13,30 +13,22 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_client_username
-TODO: re-work doc
 short_description: client username
-
 description:
-  - "Configure a client username object on a message vpn. Allows addition, removal and configuration of client username objects in an idempotent manner."
-
-notes:
-  - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientUsername."
-
+- "Configure a client username object on a message vpn. Allows addition, removal and configuration of client username objects in an idempotent manner."
+- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientUsername."
 seealso:
 - module: solace_get_client_usernames
-
 options:
   name:
     description: The client username. Maps to 'clientUsername' in the API.
     type: str
     required: true
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -48,14 +40,14 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-    solace_client_username:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
-        msg_vpn: "{{ vpn }}"
+  solace_client_username:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
 tasks:
   - name: remove
     solace_client_username:
@@ -64,15 +56,15 @@ tasks:
 
   - name: add
     solace_client_username:
-        name: foo
-        settings:
-            password: the-password
+      name: foo
+      settings:
+        password: the-password
 
   - name: update password
     solace_client_username:
-        name: foo
-        settings:
-            password: my-new-password
+      name: foo
+      settings:
+        password: my-new-password
 '''
 
 RETURN = '''
@@ -80,6 +72,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys

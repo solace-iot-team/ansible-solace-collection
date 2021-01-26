@@ -13,25 +13,22 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_acl_profile
-
 short_description: configure acl profile
-
 description:
 - "Configure an ACL Profile on a message vpn. Allows addition, removal and configuration of ACL Profile(s) on Solace Brokers in an idempotent manner."
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile)."
-
+- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile."
+seealso:
+- module: solace_get_acl_profiles
 options:
     name:
         description: Name of the ACL Profile. Maps to 'aclProfileName' in the API.
         type: str
         required: true
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
 author:
   - Mark Street (@mkst)
   - Swen-Helge Huber (@ssh)
@@ -45,32 +42,29 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-    solace_acl_profile:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
-        msg_vpn: "{{ vpn }}"
+  solace_acl_profile:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
 tasks:
   - name: Remove ACL Profile
     solace_acl_profile:
-      name: "{{ acl_profile }}"
-      msg_vpn: "{{ msg_vpn }}"
+      name: foo
       state: absent
 
   - name: Add ACL Profile
     solace_acl_profile:
-      name: "{{ acl_profile }}"
-      msg_vpn: "{{ msg_vpn }}"
+      name: foo
       settings:
         clientConnectDefaultAction: allow
 
   - name: Update ACL Profile
     solace_acl_profile:
-      name: "{{ acl_profile }}"
-      msg_vpn: "{{ msg_vpn }}"
+      name: foo
       settings:
         publishTopicDefaultAction: allow
 '''

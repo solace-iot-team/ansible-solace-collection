@@ -13,16 +13,12 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_acl_publish_topic_exception
-
 short_description: publish topic exception for acl profile
-
 description:
 - "Configure a publish topic exception object for an ACL Profile."
 - "Allows addition and removal of a publish topic exception object for an ACL Profile."
-- "Supported versions: [ <=2.13, >=2.14 ]."
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfilePublishTopicException)."
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfilePublishException)."
-
+- "Reference (>=2.14): U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfilePublishTopicException)."
+- "Reference (<=2.13): U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfilePublishException)."
 options:
   name:
     description: The name (topic) of the publish topic exception. Maps to 'publishTopicException' in the SEMP v2 API.
@@ -40,16 +36,13 @@ options:
     choices:
       - smf
       - mqtt
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.state
 - solace.pubsub_plus.solace.settings
-
 seealso:
 - module: solace_acl_profile
-
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -61,23 +54,22 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-    solace_gather_facts:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
-        solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
-        solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-    solace_acl_profile:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
-        msg_vpn: "{{ vpn }}"
+ solace_acl_profile:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
+ solace_acl_publish_topic_exception:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
 tasks:
   - name: Create ACL Profile
     solace_acl_profile:

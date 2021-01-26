@@ -12,24 +12,22 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: solace_bridge_tls_cn
-TODO: re-work doc
+module: solace_bridge_trusted_cn
 short_description: trusted common name for bridge
-
 description:
   - "Allows addition and removal of trusted commonn name objects on a bridge in an idempotent manner."
   - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeTlsTrustedCommonName."
-
 options:
   name:
     description: The trusted common name. Maps to 'tlsTrustedCommonName' in the API.
     required: true
     type: str
+    aliases: [tls_trusted_common_name]
   bridge_name:
     description: The bridge.
     required: true
     type: str
-  virtual_router:
+  bridge_virtual_router:
     description: The virtual router.
     required: false
     type: str
@@ -38,13 +36,12 @@ options:
       - primary
       - backup
       - auto
-
+    aliases: [virtual_router]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -56,7 +53,15 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-  solace_bridge_tls_cn:
+  solace_bridge:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
+  solace_bridge_trusted_cn:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -65,18 +70,24 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
+  - name: create a bridge - disabled
+    solace_bridge:
+      name: the_bridge
+      settings:
+        enabled: false
+      state: present
+
   - name: Remove Trusted Common Name
-    solace_bridge_tls_cn:
-      name: foo
-      bridge_name: bar
-      virtual_router: auto
+    solace_bridge_trusted_cn:
+      name: "*.my.domain.com"
+      bridge_name: the_bridge
       state: absent
 
   - name: Add Trusted Common Name
-    solace_bridge_tls_cn:
-      name: foo
+    solace_bridge_trusted_cn:
+      name: "*.my.domain.com"
       bridge_name: bar
-      virtual_router: auto
+      state: present
 '''
 
 RETURN = '''
@@ -84,6 +95,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -132,9 +156,9 @@ class SolaceBridgeTrustedCommonNameTask(SolaceBrokerCRUDTask):
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True),
+        name=dict(type='str', required=True, aliases=['tls_trusted_common_name']),
         bridge_name=dict(type='str', required=True),
-        bridge_virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto'])
+        bridge_virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto'], aliases=['virtual_router'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
@@ -148,6 +172,7 @@ def run_module():
 
     solace_task = SolaceBridgeTrustedCommonNameTask(module)
     solace_task.execute()
+
 
 def main():
     run_module()

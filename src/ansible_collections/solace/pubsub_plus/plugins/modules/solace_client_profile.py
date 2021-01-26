@@ -13,39 +13,28 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_client_profile
-
-TODO: rework doc
-
 short_description: client profile
-
 description:
 - "Configure a Client Profile object. Allows addition, removal and configuration of Client Profile objects on Solace Brokers in an idempotent manner."
 - "Supports Solace Cloud Brokers as well as Solace Standalone Brokers."
-
-notes:
 - "Solace Cloud: Polls periodically until Client Profile created and only then returns."
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile)."
-- "Reference: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_client_profiles.htm)."
-
+- "Reference (Sempv2): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile."
+- "Reference (Solace Cloud API): https://docs.solace.com/Solace-Cloud/ght_use_rest_api_client_profiles.htm."
 seealso:
 - module: solace_get_client_profiles
-
 options:
   name:
     description: Name of the client profile. Maps to 'clientProfileName' in the API.
     type: str
     required: true
     aliases: [client_profile, client_profile_name]
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-- solace.pubsub_plus.solace.solace_cloud_config
-
+- solace.pubsub_plus.solace.broker_config_solace_cloud
 author:
-  - Mark Street (@mkst)
   - Swen-Helge Huber (@ssh)
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -57,48 +46,55 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-    solace_client_profile:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
-        msg_vpn: "{{ vpn }}"
-        solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
-        solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+  solace_client_profile:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
+    solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+    solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 tasks:
-
   - name: Delete Client Profile
     solace_client_profile:
-        name: "test_ansible_solace"
+        name: foo
         state: absent
 
   - name: Create Client Profile
     solace_client_profile:
-        name: "test_ansible_solace"
+        name: foo
         state: present
 
   - name: Update Client Profile
     solace_client_profile:
-        name: "test_ansible_solace"
+        name: foo
         settings:
           allowGuaranteedMsgSendEnabled: true
           allowGuaranteedMsgReceiveEnabled: true
           allowGuaranteedEndpointCreateEnabled: true
         state: present
-
-  - name: Delete Client Profile
-    solace_client_profile:
-        name: "test_ansible_solace"
-        state: absent
 '''
 
 RETURN = '''
 response:
-    description: The response from the Solace Sempv2 / Solace Cloud request.
+    description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -188,7 +184,7 @@ class SolaceClientProfileTask(SolaceBrokerCRUDTask):
         mandatory = {
             self.OBJECT_KEY: client_profile_name
         }
-        data = current_settings        
+        data = current_settings
         data.update(mandatory)
         data.update(settings if settings else {})
         body = self._compose_request_body(operation='update', operation_type=self.OPERATION, settings=data)

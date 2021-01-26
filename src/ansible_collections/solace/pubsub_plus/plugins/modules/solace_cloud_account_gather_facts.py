@@ -13,115 +13,114 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_cloud_account_gather_facts
-
-TODO: re-work documentation
-
 short_description: Facts from all services in Solace Cloud Account.
-
-description: >
-  Retrieves service info (facts) about all services available in the Solace Cloud Account.
-  Stores the facts in: ['ansible_facts']['solace_cloud_accounts'][{service-name}].
-  Use to retrieve the SEMP endpoints for a Solace Cloud service as inputs for other modules.
-
+description:
+- "Retrieves service info (facts) about all services available in the Solace Cloud Account."
+- "For example, use to retrieve the SEMP endpoints for a Solace Cloud service as inputs for other modules."
+- "Reference (Solace Cloud API): https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm."
 seealso:
   - module: solace_cloud_get_facts
   - module: solace_get_facts
-
-notes:
-- "Reference: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm)."
-
 options:
-    account_name:
-        description:
-            - The host specified in the inventory. Represents the Solace Cloud Account.
-            - "Note: Only used internally in the playbooks, so you can choose whichever name makes sense in your case."
-        required: true
-        type: str
-        aliases:
-            - name
-    return_format:
-        description:
-            - The format of the returned JSON. Either as a JSON object or a JSON array.
-            - "Note: Use 'dict' when you want to access the facts in a playbook by account_name (i.e. 'inventory_hostname') directly."
-            - "Note: Use 'list' when you want to iterate over each service in your playbook."
-        required: true
-        type: str
-        choices:
-            - dict
-            - list
-
+  account_name:
+    description:
+      - The host specified in the inventory. Represents the Solace Cloud Account.
+      - "Note: Only used internally in the playbooks, so you can choose whichever name makes sense in your case."
+    required: true
+    type: str
+    aliases: [name]
+  return_format:
+    description:
+      - The format of the returned JSON. Either as a JSON object or a JSON array.
+      - "Note: Use 'dict' when you want to access the facts in a playbook by account_name (i.e. 'inventory_hostname') directly."
+      - "Note: Use 'list' when you want to iterate over each service in your playbook."
+    required: true
+    type: str
+    choices: [dict, list]
 extends_documentation_fragment:
-- solace.pubsub_plus.solace.solace_cloud_service_config
-
-author: Ricardo Gomez-Ulmke (@rjgu)
+- solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
+author:
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
+hosts: all
+gather_facts: no
+any_errors_fatal: true
+collections:
+- solace.pubsub_plus
+tasks:
 - name: "Solace Cloud Account: Gather Facts as Dict"
   solace_cloud_account_gather_facts:
     api_token: "{{ api_token_all_permissions }}"
     account_name: "{{ inventory_hostname }}"
     return_format: dict
-  register: sca_facts_dict_result
+  register: result
 
-- name: "Save Facts Dict: Solace Cloud Account"
-  local_action:
-    module: copy
-    content: "{{ sca_facts_dict_result | to_nice_json }}"
+- name: "Save Facts dict: Solace Cloud Account"
+  copy:
+    content: "{{ result | to_nice_json }}"
     dest: "./tmp/facts.dict.solace_cloud_account.{{ inventory_hostname }}.json"
+  delegate_to: localhost
 
 - name: "Set Fact as Dict: Solace Cloud Account Services"
   set_fact:
-    sca_services_dict_facts: "{{ sca_facts_dict_result.ansible_facts.solace_cloud_accounts[inventory_hostname].services }}"
-  no_log: true
+    dict_facts: "{{ result.ansible_facts.solace_cloud_accounts[inventory_hostname].services }}"
 
 - name: "Solace Cloud Account: Gather Facts as List"
   solace_cloud_account_gather_facts:
     api_token: "{{ api_token_all_permissions }}"
     account_name: "{{ inventory_hostname }}"
     return_format: list
-  register: sca_facts_list_result
+  register: result
 
 - name: "Save Facts List: Solace Cloud Account"
-  local_action:
-    module: copy
-    content: "{{ sca_facts_list_result | to_nice_json }}"
+  copy:
+    content: "{{ result | to_nice_json }}"
     dest: "./tmp/facts.list.solace_cloud_account.{{ inventory_hostname }}.json"
+  delegate_to: localhost
 
-- name: "Set Fact: Solace Cloud Account Services"
+- name: "Set Fact as List: Solace Cloud Account Services"
   set_fact:
-    sca_services_list_facts: "{{ sca_facts_list_result.ansible_facts.solace_cloud_accounts[inventory_hostname].services }}"
-  no_log: true
+    list_facts: "{{ result.ansible_facts.solace_cloud_accounts[inventory_hostname].services }}"
 
-- name: "Loop: Get Service for all Services By serviceId"
+- name: "Loop: Get Service Info for all Services By serviceId"
   solace_cloud_get_service:
     api_token: "{{ api_token_all_permissions }}"
     service_id: "{{ sc_service.serviceId }}"
-  loop: "{{ sca_services_list_facts }}"
+  loop: "{{ list_facts }}"
   loop_control:
-    loop_var: sc_service
-    index_var: sc_service_i
-    label: "[by serviceId] Service: name={{ sc_service.name }}, id={{ sc_service.serviceId }}"
-
-
+    loop_var: service
+    label: "[by serviceId] Service: name={{ service.name }}, id={{ service.serviceId }}"
 '''
 
 RETURN = '''
-    rc:
-        description: return code, either 0 (ok), 1 (not ok)
-        type: int
-        returned: always
-        sample:
+solace_cloud_account:
+    description: Contains the info from the Solace Cloud account by {_account_name_}.
+    type: dict
+    returned: success
+    sample:
+      solace_cloud_account:
+        _account_name_:
+          data_centers:
+            _data_center_id_1_: "... data center info ..."
+            _data_center_id_2_: "... data center info ..."
+          services:
+            _service_name_1_: "... service info  ..."
+            _service_name_2_: "... service info  ..."
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
             rc: 0
-    msg:
-        description: error message if not ok
-        type: str
-        returned: error
-    
-    response: - not correct
-        description: The response from the GET {serviceId} call. Differs depending on state of service.
-        type: dict
-        returned: success
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -160,21 +159,21 @@ class SolaceCloudAccountGatherFactsTask(SolaceCloudGetTask):
 
         services = self.get_solace_cloud_api().get_services_with_details(self.get_config())
         data_centers = self.get_solace_cloud_api().get_data_centers(self.get_config())
-        
+
         if return_format == 'dict':
             for service in services:
-                    name = service['name']
-                    facts['services'][name] = service
+                name = service['name']
+                facts['services'][name] = service
             for data_center in data_centers:
-                    id = data_center['id']
-                    facts['data_centers'][id] = data_center
+                id = data_center['id']
+                facts['data_centers'][id] = data_center
         else:
             facts['services'] = services
             facts['data_centers'] = data_centers
 
         result = self.create_result()
         result.update(dict(
-            solace_cloud_account = { account_name: facts }
+            solace_cloud_account={account_name: facts}
         ))
         return None, result
 

@@ -13,14 +13,11 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_acl_subscribe_share_name_exception
-
 short_description: subscribe share name exception for acl profile
-
 description:
 - "Configure Subscribe Share Name Exeption objects for an ACL Profile."
 - "Allows addition and removal of Subscribe Share Name Exception objects for ACL Profiles."
 - "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfileSubscribeShareNameExceptions)."
-
 options:
   name:
     description: Name of the subscribe share name exception topic. Maps to 'subscribeShareNameException' in the API.
@@ -38,16 +35,12 @@ options:
     choices:
       - smf
       - mqtt
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.state
 - solace.pubsub_plus.solace.settings
-
 author:
-  - Mark Street (@mkst)
-  - Swen-Helge Huber (@ssh)
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
 
@@ -58,7 +51,15 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-solace_acl_subscribe_share_name_exception:
+  solace_acl_profile:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
+  solace_acl_subscribe_share_name_exception:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -67,19 +68,24 @@ solace_acl_subscribe_share_name_exception:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
+  - name: Create ACL Profile
+    solace_acl_profile:
+      name: foo
+      settings:
+        subscribeShareNameDefaultAction: "disallow"
+      state: present
+
   - name: Remove
     solace_acl_subscribe_share_name_exception:
-        name: "foo/bar"
-        acl_profile_name: "{{ acl_profile }}"
-        msg_vpn: "{{ msg_vpn }}"
-        state: absent
+      name: "bar"
+      acl_profile_name: foo
+      state: absent
 
   - name: Add
     solace_acl_subscribe_share_name_exception:
-        name: "foo/bar"
-        acl_profile_name: "{{ acl_profile }}"
-        msg_vpn: "{{ msg_vpn }}"
-        state: present
+      name: "bar"
+      acl_profile_name: foo
+      state: present
 '''
 
 RETURN = '''
@@ -88,8 +94,8 @@ response:
     type: dict
     returned: success
     sample:
-        aclProfileName: test_ansible_solace
-        subscribeShareNameException: foo
+        aclProfileName: foo
+        subscribeShareNameException: bar
         msgVpnName: default
         subscribeShareNameExceptionSyntax: smf
 msg:

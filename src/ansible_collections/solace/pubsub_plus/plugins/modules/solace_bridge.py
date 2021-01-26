@@ -13,21 +13,18 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_bridge
-TODO: re-work doc
 short_description: bridge
-
 description:
   - "Configure a Bridge object. Allows addition, removal and update of a Bridge Object in an idempotent manner."
-
-notes:
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge)."
-
+  - "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge)."
+seealso:
+- module: solace_get_bridges  
 options:
   name:
     description: The bridge name. Maps to 'bridgeName' in the API.
     required: true
     type: str
-  virtual_router:
+  bridge_virtual_router:
     description: The virtual router.
     required: false
     type: str
@@ -36,13 +33,12 @@ options:
       - primary
       - backup
       - auto
-
+    aliases: [virtual_router]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -92,6 +88,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -144,7 +153,7 @@ class SolaceBridgeTask(SolaceBrokerCRUDTask):
 
 def run_module():
     module_args = dict(
-        virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto'])
+        bridge_virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto'], aliases=['virtual_router'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())

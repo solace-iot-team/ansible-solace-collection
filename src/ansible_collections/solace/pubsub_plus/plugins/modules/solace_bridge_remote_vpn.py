@@ -13,15 +13,12 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_bridge_remote_vpn
-TODO: re-work doc
 short_description: bridge remote vpn
-
 description:
-- "Configure a Remote Message VPN object on a bridge.. Allows addition and removal of Remote Message VPN objects on a bridge in an idempotent manner."
-
-notes:
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeRemoteMsgVpn)."
-
+- "Configure a Remote Message VPN object on a bridge. Allows addition and removal of Remote Message VPN objects on a bridge in an idempotent manner."
+- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeRemoteMsgVpn."
+seealso:
+- module: solace_get_bridge_remote_vpns
 options:
   name:
     description: The remote message VPN name on the remote broker. Maps to 'remoteMsgVpnName' in the API.
@@ -50,13 +47,11 @@ options:
     description: The remote message VPN interface. Maps to 'remoteMsgVpnInterface' in the API.
     required: false
     type: str
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
 author:
   - Ricardo Gomez-Ulmke (@rjgu))
 '''
@@ -68,6 +63,14 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
+  solace_bridge:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
   solace_bridge_remote_vpn:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
@@ -77,24 +80,30 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
+  - name: create a bridge - disabled
+    solace_bridge:
+      name: the_bridge
+      settings:
+        enabled: false
+      state: present
+
   - name: Add Remote Message VPN to Bridge
     solace_bridge_remote_vpn:
       remote_msg_vpn_name: "{{ remote_vpn.remote_msg_vpn_name }}"
-      bridge_name: "{{ bridge_name }}"
+      bridge_name: the_bridge
       bridge_virtual_router: auto
       remote_vpn_location: "{{ remote_vpn.remote_vpn_location }}"
       settings:
         enabled: true
-        queueBinding: "ansible-solace__test_bridge"
+        queueBinding: "an-existing-queue"
       state: present
 
   - name: Remove Bridge Remote VPN
     solace_bridge_remote_vpn:
       remote_msg_vpn_name: "{{ remote_vpn.remote_msg_vpn_name }}"
-      bridge_name: "{{ bridge_name }}"
+      bridge_name: the_bridge
       remote_vpn_location: "{{ remote_vpn.remote_vpn_location }}"
       state: absent
-
 '''
 
 RETURN = '''
@@ -102,6 +111,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -160,8 +182,9 @@ class SolaceBridgeRemoteVpnTask(SolaceBrokerCRUDTask):
 
 def run_module():
     module_args = dict(
+        name=dict(type='str', required=True, aliases=['remote_msg_vpn_name']),
         bridge_name=dict(type='str', required=True),
-        bridge_virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto']),
+        bridge_virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto'], aliases=['virtual_router']),
         remote_vpn_location=dict(type='str', required=True),
         remote_vpn_interface=dict(type='str', default=None, required=False)
     )

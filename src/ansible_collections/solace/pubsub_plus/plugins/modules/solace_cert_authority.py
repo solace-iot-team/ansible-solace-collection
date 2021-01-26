@@ -13,36 +13,26 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_cert_authority
-
-TODO: re-work doc
-
-Note: uses deprecated API, since 2.19: clientCertAuthority & domainCertAuthority - raise an issue if you need those instead
-
 short_description: certificate authority
-
 description:
 - "Allows addition, removal and configuration of certificate authority objects on Solace Brokers in an idempotent manner."
-
+- "Supports standalone brokers and Solace Cloud."
+- "Reference (Sempv2): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority."
+- "Reference (Solace Cloud API): not available"
 notes:
-- "Solace Cloud currently does not support managing certificate authorities."
-- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority."
-
+- "Uses deprecated SempV2 API. Since 2.19, broker supports 'clientCertAuthority' & 'domainCertAuthority' instead. Raise an issue if these are required."
+seealso:
+- module: solace_get_cert_authorities
 options:
-    name:
-        description: The name of the Certificate Authority. Maps to 'certAuthorityName' in the API.
-        required: true
-        type: str
-    cert_content:
-        description: The certificate.
-        required: false
-        default: ''
-        type: str
-
+  name:
+    description: The name of the Certificate Authority. Maps to 'certAuthorityName' in the Sempv2 API.
+    required: true
+    type: str
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+- solace.pubsub_plus.solace.broker_config_solace_cloud
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -54,20 +44,22 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-    solace_cert_authority:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
+  solace_cert_authority:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+    solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 tasks:
   - name: set files
     set_fact:
       cert_key_file: ./tmp/key.pem
       cert_file: ./tmp/cert.pem
 
-  - name: create certificate
+  - name: generate certificate
     command: >
       openssl req
       -x509
@@ -81,15 +73,15 @@ tasks:
 
   - name: add
     solace_cert_authority:
-      name: bar
-      cert_content: "{{ lookup('file', cert_file) }}"
+      name: foo
       settings:
+        certContent: "{{ lookup('file', cert_file) }}"
         revocationCheckEnabled: false
       state: present
 
   - name: remove
     solace_cert_authority:
-      name: bar
+      name: foo
       state: absent
 '''
 
@@ -98,6 +90,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -127,7 +132,7 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
         params = self.get_module().params
         name = params['name']
         if '-' in name:
-            raise SolaceParamsValidationError('name', name, f"must not contain '-'")
+            raise SolaceParamsValidationError('name', name, "must not contain '-'")
 
     def get_args(self):
         params = self.get_module().params
@@ -187,7 +192,7 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
             }
         }
         if cert_content:
-            body['certificate'].update({ 'content': cert_content})
+            body['certificate'].update({'content': cert_content})
         body.update(settings if settings else {})
         service_id = self.get_config().get_params()['solace_cloud_service_id']
         path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']

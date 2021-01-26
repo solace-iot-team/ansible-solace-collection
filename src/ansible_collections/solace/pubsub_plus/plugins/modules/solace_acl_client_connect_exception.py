@@ -24,7 +24,7 @@ options:
     required: true
     type: str
   acl_profile_name:
-    description: The ACL Profile.
+    description: The ACL Profile name.
     required: true
     type: str
 extends_documentation_fragment:
@@ -45,7 +45,15 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-solace_acl_client_connect_exception:
+  solace_acl_profile:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
+  solace_acl_client_connect_exception:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -54,19 +62,24 @@ solace_acl_client_connect_exception:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
+  - name: Create ACL Profile
+    solace_acl_profile:
+      name: foo
+      settings:
+        clientConnectDefaultAction: "disallow"
+      state: present
+
   - name: Remove ACL Client Connect Exception
     solace_acl_client_connect_exception:
-        name: "{{client_address}}"
-        acl_profile_name: "{{ acl_profile }}"
-        msg_vpn: "{{ msg_vpn }}"
-        state: absent
+      name: "{{client_address}}"
+      acl_profile_name: foo
+      state: absent
 
   - name: Add ACL Client Connect Exception
     solace_acl_client_connect_exception:
-        name: "{{client_address}}"
-        acl_profile_name: "{{ acl_profile }}"
-        msg_vpn: "{{ msg_vpn }}"
-        state: present
+      name: "{{client_address}}"
+      acl_profile_name: foo
+      state: present
 '''
 
 RETURN = '''
