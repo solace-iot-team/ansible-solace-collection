@@ -13,38 +13,19 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_cloud_get_service
-
-TODO: rework documentation
-
-short_description: Get the Solace Cloud Service details.
-
-description: Get the Solace Cloud Service details by name or serviceId.
-
-notes:
-- "Reference: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm)."
-
-options:
-  name:
-    description:
-        - The name of the service.
-        - "Note: If name is not provided, service_id must."
-    required: false
-    type: str
-  service_id:
-    description:
-        - The service id.
-        - "Note: If service_id is not provided, name must."
-    required: false
-    type: str
-
+short_description: get Solace Cloud service details
+description:
+- Get the Solace Cloud Service details by service id.
+- "Reference (Solace Cloud API): https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm."
 extends_documentation_fragment:
-- solace.pubsub_plus.solace.solace_cloud_service_config
-
+- solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
+- solace.pubsub_plus.solace.solace_cloud_service_config_service_id
 seealso:
+- module: solace_cloud_get_services
 - module: solace_cloud_service
-
-author: Ricardo Gomez-Ulmke (@rjgu)
-
+- module: solace_cloud_get_facts
+author:
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -54,47 +35,50 @@ EXAMPLES = '''
   collections:
     - solace.pubsub_plus
   tasks:
+    - set_fact:
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+        service_id: "the-service-id"
+
     - name: "Get service details"
       solace_cloud_get_service:
-        api_token: "{{ api_token_all_permissions }}"
-        service_id: "{{ sc_service_created_id }}"
-      register: get_service_result
+        api_token: "{{ api_token }}"
+        service_id: "{{ service_id }}"
+      register: result
 
     - set_fact:
-        sc_service_created_info: "{{ result.response }}"
+        service_info: "{{ result.response }}"
+        service_name: "{{ result.response.name }}"
+        admin_state: "{{ result.response.adminState }}"
 
-    - name: "Save Solace Cloud Service Facts to File"
+    - name: "Save Solace Cloud Service Info to File"
       copy:
-        content: "{{ sc_service_created_info | to_nice_json }}"
-        dest: "./tmp/facts.solace_cloud_service.{{ sc_service.name }}.json"
+        content: "{{ service_info | to_nice_json }}"
+        dest: "./tmp/solace_cloud.service_info.{{ service_name }}.json"
       delegate_to: localhost
 '''
 
 RETURN = '''
-
+response:
+    description: The response from the get call. Content differs depending on state of service.
+    type: dict
+    returned: success
+    sample:
+        name: "the-service-name"
+        serviceId: "the-service-id"
+        adminState: "the-admin-state"
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
 rc:
-    description: return code, either 0 (ok), 1 (not ok)
+    description: Return code. rc=0 on success, rc=1 on error.
     type: int
     returned: always
     sample:
-        rc: 0
-msg:
-    description: error message if not ok
-    type: str
-    returned: error
-response:
-    description: The response from the get call. Differs depending on state of service.
-    type: complex
-    returned: success
-    contains:
-        serviceId:
-            description: The service Id of the created service
-            returned: if service exists
-            type: str
-        adminState:
-            description: The state of the service
-            returned: if service exists
-            type: str
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -123,8 +107,8 @@ def run_module():
 
     module_args = dict(
     )
-    arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud()
-    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service())
+    arg_spec = SolaceTaskSolaceCloudConfig.arg_spec_solace_cloud()
+    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service_id())
     arg_spec.update(module_args)
 
     module = AnsibleModule(

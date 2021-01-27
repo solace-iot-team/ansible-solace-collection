@@ -103,19 +103,15 @@ options:
     type: int
 '''
 
-    SOLACE_CLOUD_SERVICE_CONFIG = r'''
+    SOLACE_CLOUD_SERVICE_CONFIG_SERVICE_ID = r'''
 options:
-  api_token:
+  solace_cloud_service_id:
     description:
-      - The API Token.
-      - Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+      - The service id of a service in Solace Cloud.
+      - Click on the service in Solace Cloud - the service id is in the URL.
     type: str
-    required: true
-  timeout:
-    description: Connection timeout in seconds for the http/s request.
     required: false
-    default: 60
-    type: int
+    aliases: [service_id]
 '''
 
     VIRTUAL_ROUTER = r'''

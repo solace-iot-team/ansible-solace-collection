@@ -101,11 +101,13 @@ Parameters
 
   {{ "  " * level }}| **returned**: {{ ret }}
   {{ "  " * level }}| **type**: {{ typ }}
+{% if spec.sample is defined %}
   {{ "  " * level }}| **sample**:
 
   {{ "  " * level }}.. code-block:: json
 
   {{ sample|tojson(indent=2) | indent(3, True) }}
+{% endif %}
 
 {%     if spec.contains %}
 {{ result_desc(spec.contains, level + 1) }}

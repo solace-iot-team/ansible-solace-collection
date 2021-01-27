@@ -13,46 +13,47 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_cloud_service
-short_description: "Create & delete Solace Cloud services."
-description: >
-    Create & delete Solace Cloud services.
-    Note that you can't change a service once it has been created.
-    Only option: delete & re-create.
+short_description: manage Solace Cloud services
+description:
+- Create & delete Solace Cloud services.
+- "Note that you can't change a service once it has been created. Only option: delete & re-create."
+- Creating a service in Solace Cloud is a long-running process. In case creation fails, module will delete the service and try again, up to 3 times.
+- "Reference: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm."
 notes:
 - "The Solace Cloud API does not support updates to a service. Hence, changes are not supported here."
-TODO
-- "Creating a service in Solace Cloud is a long-running process. See examples for checking until completed."
-- "Reference: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm)."
-
 options:
-
-wait_timeout_minutes:
-    = 0 ==> no waiting
-    > 0 ==> waiting, polling every 30 seconds
-
-
   name:
     description:
-        - The name of the service to manage. Mandatory for state='present'.
-        - "Note: The name must be a key, it is used as a YAML / JSON key. Use only ASCII, '-', or '_'. No whitespaces."
+    - The name of the service to manage. Mandatory for state='present'.
+    - "Note: The name must be a key, it is used as a YAML / JSON key. Use only ASCII, '-', or '_'. No whitespaces."
     type: str
     required: false
-  service_id:
-    description: The service-id of the service to manage. Allowed option for state='absent'.
+  solace_cloud_service_id:
+    description:
+    - The service id of a service in Solace Cloud.
+    - Allowed option for state='absent'
     type: str
     required: false
+    aliases: [service_id]
+  wait_timeout_minutes:
+    description:
+    - Minutes to wait until service is created. Module polls every 30 seconds to check on service state.
+    - wait_timeout_minutes == 0 ==> no waiting, module returns immediately.
+    - wait_timeout_minutes > 0 ==> waits, polls every 30 seconds until service request completed.
+    type: int
+    required: false
+    default: 20
   settings:
     description:
-        - Additional settings for state=present. See Reference documentation output of M(solace_cloud_get_service) for details.
-        - "Note: For state=present, provide at least: msgVpnName, datacenterId, serviceTypeId, serviceClassId."
+    - Additional settings for state=present. See Reference documentation output of M(solace_cloud_get_service) for details.
+    - "Note: For state=present, provide at least: msgVpnName, datacenterId, serviceTypeId, serviceClassId."
     type: dict
     required: false
-
 extends_documentation_fragment:
-- solace.pubsub_plus.solace.solace_cloud_service_config
+- solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
 - solace.pubsub_plus.solace.state
-
-author: Ricardo Gomez-Ulmke (@rjgu)
+author:
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -60,47 +61,25 @@ hosts: all
 gather_facts: no
 any_errors_fatal: true
 collections:
-    - solace.pubsub_plus
+- solace.pubsub_plus
 tasks:
-  - name: "Create Solace Cloud Service"
-    solace_cloud_service:
-        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
-        name: "foo"
-        settings:
-            msgVpnName: "foo"
-            datacenterId: "aws-ca-central-1a"
-            serviceTypeId: "enterprise"
-            serviceClassId: "enterprise-250-nano"
-            state: present
+- set_fact:
+    api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
 
-  - set_fact:
-        sc_service_created_interim_info: "{{ result.response }}"
-        sc_service_created_id: "{{ result.response.serviceId }}"
+- name: "Create Solace Cloud Service"
+  solace_cloud_service:
+    api_token: "{{ api_token }}"
+    name: "foo"
+    settings:
+        msgVpnName: "foo"
+        datacenterId: "aws-ca-central-1a"
+        serviceTypeId: "enterprise"
+        serviceClassId: "enterprise-250-nano"
+        state: present
 
-TODO
-
-  - name: "Print Solace Cloud Service: service id"
-    debug:
-        msg: "service_id = {{ sc_service_created_id }}"
-
-  - name: "Wait for Service Provisioning to Complete"
-    solace_cloud_get_service:
-        api_token: "{{ api_token_all_permissions }}"
-        service_id: "{{ sc_service_created_id }}"
-    register: get_service_result
-    until: "get_service_result.rc != 0 or get_service_result.response.creationState == 'completed'"
-    retries: 40
-    delay: 30 # Every 30 seconds
-
-  - set_fact:
-        sc_service_created_info: "{{ result.response }}"
-
-  - name: "Save New Solace Cloud Service Facts to File"
-    copy:
-        content: "{{ sc_service_created_info | to_nice_json }}"
-        dest: "./tmp/facts.solace_cloud_service.foo.json"
-    delegate_to: localhost
-
+- set_fact:
+    service_info: "{{ result.response }}"
+    service_id: "{{ result.response.serviceId }}"
 '''
 
 RETURN = '''
@@ -127,39 +106,37 @@ response:
           thresholds:
           - type: warning
             value: '75'
-        unit: bytes
-        value: '50000000000'
-        adminState: start
+        adminState: completed
         attributes:
-        customizedMessagingPorts: {}
-        customizedResourceNames: {}
-        monitoring: {}
-        certificateAuthorities: []
-        clientProfiles: []
-        created: 1608128117689
-        creationState: pending
-        datacenterId: aws-eu-west-2a
-        locked: false
-        messagingStorage: 25
-        msgVpnAttributes: {}
-        msgVpnName: as_test_broker
-        name: ansible_solace_test_broker
-        serviceClassDisplayedAttributes:
-        Clients: '250'
-        High Availability: HA Group
-        Message Broker Tenancy: Dedicated
-        Network Speed: 450 Mbps
-        Network Usage: 50 GB per month
-        Queues: '250'
-        Storage: 25 GB
-        serviceClassId: enterprise-250-nano
-        serviceId: 1a2o94jfedl9
-        servicePackageId: DH-V13.0
-        serviceStage: generalavailability
-        serviceTypeId: enterprise
-        timestamp: 0
-        type: service
-        userId: xxx
+            customizedMessagingPorts: {}
+            customizedResourceNames: {}
+            monitoring: {}
+            certificateAuthorities: []
+            clientProfiles: []
+            created: 1608128117689
+            creationState: pending
+            datacenterId: aws-eu-west-2a
+            locked: false
+            messagingStorage: 25
+            msgVpnAttributes: {}
+            msgVpnName: as_test_broker
+            name: ansible_solace_test_broker
+            serviceClassDisplayedAttributes:
+            Clients: '250'
+            High Availability: HA Group
+            Message Broker Tenancy: Dedicated
+            Network Speed: 450 Mbps
+            Network Usage: 50 GB per month
+            Queues: '250'
+            Storage: 25 GB
+            serviceClassId: enterprise-250-nano
+            serviceId: 1a2o94jfedl9
+            servicePackageId: DH-V13.0
+            serviceStage: generalavailability
+            serviceTypeId: enterprise
+            timestamp: 0
+            type: service
+            userId: xxx
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -168,7 +145,8 @@ from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_con
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceCloudApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError, SolaceError
 from ansible.module_utils.basic import AnsibleModule
-import logging, json
+import logging
+import json
 
 
 class SolaceCloudServiceTask(SolaceCloudCRUDTask):
@@ -188,9 +166,9 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
         service_id = params.get(self.get_config().PARAM_SERVICE_ID, None)
         state = params['state']
         if state == 'present' and not name:
-            raise SolaceParamsValidationError('name', name, f"required for state='present'")
+            raise SolaceParamsValidationError('name', name, "required for state='present'")
         if state == 'absent' and not name and not service_id:
-            raise SolaceParamsValidationError(f"name, {self.get_config().PARAM_SERVICE_ID}", name, f"at least one is required for state='absent'")
+            raise SolaceParamsValidationError(f"name, {self.get_config().PARAM_SERVICE_ID}", name, "at least one is required for state='absent'")
 
     def get_args(self):
         params = self.get_module().params
@@ -224,14 +202,14 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
 
         wait_timeout_minutes = self.get_module().params['wait_timeout_minutes']
         if service['creationState'] != 'completed' and wait_timeout_minutes > 0:
-            logging.debug(f"solace cloud service creationState not completed (creationState={service['creationState']}) - waiting to complete ...")
+            logging.debug("solace cloud service creationState not completed (creationState=%s) - waiting to complete ...", service['creationState'])
             service = self.solace_cloud_api.wait_for_service_create_completion(self.get_config(), wait_timeout_minutes, self._service_id)
 
         return service
 
     def create_func(self, key, name, settings=None):
         if not settings:
-            raise SolaceParamsValidationError('settings', settings, f"required for creating a service")
+            raise SolaceParamsValidationError('settings', settings, "required for creating a service")
         data = {
             'adminState': 'start',
             'partitionId': 'default',
@@ -258,7 +236,7 @@ def run_module():
         wait_timeout_minutes=dict(type='int', required=False, default=20)
     )
     arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud()
-    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service())
+    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service_id())
     arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_state())
     arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_settings())
     arg_spec.update(module_args)

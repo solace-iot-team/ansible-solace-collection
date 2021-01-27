@@ -52,7 +52,7 @@ collections:
 tasks:
 - name: "Solace Cloud Account: Gather Facts as Dict"
   solace_cloud_account_gather_facts:
-    api_token: "{{ api_token_all_permissions }}"
+    api_token: "{{ api_token }}"
     account_name: "{{ inventory_hostname }}"
     return_format: dict
   register: result
@@ -69,7 +69,7 @@ tasks:
 
 - name: "Solace Cloud Account: Gather Facts as List"
   solace_cloud_account_gather_facts:
-    api_token: "{{ api_token_all_permissions }}"
+    api_token: "{{ api_token }}"
     account_name: "{{ inventory_hostname }}"
     return_format: list
   register: result
@@ -86,7 +86,7 @@ tasks:
 
 - name: "Loop: Get Service Info for all Services By serviceId"
   solace_cloud_get_service:
-    api_token: "{{ api_token_all_permissions }}"
+    api_token: "{{ api_token }}"
     service_id: "{{ sc_service.serviceId }}"
   loop: "{{ list_facts }}"
   loop_control:

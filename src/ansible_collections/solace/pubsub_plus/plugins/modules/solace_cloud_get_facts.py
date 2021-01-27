@@ -13,137 +13,130 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_cloud_get_facts
-
-
-TOOD: rework completely
-
-short_description: access solace facts from M(solace_cloud_account_gather_facts)
-
-description: >
-    Provides convenience functions to access Solace Cloud service facts gathered with M(solace_cloud_account_gather_facts).
-    Call M(solace_cloud_account_gather_facts) first.
-
+short_description: get Solace Cloud service facts
+description:
+- Convenience functions to access Solace Cloud service facts gathered with M(solace_cloud_get_service).
 options:
-    from_dict:
-        description: The JSON object (dict) which holds the facts. This is direct result from the GET {service} call.
-        required: True
-        type: dict
-    field_funcs:
-        description: List of pre-built field functions that retrieve values from the 'from_dict'.
-        required: false
-        type: list
-        default: []
-        elements: str
-        suboptions:
-            get_serviceSEMPManagementEndpoints:
-                description: Retrieves the SEMP management endpoint.
-                type: str
-                required: no
-    get_formattedHostInventory:
-        description: >
-            Get the facts formatted as a JSON host inventory.
-            Retrieve the inventory field by field or
-            save to file and use in subsequent playbooks as an inventory.
-        type: dict
+  from_dict:
+    description: The JSON object (dict) which holds the service facts.
+    required: True
+    type: dict
+  field_funcs:
+    description: List of pre-built field functions that retrieve values from the 'from_dict'.
+    required: false
+    type: list
+    default: []
+    elements: str
+    suboptions:
+      get_serviceSEMPManagementEndpoints:
+        description: Retrieves the SEMP management endpoint.
+        type: str
         required: no
-        suboptions:
-            host_entry:
-                description: The entry for this broker / service in the hosts file. Must be a valid JSON key.
-                type: str
-                required: true
-            api_token:
-                description: The API token to access the Solace Cloud Service API.
-                type: str
-                required: true
-            meta:
-                description: Additional meta data describing the service instance.
-                type: dict
-                required: true
-
+  get_formattedHostInventory:
+    description: >
+        Get the facts formatted as a JSON host inventory.
+        Retrieve the inventory field by field or save to file and use in subsequent playbooks as an inventory.
+    type: dict
+    required: no
+    suboptions:
+      host_entry:
+        description: The entry for this broker / service in the hosts file. Must be a valid JSON key.
+        type: str
+        required: true
+      api_token:
+        description: The API token to access the Solace Cloud Service API.
+        type: str
+        required: false
+      meta:
+        description: Additional meta data describing the service instance.
+        type: dict
+        required: true
 seealso:
-- module: solace_cloud_account_gather_facts
 - module: solace_cloud_get_service
-
-author: Ricardo Gomez-Ulmke (@rjgu)
+author:
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
+hosts: all
+gather_facts: no
+any_errors_fatal: true
+collections:
+- solace.pubsub_plus
+tasks:
+  - set_fact:
+      api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      service_id: "the-service-id"
 
-  hosts: all
-  gather_facts: no
-  any_errors_fatal: true
-  collections:
-    - solace.pubsub_plus
-  tasks:
-    - name: "Get Service"
-      solace_cloud_get_service:
+  - name: "Get Service"
+    solace_cloud_get_service:
+      api_token: "{{ api_token }}"
+      service_id: "{{ service_id }}"
+    register: result
+
+  - name: "Set Fact: Solace Service Details"
+    set_fact:
+      sc_service_details: "{{ result.response }}"
+
+  - name: "Get Semp Management Endpoints"
+    solace_cloud_get_facts:
+      from_dict: "{{ sc_service_details }}"
+      field_funcs:
+        - get_serviceSEMPManagementEndpoints
+      register: semp_enpoints_facts
+
+  - name: "Save Solace Cloud Service SEMP Management Endpoints to File"
+    copy:
+      content: "{{ semp_enpoints_facts | to_nice_json }}"
+      dest: "./tmp/facts.solace_cloud_service.semp.json"
+    delegate_to: localhost
+
+  - name: "Set Fact: Solace Service SEMP"
+    set_fact:
+      sempv2_host: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.host }}"
+      sempv2_port: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.port }}"
+      sempv2_is_secure_connection: True
+      sempv2_username: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.username }}"
+      sempv2_password: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.password }}"
+      sempv2_timeout: 60
+
+  - name: "Gather Solace Facts from Service"
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ api_token }}"
+      solace_cloud_service_id: "{{ serviceId }}"
+
+  - name: "Save Solace Cloud Service Facts to File"
+    copy:
+      content: "{{ ansible_facts.solace | to_nice_json }}"
+      dest: "./tmp/solace_facts.solace_cloud_service.json"
+    delegate_to: localhost
+
+  - name: "Get Host Inventory"
+    solace_cloud_get_facts:
+      from_dict: "{{ sc_service_details }}"
+      get_formattedHostInventory:
+        host_entry: "{{ sc_service_name }}"
         api_token: "{{ api_token }}"
-        service_id: "{{ serviceId }}"
-      register: result
+        meta:
+          service_name: "{{ sc_service_details.name }}"
+          service_id: "{{ sc_service_details.serviceId }}"
+          datacenterId: "{{ sc_service_details.datacenterId }}"
+          serviceTypeId: "{{ sc_service_details.serviceTypeId}}"
+          serviceClassId: "{{ sc_service_details.serviceClassId }}"
+          serviceClassDisplayedAttributes: "{{ sc_service_details.serviceClassDisplayedAttributes }}"
+    register: inv_results
 
-    - name: "Set Fact: Solace Service Details"
-      set_fact:
-        sc_service_details: "{{ result.response }}"
-
-    - name: "Get Semp Management Endpoints"
-      solace_cloud_get_facts:
-        from_dict: "{{ sc_service_details }}"
-        field_funcs:
-            - get_serviceSEMPManagementEndpoints
-        register: semp_enpoints_facts
-
-    - name: "Save Solace Cloud Service SEMP Management Endpoints to File"
-      copy:
-        content: "{{ semp_enpoints_facts | to_nice_json }}"
-        dest: "./tmp/facts.solace_cloud_service.semp.json"
-      delegate_to: localhost
-
-    - name: "Set Fact: Solace Service SEMP"
-      set_fact:
-        sempv2_host: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.host }}"
-        sempv2_port: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.port }}"
-        sempv2_is_secure_connection: True
-        sempv2_username: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.username }}"
-        sempv2_password: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.password }}"
-        sempv2_timeout: 60
-
-    - name: "Gather Solace Facts from Service"
-      solace_gather_facts:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
-        solace_cloud_api_token: "{{ api_token }}"
-        solace_cloud_service_id: "{{ serviceId }}"
-
-    - name: "Save Solace Cloud Service Facts to File"
-      copy:
-        content: "{{ ansible_facts.solace | to_nice_json }}"
-        dest: "./tmp/solace_facts.solace_cloud_service.json"
-      delegate_to: localhost
-
-    - name: "Get Host Inventory"
-      solace_cloud_get_facts:
-        from_dict: "{{ sc_service_details }}"
-        get_formattedHostInventory:
-          host_entry: "{{ sc_service_name }}"
-          api_token: "{{ api_token }}"
-          meta:
-            service_name: "{{ sc_service_details.name }}"
-            service_id: "{{ sc_service_details.serviceId }}"
-            datacenterId: "{{ sc_service_details.datacenterId }}"
-            serviceTypeId: "{{ sc_service_details.serviceTypeId}}"
-            serviceClassId: "{{ sc_service_details.serviceClassId }}"
-            serviceClassDisplayedAttributes: "{{ sc_service_details.serviceClassDisplayedAttributes }}"
-      register: inv_results
-
-    - name: "Save Solace Cloud Service inventory to File"
-      copy:
-        content: "{{ inv_results.facts.formattedHostInventory | to_nice_json }}"
-        dest: "./tmp/inventory.{{ sc_service_name }}.json"
-      delegate_to: localhost
+  - name: "Save Solace Cloud Service inventory to File"
+    copy:
+      content: "{{ inv_results.facts.formattedHostInventory | to_nice_json }}"
+      dest: "./tmp/inventory.{{ sc_service_name }}.json"
+    delegate_to: localhost
 '''
 
 RETURN = '''
@@ -189,22 +182,14 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
 
         from_dict = params['from_dict']
         if not isinstance(from_dict, dict):
-            raise SolaceParamsValidationError("from_dict", type(from_dict), f"invalid type, must be a dict")
+            raise SolaceParamsValidationError("from_dict", type(from_dict), "invalid type, must be a dict")
 
         # check state of service
         service_state = self.get_field(from_dict, 'creationState')
         if service_state != 'completed':
-            raise SolaceParamsValidationError("service creationState", service_state, f"is not 'completed'") 
+            raise SolaceParamsValidationError("service creationState", service_state, "is not 'completed'")
 
         has_get_funcs = self.validate_param_field_funcs(self.FIELD_FUNCS, params['field_funcs'])
-        # field_funcs = params['field_funcs']
-        # has_get_funcs = False
-        # if field_funcs and len(field_funcs) > 0:
-        #     for field_func in field_funcs:
-        #         exists = (True if field_func in self.FIELD_FUNCS else False)
-        #         if not exists:
-        #             raise SolaceParamsValidationError("field_funcs", field_func, f"unknown, valid field functions are: {self.FIELD_FUNCS}.")
-        #     has_get_funcs = True
 
         param_get_formattedHostInventory = params.get('get_formattedHostInventory', None)
         if param_get_formattedHostInventory:
@@ -213,9 +198,8 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
             raise SolaceError("no get functions found - specify at least one")
         return
 
-    def do_task(self):    
+    def do_task(self):
         self.validate_params()
-        
         params = self.get_module().params
         search_dict = params['from_dict']
         field_funcs = params['field_funcs']
@@ -228,9 +212,9 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
         param_get_formattedHostInventory = params['get_formattedHostInventory']
         if param_get_formattedHostInventory:
             field, value = self.get_formattedHostInventory(search_dict,
-                                                        param_get_formattedHostInventory['host_entry'],
-                                                        param_get_formattedHostInventory['api_token'],
-                                                        param_get_formattedHostInventory['meta'])
+                                                           param_get_formattedHostInventory['host_entry'],
+                                                           param_get_formattedHostInventory['api_token'],
+                                                           param_get_formattedHostInventory['meta'])
             facts[field] = value
 
         result = self.create_result(rc=0, changed=False)

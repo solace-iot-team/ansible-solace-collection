@@ -12,95 +12,73 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: solace_cloud_get_service
-
-TODO: rework documentation
-
-short_description: Get the Solace Cloud Service details.
-
-description: Get the Solace Cloud Service details by name or serviceId.
-
-notes:
-- "Reference: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm)."
-
-options:
-  name:
-    description:
-        - The name of the service.
-        - "Note: If name is not provided, service_id must."
-    required: false
-    type: str
-  service_id:
-    description:
-        - The service id.
-        - "Note: If service_id is not provided, name must."
-    required: false
-    type: str
-
+module: solace_cloud_get_services
+short_description: get all services in Solace Cloud
+description:
+- "Get a list of all services' details in the Solace Cloud account."
+- "Reference: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm."
 extends_documentation_fragment:
-- solace.pubsub_plus.solace.solace_cloud_service_config
-
+- solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
 seealso:
+- module: solace_cloud_get_service
 - module: solace_cloud_service
-
-author: Ricardo Gomez-Ulmke (@rjgu)
-
+author:
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
-  hosts: all
-  gather_facts: no
-  any_errors_fatal: true
-  collections:
-    - solace.pubsub_plus
-  tasks:
-    - name: "Get service details"
-      solace_cloud_get_service:
-        api_token: "{{ api_token_all_permissions }}"
-        service_id: "{{ sc_service_created_id }}"
-      register: get_service_result
+hosts: all
+gather_facts: no
+any_errors_fatal: true
+collections:
+  - solace.pubsub_plus
+tasks:
+  - name: "solace_cloud_get_services"
+    solace_cloud_get_services:
+      api_token: "{{ api_token }}"
+    register: result
 
-    - set_fact:
-        sc_service_created_info: "{{ result.response }}"
+  - set_fact:
+      service_list: "{{ result.result_list }}"
 
-    - name: "Save Solace Cloud Service Facts to File"
-      copy:
-        content: "{{ sc_service_created_info | to_nice_json }}"
-        dest: "./tmp/facts.solace_cloud_service.{{ sc_service.name }}.json"
-      delegate_to: localhost
+  - name: "Loop: Get Service for all Services By serviceId"
+    solace_cloud_get_service:
+      api_token: "{{ api_token }}"
+      service_id: "{{ service.serviceId }}"
+    loop: "{{ service_list }}"
+    loop_control:
+      loop_var: service
 '''
 
 RETURN = '''
-
+result_list:
+  description: The list of objects found containing requested fields. Results differ based on the api called.
+  returned: success
+  type: list
+  elements: dict
+result_list_count:
+  description: Number of items in result_list.
+  returned: success
+  type: int
 rc:
-    description: return code, either 0 (ok), 1 (not ok)
-    type: int
-    returned: always
-    sample:
-        rc: 0
+  description: Return code. rc=0 on success, rc=1 on error.
+  type: int
+  returned: always
+  sample:
+      success:
+          rc: 0
+      error:
+          rc: 1
 msg:
-    description: error message if not ok
-    type: str
-    returned: error
-response:
-    description: The response from the get call. Differs depending on state of service.
-    type: complex
-    returned: success
-    contains:
-        serviceId:
-            description: The service Id of the created service
-            returned: if service exists
-            type: str
-        adminState:
-            description: The state of the service
-            returned: if service exists
-            type: str
+  description: The response from the HTTP call in case of error.
+  type: dict
+  returned: error
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceCloudGetTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceCloudApi
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudConfig, SolaceTaskSolaceCloudServiceConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -119,7 +97,7 @@ def run_module():
 
     module_args = dict(
     )
-    arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud()
+    arg_spec = SolaceTaskSolaceCloudConfig.arg_spec_solace_cloud()
     arg_spec.update(module_args)
 
     module = AnsibleModule(

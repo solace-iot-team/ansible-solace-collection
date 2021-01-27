@@ -232,7 +232,7 @@ class SolaceTaskSolaceCloudServiceConfig(SolaceTaskSolaceCloudConfig):
         self.solace_cloud_service_id = module.params.get(self.PARAM_SERVICE_ID, None)
 
     @staticmethod
-    def arg_spec_solace_cloud_service() -> dict:
+    def arg_spec_solace_cloud_service_id() -> dict:
         return dict(
             solace_cloud_service_id=dict(type='str', required=False, default=None, aliases=['service_id'])
         )
