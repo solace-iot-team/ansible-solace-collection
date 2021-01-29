@@ -13,27 +13,23 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_dmr_bridge
-
 short_description: dmr bridge
-
 description:
 - "Configure a DMR Bridge Object. Allows addition, removal and configuration of DMR brige objects in an idempotent manner."
-
-notes:
 - "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrBridge)."
-
 options:
   name:
     description: Name of the DMR bridge object. Maps to 'remoteNodeName' in the API.
     required: true
     type: str
-
+    aliases: [remote_node_name]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_get_dmr_bridges
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -70,6 +66,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys

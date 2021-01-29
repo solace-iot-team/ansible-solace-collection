@@ -13,29 +13,27 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_dmr_cluster_link
-TODO: rework doc
-short_description: Configure a link object on a DMR cluster.
-
+short_description: link on a dmr cluster
 description:
-  - "Allows addition, removal and configuration of link objects on a DMR cluster."
+  - "Allows addition, removal and configuration of Link Objects on a DMR Cluster in an idempotent manner."
   - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLink."
-
 options:
   name:
     description: The name of the node at the remote end of the Link. Maps to 'remoteNodeName' in the API.
     required: true
     type: str
+    aliases: [remote_node_name]
   dmr_cluster_name:
     description: The name of the DMR cluster. Maps to 'dmrClusterName' in the API.
     required: true
     type: str
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-- solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_dmr_cluster
+- module: solace_get_dmr_cluster_links
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -54,24 +52,23 @@ module_defaults:
     username: "{{ sempv2_username }}"
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
 tasks:
-  - name: remove
-    solace_dmr_cluster_link:
-      name: remoteNode
-      dmr_cluster_name: foo
-      state: absent
+- name: remove
+  solace_dmr_cluster_link:
+    name: remoteNode
+    dmr_cluster_name: foo
+    state: absent
 
-  - name: add
-    solace_dmr_cluster_link:
-      name: remoteNode
-      dmr_cluster_name: foo
-      state: present
-      settings:
-        enabled: false
-        authenticationBasicPassword: secret_password
-        span: internal
-        initiator: local
+- name: add
+  solace_dmr_cluster_link:
+    name: remoteNode
+    dmr_cluster_name: foo
+    settings:
+      enabled: false
+      authenticationBasicPassword: secret_password
+      span: internal
+      initiator: local
+    state: present
 '''
 
 RETURN = '''
@@ -79,6 +76,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys

@@ -29,6 +29,8 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
+seealso:
+- module: solace_get_acl_profiles
 author:
   - Mark Street (@mkst)
   - Swen-Helge Huber (@ssh)

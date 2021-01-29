@@ -13,18 +13,16 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_dmr_cluster_link_trusted_cn
-TODO: re-work doc
 short_description: trusted common name for dmr cluster link
-
 description:
-  - "Allows addition, removal and configuration of trusted common name objects on DMR cluster links."
+  - "Allows addition, removal and configuration of Trusted Common Name Objects on DMR Cluster links."
   - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLinkTlsTrustedCommonName."
-
 options:
   name:
     description: The expected trusted common name of the remote certificate. Maps to 'tlsTrustedCommonName' in the API.
     required: true
     type: str
+    aliases: [tls_trusted_common_name]
   dmr_cluster_name:
     description: The name of the DMR cluster. Maps to 'dmrClusterName' in the API.
     required: true
@@ -33,13 +31,14 @@ options:
     description: The name of the remote node. Maps to 'remoteNodeName' in the API.
     required: true
     type: str
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-- solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_dmr_cluster
+- module: solace_dmr_cluster_link
+- module: solace_get_dmr_cluster_link_trusted_cns
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -58,7 +57,6 @@ module_defaults:
     username: "{{ sempv2_username }}"
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
 tasks:
   - name: remove
     solace_dmr_cluster_link_trusted_cn:
@@ -80,6 +78,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys

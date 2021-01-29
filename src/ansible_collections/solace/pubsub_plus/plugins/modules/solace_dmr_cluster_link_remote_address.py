@@ -13,18 +13,16 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_dmr_cluster_link_remote_address
-TODO: rework doc
 short_description: remote address for dmr cluster link
-
 description:
-  - "Allows addition, removal and configuration of remote address objects on a DRM cluster link."
+  - "Allows addition, removal and configuration of Remote Address Objects on a DRM Cluster Link."
   - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLinkRemoteAddress."
-
 options:
   name:
     description: The FQDN or IP address (and optional port) of the remote node. Maps to 'remoteAddress' in the API.
     required: true
     type: str
+    aliases: [remote_address]
   dmr_cluster_name:
     description: The name of the DMR cluster. Maps to 'dmrClusterName' in the API.
     required: true
@@ -33,13 +31,14 @@ options:
     description: The name of the remote node. Maps to 'remoteNodeName' in the API.
     required: true
     type: str
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-- solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_dmr_cluster
+- module: solace_dmr_cluster_link
+- module: solace_get_dmr_cluster_link_remote_addresses
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -58,7 +57,6 @@ module_defaults:
     username: "{{ sempv2_username }}"
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
 tasks:
   - name: Remove 'remoteNode' DMR Link Remote address
     solace_dmr_cluster_link_remote_address:
@@ -80,6 +78,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -116,7 +127,6 @@ class SolaceDmrClusterLinkRemoteAddressTask(SolaceBrokerCRUDTask):
         data.update(settings if settings else {})
         path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'dmrClusters', dmr_cluster_name, 'links', remote_node_name, 'remoteAddresses']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
-
 
     def delete_func(self, dmr_cluster_name, remote_node_name, remote_address):
         #  DELETE /dmrClusters/{dmrClusterName}/links/{remoteNodeName}/remoteAddresses/{remoteAddress}

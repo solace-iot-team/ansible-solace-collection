@@ -13,27 +13,22 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_dmr_cluster
-TODO: re-work doc
 short_description: dmr cluster
-
 description:
 - "Configure DMR Cluster Objects. Allows addition, removal and configuration of DMR cluster objects in an idempotent manner."
-
-notes:
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster)."
-
+- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster."
 options:
   name:
     description: Name of the DMR cluster. Maps to 'dmrClusterName' in the API.
     required: true
     type: str
-
+    aliases: [dmr_cluster_name]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-- solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_get_dmr_clusters
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -52,8 +47,8 @@ module_defaults:
     username: "{{ sempv2_username }}"
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
 tasks:
+
 - name: create
   solace_dmr_cluster:
     name: foo
@@ -62,7 +57,9 @@ tasks:
   solace_dmr_cluster:
     name: foo
     settings:
-      tlsServerCertMaxChainDepth: 5
+        authenticationBasicEnabled: true
+        authenticationBasicType: internal
+        tlsServerCertMaxChainDepth: 5
 
 - name: remove
   solace_dmr_cluster:
@@ -75,6 +72,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -123,6 +133,7 @@ class SolaceDMRClusterTask(SolaceBrokerCRUDTask):
 
 def run_module():
     module_args = dict(
+        name=dict(type='str', required=True, aliases=['dmr_cluster_name'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
