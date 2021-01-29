@@ -13,27 +13,21 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_cert_authorities
-TODO: rework doc
-
-Note:    # TODO: implement the other OPs: !=, <, >, <=, >=
-
-short_description: get client profiles
-
+short_description: get list of cert authorities
 description:
-- "Get a list of Client Profile objects."
-
+- "Get a list of Certificate Authority objects."
+- "Supports Solace Cloud Brokers as well as Solace Standalone Brokers."
+- "Reference (Sempv2 Config): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority/getCertAuthorities"
+- "Reference (Sempv2 Monitor): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/certAuthority/getCertAuthorities"
+- "Reference (Solace Cloud API): not available"
 notes:
-- "Reference Config: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile/getMsgVpnClientProfiles)."
-- "Reference Monitor: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/clientProfile/getMsgVpnClientProfiles)."
-
+- "Using Solace Cloud: where clause only supports operations: '=='"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-- solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
-
+- solace.pubsub_plus.solace.broker_config_solace_cloud
 seealso:
-- module: solace_client_profile
-
+- module: solace_cert_authority
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -43,72 +37,85 @@ hosts: all
 gather_facts: no
 any_errors_fatal: true
 collections:
-- solace.pubsub_plus
+  - solace.pubsub_plus
 module_defaults:
-  solace_client_profile:
+  solace_cert_authority:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
     username: "{{ sempv2_username }}"
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
-    solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+    solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
     solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-  solace_get_client_profiles:
+  solace_get_cert_authorities:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
     username: "{{ sempv2_username }}"
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
+    solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
+    solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 tasks:
-  - name: create client profile
-    solace_client_profile:
-      name: "ansible-solace__test_1"
+- name: create cert authority
+  solace_cert_authority:
+    name: foo
+    settings:
+      certContent: "the-cert"
       state: present
 
-  - name: get list - config
-    solace_get_client_profiles:
-      api: config
-      query_params:
-        where:
-          - "clientProfileName==ansible-solace__test*"
-    register: result
-  - debug:
-      msg:
-        - "{{ result.result_list }}"
-        - "{{ result.result_list_count }}"
+- name: get list config
+  solace_get_cert_authorities:
+    query_params:
+      where:
+        - "certAuthorityName==foo"
+  register: result
 
-  - name: get list - monitor
-    solace_get_client_profiles:
-      api: monitor
-      query_params:
-        where:
-          - "clientProfileName==ansible-solace__test*"
-    register: result
-  - debug:
-      msg:
-        - "{{ result.result_list }}"
-        - "{{ result.result_list_count }}"
+- name: print result
+  debug:
+    msg:
+      - "{{ result.result_list }}"
+      - "{{ result.result_list_count }}"
 
-  - name: remove client profile
-    solace_client_profile:
-      name: "ansible-solace__test_1"
-      state: absent
+- name: get list monitor
+  solace_get_cert_authorities:
+    api: monitor
+    query_params:
+      where:
+        - "certAuthorityName==foo"
+  register: result
+
+- name: print result
+  debug:
+    msg:
+      - "{{ result.result_list }}"
+      - "{{ result.result_list_count }}"
 '''
 
 RETURN = '''
 result_list:
-    description: The list of objects found containing requested fields. Payload depends on API called.
-    returned: success
-    type: list
-    elements: dict
+  description: The list of objects found containing requested fields. Payload depends on API called.
+  returned: success
+  type: list
+  elements: dict
 result_list_count:
-    description: Number of items in result_list.
-    returned: success
-    type: int
+  description: Number of items in result_list.
+  returned: success
+  type: int
+rc:
+  description: Return code. rc=0 on success, rc=1 on error.
+  type: int
+  returned: always
+  sample:
+    success:
+      rc: 0
+    error:
+      rc: 1
+msg:
+  description: The response from the HTTP call in case of error.
+  type: dict
+  returned: error
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -121,9 +128,9 @@ import re
 
 
 class Mappings:
-  SEMPV2_SOLACE_CLOUD = {
-    "certAuthorityName": "name"
-  }
+    SEMPV2_SOLACE_CLOUD = {
+        "certAuthorityName": "name"
+    }
 
 
 class SolaceCloudGetCertAuthoritiesTask(SolaceCloudGetTask):
@@ -133,35 +140,33 @@ class SolaceCloudGetCertAuthoritiesTask(SolaceCloudGetTask):
     # TODO: implement the other OPs: !=, <, >, <=, >=
     def filter_cert_authority(self, cert_authority_settings: dict, query_params: dict) -> dict:
         if not query_params:
-          return cert_authority_settings
+            return cert_authority_settings
         where_list = []
-        if ("where" in query_params
-            and query_params['where']
-            and len(query_params['where']) > 0):
+        if ("where" in query_params and query_params['where'] and len(query_params['where']) > 0):
             where_list = query_params['where']
         is_match = True
         for where in where_list:
-          # OP: ==
-          where_elements = where.split('==')
-          if len(where_elements) != 2:
-            raise SolaceParamsValidationError('query_params.where', where, "cannot parse where clause - must be in format '{key}=={pattern}' (other ops are not supported)")
-          sempv2_key = where_elements[0]
-          pattern = where_elements[1]
-          solace_cloud_key = Mappings.SEMPV2_SOLACE_CLOUD.get(sempv2_key, None)
-          if not solace_cloud_key:
-            raise SolaceParamsValidationError('query_params.where', where, f"unknown key for solace cloud '{sempv2_key}' - check with SEMPv2 settings")
-          # pattern match
-          solace_cloud_value = cert_authority_settings.get(solace_cloud_key, None)
-          if not solace_cloud_value:
-            raise SolaceInternalError(f"solace-cloud-key={solace_cloud_key} not found in solace cloud settings - likely a key map issue")
-          # create regex
-          regex = pattern.replace("*", ".+")
-          this_match = re.search(regex, solace_cloud_value)          
-          is_match = (is_match and this_match)
-          if not is_match:
-            break
+            # OP: ==
+            where_elements = where.split('==')
+            if len(where_elements) != 2:
+                raise SolaceParamsValidationError('query_params.where', where, "cannot parse where clause - must be in format '{key}=={pattern}' (other ops are not supported)")
+            sempv2_key = where_elements[0]
+            pattern = where_elements[1]
+            solace_cloud_key = Mappings.SEMPV2_SOLACE_CLOUD.get(sempv2_key, None)
+            if not solace_cloud_key:
+                raise SolaceParamsValidationError('query_params.where', where, f"unknown key for solace cloud '{sempv2_key}' - check with SEMPv2 settings")
+            # pattern match
+            solace_cloud_value = cert_authority_settings.get(solace_cloud_key, None)
+            if not solace_cloud_value:
+                raise SolaceInternalError(f"solace-cloud-key={solace_cloud_key} not found in solace cloud settings - likely a key map issue")
+            # create regex
+            regex = pattern.replace("*", ".+")
+            this_match = re.search(regex, solace_cloud_value)
+            is_match = (is_match and this_match)
+            if not is_match:
+                break
         if is_match:
-          return cert_authority_settings    
+            return cert_authority_settings
         return None
 
     def _get_cert_authority(self, service_id, cert_authority_name, query_params):
@@ -179,9 +184,9 @@ class SolaceCloudGetCertAuthoritiesTask(SolaceCloudGetTask):
         cert_authoritie_names = service['certificateAuthorities']
         cert_authorities = []
         for cert_authority_name in cert_authoritie_names:
-          cert_authority = self._get_cert_authority(service_id, cert_authority_name, query_params)
-          if cert_authority:
-            cert_authorities.append(cert_authority)
+            cert_authority = self._get_cert_authority(service_id, cert_authority_name, query_params)
+            if cert_authority:
+                cert_authorities.append(cert_authority)
         result = self.create_result_with_list(cert_authorities)
         return None, result
 
@@ -190,14 +195,9 @@ class SolaceBrokerGetCertAuthoritiesTask(SolaceBrokerGetPagingTask):
     def __init__(self, module):
         super().__init__(module)
 
-    def do_task(self):
+    def get_path_array(self, params: dict) -> list:
         # GET /certAuthorities
-        path_array = ['certAuthorities']
-        api = self.get_config().get_params()['api']
-        query_params = self.get_config().get_params()['query_params']
-        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, path_array, query_params)
-        result = self.create_result_with_list(objects)
-        return None, result
+        return ['certAuthorities']
 
 
 class SolaceGetCertAuthoritiesTask(SolaceTask):
@@ -214,7 +214,7 @@ class SolaceGetCertAuthoritiesTask(SolaceTask):
             return solace_task.do_task()
         solace_task = SolaceBrokerGetCertAuthoritiesTask(self.get_module())
         return solace_task.do_task()
-        
+
 
 def run_module():
     module_args = dict(

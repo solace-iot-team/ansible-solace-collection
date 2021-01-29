@@ -12,27 +12,18 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: solace_get_vpns
-
-todo: write this one
-
-short_description: get list of queues
-
+module: solace_get_acl_profiles
+short_description: get list of acl profiles
 description:
-- "Get a list of Queue objects."
-
-notes:
-- "Reference Config: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/getMsgVpnQueues)."
-- "Reference Monitor: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/queue/getMsgVpnQueues)"
-
-seealso:
-- module: solace_queue
-
+- "Get a list of ACL Profile Objects."
+- "Reference (Sempv2 Config): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfiles."
+- "Reference (Sempv2 Monitor): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/aclProfile/getMsgVpnAclProfiles."
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
-
+seealso:
+- module: solace_acl_profile
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -44,7 +35,7 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-  solace_queue:
+  solace_acl_profile:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -52,7 +43,7 @@ module_defaults:
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
-  solace_get_queues:
+  solace_get_acl_profiles:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -61,91 +52,67 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: Create Queue
-    solace_queue:
-      name: foo
-      state: present
+- name: create acl profile
+  solace_acl_profile:
+    name: foo
+    state: present
 
-  - name: Get queues
-    solace_get_queues:
-      api: config
-      query_params:
-        where:
-          - "queueName==foo*"
+- name: get acl profiles config
+  solace_get_acl_profiles:
+    api: config
+    query_params:
+      where:
+        - "aclProfileName==foo"
       select:
-          - "queueName"
-          - "eventMsgSpoolUsageThreshold"
-    register: result
+        - "aclProfileName"
+  register: result
 
-  - name: Result Config API
-    debug:
-        msg:
-          - "{{ result.result_list }}"
-          - "{{ result.result_list_count }}"
+- name: print result
+  debug:
+    msg:
+      - "{{ result.result_list }}"
+      - "{{ result.result_list_count }}"
 
-  - name: Get queues
-    solace_get_queues:
-      api: monitor
-      query_params:
-        where:
-          - "queueName==foo*"
+- name: get acl profiles monitor
+  solace_get_acl_profiles:
+    api: monitor
+    query_params:
+      where:
+        - "aclProfileName==foo"
       select:
-          - "queueName"
-          - "eventMsgSpoolUsageThreshold"
-    register: result
+        - "aclProfileName"
+  register: result
 
-  - name: Result Monitor API
-    debug:
-        msg:
-          - "{{ result.result_list }}"
-          - "{{ result.result_list_count }}"
-
+- name: print result
+  debug:
+    msg:
+      - "{{ result.result_list }}"
+      - "{{ result.result_list_count }}"
 '''
 
 RETURN = '''
 result_list:
-    description: The list of objects found containing requested fields. Results differ based on the api called.
-    returned: success
-    type: list
-    elements: dict
-    sample:
-        config_api:
-            result_list:
-              - eventMsgSpoolUsageThreshold:
-                    clearPercent: 50
-                    setPercent: 60
-                queueName: foo
-        monitor_api:
-            result_list:
-              - accessType: exclusive
-                alreadyBoundBindFailureCount: 0
-                averageRxByteRate: 0
-                averageRxMsgRate: 0
-                averageTxByteRate: 0
-                averageTxMsgRate: 0
-                bindRequestCount: 0
-                bindSuccessCount: 0
-                bindTimeForwardingMode: store-and-forward
-                clientProfileDeniedDiscardedMsgCount: 0
-                consumerAckPropagationEnabled: true
-                createdByManagement: true
-                deadMsgQueue: "#DEAD_MSG_QUEUE"
-                deletedMsgCount: 0
-                destinationGroupErrorDiscardedMsgCount: 0
-                disabledBindFailureCount: 0
-                disabledDiscardedMsgCount: 0
-                durable: true
-                egressEnabled: true
-                eventBindCountThreshold:
-                    clearPercent: 60
-                    setPercent: 80
-
+  description: The list of objects found containing requested fields. Payload depends on API called.
+  returned: success
+  type: list
+  elements: dict
 result_list_count:
-    description: Number of items in result_list.
-    returned: success
-    type: int
-    sample:
-        result_list_count: 2
+  description: Number of items in result_list.
+  returned: success
+  type: int
+rc:
+  description: Return code. rc=0 on success, rc=1 on error.
+  type: int
+  returned: always
+  sample:
+      success:
+          rc: 0
+      error:
+          rc: 1
+msg:
+  description: The response from the HTTP call in case of error.
+  type: dict
+  returned: error
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -162,7 +129,6 @@ class SolaceGetAclProfilesTask(SolaceBrokerGetPagingTask):
     def get_path_array(self, params: dict) -> list:
         # GET /msgVpns/{msgVpnName}/aclProfiles
         return ['msgVpns', params['msg_vpn'], 'aclProfiles']
-
 
 
 def run_module():

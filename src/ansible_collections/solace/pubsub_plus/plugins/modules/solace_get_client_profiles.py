@@ -13,26 +13,18 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_client_profiles
-
-TODO: rework doc
-
-short_description: get client profiles
-
+short_description: get list of client profiles
 description:
 - "Get a list of Client Profile objects."
-
-notes:
-- "Reference Config: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile/getMsgVpnClientProfiles)."
-- "Reference Monitor: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/clientProfile/getMsgVpnClientProfiles)."
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
-
 seealso:
-- module: solace_client_profile
-
+  - module: solace_client_profile
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile/getMsgVpnClientProfiles"
+- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/clientProfile/getMsgVpnClientProfiles"
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -52,7 +44,7 @@ module_defaults:
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
-    solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+    solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
     solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
   solace_get_client_profiles:
     host: "{{ sempv2_host }}"
@@ -63,51 +55,63 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: create client profile
-    solace_client_profile:
-      name: "ansible-solace__test_1"
-      state: present
+- name: create client profile
+  solace_client_profile:
+    name: foo
+    state: present
 
-  - name: get list - config
-    solace_get_client_profiles:
-      api: config
-      query_params:
-        where:
-          - "clientProfileName==ansible-solace__test*"
-    register: result
-  - debug:
-      msg:
-        - "{{ result.result_list }}"
-        - "{{ result.result_list_count }}"
+- name: get list - config
+  solace_get_client_profiles:
+    api: config
+    query_params:
+      where:
+        - "clientProfileName==foo"
+  register: result
 
-  - name: get list - monitor
-    solace_get_client_profiles:
-      api: monitor
-      query_params:
-        where:
-          - "clientProfileName==ansible-solace__test*"
-    register: result
-  - debug:
-      msg:
-        - "{{ result.result_list }}"
-        - "{{ result.result_list_count }}"
+- name: print result
+  debug:
+    msg:
+      - "{{ result.result_list }}"
+      - "{{ result.result_list_count }}"
 
-  - name: remove client profile
-    solace_client_profile:
-      name: "ansible-solace__test_1"
-      state: absent
+- name: get list - monitor
+  solace_get_client_profiles:
+    api: monitor
+    query_params:
+      where:
+        - "clientProfileName==foo"
+  register: result
+
+- name: print result
+  debug:
+    msg:
+      - "{{ result.result_list }}"
+      - "{{ result.result_list_count }}"
 '''
 
 RETURN = '''
 result_list:
-    description: The list of objects found containing requested fields. Payload depends on API called.
-    returned: success
-    type: list
-    elements: dict
+  description: The list of objects found containing requested fields. Payload depends on API called.
+  returned: success
+  type: list
+  elements: dict
 result_list_count:
-    description: Number of items in result_list.
-    returned: success
-    type: int
+  description: Number of items in result_list.
+  returned: success
+  type: int
+rc:
+  description: Return code. rc=0 on success, rc=1 on error.
+  type: int
+  returned: always
+  sample:
+    success:
+      rc: 0
+    error:
+      rc: 1
+msg:
+  description: The response from the HTTP call in case of error.
+  type: dict
+  returned: error
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys

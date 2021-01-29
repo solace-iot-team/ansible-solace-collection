@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_gather_facts
-
+TODO: re-work me
 short_description: Retrieve facts from the Solace event broker and set 'ansible_facts.solace'.
 
 description: >

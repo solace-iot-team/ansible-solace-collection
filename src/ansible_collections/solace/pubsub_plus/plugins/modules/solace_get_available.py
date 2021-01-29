@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_available
-
+TODO: re-work me
 short_description: broker/service is available
 
 description: >

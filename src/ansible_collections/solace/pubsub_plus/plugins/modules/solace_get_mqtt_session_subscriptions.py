@@ -14,6 +14,7 @@ DOCUMENTATION = '''
 ---
 module: solace_get_mqtt_session_subscriptions
 TODO: rework doc
+
 short_description: list of mqtt session subscriptions
 
 description:

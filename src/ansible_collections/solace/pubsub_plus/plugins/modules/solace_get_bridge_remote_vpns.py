@@ -13,16 +13,11 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_bridge_remote_vpns
-TODO: re-work doc
-short_description: get remote vpns of bridge
-
+short_description: get list of remote vpns of a bridge
 description:
-- "Get a list of Bridge Remote VPN objects."
-
-notes:
-- "Reference Config: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/getMsgVpnBridgeRemoteMsgVpns)."
-- "Reference Monitor: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/bridge/getMsgVpnBridgeRemoteMsgVpns)."
-
+- "Get a list of Remote Message VPN objects of a Bridge."
+- "Reference (Sempv2 Config): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/getMsgVpnBridgeRemoteMsgVpns."
+- "Reference (Sempv2 Monitor): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/bridge/getMsgVpnBridgeRemoteMsgVpns."
 options:
   bridge_name:
     description: The bridge. Maps to 'bridgeName' in the API.
@@ -37,16 +32,12 @@ options:
       - primary
       - backup
       - auto
-    aliases: [virtual_router]
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
-
 seealso:
 - module: solace_bridge_remote_vpn
-
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -58,6 +49,22 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
+  solace_bridge:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
+  solace_bridge_remote_vpn:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
   solace_get_bridge_remote_vpns:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
@@ -67,33 +74,81 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: "Check: Bridge Remote VPN is UP"
-    solace_get_bridge_remote_vpns:
-        bridge_name: foo
-        api: monitor
-        query_params:
-            where:
-            select:
-            - bridgeName
-            - remoteMsgVpnLocation
-            - enabled
-            - up
-            - lastConnectionFailureReason
-            - compressedDataEnabled
-            - tlsEnabled
+- name: create a bridge
+  solace_bridge:
+    name: the_bridge
+    state: present
+
+- name: add remote vpn
+  solace_bridge_remote_vpn:
+    remote_msg_vpn_name: the_remote_msg_vpn
+    bridge_name: the_bridge
+    remote_vpn_location: "xxx.messaging.solace.cloud:55555"
+    settings:
+      enabled: true
+    state: present
+
+- name: get list config
+  solace_get_bridge_remote_vpns:
+    bridge_name: the_bridge
+    api: confing
+    query_params:
+      where:
+      select:
+      - bridgeName
+      - remoteMsgVpnLocation
+      - enabled
+  register: result
+
+- name: print result
+  debug:
+    msg:
+      - "{{ result.result_list }}"
+      - "{{ result.result_list_count }}"
+
+- name: get list monitor
+  solace_get_bridge_remote_vpns:
+    bridge_name: the_bridge
+    api: monitor
+    query_params:
+      select:
+      - bridgeName
+      - remoteMsgVpnLocation
+      - enabled
+      - up
+      - lastConnectionFailureReason
+  register: result
+
+- name: print result
+  debug:
+    msg:
+      - "{{ result.result_list }}"
+      - "{{ result.result_list_count }}"
 '''
 
 RETURN = '''
 result_list:
-    description: The list of objects found containing requested fields. Results differ based on the api called.
-    returned: success
-    type: list
-    elements: dict
-
+  description: The list of objects found containing requested fields. Payload depends on API called.
+  returned: success
+  type: list
+  elements: dict
 result_list_count:
-    description: Number of items in result_list.
-    returned: success
-    type: int
+  description: Number of items in result_list.
+  returned: success
+  type: int
+rc:
+  description: Return code. rc=0 on success, rc=1 on error.
+  type: int
+  returned: always
+  sample:
+      success:
+          rc: 0
+      error:
+          rc: 1
+msg:
+  description: The response from the HTTP call in case of error.
+  type: dict
+  returned: error
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys

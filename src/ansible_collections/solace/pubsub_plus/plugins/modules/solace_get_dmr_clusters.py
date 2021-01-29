@@ -13,26 +13,19 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_dmr_clusters
-TODO: re-work doc
-short_description: get bridges
-
+short_description: get list of dmr clusters
 description:
-- "Get a list of Bridge objects."
-
+- "Get a list of DMR Cluster objects."
 notes:
-- "Reference Config: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/getMsgVpnBridges)."
-- "Reference Monitor: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/bridge/getMsgVpnBridges)."
-
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/getDmrClusters"
+- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/getDmrClusters"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-- solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
-
 seealso:
-- module: solace_bridge
-
+- module: solace_dmr_cluster
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -42,55 +35,64 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-  solace_bridge:
+  solace_get_dmr_clusters:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
     username: "{{ sempv2_username }}"
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
-  solace_get_bridges:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
 tasks:
 
-  - name: add
-    solace_bridge:
-        name: foo
-        virtual_router: auto
+- name: get list config
+  solace_get_dmr_clusters:
+    dmr_cluster_name: "{{ dmr_cluster_name }}"
+    remote_node_name: "{{ remote_node_name }}"
+  register: result
 
-  - name: get list config
-    solace_get_bridges:
-        api: config
-        query_params:
-            where:
-            - "bridgeName==foo"
+- name: print result
+  debug:
+    msg:
+    - "{{ result.result_list }}"
+    - "{{ result.result_list_count }}"
 
-  - name: get list monitor
-    solace_get_bridges:
-        api: monitor
-        query_params:
-            where:
-            - "bridgeName==foo"
+- name: get list monitor
+  solace_get_dmr_clusters:
+    api: monitor
+    dmr_cluster_name: "{{ dmr_cluster_name }}"
+    remote_node_name: "{{ remote_node_name }}"
+  register: result
+
+- name: print result
+  debug:
+    msg:
+    - "{{ result.result_list }}"
+    - "{{ result.result_list_count }}"
 '''
 
 RETURN = '''
 result_list:
-    description: The list of objects found containing requested fields. Results differ based on the api called.
-    returned: success
-    type: list
-    elements: dict
-
+  description: The list of objects found containing requested fields. Payload depends on API called.
+  returned: success
+  type: list
+  elements: dict
 result_list_count:
-    description: Number of items in result_list.
-    returned: success
-    type: int
+  description: Number of items in result_list.
+  returned: success
+  type: int
+rc:
+  description: Return code. rc=0 on success, rc=1 on error.
+  type: int
+  returned: always
+  sample:
+    success:
+      rc: 0
+    error:
+      rc: 1
+msg:
+  description: The response from the HTTP call in case of error.
+  type: dict
+  returned: error
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
