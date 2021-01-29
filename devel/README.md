@@ -66,6 +66,46 @@ env vars & links
 ...$
 ````
 
+## Tests
+
+### ansible-test
+````bash
+cd src/ansible_collections/solace/pubsub_plus
+# single module
+ansible-test sanity {module_name}
+# project
+ansible-test sanity
+````
+### docs
+````bash
+pip3 install ansible-doc-extractor
+# check make version
+make --version
+  GNU Make 3.81 # <- min version
+````
+
+
+#### Create the rst file:
+````bash
+cd src/ansible_collections/solace/pubsub_plus/docs
+ansible-doc-extractor --template source/_templates/module.rst.j2 source/modules ../plugins/modules/{module}.py
+# check generated rst
+ls source/modules/{module}.rst
+````
+#### Create the html:
+````bash
+cd src/ansible_collections/solace/pubsub_plus/docs
+make html
+# point browser to
+{your-path}/src/ansible_collections/solace/pubsub_plus/docs/build/html/index.html
+{your-path}/src/ansible_collections/solace/pubsub_plus/docs/build/html/modules/{module}.html
+````
+
+#### Create all project docs:
+````bash
+cd src/ansible_collections/solace/pubsub_plus/docs
+./make.sh
+````
 
 ---
 The End.
