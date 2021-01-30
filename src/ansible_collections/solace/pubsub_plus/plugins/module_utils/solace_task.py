@@ -164,33 +164,19 @@ class SolaceCRUDTask(SolaceTask):
         raise SolaceInternalErrorAbstractMethod()
 
     def do_task(self):
-
         self.validate_params()
         args = self.get_args()
         new_settings = self.get_new_settings()
         current_settings = self.get_func(*args)
         new_state = self.get_module().params['state']
-
-
-        # result = self.create_result(rc=1, changed=False)
-        # result.update({'args': args})
-        # result.update({'new_settings': new_settings})
-        # result.update({'current_settings': current_settings})
-
-        # return None, result
-
-
-
-
         # delete if exists
-        if new_state =='absent':
+        if new_state == 'absent':
             if current_settings is None:
                 return None, self.create_result(rc=0, changed=False)
             result = self.create_result(rc=0, changed=True)
             if not self.get_module().check_mode:
                 result['response'] = self.delete_func(*args)
             return None, result
-
         # create if not exist
         if new_state == 'present' and current_settings is None:
             result = self.create_result(rc=0, changed=True)
@@ -198,25 +184,11 @@ class SolaceCRUDTask(SolaceTask):
                 args.append(new_settings)
                 result['response'] = self.create_func(*args)
             return None, result
-
         # update if any changes
         if new_state == 'present' and current_settings is not None:
             update_settings = None
             if new_settings is not None:
-
-                # update_settings = {k: v for k,v in new_settings.items() if (k in current_settings and v != current_settings[k]) or k not in current_settings}
-
                 update_settings = SolaceUtils.deep_dict_diff(new_settings, current_settings)
-
-                # TODO: test
-                import logging, json
-                logging.debug(f">>> current_settings=\n{json.dumps(current_settings, indent=2)}")
-                logging.debug(f">>> new_settings=\n{json.dumps(new_settings, indent=2)}")
-                logging.debug(f">>> update_settings=\n{json.dumps(update_settings, indent=2)}")
-
-
-
-
             if not update_settings:
                 result = self.create_result(rc=0, changed=False)
                 result['response'] = current_settings
@@ -229,7 +201,6 @@ class SolaceCRUDTask(SolaceTask):
                     args.append(update_settings)
                     result['response'] = self.update_func(*args)
             return None, result
-
         # should never get here
         raise SolaceInternalError("unhandled task combination")
 
@@ -249,8 +220,8 @@ class SolaceBrokerCRUDTask(SolaceCRUDTask):
             self.config.set_sempv2_version(sempv2_version)
         try:
             v = float(self.config.sempv2_version)
-        except ValueError:
-            raise SolaceParamsValidationError('sempv2_version', self.config.sempv2_version, "value cannot be converted to a float")
+        except ValueError as e:
+            raise SolaceParamsValidationError('sempv2_version', self.config.sempv2_version, "value cannot be converted to a float") from e
         return v
 
 
@@ -286,7 +257,7 @@ class SolaceBrokerGetTask(SolaceGetTask):
         return self.config
 
     def get_sempv2_api(self) -> SolaceSempV2Api:
-        return self.sempv2_api    
+        return self.sempv2_api
 
 
 class SolaceBrokerGetPagingTask(SolaceGetTask):
@@ -302,7 +273,7 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
         return self.config
 
     def get_sempv2_get_paging_api(self) -> SolaceSempV2Api:
-        return self.sempv2_get_paging_api    
+        return self.sempv2_get_paging_api
 
     def get_path_array(self, params: dict) -> list:
         raise SolaceInternalErrorAbstractMethod()
@@ -314,6 +285,7 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
         objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, self.get_path_array(params), query_params)
         result = self.create_result_with_list(objects)
         return None, result
+
 
 class SolaceCloudGetTask(SolaceGetTask):
     def __init__(self, module: AnsibleModule):

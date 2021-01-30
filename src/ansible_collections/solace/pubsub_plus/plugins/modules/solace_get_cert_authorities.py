@@ -18,11 +18,11 @@ description:
 - "Get a list of Certificate Authority objects."
 - "Supports Solace Cloud Brokers as well as Solace Standalone Brokers."
 notes:
+- "Using Solace Cloud: where clause only supports operations: '=='"
+- ""
 - "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority/getCertAuthorities"
 - "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/certAuthority/getCertAuthorities"
 - "Module Solace Cloud API: not available"
-notes:
-- "Using Solace Cloud: where clause only supports operations: '=='"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.get_list

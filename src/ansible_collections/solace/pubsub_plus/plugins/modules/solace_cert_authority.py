@@ -20,7 +20,6 @@ description:
 notes:
 - "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority"
 - "Module Solace Cloud API: not available"
-notes:
 - "Uses deprecated SempV2 API. Since 2.19, broker supports 'clientCertAuthority' & 'domainCertAuthority' instead. Raise an issue if these are required."
 seealso:
 - module: solace_get_cert_authorities

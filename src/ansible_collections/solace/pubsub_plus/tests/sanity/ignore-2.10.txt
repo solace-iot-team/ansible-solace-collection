@@ -1,7 +1,14 @@
-plugins/module_utils/solace_cloud_utils.py compile-2.7!skip
 plugins/module_utils/solace_utils.py compile-2.7!skip
-plugins/module_utils/solace_utils.py pep8:E501
+plugins/module_utils/solace_utils.py pylint:dangerous-default-value
+plugins/module_utils/solace_error.py compile-2.7!skip
+plugins/module_utils/solace_task_config.py compile-2.7!skip
+plugins/module_utils/solace_task_config.py pep8:E501
+plugins/module_utils/solace_task.py compile-2.7!skip
+plugins/module_utils/solace_task.py pep8:E501
+plugins/module_utils/solace_sys.py compile-2.7!skip
+plugins/module_utils/solace_sys.py pylint:ansible-bad-function
 plugins/doc_fragments/solace.py pep8:E501
+plugins/module_utils/solace_api.py compile-2.7!skip
 plugins/modules/solace_gather_facts.py compile-2.7!skip
 plugins/modules/solace_get_facts.py compile-2.7!skip
 plugins/modules/solace_cloud_service.py compile-2.7!skip
@@ -51,9 +58,10 @@ plugins/modules/solace_get_bridges.py compile-2.7!skip
 plugins/modules/solace_bridge_remote_vpn.py compile-2.7!skip
 plugins/modules/solace_bridge_remote_vpn.py pep8:E501
 plugins/modules/solace_bridge_remote_subscription.py compile-2.7!skip
+plugins/modules/solace_bridge_remote_subscription.py pep8:E501
 plugins/modules/solace_get_bridge_remote_vpns.py compile-2.7!skip
-plugins/modules/solace_get_bridge_remote_vpns.py pep8:E501
 plugins/modules/solace_bridge_trusted_cn.py compile-2.7!skip
+plugins/modules/solace_bridge_trusted_cn.py pep8:E501
 plugins/modules/solace_dmr_cluster.py compile-2.7!skip
 plugins/modules/solace_get_dmr_clusters.py compile-2.7!skip
 plugins/modules/solace_dmr_cluster_link.py compile-2.7!skip
@@ -80,3 +88,4 @@ plugins/modules/solace_get_rdp_rest_consumers.py compile-2.7!skip
 plugins/modules/solace_get_rdp_rest_consumers.py pep8:E501
 plugins/modules/solace_get_available.py compile-2.7!skip
 plugins/modules/solace_acl_subscribe_share_name_exception.py pep8:E501
+plugins/modules/solace_dmr_cluster_link_remote_address.py pep8:E501

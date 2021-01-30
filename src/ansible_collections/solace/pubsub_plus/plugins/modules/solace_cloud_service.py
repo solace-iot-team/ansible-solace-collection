@@ -19,9 +19,8 @@ description:
 - "Note that you can't change a service once it has been created. Only option: delete & re-create."
 - Creating a service in Solace Cloud is a long-running process. In case creation fails, module will delete the service and try again, up to 3 times.
 notes:
-- "Module Solace Cloud API: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm"
-notes:
 - "The Solace Cloud API does not support updates to a service. Hence, changes are not supported here."
+- "Module Solace Cloud API: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm"
 options:
   name:
     description:

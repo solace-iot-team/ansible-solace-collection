@@ -29,7 +29,8 @@ if not SOLACE_TASK_CONFIG_HAS_IMPORT_ERROR:
             r.headers["authorization"] = "Bearer " + self.token
             return r
 
-class SolaceTaskConfig(object):    
+
+class SolaceTaskConfig(object):
     def __init__(self, module: AnsibleModule):
         self.module = module
 
@@ -58,13 +59,13 @@ class SolaceTaskConfig(object):
 class SolaceTaskBrokerConfig(SolaceTaskConfig):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
-        is_secure=module.params['secure_connection']
-        host=module.params['host']
-        port=module.params['port']
+        is_secure = module.params['secure_connection']
+        host = module.params['host']
+        port = module.params['port']
         self.broker_url = ('https' if is_secure else 'http') + '://' + host + ':' + str(port)
         self.timeout = float(module.params['timeout'])
         self.x_broker = module.params.get('x_broker', None)
-        self.sempv2_version=module.params.get('sempv2_version', None)
+        self.sempv2_version = module.params.get('sempv2_version', None)
 
         solace_cloud_api_token = module.params.get('solace_cloud_api_token', None)
         solace_cloud_service_id = module.params.get('solace_cloud_service_id', None)
@@ -83,12 +84,12 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         else:
             self.solace_cloud_config = None
 
-        self.solace_cloud_auth = None    
+        self.solace_cloud_auth = None
         if self.solace_cloud_config is not None:
             self.solace_cloud_auth = BearerAuth(self.solace_cloud_config['api_token'])
         self.semp_auth = (module.params['username'], module.params['password'])
         return
-    
+
     def set_sempv2_version(self, sempv2_version: str):
         self.sempv2_version = sempv2_version
 
@@ -97,7 +98,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
 
     def get_semp_url(self, path: str) -> str:
         return self.broker_url + path
-    
+
     def get_solace_cloud_url(self, path: str) -> str:
         return path
 
@@ -141,7 +142,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             msg_vpn=dict(type='str', required=True)
         )
 
-    @staticmethod    
+    @staticmethod
     def arg_spec_virtual_router():
         return dict(
             virtual_router=dict(type='str', default='primary', choices=['primary', 'backup'])
@@ -152,7 +153,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         return dict(
             name=dict(type='str', required=True)
         )
-    
+
     @staticmethod
     def arg_spec_crud():
         arg_spec = SolaceTaskBrokerConfig.arg_spec_name()
@@ -208,7 +209,7 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
 
     def get_solace_cloud_auth(self) -> str:
         return self.auth
-    
+
     def get_timeout(self) -> float:
         return self.timeout
 
@@ -224,7 +225,7 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
 
 
 class SolaceTaskSolaceCloudServiceConfig(SolaceTaskSolaceCloudConfig):
-    
+
     PARAM_SERVICE_ID = 'solace_cloud_service_id'
 
     def __init__(self, module: AnsibleModule):
@@ -236,4 +237,3 @@ class SolaceTaskSolaceCloudServiceConfig(SolaceTaskSolaceCloudConfig):
         return dict(
             solace_cloud_service_id=dict(type='str', required=False, default=None, aliases=['service_id'])
         )
-

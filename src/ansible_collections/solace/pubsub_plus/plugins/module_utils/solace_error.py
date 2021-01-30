@@ -4,6 +4,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+
 class SolaceInternalError(Exception):
     def __init__(self, message):
         self.message = message
@@ -29,11 +30,13 @@ class SolaceApiError(Exception):
         return self.resp
 
     def get_resp(self):
-        return self.resp    
+        return self.resp
+
 
 class SolaceParamsValidationError(Exception):
     def __init__(self, param, value, msg):
         super().__init__(f"arg '{param}={value}': {msg}")
+
 
 class SolaceError(Exception):
     def __init__(self, message, result_update: dict = None):
@@ -45,6 +48,6 @@ class SolaceError(Exception):
         if isinstance(self.message, list):
             return self.message
         return [str(self.message)]
-    
+
     def get_result_update(self):
         return self.result_update

@@ -19,7 +19,7 @@ description:
 notes:
 - "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge"
 seealso:
-- module: solace_get_bridges  
+- module: solace_get_bridges
 options:
   name:
     description: The bridge name. Maps to 'bridgeName' in the API.

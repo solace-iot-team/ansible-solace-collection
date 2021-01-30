@@ -23,10 +23,11 @@ except ImportError:
     SOLACE_UTILS_HAS_IMPORT_ERROR = True
     SOLACE_UTILS_IMPORT_ERR_TRACEBACK = traceback.format_exc()
 
+
 class SolaceUtils(object):
 
     @staticmethod
-    def module_fail_on_import_error(module: AnsibleModule, is_error: bool, import_error_traceback: str=None):
+    def module_fail_on_import_error(module: AnsibleModule, is_error: bool, import_error_traceback: str = None):
         if is_error:
             if import_error_traceback is not None:
                 exceptiondata = import_error_traceback.splitlines()
@@ -35,7 +36,7 @@ class SolaceUtils(object):
             else:
                 module.fail_json(msg="Missing module: unknown", rc=solace_sys._SC_SYSTEM_ERR_RC)
         return
-    
+
     @staticmethod
     def create_result(rc=0, changed=False) -> dict:
         result = dict(
@@ -48,10 +49,10 @@ class SolaceUtils(object):
     def get_key(d: dict, k: str):
         try:
             return d[k]
-        except KeyError:
-            raise SolaceInternalError(f"KeyError: dict has no key '{k}'")
-    
-    @staticmethod            
+        except KeyError as e:
+            raise SolaceInternalError(f"KeyError: dict has no key '{k}'") from e
+
+    @staticmethod
     def type_conversion(d, is_solace_cloud):
         # solace cloud: cast everything to string
         # broker: cast strings to ints & floats, string booleans to boolean
@@ -72,7 +73,7 @@ class SolaceUtils(object):
         return d
 
     @staticmethod
-    def deep_dict_diff(new: dict, old: dict, changes: dict=dict()):
+    def deep_dict_diff(new: dict, old: dict, changes: dict = dict()):
         for k in new.keys():
             if not isinstance(new[k], dict):
                 if new[k] != old.get(k, None):
@@ -89,27 +90,7 @@ class SolaceUtils(object):
                 else:
                     changes[k] = copy.deepcopy(new[k])
         # logging.debug("\n\nreturning changes =\n{}\n\n".format(json.dumps(changes, indent=2)))
-        return changes        
-
-    # @staticmethod
-    # def do_deep_compare(new, old, changes=dict()):
-    #     for k in new.keys():
-    #         if not isinstance(new[k], dict):
-    #             if new[k] != old.get(k, None):
-    #                 changes[k] = new[k]
-    #         else:
-    #             # changes[k] = dict()
-    #             if k in old:
-    #                 c = do_deep_compare(new[k], old[k], dict())
-    #                 # logging.debug("\n\nc=\n{}\n\n".format(json.dumps(c, indent=2)))
-    #                 if c:
-    #                     # logging.debug("\n\nc not empty: c=\n{}\n\n".format(json.dumps(c, indent=2)))
-    #                     changes[k] = c
-    #                     # changes[k].update(c)
-    #             else:
-    #                 changes[k] = copy.deepcopy(new[k])
-    #     # logging.debug("\n\nreturning changes =\n{}\n\n".format(json.dumps(changes, indent=2)))
-    #     return changes                
+        return changes
 
     @staticmethod
     def parse_response_body(resp_text: str):

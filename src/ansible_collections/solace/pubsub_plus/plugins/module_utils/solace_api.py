@@ -24,6 +24,7 @@ except ImportError:
     SOLACE_API_HAS_IMPORT_ERROR = True
     SOLACE_API_IMPORT_ERR_TRACEBACK = traceback.format_exc()
 
+
 class SolaceApi(object):
 
     def __init__(self, module: AnsibleModule):
@@ -54,7 +55,7 @@ class SolaceApi(object):
     def handle_response(self, resp):
         if resp.status_code != 200:
             self.handle_bad_response(resp)
-        return self.handle_good_response(resp)    
+        return self.handle_good_response(resp)
 
     def handle_bad_response(self, resp):
         raise SolaceInternalErrorAbstractMethod()
@@ -70,7 +71,7 @@ class SolaceApi(object):
         path = SolaceApi.compose_path(path_array)
         url = self.get_url(config, path)
         resp = request_func(
-            url, 
+            url,
             json=json,
             auth=self.get_auth(config),
             timeout=config.get_timeout(),
@@ -149,14 +150,14 @@ class SolaceApi(object):
             }
         }
         logging.debug("\n%s", json.dumps(log, indent=2))
-        return    
+        return
 
 
 class SolaceSempV2Api(SolaceApi):
 
-    API_BASE_SEMPV2_CONFIG="/SEMP/v2/config"
-    API_BASE_SEMPV2_MONITOR="/SEMP/v2/monitor"
-    
+    API_BASE_SEMPV2_CONFIG = "/SEMP/v2/config"
+    API_BASE_SEMPV2_MONITOR = "/SEMP/v2/monitor"
+
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
         return
@@ -177,9 +178,9 @@ class SolaceSempV2Api(SolaceApi):
             _resp = resp
         else:
             _resp = dict(status_code=resp.status_code,
-                            reason=resp.reason,
-                            body=SolaceUtils.parse_response_body(resp.text)
-                            )
+                         reason=resp.reason,
+                         body=SolaceUtils.parse_response_body(resp.text)
+                         )
         raise SolaceApiError(_resp)
 
     def get_object_settings(self, config: SolaceTaskBrokerConfig, path_array: list) -> dict:
@@ -197,7 +198,7 @@ class SolaceSempV2Api(SolaceApi):
                             and 'code' in meta['error']
                             and meta['error']['code'] == 6):
                         return None
-            raise SolaceApiError(resp)
+            raise SolaceApiError(resp) from e
         return resp
 
 
@@ -221,7 +222,7 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
         return dict()
 
     def get_objects(self, config: SolaceTaskBrokerConfig, api: str, path_array: list, query_params: dict = None) -> list:
-        query=""
+        query = ""
         if self.is_supports_paging:
             query = "count=100"
         if query_params:
@@ -253,7 +254,7 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
                 result_list.extend(data_list)
             # cursor seems to have a bug ==> test first if any data returned
             if len(data_list) == 0:
-                hasNextPage = False                    
+                hasNextPage = False
             elif "meta" not in body:
                 hasNextPage = False
             elif "paging" not in body["meta"]:
@@ -269,7 +270,7 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
 
 class SolaceSempV1Api(SolaceApi):
 
-    API_BASE_SEMPV1="/SEMP"
+    API_BASE_SEMPV1 = "/SEMP"
 
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
@@ -290,11 +291,11 @@ class SolaceSempV1Api(SolaceApi):
         resp_body = xmltodict.parse(resp.text)
         try:
             code = resp_body['rpc-reply']['execute-result']['@code']
-        except KeyError:
-            raise SolaceApiError(resp_body)
+        except KeyError as e:
+            raise SolaceApiError(resp_body) from e
         if code != "ok":
             raise SolaceApiError(resp_body)
-        return resp_body    
+        return resp_body
 
     def make_post_request(self, config: SolaceTaskConfig, xml_data: str):
         url = config.get_semp_url(self.API_BASE_SEMPV1)
@@ -308,6 +309,7 @@ class SolaceSempV1Api(SolaceApi):
         )
         SolaceApi.log_http_roundtrip(resp)
         return self.handle_response(resp)
+
 
 class SolaceSempV1PagingGetApi(SolaceSempV1Api):
 
@@ -354,7 +356,7 @@ class SolaceCloudApi(SolaceApi):
     API_DATA_CENTERS = "datacenters"
     API_SERVICES = "services"
     API_REQUESTS = "requests"
-    
+
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
         return
@@ -368,19 +370,19 @@ class SolaceCloudApi(SolaceApi):
     def handle_response(self, resp):
         # POST: https://api.solace.cloud/api/v0/services: returns 201
         # POST: ../requests returns 202: accepted if long running request
-        if not resp.status_code in [200, 201, 202]:
+        if resp.status_code not in [200, 201, 202]:
             self.handle_bad_response(resp)
         # if resp.status_code == 202:
         #     return self.wait_for_request_completion(resp)
         # TODO: test for deleting service (failed state)
-        import logging
-        logging.debug(f">>>>> handling good response, resp.status_code={resp.status_code}")    
-        return self.handle_good_response(resp)   
+        # import logging
+        # logging.debug(f">>>>> handling good response, resp.status_code={resp.status_code}")
+        return self.handle_good_response(resp)
 
     def handle_bad_response(self, resp):
         _resp = dict(status_code=resp.status_code,
-                    reason=resp.reason
-                )
+                     reason=resp.reason
+                     )
         if resp.text:
             _resp.update({'body': json.loads(resp.text)})
         raise SolaceApiError(_resp)
@@ -399,7 +401,7 @@ class SolaceCloudApi(SolaceApi):
             # TODO: what is the code if solace cloud account has 0 services?
             if resp['status_code'] == 404:
                 return []
-            raise SolaceApiError(resp)
+            raise SolaceApiError(resp) from e
         if isinstance(resp, dict):
             return [resp]
         return resp
@@ -425,7 +427,7 @@ class SolaceCloudApi(SolaceApi):
             resp = e.get_resp()
             if resp['status_code'] == 404:
                 return None
-            raise SolaceApiError(resp)
+            raise SolaceApiError(resp) from e
         return resp
 
     def get_services_with_details(self, config: SolaceTaskSolaceCloudConfig) -> list:
@@ -436,24 +438,21 @@ class SolaceCloudApi(SolaceApi):
             services.append(self.get_service(config, _service['serviceId']))
         return services
 
-    def create_service(self, config: SolaceTaskSolaceCloudConfig, wait_timeout_minutes: int, data: dict, try_count=0) -> dict:        
+    def create_service(self, config: SolaceTaskSolaceCloudConfig, wait_timeout_minutes: int, data: dict, try_count=0) -> dict:
         # POST https://api.solace.cloud/api/v0/services
         resp = self.make_post_request(config, [self.API_BASE_PATH, self.API_SERVICES], data)
         _service_id = resp['serviceId']
         if wait_timeout_minutes > 0:
             res = self.wait_for_service_create_completion(config, wait_timeout_minutes, resp['serviceId'])
             if "failed" in res:
-
-                import logging
-                logging.debug("***** SERVICE CREATION FAILED HANDLING STARTING ******")
-
-
+                # import logging
+                # logging.debug("***** SERVICE CREATION FAILED HANDLING STARTING ******")
                 if try_count < 3:
-                    logging.debug(f"solace cloud service in failed state - deleting service_id={_service_id} ...")
+                    # logging.debug(f"solace cloud service in failed state - deleting service_id={_service_id} ...")
                     _resp = self.delete_service(config, _service_id)
-                    logging.debug("creating solace cloud service again ...")
-                    _resp = self.create_service(config, wait_timeout_minutes, data, try_count+1)
-                    logging.debug(f"new service_id={_resp['serviceId']}")
+                    # logging.debug("creating solace cloud service again ...")
+                    _resp = self.create_service(config, wait_timeout_minutes, data, try_count + 1)
+                    # logging.debug(f"new service_id={_resp['serviceId']}")
                     return self.wait_for_service_create_completion(config, wait_timeout_minutes, _resp['serviceId'])
                 else:
                     r = dict(
@@ -462,7 +461,7 @@ class SolaceCloudApi(SolaceApi):
                     )
                     raise SolaceApiError(r)
             else:
-                return res    
+                return res
         else:
             return resp
 
@@ -510,7 +509,7 @@ class SolaceCloudApi(SolaceApi):
             resp = e.get_resp()
             if resp['status_code'] == 404:
                 return None
-            raise SolaceApiError(resp)
+            raise SolaceApiError(resp) from e
         return resp
 
     def get_service_request_status(self, config: SolaceTaskBrokerConfig, service_id: str, request_id: str):
@@ -520,12 +519,9 @@ class SolaceCloudApi(SolaceApi):
 
     def make_service_post_request(self, config: SolaceTaskBrokerConfig, path_array: list, service_id: str, json=None):
         resp = self.make_request(config, requests.post, path_array, json)
-        
-        import logging, json
-        logging.debug(f"resp (make_request) = \n{json.dumps(resp, indent=2)}")
-        
+        # import logging, json
+        # logging.debug(f"resp (make_request) = \n{json.dumps(resp, indent=2)}")
         request_id = resp['id']
-
         timeout_minutes = 2
         is_completed = False
         is_failed = False
@@ -535,19 +531,17 @@ class SolaceCloudApi(SolaceApi):
 
         while not is_completed and not is_failed and try_count < max_retries:
             resp = self.get_service_request_status(config, service_id, request_id)
-
-            import logging, json
-            logging.debug(f"resp (get_service_request_status)= \n{json.dumps(resp, indent=2)}")
-
+            # import logging, json
+            # logging.debug(f"resp (get_service_request_status)= \n{json.dumps(resp, indent=2)}")
             is_completed = (resp['adminProgress'] == 'completed')
             is_failed = (resp['adminProgress'] == 'failed')
             try_count += 1
             if timeout_minutes > 0:
                 time.sleep(delay)
-        
+
         if is_failed:
             raise SolaceApiError(resp)
         if not is_completed:
-            msg = [ f"timeout service post request - not completed, state={resp['adminProgress']}", str(resp)]
+            msg = [f"timeout service post request - not completed, state={resp['adminProgress']}", str(resp)]
             raise SolaceInternalError(msg)
         return resp
