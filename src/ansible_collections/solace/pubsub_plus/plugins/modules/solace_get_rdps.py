@@ -13,26 +13,20 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_rdps
-TODO: rework docs
 short_description: get list of rdps
-
 description:
 - "Get a list of Rest Delivery Point objects."
-
 notes:
-- "Reference Config: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints)."
-- "Reference Monitor: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints)"
-
-seealso:
-- module: solace_rdp
-
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints"
+- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPoints"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
-
+seealso:
+- module: solace_rdp
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -59,69 +53,56 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: Create RDP - Disabled
-    solace_rdp:
-      name: "rdp-test-ansible-solace"
-      settings:
-        enabled: false
-      state: present
+- name: create rdp
+  solace_rdp:
+    name: foo
+    state: present
 
-  - name: Get List of RDPs - Config
-    solace_get_rdps:
-      query_params:
-        where:
-          - "restDeliveryPointName==rdp-test-ansible*"
+- name: get list config
+  solace_get_rdp_rest_consumers:
+    query_params:
+      where:
+      - "restDeliveryPointName==foo"
+  register: result
 
-    register: result
+- name: print result
+  debug:
+    msg:
+    - "{{ result.result_list }}"
+    - "{{ result.result_list_count }}"
 
-  - name: Result Config API
-    debug:
-      msg:
-        - "{{ result.result_list }}"
-        - "{{ result.result_list_count }}"
-
-  - name: Get List of RDPs - Monitor
-    solace_get_rdps:
-      api: monitor
-    register: result
-
-  - name: Result Monitor API
-    debug:
-      msg:
-        - "{{ result.result_list }}"
-        - "{{ result.result_list_count }}"
+- name: get list monitor
+  solace_get_rdp_rest_consumers:
+    api: monitor
+    query_params:
+      where:
+      - "restDeliveryPointName==foo"
+  register: result
 '''
 
 RETURN = '''
 result_list:
-    description: The list of objects found containing requested fields. Results differ based on the api called.
-    returned: success
-    type: list
-    elements: dict
-    sample:
-        config_api:
-            result_list:
-              - clientProfileName: default
-                enabled: false
-                msgVpnName: default
-                restDeliveryPointName: rdp-test-ansible-solace
-        monitor_api:
-            result_list:
-              - clientName: #rdp/rdp-test-ansible-solace
-                clientProfileName: default
-                enabled: false
-                lastFailureReason: RDP Shutdown
-                lastFailureTime: 1609233281
-                msgVpnName: default
-                restDeliveryPointName: rdp-test-ansible-solace
-                timeConnectionsBlocked: 0
-                up: false
+  description: The list of objects found containing requested fields. Payload depends on API called.
+  returned: success
+  type: list
+  elements: dict
 result_list_count:
-    description: Number of items in result_list.
-    returned: success
-    type: int
-    sample:
-        result_list_count: 1
+  description: Number of items in result_list.
+  returned: success
+  type: int
+rc:
+  description: Return code. rc=0 on success, rc=1 on error.
+  type: int
+  returned: always
+  sample:
+    success:
+      rc: 0
+    error:
+      rc: 1
+msg:
+  description: The response from the HTTP call in case of error.
+  type: dict
+  returned: error
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys

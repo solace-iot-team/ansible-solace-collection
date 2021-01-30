@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_facts
-
+TODO: re-work doc
 short_description: get facts from M(solace_gather_facts)
 
 description: >

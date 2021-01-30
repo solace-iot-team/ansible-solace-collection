@@ -13,33 +13,25 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_mqtt_session_subscriptions
-TODO: rework doc
-
-short_description: list of mqtt session subscriptions
-
+short_description: get list of mqtt session subscriptions
 description:
-- "Get a list of MQTT Session Subscription Objects."
-
+- "Get a list of Subscription objects attached to a MQTT Session."
 notes:
-- "Reference Config: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/mqttSession/getMsgVpnMqttSessionSubscriptions)."
-- "Reference Monitor: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/mqttSession/getMsgVpnMqttSessionSubscriptions)."
-
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/mqttSession/getMsgVpnMqttSessionSubscriptions"
+- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/mqttSession/getMsgVpnMqttSessionSubscriptions"
 options:
   mqtt_session_client_id:
     description: The MQTT session client id. Maps to 'mqttSessionClientId' in the API.
     type: str
     required: true
     aliases: [client_id, client]
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
 - solace.pubsub_plus.solace.virtual_router
-
 seealso:
 - module: solace_mqtt_session_subscription
-
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -61,59 +53,61 @@ module_defaults:
     msg_vpn: "{{ vpn }}"
 tasks:
 
-  - name: get subscriptions
-    solace_get_mqtt_session_subscriptions:
-        api: config
-        client_id: client-id
-        query_params:
-          where:
-            - "subscriptionTopic==ansible-solace/test/*"
-          select:
-            - "mqttSessionClientId"
-            - "mqttSessionVirtualRouter"
-            - "subscriptionTopic"
-            - "subscriptionQos"
-    register: result
+- name: get list config
+  solace_get_mqtt_session_subscriptions:
+    mqtt_session_client_id: foo
+    query_params:
+      where:
+        - "subscriptionTopic==foo/bar/*"
+      select:
+        - "mqttSessionClientId"
+        - "mqttSessionVirtualRouter"
+        - "subscriptionTopic"
+        - "subscriptionQos"
+  register: result
 
-  - name: result config api
-    debug:
-        msg:
-            - "{{ result.result_list }}"
-            - "{{ result.result_list_count }}"
+- name: print result
+  debug:
+    msg:
+    - "{{ result.result_list }}"
+    - "{{ result.result_list_count }}"
 
-  - name: get subscriptions
-    solace_get_mqtt_session_subscriptions:
-        api: monitor
-        client_id: client-id
-        query_params:
-          where:
-            - "subscriptionTopic==ansible-solace/test/*"
-          select:
-            - "mqttSessionClientId"
-            - "mqttSessionVirtualRouter"
-            - "subscriptionTopic"
-            - "subscriptionQos"
-    register: result
+- name: get list monitor
+  solace_get_mqtt_session_subscriptions:
+    api: monitor
+    mqtt_session_client_id: foo
+  register: result
 
-  - name: result monitor api
-    debug:
-        msg:
-            - "{{ result.result_list }}"
-            - "{{ result.result_list_count }}"
+- name: print result
+  debug:
+    msg:
+    - "{{ result.result_list }}"
+    - "{{ result.result_list_count }}"
 '''
 
 RETURN = '''
 result_list:
-    description: The list of objects found containing requested fields. Payload depends on API called.
-    returned: success
-    type: list
-    elements: dict
-
+  description: The list of objects found containing requested fields. Payload depends on API called.
+  returned: success
+  type: list
+  elements: dict
 result_list_count:
-    description: Number of items in result_list.
-    returned: success
-    type: int
-
+  description: Number of items in result_list.
+  returned: success
+  type: int
+rc:
+  description: Return code. rc=0 on success, rc=1 on error.
+  type: int
+  returned: always
+  sample:
+    success:
+      rc: 0
+    error:
+      rc: 1
+msg:
+  description: The response from the HTTP call in case of error.
+  type: dict
+  returned: error
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys

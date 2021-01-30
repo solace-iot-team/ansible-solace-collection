@@ -184,7 +184,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
     @staticmethod
     def arg_spec_get_object_list_monitor():
         d = dict(
-            api=dict(type='str', default='monitor', choices=['monitor']),
+            api=dict(type='str', default='monitor', choices=['monitor'])
         )
         d.update(SolaceTaskBrokerConfig._arg_spec_get_query_params())
         return d

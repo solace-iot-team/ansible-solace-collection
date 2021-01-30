@@ -187,6 +187,13 @@ description:
 - "Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter."
 
 options:
+  api:
+   description: The API the query should run against.
+   required: false
+   type: str
+   default: monitor
+   choices:
+     - monitor
   query_params:
     description: The query parameters.
     required: false

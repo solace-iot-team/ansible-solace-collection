@@ -13,28 +13,19 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_vpns
-
-todo: write this one
-
-short_description: get list of queues
-
+short_description: get list of vpns
 description:
-- "Get a list of Queue objects."
-
+- "Get a list of Message Vpn objects."
 notes:
-- "Reference Config: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/getMsgVpnQueues)."
-- "Reference Monitor: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/queue/getMsgVpnQueues)"
-
-seealso:
-- module: solace_queue
-
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/msgVpn/getMsgVpns"
+- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/msgVpn/getMsgVpns"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-- solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
-
+seealso:
+- module: solace_vpn
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -44,108 +35,72 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-  solace_queue:
+  solace_vpn:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
     username: "{{ sempv2_username }}"
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
-  solace_get_queues:
+  solace_get_vpns:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
     username: "{{ sempv2_username }}"
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
 tasks:
-  - name: Create Queue
-    solace_queue:
-      name: foo
-      state: present
+- name: create vpn
+  solace_vpn:
+    name: foo
+    state: present
+  when: broker_type != 'solace_cloud'
 
-  - name: Get queues
-    solace_get_queues:
-      api: config
-      query_params:
-        where:
-          - "queueName==foo*"
-      select:
-          - "queueName"
-          - "eventMsgSpoolUsageThreshold"
-    register: result
+- name: get list config
+  solace_get_vpns:
+  register: result
 
-  - name: Result Config API
-    debug:
-        msg:
-          - "{{ result.result_list }}"
-          - "{{ result.result_list_count }}"
+- name: print result
+  debug:
+    msg:
+    - "{{ result.result_list }}"
+    - "{{ result.result_list_count }}"
 
-  - name: Get queues
-    solace_get_queues:
-      api: monitor
-      query_params:
-        where:
-          - "queueName==foo*"
-      select:
-          - "queueName"
-          - "eventMsgSpoolUsageThreshold"
-    register: result
+- name: get list monitor
+  solace_get_vpns:
+    api: monitor
+  register: result
 
-  - name: Result Monitor API
-    debug:
-        msg:
-          - "{{ result.result_list }}"
-          - "{{ result.result_list_count }}"
-
+- name: print result
+  debug:
+    msg:
+    - "{{ result.result_list }}"
+    - "{{ result.result_list_count }}"
 '''
 
 RETURN = '''
 result_list:
-    description: The list of objects found containing requested fields. Results differ based on the api called.
-    returned: success
-    type: list
-    elements: dict
-    sample:
-        config_api:
-            result_list:
-              - eventMsgSpoolUsageThreshold:
-                    clearPercent: 50
-                    setPercent: 60
-                queueName: foo
-        monitor_api:
-            result_list:
-              - accessType: exclusive
-                alreadyBoundBindFailureCount: 0
-                averageRxByteRate: 0
-                averageRxMsgRate: 0
-                averageTxByteRate: 0
-                averageTxMsgRate: 0
-                bindRequestCount: 0
-                bindSuccessCount: 0
-                bindTimeForwardingMode: store-and-forward
-                clientProfileDeniedDiscardedMsgCount: 0
-                consumerAckPropagationEnabled: true
-                createdByManagement: true
-                deadMsgQueue: "#DEAD_MSG_QUEUE"
-                deletedMsgCount: 0
-                destinationGroupErrorDiscardedMsgCount: 0
-                disabledBindFailureCount: 0
-                disabledDiscardedMsgCount: 0
-                durable: true
-                egressEnabled: true
-                eventBindCountThreshold:
-                    clearPercent: 60
-                    setPercent: 80
-
+  description: The list of objects found containing requested fields. Payload depends on API called.
+  returned: success
+  type: list
+  elements: dict
 result_list_count:
-    description: Number of items in result_list.
-    returned: success
-    type: int
-    sample:
-        result_list_count: 2
+  description: Number of items in result_list.
+  returned: success
+  type: int
+rc:
+  description: Return code. rc=0 on success, rc=1 on error.
+  type: int
+  returned: always
+  sample:
+    success:
+      rc: 0
+    error:
+      rc: 1
+msg:
+  description: The response from the HTTP call in case of error.
+  type: dict
+  returned: error
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -159,14 +114,9 @@ class SolaceGetVpnsTask(SolaceBrokerGetPagingTask):
     def __init__(self, module):
         super().__init__(module)
 
-    def do_task(self):
+    def get_path_array(self, params: dict) -> list:
         # GET /msgVpns
-        path_array = ['msgVpns']
-        api = self.get_config().get_params()['api']
-        query_params = self.get_config().get_params()['query_params']
-        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, path_array, query_params)
-        result = self.create_result_with_list(objects)
-        return None, result
+        return ['msgVpns']
 
 
 def run_module():
