@@ -13,43 +13,36 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_available
-TODO: re-work me
-short_description: broker/service is available
-
-description: >
-  Check if broker/service is reachable and responsive.
-  Calls "GET /about".
-
+short_description: check if broker is available
+description:
+- Check if broker/service is reachable and responsive. Calls "GET /about".
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about/getAbout"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-
-author: Ricardo Gomez-Ulmke (@rjgu)
-
+author:
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
--
-  name: "Check/wait until brokers available"
-  hosts: all
-  gather_facts: no
-  any_errors_fatal: true
-  module_defaults:
-    solace_get_available:
-      host: "{{ sempv2_host }}"
-      port: "{{ sempv2_port }}"
-      secure_connection: "{{ sempv2_is_secure_connection }}"
-      username: "{{ sempv2_username }}"
-      password: "{{ sempv2_password }}"
-      timeout: "{{ sempv2_timeout }}"
-
-  tasks:
-
-    - name: "Pause Until Broker/Service available"
-      solace_get_available:
-      register: _result
-      until: "_result.is_available"
-      retries: 25 # 25 * 5 seconds
-      delay: 5 # Every 5 seconds
+hosts: all
+gather_facts: no
+any_errors_fatal: true
+module_defaults:
+  solace_get_available:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+tasks:
+- name: "Pause Until Broker/Service available"
+  solace_get_available:
+  register: _result
+  until: "_result.is_available"
+  retries: 25 # 25 * 5 seconds
+  delay: 5 # Every 5 seconds
 '''
 
 RETURN = '''

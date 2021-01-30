@@ -17,8 +17,9 @@ short_description: publish topic exception for acl profile
 description:
 - "Configure a publish topic exception object for an ACL Profile."
 - "Allows addition and removal of a publish topic exception object for an ACL Profile."
-- "Reference (>=2.14): U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfilePublishTopicException)."
-- "Reference (<=2.13): U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfilePublishException)."
+notes:
+- "Module Sempv2 Config (>=2.14): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfilePublishTopicException"
+- "Module Sempv2 Config (<=2.13): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfilePublishException"
 options:
   name:
     description: The name (topic) of the publish topic exception. Maps to 'publishTopicException' in the SEMP v2 API.

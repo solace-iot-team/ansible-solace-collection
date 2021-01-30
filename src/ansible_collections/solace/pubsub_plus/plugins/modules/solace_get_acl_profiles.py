@@ -16,8 +16,9 @@ module: solace_get_acl_profiles
 short_description: get list of acl profiles
 description:
 - "Get a list of ACL Profile Objects."
-- "Reference (Sempv2 Config): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfiles."
-- "Reference (Sempv2 Monitor): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/aclProfile/getMsgVpnAclProfiles."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfiles"
+- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/aclProfile/getMsgVpnAclProfiles"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn

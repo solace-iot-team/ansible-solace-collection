@@ -16,7 +16,8 @@ module: solace_acl_profile
 short_description: configure acl profile
 description:
 - "Configure an ACL Profile on a message vpn. Allows addition, removal and configuration of ACL Profile(s) on Solace Brokers in an idempotent manner."
-- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile"
 seealso:
 - module: solace_get_acl_profiles
 options:

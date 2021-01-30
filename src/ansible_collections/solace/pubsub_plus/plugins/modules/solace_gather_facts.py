@@ -13,74 +13,58 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_gather_facts
-TODO: re-work me
-short_description: Retrieve facts from the Solace event broker and set 'ansible_facts.solace'.
-
+short_description: gather broker facts
 description: >
-  Retrieves facts from the Solace event broker and set 'ansible_facts.solace'.
+  Retrieve facts from the Solace broker and set 'ansible_facts.solace'.
   Call at the beginning of the playbook so all subsequent tasks can use '{{ ansible_facts.solace.<path-to-fact> }}' or M(solace_get_facts) module.
-  Supports Solace Cloud and brokers.
+  Supports Solace Cloud and standalone brokers.
   Retrieves: service/broker info, about info, virtual router name, messaging endpoints, etc.
-
 notes:
 - In order to access other hosts' (other than the current 'inventory_host') facts, you must not use the 'serial' strategy for the playbook.
-- "Reference about: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about)."
-- "Reference broker: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/all/getBroker)."
-- "Reference Solace Cloud: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm) - Get Service / Connections Details."
-
+- "Module Sempv2 Config - about: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about"
+- "Module Sempv2 Config - broker: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/all/getBroker"
+- "Module Solace Cloud Api - get service: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-- solace.pubsub_plus.solace.solace_cloud_config
-
+- solace.pubsub_plus.solace.broker_config_solace_cloud
 seealso:
 - module: solace_get_facts
-
+- module: solace_cloud_account_gather_facts
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
--
-  name: "Get Information about the broker / service"
-  hosts: "{{ brokers }}"
-  gather_facts: no
-  any_errors_fatal: true
-  collections:
-    - solace.pubsub_plus
-  module_defaults:
-    solace_gather_facts:
-      host: "{{ sempv2_host }}"
-      port: "{{ sempv2_port }}"
-      secure_connection: "{{ sempv2_is_secure_connection }}"
-      username: "{{ sempv2_username }}"
-      password: "{{ sempv2_password }}"
-      timeout: "{{ sempv2_timeout }}"
-      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
-      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+hosts: all
+gather_facts: no
+any_errors_fatal: true
+collections:
+- solace.pubsub_plus
+module_defaults:
+  solace_gather_facts:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+    solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 
-  tasks:
-    - name: Gather Solace Facts
-      solace_gather_facts:
+tasks:
+- name: Gather Solace Facts
+  solace_gather_facts:
 
-    - name: "Save hostvars to ./hostvars.json"
-      copy:
-        content: "{{ hostvars | to_nice_json }}"
-        dest: ./hostvars.json
-      delegate_to: localhost
-
+- name: "Save hostvars to ./hostvars.json"
+  copy:
+    content: "{{ hostvars | to_nice_json }}"
+    dest: ./hostvars.json
+  delegate_to: localhost
 '''
 
 RETURN = '''
-
-msg, 
-rc,
-solace:
-    about,
-    service (solace cloud)
-    service (broker)
-
-ansible_facts.solace:
-    description: The facts as returned from the APIs.
+ansible_facts:
+    description: "The facts as returned by the APIs. Element: 'solace'."
     type: dict
     returned: success
     elements: dict
@@ -88,7 +72,6 @@ ansible_facts.solace:
         ansible_facts:
             solace:
                 isSolaceCloud: false
-                Server: "Solace_VMR/9.6.0.27"
                 about:
                     api:
                         platform: "VMR"
@@ -99,7 +82,20 @@ ansible_facts.solace:
                             - msgVpnName: "default"
                               accessLevel: "read-write"
                 service_facts:
-
+                    info: "various service/broker info"
+rc:
+  description: Return code. rc=0 on success, rc=1 on error.
+  type: int
+  returned: always
+  sample:
+    success:
+      rc: 0
+    error:
+      rc: 1
+msg:
+  description: The response from the HTTP call in case of error.
+  type: dict
+  returned: error
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -138,16 +134,16 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
             ["about", "api"]
         ]
         for path_array in path_array_list:
-            resp = self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + path_array )
+            resp = self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + path_array)
             self.add_path_value(about_info, path_array, resp)
         about_info['isSolaceCloud'] = self.get_config().is_solace_cloud()
         return about_info
 
     def get_service_info(self) -> dict:
         resp = dict(
-            vpns = dict()
+            vpns=dict()
         )
-        msg_vpns = self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, "about", "user", "msgVpns"])            
+        msg_vpns = self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, "about", "user", "msgVpns"])
         for msg_vpn in msg_vpns:
             # GET /msgVpns/{msgVpnName}
             vpn_name = msg_vpn['msgVpnName']
@@ -161,7 +157,7 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
             # is this the potential virutal router?
             # 'primaryRouterName'
         else:
-            # get service  
+            # get service
             xml_post_cmd = "<rpc><show><service></service></show></rpc>"
             resp_service = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd)
             resp['service'] = resp_service['rpc-reply']['rpc']['show']['service']['services']
@@ -181,7 +177,7 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
         service_info = self.get_service_info()
         ansible_facts['solace'].update(about_info)
         ansible_facts['solace'].update(service_info)
-        
+
         result = self.create_result()
         result.update(dict(
             ansible_facts=ansible_facts

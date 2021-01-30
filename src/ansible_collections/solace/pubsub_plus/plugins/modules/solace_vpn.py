@@ -13,29 +13,27 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_vpn
-
 short_description: vpn
-
 description:
-- "Allows addition, removal and configuration of VPNs on Solace Brokers in an idempotent manner."
-- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/msgVpn."
-
+- "Allows addition, removal and configuration of VPN objects in an idempotent manner."
 notes:
 - "Only applicable for software brokers, does not apply to Solace Cloud."
-
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/msgVpn"
 options:
   name:
     description: Name of the vpn. Maps to 'msgVpnName' in the API.
     required: true
     type: str
-
+    aliases: [msg_vpn_name]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_get_vpns
+- module: solace_get_vpn_clients
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -57,13 +55,13 @@ tasks:
   solace_vpn:
     name: foo
 
-- name: set mqtt listen port to 1234
+- name: update
   solace_vpn:
     name: foo
     settings:
       serviceMqttPlainTextListenPort: 1234
 
-- name: remove
+- name: delete
   solace_vpn:
     name: foo
     state: absent
@@ -74,6 +72,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -127,7 +138,7 @@ class SolaceVpnTask(SolaceBrokerCRUDTask):
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True)
+        name=dict(type='str', required=True, aliases=['msg_vpn_name'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())

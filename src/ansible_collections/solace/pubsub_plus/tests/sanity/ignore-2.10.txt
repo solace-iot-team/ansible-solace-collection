@@ -2,7 +2,7 @@ plugins/module_utils/solace_cloud_utils.py compile-2.7!skip
 plugins/module_utils/solace_utils.py compile-2.7!skip
 plugins/module_utils/solace_utils.py pep8:E501
 plugins/doc_fragments/solace.py pep8:E501
-plugins/modules/solace_get_facts.py pep8:E501
+plugins/modules/solace_gather_facts.py compile-2.7!skip
 plugins/modules/solace_get_facts.py compile-2.7!skip
 plugins/modules/solace_cloud_service.py compile-2.7!skip
 plugins/modules/solace_cloud_get_service.py compile-2.7!skip
@@ -31,6 +31,7 @@ plugins/modules/solace_client_username.py compile-2.7!skip
 plugins/modules/solace_mqtt_session.py compile-2.7!skip
 plugins/modules/solace_get_mqtt_sessions.py compile-2.7!skip
 plugins/modules/solace_mqtt_session_subscription.py compile-2.7!skip
+plugins/modules/solace_mqtt_session_subscription.py pep8:E501
 plugins/modules/solace_get_mqtt_session_subscriptions.py compile-2.7!skip
 plugins/modules/solace_get_mqtt_session_subscriptions.py pep8:E501
 plugins/modules/solace_get_magic_queues.py compile-2.7!skip

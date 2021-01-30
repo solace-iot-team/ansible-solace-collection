@@ -15,8 +15,9 @@ DOCUMENTATION = '''
 module: solace_dmr_cluster_link_remote_address
 short_description: remote address for dmr cluster link
 description:
-  - "Allows addition, removal and configuration of Remote Address Objects on a DRM Cluster Link."
-  - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLinkRemoteAddress."
+- "Allows addition, removal and configuration of Remote Address Objects on a DRM Cluster Link."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLinkRemoteAddress"
 options:
   name:
     description: The FQDN or IP address (and optional port) of the remote node. Maps to 'remoteAddress' in the API.

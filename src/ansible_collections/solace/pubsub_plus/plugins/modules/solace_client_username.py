@@ -16,7 +16,8 @@ module: solace_client_username
 short_description: client username
 description:
 - "Configure a client username object on a message vpn. Allows addition, removal and configuration of client username objects in an idempotent manner."
-- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientUsername."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientUsername"
 seealso:
 - module: solace_get_client_usernames
 options:

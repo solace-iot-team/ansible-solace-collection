@@ -17,7 +17,8 @@ short_description: client connect exception for acl profile
 description:
 - "Configure client connect exception objects for an ACL Profile."
 - "Allows addition and removal of client connect exception objects for ACL Profiles."
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfileClientConnectExceptions)."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfileClientConnectExceptions"
 options:
   name:
     description: Name of the client connect exception address. Maps to 'clientConnectExceptionAddress' in the API.

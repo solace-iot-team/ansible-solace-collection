@@ -16,7 +16,8 @@ module: solace_cloud_get_services
 short_description: get all services in Solace Cloud
 description:
 - "Get a list of all services' details in the Solace Cloud account."
-- "Reference: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm."
+notes:
+- "Module Solace Cloud API: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
 seealso:

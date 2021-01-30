@@ -16,7 +16,8 @@ module: solace_bridge
 short_description: bridge
 description:
   - "Configure a Bridge object. Allows addition, removal and update of a Bridge Object in an idempotent manner."
-  - "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge)."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge"
 seealso:
 - module: solace_get_bridges  
 options:

@@ -16,7 +16,8 @@ module: solace_bridge_remote_subscription
 short_description: remote subscription on a bridge
 description:
 - "Configure a Remote Subscription Object on a bridge. Allows addition and removal of remote subscription objects on a bridge in an idempotent manner."
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeRemoteSubscription)."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeRemoteSubscription"
 options:
   name:
     description: The subscription topic. Maps to 'remoteSubscriptionTopic' in the API.

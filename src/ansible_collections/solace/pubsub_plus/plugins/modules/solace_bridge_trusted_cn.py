@@ -16,7 +16,8 @@ module: solace_bridge_trusted_cn
 short_description: trusted common name for bridge
 description:
   - "Allows addition and removal of trusted commonn name objects on a bridge in an idempotent manner."
-  - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeTlsTrustedCommonName."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeTlsTrustedCommonName"
 options:
   name:
     description: The trusted common name. Maps to 'tlsTrustedCommonName' in the API.

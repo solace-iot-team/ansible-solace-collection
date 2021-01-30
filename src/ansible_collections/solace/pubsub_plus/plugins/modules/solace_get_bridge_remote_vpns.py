@@ -16,8 +16,9 @@ module: solace_get_bridge_remote_vpns
 short_description: get list of remote vpns of a bridge
 description:
 - "Get a list of Remote Message VPN objects of a Bridge."
-- "Reference (Sempv2 Config): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/getMsgVpnBridgeRemoteMsgVpns."
-- "Reference (Sempv2 Monitor): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/bridge/getMsgVpnBridgeRemoteMsgVpns."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/getMsgVpnBridgeRemoteMsgVpns"
+- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/bridge/getMsgVpnBridgeRemoteMsgVpns"
 options:
   bridge_name:
     description: The bridge. Maps to 'bridgeName' in the API.

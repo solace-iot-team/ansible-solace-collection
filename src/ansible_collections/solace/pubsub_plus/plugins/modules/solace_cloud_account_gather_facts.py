@@ -17,7 +17,8 @@ short_description: Facts from all services in Solace Cloud Account.
 description:
 - "Retrieves service info (facts) about all services available in the Solace Cloud Account."
 - "For example, use to retrieve the SEMP endpoints for a Solace Cloud service as inputs for other modules."
-- "Reference (Solace Cloud API): https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm."
+notes:
+- "Module Solace Cloud API: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm"
 seealso:
   - module: solace_cloud_get_facts
   - module: solace_get_facts

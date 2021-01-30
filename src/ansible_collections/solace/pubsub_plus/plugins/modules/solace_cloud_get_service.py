@@ -16,7 +16,8 @@ module: solace_cloud_get_service
 short_description: get Solace Cloud service details
 description:
 - Get the Solace Cloud Service details by service id.
-- "Reference (Solace Cloud API): https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm."
+notes:
+- "Module Solace Cloud API: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
 - solace.pubsub_plus.solace.solace_cloud_service_config_service_id

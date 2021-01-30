@@ -13,38 +13,33 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_mqtt_session_subscription
-TODO: rework doc
 short_description: subscription for mqtt session
-
 description:
-- "Configure a MQTT Session Subscription object. Allows addition, removal and update of a MQTT Session Subscription object in an idempotent manner."
+- "Configure a MQTT Session Subscription object on a MQTT Session. Allows addition, removal and update of a MQTT Session Subscription object in an idempotent manner."
 notes:
-- >
-    Depending on the Broker version, a QoS=1 subscription results in the 'magic queue' ('#mqtt/{client_id}/{number}') to
-    have ingress / egress ON or OFF. Module uses SEMP v1 <no><shutdown><full/> to ensure they are ON.
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/mqttSession/createMsgVpnMqttSessionSubscription)."
-
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/mqttSession/createMsgVpnMqttSessionSubscription"
 options:
   name:
     description: The subscription topic. Maps to 'subscriptionTopic' in the API.
     type: str
     required: true
-    aliases: [mqtt_session_subscription_topic, topic]
+    aliases: [subscription_topic, topic]
   mqtt_session_client_id:
     description: The MQTT session client id. Maps to 'mqttSessionClientId' in the API.
     type: str
     required: true
-    aliases: [client_id, client]
-
+    aliases: [client_id]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
 - solace.pubsub_plus.solace.virtual_router
-
+seealso:
+- module: solace_mqtt_session
+- module: solace_get_mqtt_session_subscriptions
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -71,38 +66,30 @@ module_defaults:
         timeout: "{{ sempv2_timeout }}"
         msg_vpn: "{{ vpn }}"
 tasks:
-  - name: create session
-    solace_mqtt_session:
-        name: foo
-        state: present
+- name: create session
+  solace_mqtt_session:
+    name: foo
+    state: present
 
-  - name: add subscription
-    solace_mqtt_session_subscription:
-        virtual_router: "{{ virtual_router }}"
-        client_id: foo-client
-        topic: "test/v1/event/+"
-        state: present
+- name: add subscription
+  solace_mqtt_session_subscription:
+    client_id: foo-client
+    topic: "foo/bar/+"
+    state: present
 
-  - name: update subscription
-    solace_mqtt_session_subscription:
-        virtual_router: "{{ virtual_router }}"
-        client_id: foo-client
-        topic: "test/+/#"
-        settings:
-          subscriptionQos: 1
-        state: present
+- name: update subscription
+  solace_mqtt_session_subscription:
+    client_id: foo-client
+    topic: "foo/bar/+"
+    settings:
+        subscriptionQos: 1
+    state: present
 
-  - name: delete subscription
-    solace_mqtt_session_subscription:
-        virtual_router: "{{ virtual_router }}"
-        client_id: "{{ mqtt_session_item.mqttSessionClientId }}"
-        topic: "test/v1/#"
-        state: absent
-
-  - name: delete session
-    solace_mqtt_session:
-        name: foo
-        state: absent
+- name: delete subscription
+  solace_mqtt_session_subscription:
+    client_id: foo-client
+    topic: "foo/bar/+"
+    state: absent
 '''
 
 RETURN = '''
@@ -110,6 +97,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -164,7 +164,7 @@ class SolaceMqttSessionSubscriptionTask(SolaceBrokerCRUDTask):
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', aliases=['topic'], required=True),
+        name=dict(type='str', aliases=['subscription_topic', 'topic'], required=True),
         mqtt_session_client_id=dict(type='str', aliases=['client_id'], required=True),
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()

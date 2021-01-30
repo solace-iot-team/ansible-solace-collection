@@ -17,7 +17,8 @@ short_description: subscribe share name exception for acl profile
 description:
 - "Configure Subscribe Share Name Exeption objects for an ACL Profile."
 - "Allows addition and removal of Subscribe Share Name Exception objects for ACL Profiles."
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfileSubscribeShareNameExceptions)."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfileSubscribeShareNameExceptions"
 options:
   name:
     description: Name of the subscribe share name exception topic. Maps to 'subscribeShareNameException' in the API.

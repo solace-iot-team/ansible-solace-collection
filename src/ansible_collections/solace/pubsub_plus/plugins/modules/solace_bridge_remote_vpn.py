@@ -16,7 +16,8 @@ module: solace_bridge_remote_vpn
 short_description: bridge remote vpn
 description:
 - "Configure a Remote Message VPN object on a bridge. Allows addition and removal of Remote Message VPN objects on a bridge in an idempotent manner."
-- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeRemoteMsgVpn."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeRemoteMsgVpn"
 seealso:
 - module: solace_get_bridge_remote_vpns
 options:

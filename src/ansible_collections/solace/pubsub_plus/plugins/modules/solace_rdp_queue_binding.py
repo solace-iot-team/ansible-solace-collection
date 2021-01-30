@@ -13,36 +13,32 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_rdp_queue_binding
-TODO: rework docs
-short_description: queue bindining for rdp
-
+short_description: queue bindining on rdp
 description:
-    - "Allows addition, removal and configuration of Queue Binding objeccts for a Rest Delivery Point(RDP). "
-    - "Reference documentation: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPointQueueBindings."
-
-seealso:
-- module: solace_rdp
-- module: solace_queue
-
+- "Allows addition, removal and configuration of Queue Binding objects for a Rest Delivery Point(RDP). "
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPointQueueBindings"
 options:
-  queue_name:
+  name:
     description: Name of the queue. Maps to 'queueBindingName' in the API.
     required: true
     type: str
-    aliases: [name]
+    aliases: [queue_name, queue_binding_name]
   rdp_name:
     description: Name of the RDP. Maps to 'restDeliveryPointName' in the API.
     required: true
     type: str
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_rdp
+- module: solace_queue
+- module: solace_get_rdp_queue_bindings
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -77,23 +73,35 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: Create RDP
-    solace_rdp:
-      name: "rdp"
-      state: present
+- name: create rdp
+  solace_rdp:
+    name: rdp-foo
+    state: present
 
-  - name: Create Queue
-    solace_queue:
-      name: "rdp-queue"
-      state: present
+- name: create queue
+  solace_queue:
+    name: queue-foo
+    state: present
 
-  - name: Create a Queue Binding
-    solace_rdp_queue_binding:
-      rdp_name: "rdp"
-      queue_name: "rdp-queue"
-      settings:
-        postRequestTarget: "{host}:{port}"
-      state: present
+- name: create a queue binding
+  solace_rdp_queue_binding:
+    rdp_name: rdp-foo
+    queue_name: queue-foo
+    state: present
+
+- name: update a queue binding
+  solace_rdp_queue_binding:
+    rdp_name: rdp-foo
+    queue_name: queue-foo
+    settings:
+      postRequestTarget: "{host}:{port}"
+    state: present
+
+- name: delete a queue binding
+  solace_rdp_queue_binding:
+    rdp_name: rdp-foo
+    queue_name: queue-foo
+    state: absent
 '''
 
 RETURN = '''
@@ -101,6 +109,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -152,7 +173,7 @@ class SolaceRdpQueueBindingTask(SolaceBrokerCRUDTask):
 def run_module():
     module_args = dict(
         rdp_name=dict(type='str', required=True),
-        name=dict(type='str', required=True, aliases=['queue_name'])
+        name=dict(type='str', required=True, aliases=['queue_name', 'queue_binding_name'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())

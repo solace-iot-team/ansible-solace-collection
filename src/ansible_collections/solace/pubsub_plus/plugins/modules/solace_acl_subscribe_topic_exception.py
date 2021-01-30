@@ -17,8 +17,9 @@ short_description: subscribe topic exception for acl profile
 description:
 - "Configure a subscribe topic exception object for an ACL Profile."
 - "Allows addition and removal of a subscribe topic exception object for an ACL Profile."
-- "Reference (>=2.14): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeTopicException."
-- "Reference (<=2.13): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeException."
+notes:
+- "Module Sempv2 Config (>=2.14): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeTopicException"
+- "Module Sempv2 Config (<=2.13): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeException"
 options:
   name:
     description: The name (topic) of the subscribe topic exception. Maps to 'subscribeTopicException' in the SEMP v2 API.

@@ -18,10 +18,9 @@ description:
 - "Configure a Client Profile object. Allows addition, removal and configuration of Client Profile objects on Solace Brokers in an idempotent manner."
 - "Supports Solace Cloud Brokers as well as Solace Standalone Brokers."
 - "Solace Cloud: Polls periodically until Client Profile created and only then returns."
-- "Reference (Sempv2): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile."
-- "Reference (Solace Cloud API): https://docs.solace.com/Solace-Cloud/ght_use_rest_api_client_profiles.htm."
-seealso:
-- module: solace_get_client_profiles
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile"
+- "Module Solace Cloud API: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_client_profiles.htm"
 options:
   name:
     description: Name of the client profile. Maps to 'clientProfileName' in the API.
@@ -34,6 +33,8 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
 - solace.pubsub_plus.solace.broker_config_solace_cloud
+seealso:
+- module: solace_get_client_profiles
 author:
   - Swen-Helge Huber (@ssh)
   - Ricardo Gomez-Ulmke (@rjgu)

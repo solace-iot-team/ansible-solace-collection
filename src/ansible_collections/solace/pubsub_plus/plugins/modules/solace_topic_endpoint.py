@@ -13,27 +13,26 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_topic_endpoint
-
 short_description: topic endpoint
-
 description:
-  - "Allows addition, removal and configuration of topic endpoint objects."
-  - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/topicEndpoint."
-
+- "Allows addition, removal and configuration of Topic Endpoint objects in an idempotent manner."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/topicEndpoint"
 options:
   name:
     description: The topic endpoint name. Maps to 'topicEndpointName' in the API.
     required: true
     type: str
-
+    aliases: [topic_endpoint_name]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_get_topic_endpoints
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -52,16 +51,22 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
+- name: create
+  solace_topic_endpoint:
+    name: bar
+    state: present
 
-  - name: add
-    solace_topic_endpoint:
-      name: bar
-      state: present
+- name: update
+  solace_topic_endpoint:
+    name: bar
+    settings:
+      egressEnabled: true
+    state: present
 
-  - name: remove
-    solace_topic_endpoint:
-      name: bar
-      state: absent
+- name: delete
+  solace_topic_endpoint:
+    name: bar
+    state: absent
 '''
 
 RETURN = '''
@@ -69,6 +74,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -103,7 +121,7 @@ class SolaceTopicEndpointTask(SolaceBrokerCRUDTask):
         data.update(settings if settings else {})
         path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'topicEndpoints']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
-   
+
     def update_func(self, vpn_name, topic_endpoint_name, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/topicEndpoints/{topicEndpointName}
         path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'topicEndpoints', topic_endpoint_name]
@@ -117,6 +135,7 @@ class SolaceTopicEndpointTask(SolaceBrokerCRUDTask):
 
 def run_module():
     module_args = dict(
+        name=dict(type='str', required=True, aliases=['topic_endpoint_name'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())

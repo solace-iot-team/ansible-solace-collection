@@ -13,27 +13,26 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_rdp
-TODO: re-work doc
 short_description: rest delivery point
-
 description:
-  - "Allows addition, removal and configuration of rest delivery point (RDP) objects."
-  - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint."
-
+- "Configure a Rest Delivery Point (RDP). Allows addition, removal and configuration of Rest Delivery Point objects in an idempotent manner."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint"
 options:
   name:
     description: The RDP name. Maps to 'restDeliveryPointName' in the API.
     required: true
     type: str
-
+    aliases: [rest_delivery_point_name, rdp_name]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_get_rdps
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -52,16 +51,22 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: Create RDP
-    solace_rdp:
-      settings:
-        clientProfileName: "{{ deployment.azRDPFunction.brokerConfig.clientProfileName | default('default') }}"
-        enabled: false
-      state: present
+- name: create
+  solace_rdp:
+    name: foo
+    state: present
 
-  - name: Delete RDP
-    solace_rdp:
-      state: absent
+- name: update
+  solace_rdp:
+    name: foo
+    settings:
+      enabled: false
+    state: present
+
+- name: delete
+  solace_rdp:
+    name: foo
+    state: absent
 '''
 
 RETURN = '''
@@ -69,6 +74,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -118,6 +136,7 @@ class SolaceRdpTask(SolaceBrokerCRUDTask):
 
 def run_module():
     module_args = dict(
+        name=dict(type='str', required=True, aliases=['rdp_name', 'rest_delivery_point_name'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())

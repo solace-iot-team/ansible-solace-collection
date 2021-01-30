@@ -13,21 +13,17 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_rdp_rest_consumer_trusted_cn
-TODO: rework docs
-short_description: trusted common name for rest consumer
-
+short_description: trusted common name on rdp rest consumer
 description:
-  - "Allows addition, removal and configuration of trusted common name objects for a rest consumer of an RDP."
-  - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPointRestConsumerTlsTrustedCommonNames."
-
-seealso:
-- module: solace_rdp_rest_consumer
-
+- "Allows addition, removal and configuration of Trusted Common Name objects on a Rest Consumer object on a Rest Delivery Point object."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPointRestConsumerTlsTrustedCommonNames"
 options:
   name:
     description: The expected trusted common name of the remote certificate. Maps to 'tlsTrustedCommonName' in the API.
     required: true
     type: str
+    aliases: [tls_trusted_common_name]
   rdp_name:
     description: The RDP name. Maps to 'restDeliveryPointName' in the API.
     required: true
@@ -36,13 +32,15 @@ options:
     description: The Rest consumer name. Maps to 'restConsumerName' in the API.
     required: true
     type: str
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_rdp
+- module: solace_rdp_rest_consumer
+- module: solace_get_rdp_rest_consumer_trusted_cns
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -79,26 +77,30 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: Create RDP
-    solace_rdp:
-      name: "rdp"
-      state: present
+- name: create rdp
+  solace_rdp:
+    name: foo
+    state: present
 
-  - name: Create RDP RestConsumer
-    solace_rdp_restConsumer:
-      name: "rest-consumer"
-      rdp_name: "rdp"
-      settings:
-        remoteHost: "{{ host }}"
-        remotePort: "{{ port }}"
-      state: present
+- name: create rdp rest consumer
+  solace_rdp_rest_consumer:
+    name: bar
+    rdp_name: foo
+    state: present
 
-  - name: Add the TLS Trusted Common Name
-    solace_rdp_restConsumer_trusted_cn:
-      rdp_name: "rdp"
-      rest_consumer_name: "rest-consumer"
-      name: "cn"
-      state: present
+- name: add trusted common name
+  solace_rdp_rest_consumer_trusted_cn:
+    rdp_name: foo
+    rest_consumer_name: bar
+    name: "*.my.domain.com"
+    state: present
+
+- name: delete trusted common name
+  solace_rdp_rest_consumer_trusted_cn:
+    rdp_name: foo
+    rest_consumer_name: bar
+    name: "*.my.domain.com"
+    state: absent
 '''
 
 RETURN = '''
@@ -106,6 +108,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
@@ -152,7 +167,8 @@ class SolaceRdpRestConsumerTrustedCommonNameTask(SolaceBrokerCRUDTask):
 
 def run_module():
     module_args = dict(
-        rdp_name=dict(type='str', required=True, aliases=['tls_trusted_common_name']),
+        name=dict(type='str', required=True, aliases=['tls_trusted_common_name']),
+        rdp_name=dict(type='str', required=True),
         rest_consumer_name=dict(type='str', required=True)
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()

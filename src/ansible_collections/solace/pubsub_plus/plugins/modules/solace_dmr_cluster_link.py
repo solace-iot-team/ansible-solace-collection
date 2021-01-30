@@ -15,8 +15,9 @@ DOCUMENTATION = '''
 module: solace_dmr_cluster_link
 short_description: link on a dmr cluster
 description:
-  - "Allows addition, removal and configuration of Link Objects on a DMR Cluster in an idempotent manner."
-  - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLink."
+- "Allows addition, removal and configuration of Link Objects on a DMR Cluster in an idempotent manner."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLink"
 options:
   name:
     description: The name of the node at the remote end of the Link. Maps to 'remoteNodeName' in the API.

@@ -16,7 +16,8 @@ module: solace_dmr_bridge
 short_description: dmr bridge
 description:
 - "Configure a DMR Bridge Object. Allows addition, removal and configuration of DMR brige objects in an idempotent manner."
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrBridge)."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrBridge"
 options:
   name:
     description: Name of the DMR bridge object. Maps to 'remoteNodeName' in the API.

@@ -13,17 +13,11 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_queue_subscription
-
-TODO: rework doc
-
 short_description: subscription on a queue
-
 description:
-- "Configure a Subscription Object on a Queue.. Allows addition, removal and configuration of subscription objects on a queue."
-
+- "Configure a Subscription object on a Queue. Allows addition, removal and configuration of Subscription objects on a queue."
 notes:
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/createMsgVpnQueueSubscription)."
-
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/createMsgVpnQueueSubscription"
 options:
   name:
     description: The subscription topic. Maps to 'subscriptionTopic' in the API.
@@ -35,15 +29,16 @@ options:
     required: true
     type: str
     aliases: [queue_name]
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_queue
+- module: solace_get_queue_subscriptions
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -70,22 +65,22 @@ module_defaults:
         timeout: "{{ sempv2_timeout }}"
         msg_vpn: "{{ vpn }}"
 tasks:
-  - name: create queue
-    solace_queue:
-        name: foo
-        state: present
+- name: create queue
+  solace_queue:
+    name: foo
+    state: present
 
-  - name: add subscription
-    solace_queue_subscription:
-        queue: foo
-        name: "foo/bar"
-        state: present
+- name: add subscription
+  solace_queue_subscription:
+    queue: foo
+    topic: "foo/bar"
+    state: present
 
-  - name: remove subscription
-    solace_queue_subscription:
-        queue: foo
-        name: "foo/bar"
-        state: absent
+- name: remove subscription
+  solace_queue_subscription:
+    queue: foo
+    topic: "foo/bar"
+    state: absent
 '''
 
 RETURN = '''
@@ -93,6 +88,19 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys

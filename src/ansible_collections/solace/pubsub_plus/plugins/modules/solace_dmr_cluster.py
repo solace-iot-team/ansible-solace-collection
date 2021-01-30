@@ -16,7 +16,8 @@ module: solace_dmr_cluster
 short_description: dmr cluster
 description:
 - "Configure DMR Cluster Objects. Allows addition, removal and configuration of DMR cluster objects in an idempotent manner."
-- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster"
 options:
   name:
     description: Name of the DMR cluster. Maps to 'dmrClusterName' in the API.

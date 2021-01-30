@@ -15,8 +15,9 @@ DOCUMENTATION = '''
 module: solace_dmr_cluster_link_trusted_cn
 short_description: trusted common name for dmr cluster link
 description:
-  - "Allows addition, removal and configuration of Trusted Common Name Objects on DMR Cluster links."
-  - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLinkTlsTrustedCommonName."
+- "Allows addition, removal and configuration of Trusted Common Name Objects on DMR Cluster links."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLinkTlsTrustedCommonName"
 options:
   name:
     description: The expected trusted common name of the remote certificate. Maps to 'tlsTrustedCommonName' in the API.

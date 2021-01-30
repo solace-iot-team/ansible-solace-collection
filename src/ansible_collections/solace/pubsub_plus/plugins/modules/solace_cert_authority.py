@@ -17,8 +17,9 @@ short_description: certificate authority
 description:
 - "Allows addition, removal and configuration of certificate authority objects on Solace Brokers in an idempotent manner."
 - "Supports standalone brokers and Solace Cloud."
-- "Reference (Sempv2): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority."
-- "Reference (Solace Cloud API): not available"
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority"
+- "Module Solace Cloud API: not available"
 notes:
 - "Uses deprecated SempV2 API. Since 2.19, broker supports 'clientCertAuthority' & 'domainCertAuthority' instead. Raise an issue if these are required."
 seealso:
