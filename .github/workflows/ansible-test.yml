@@ -20,6 +20,8 @@ on:
 env:
   # DEBUG_FLAG: ${{ true }}
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
+  PIP_DEVEL_REQUIREMENTS_FILE: "devel/devel.requirements.frozen.txt"
+  # PIP_DEVEL_REQUIREMENTS_FILE: "devel/devel.requirements.txt"
 
 jobs:
   test:
@@ -66,8 +68,8 @@ jobs:
           sudo apt-get install libyaml-dev
           sudo apt-get install shellcheck
           python3 -m pip install --upgrade pip
-          pip3 install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
-          pip3 install -r devel/devel.requirements.txt
+          # python3 -m pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
+          python3 -m pip install -r "${PIP_DEVEL_REQUIREMENTS_FILE}"
 
       - name: Set up Python
         uses: actions/setup-python@v2
