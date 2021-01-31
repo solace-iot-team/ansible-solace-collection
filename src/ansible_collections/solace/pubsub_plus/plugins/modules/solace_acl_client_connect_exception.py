@@ -12,6 +12,9 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
+
+BREAK-TEST: break the test - how does it show up in the pull request?
+
 module: solace_acl_client_connect_exception
 short_description: client connect exception for acl profile
 description:
