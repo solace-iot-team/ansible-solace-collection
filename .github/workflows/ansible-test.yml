@@ -37,6 +37,11 @@ jobs:
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
         uses: andymckay/cancel-action@0.2
 
+      - name: Checkout Current Branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+
         # vm comes with a pre-installed python3
         # ansible-test will also use that
         # ==> install all devel requirements on that python3 version first
@@ -48,11 +53,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
           pip install -r devel/devel.requirements.txt
-
-      - name: Checkout Current Branch
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v2
