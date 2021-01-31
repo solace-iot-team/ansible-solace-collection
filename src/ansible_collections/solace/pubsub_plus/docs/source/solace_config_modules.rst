@@ -30,7 +30,7 @@ Solace Configuration Module Reference
    modules/solace_get_queue*
    modules/solace_get_rdp*
    modules/solace_get_topic*
-   modules/solace_get_vpn*
+   modules/solace_get_vpns*
    modules/solace_mqtt_session*
    modules/solace_queue*
    modules/solace_rdp*

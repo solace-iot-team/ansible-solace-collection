@@ -18,9 +18,11 @@ The collection is available on `Ansible Galaxy`_.
 
 
 .. toctree::
-  :maxdepth: 1
+  :maxdepth: 2
   :caption: Guides
 
+  basics
+  inventory-files
   concepts
 
 .. toctree::

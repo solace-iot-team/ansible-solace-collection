@@ -1,58 +1,6 @@
 Concepts of Solace PubSub+ Ansible Collection
 =============================================
 
-The Basics
-++++++++++
-
-The `ansible-solace` modules mostly use the SEMP v2 Config API of the Broker. In some cases, to be backwards compatible with broker versions, they fall back on SEMP v1.
-In order to check the outcome of some of the configurations, some modules also use the SEMP v2 Monitor APIs.
-
-The modules follow the same naming convention as the SEMP v2 API calls so there is an easy mapping between the SEMP documentation and the `ansible-solace` module name.
-For example: SEMP v2 API: `clientUsername`_ maps to `solace_client_username`.
-
-.. _clientUsername:
-  https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientUsername
-
-Some specific Solace Cloud APIs have modules as well, such as creating and deleting a service. They are named `solace_cloud_{module}`.
-
-Types of Modules
-----------------
-
-* Configuration modules: `solace_{configuration-object}`.
-  - add/update/delete a configuration object
-  - support the **state** parameter with **values=['present', 'absent']**
-* Get modules: `solace_get_{configuration_object}s`.
-  - retrieve a list of configuration objects
-
-Idempotency
------------
-The configuration modules update/add Broker objects in an idempotent manner.
-
-**state='present'**:
-  - get the current object from the broker
-  - create a delta settings by comparing current object settings with requested settings
-  - update or create current object based on delta settings (or leave it if no delta found)
-
-**state='absent'**:
-  - check if the object exists
-  - if it does, delete it
-  - if not, do nothing
-
-Ansible Hosts are not Hosts
----------------------------
-
-The Ansible concept of a host is that, a machine which Ansible logs into, transfers scripts, executes scripts, etc.
-
-**For `ansible-solace`, hosts are actually Brokers or Solace Cloud Accounts.**
-
-Which means a few things:
-  - Ansible cannot login and run it's normal setup / fact gathering routines
-  - therefore, always use the following settings in your inventory / playbooks:
-
-.. code-block:: yaml
-
-  ansible_connection: local
-  gather_facts: no
 
 Facts for Solace Brokers
 ------------------------

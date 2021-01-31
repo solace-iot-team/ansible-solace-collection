@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_cloud_account_gather_facts
-short_description: Facts from all services in Solace Cloud Account.
+short_description: gather account services facts
 description:
 - "Retrieves service info (facts) about all services available in the Solace Cloud Account."
 - "For example, use to retrieve the SEMP endpoints for a Solace Cloud service as inputs for other modules."
