@@ -46,6 +46,12 @@ jobs:
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
         uses: andymckay/cancel-action@0.2
 
+      - name: update packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install libyaml-dev
+          sudo apt-get install shellcheck
+
       - name: check pre-installed versions
         run: |
           lsb_release -a
@@ -59,17 +65,21 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
+
         # vm comes with a pre-installed python3
         # ansible-test will also use that
         # ==> install all devel requirements on that python3 version first
       - name: Set up Pre-installed python
+        env:
+          ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
         run: |
-          sudo apt-get update
-          sudo apt-get install libyaml-dev
-          sudo apt-get install shellcheck
           python3 -m pip install --upgrade pip
+          pip install "$ANSIBLE_VERSION"
+          pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
+          pip install -r devel/devel.requirements.txt
+
           # python3 -m pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
-          python3 -m pip install -r "${PIP_DEVEL_REQUIREMENTS_FILE}"
+          # python3 -m pip install -r "${PIP_DEVEL_REQUIREMENTS_FILE}"
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -80,9 +90,6 @@ jobs:
         env:
           ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
         run: |
-          # sudo apt-get update
-          # sudo apt-get install libyaml-dev
-          # sudo apt-get install shellcheck
           python -m pip install --upgrade pip
           pip install "$ANSIBLE_VERSION"
           pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
