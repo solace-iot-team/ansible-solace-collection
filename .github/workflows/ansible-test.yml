@@ -73,7 +73,7 @@ jobs:
         env:
           ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
         run: |
-          pip uninstall ansible
+          sudo pip uninstall ansible
           python3 -m pip install --upgrade pip
           pip install "$ANSIBLE_VERSION"
           pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
@@ -99,6 +99,7 @@ jobs:
       - name: Print versions
         run: |
           ansible --version
+          which ansible-test
           pip3 show ansible-doc-extractor
 
       - name: Run ansible-test
