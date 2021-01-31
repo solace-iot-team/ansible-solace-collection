@@ -27,11 +27,6 @@ jobs:
         # ansible-version: [ 'ansible>=2.9.11,<2.10.0', 'ansible>=2.10.3' ]
         # ansible-version: [ 'ansible>=2.9.11,<2.10.0' ]
     steps:
-
-      - name: hello world
-        run: |
-          echo "hello world"
-
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
         run: |
@@ -41,6 +36,18 @@ jobs:
       - name: Cancel Workflow
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
         uses: andymckay/cancel-action@0.2
+
+        # vm comes with a pre-installed python3
+        # ansible-test will also use that
+        # ==> install all devel requirements on that python3 version first
+      - name: Set up Pre-installed python
+        run: |
+          sudo apt-get update
+          sudo apt-get install libyaml-dev
+          sudo apt-get install shellcheck
+          python -m pip install --upgrade pip
+          pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
+          pip install -r devel/devel.requirements.txt
 
       - name: Checkout Current Branch
         uses: actions/checkout@v2
@@ -56,9 +63,9 @@ jobs:
         env:
           ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
         run: |
-          sudo apt-get update
-          sudo apt-get install libyaml-dev
-          sudo apt-get install shellcheck
+          # sudo apt-get update
+          # sudo apt-get install libyaml-dev
+          # sudo apt-get install shellcheck
           python -m pip install --upgrade pip
           pip install "$ANSIBLE_VERSION"
           pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
@@ -67,7 +74,8 @@ jobs:
       - name: Print versions
         run: |
           ansible --version
-    
+          pip3 show ansible-doc-extractor
+
       - name: Run ansible-test
         run: |
           cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
