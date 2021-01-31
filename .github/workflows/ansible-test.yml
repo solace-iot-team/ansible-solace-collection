@@ -20,8 +20,7 @@ on:
 env:
   # DEBUG_FLAG: ${{ true }}
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
-  PIP_DEVEL_REQUIREMENTS_FILE: "devel/devel.requirements.frozen.txt"
-  # PIP_DEVEL_REQUIREMENTS_FILE: "devel/devel.requirements.txt"
+  PIP_DEVEL_REQUIREMENTS_FILE: "devel/devel.requirements.txt"
 
 jobs:
   test:
@@ -69,20 +68,34 @@ jobs:
         # vm comes with a pre-installed python3
         # ansible-test will also use that
         # ==> install all devel requirements on that python3 version first
-      - name: clean preinstalled python and ansible
+      # - name: clean preinstalled python and ansible
+      #   env:
+      #     ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
+      #   run: |
+      #     sudo -H pip uninstall ansible
+      #     python3 -m pip install --upgrade pip
+      #     pip install "$ANSIBLE_VERSION"
+      #     pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
+      #     pip install -r devel/devel.requirements.txt
+      #
+      #     # python3 -m pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
+      #     # python3 -m pip install -r "${PIP_DEVEL_REQUIREMENTS_FILE}"
+
+      - name: set up python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+
+      - name: Install ansible and devel requirements
         env:
           ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
         run: |
-          sudo pip uninstall ansible
-          python3 -m pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install "$ANSIBLE_VERSION"
           pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
-          pip install -r devel/devel.requirements.txt
+          pip install -r "${PIP_DEVEL_REQUIREMENTS_FILE}"
 
-          # python3 -m pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
-          # python3 -m pip install -r "${PIP_DEVEL_REQUIREMENTS_FILE}"
-
-      - name: Set up Python
+      - name: setup python matrix version
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
@@ -94,7 +107,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install "$ANSIBLE_VERSION"
           pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
-          pip install -r devel/devel.requirements.txt
+          pip install -r "${PIP_DEVEL_REQUIREMENTS_FILE}"
 
       - name: Print versions
         run: |
