@@ -23,8 +23,9 @@ env:
 
 jobs:
   test:
-    # runs-on: ubuntu-latest
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
+    # runs-on: ubuntu-18.04
+      # pre-installed: /usr/bin/python=2.7.17 and /usr/bin/python3=3.6.9
     strategy:
       matrix:
         python-version: [ '3.9' ]
