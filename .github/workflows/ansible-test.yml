@@ -10,6 +10,8 @@ on:
     # - cron: '0 1 * * THU'
     - cron: '0 1 * * *'
 
+  pull_request:
+
 env:
   # DEBUG_FLAG: ${{ true }}
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
@@ -19,12 +21,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # python-version: [ '3.6' ]
-        python-version: [ '3.6', '3.8', '3.9' ]
+        python-version: [ '3.9' ]
+        # python-version: [ '3.6', '3.8', '3.9' ]
         ansible-version: [ 'ansible>=2.10.3' ]
         # ansible-version: [ 'ansible>=2.9.11,<2.10.0', 'ansible>=2.10.3' ]
         # ansible-version: [ 'ansible>=2.9.11,<2.10.0' ]
     steps:
+
+      - name: hello world
+        run: |
+          echo "hello world"
+
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
         run: |
@@ -57,6 +64,10 @@ jobs:
           pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
           pip install -r devel/devel.requirements.txt
 
+      - name: Print versions
+        run: |
+          ansible --version
+    
       - name: Run ansible-test
         run: |
           cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
