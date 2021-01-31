@@ -12,6 +12,9 @@ on:
   schedule:
     # - cron: '0 1 * * THU'
     - cron: '0 1 * * *'
+  pull_request:
+    branches:
+      - main    
 
 env:
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
