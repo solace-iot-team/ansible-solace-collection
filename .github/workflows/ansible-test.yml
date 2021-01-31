@@ -31,7 +31,7 @@ jobs:
       matrix:
         # python-version: [ '3.9' ]
         # 3.6 is always tested
-        python-version: [ 3.8', '3.9' ]
+        python-version: [ '3.8', '3.9' ]
         ansible-version: [ 'ansible>=2.10.3' ]
         # ansible-version: [ 'ansible>=2.9.11,<2.10.0', 'ansible>=2.10.3' ]
         # ansible-version: [ 'ansible>=2.9.11,<2.10.0' ]
