@@ -23,8 +23,8 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    # runs-on: ubuntu-18.04
+    # runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
       # pre-installed: /usr/bin/python=2.7.17 and /usr/bin/python3=3.6.9
     strategy:
       matrix:
@@ -46,13 +46,11 @@ jobs:
 
       - name: check pre-installed versions
         run: |
+          lsb_release -a
           which python
           python --version
           which python3
           python3 --version
-          lsb_release -a
-          exit 1
-
 
       - name: Checkout Current Branch
         uses: actions/checkout@v2
@@ -67,9 +65,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install libyaml-dev
           sudo apt-get install shellcheck
-          python -m pip install --upgrade pip
-          pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
-          pip install -r devel/devel.requirements.txt
+          python3 -m pip install --upgrade pip
+          pip3 install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
+          pip3 install -r devel/devel.requirements.txt
 
       - name: Set up Python
         uses: actions/setup-python@v2
