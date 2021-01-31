@@ -23,7 +23,8 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         python-version: [ '3.9' ]
@@ -41,6 +42,13 @@ jobs:
       - name: Cancel Workflow
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
         uses: andymckay/cancel-action@0.2
+
+      - name: check pre-installed python
+        run: |
+          which python
+          python --version
+          exit 1
+
 
       - name: Checkout Current Branch
         uses: actions/checkout@v2
