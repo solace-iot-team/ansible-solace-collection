@@ -5,7 +5,6 @@ name: ansible-test
 on:
   # for testing
   workflow_dispatch:
-
   # testing branches
   push:
     branches:
