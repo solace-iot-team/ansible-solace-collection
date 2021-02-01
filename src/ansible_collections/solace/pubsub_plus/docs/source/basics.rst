@@ -21,22 +21,9 @@ Types of Modules
 * **Configuration modules**: `solace_{configuration-object}`.
   - add/update/delete a configuration object
   - support the **state** parameter with **values=['present', 'absent']**
-* **Get modules**: `solace_get_{configuration_object}s`.
-  - retrieve a list of configuration objects
-
-Idempotency
------------
-The configuration modules update/add/delete Broker objects in an idempotent manner.
-
-**state='present'**:
-  - get the current object from the broker
-  - create a delta settings by comparing current object settings with requested settings
-  - update or create current object based on delta settings (or leave it if no delta found)
-
-**state='absent'**:
-  - check if the object exists
-  - if it does, delete it
-  - if not, do nothing
+  - support to configure the Broker objects in an idempotent manner
+* **Monitor modules**: `solace_get_{configuration_object}s`.
+  - retrieve a list of configuration objects, either from the monitor or config Api
 
 Ansible Hosts are not Hosts but Brokers
 ---------------------------------------

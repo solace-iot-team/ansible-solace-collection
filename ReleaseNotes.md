@@ -5,6 +5,9 @@ Refactor framework to streamline module interfaces and development.
 
 _**Note: the release breaks existing playbooks. some module args have changed.**_
 
+#### Documentation
+  * detailed description of inventory files and their use in playbooks
+
 #### New / Updated Modules
   * [solace_cloud_get_services](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_cloud_get_services.html)
   * [solace_acl_subscribe_share_name_exception](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_acl_subscribe_share_name_exception.html)

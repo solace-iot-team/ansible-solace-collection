@@ -4,16 +4,18 @@ Installation
 Installation & Dependencies
 ---------------------------
 
-Prerequisites:
+Prerequisites
++++++++++++++
+
   - install python >=3.6
 
-Install Python dependencies:
+Python dependencies:
 :download:`requirements <../../requirements.txt>`:
 
 .. literalinclude:: ../../requirements.txt
 
 
-Install:
+Install dependencies:
 
 .. code-block:: bash
 
@@ -22,7 +24,10 @@ Install:
   $ pip install -r requirements.txt
   $ pip install ansible
 
-Install the Solace PubSub+ Ansible Collection::
+Install the Solace PubSub+ Ansible Collection
++++++++++++++++++++++++++++++++++++++++++++++
+
+.. code-block:: bash
 
   $ ansible-galaxy collection install solace.pubsub_plus
 
@@ -40,13 +45,31 @@ installation options in the `Using collections`_ document.
 .. _Using collections:
    https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#installing-collections
 
-Set the Python interpreter::
+Set the Python interpreter
+++++++++++++++++++++++++++
 
-   # manually
+.. note::
+
+  Ansible-Solace only works with Python version >=3.6. Most systems come with a Python version 2.x pre-installed in `/usr/bin/python`.
+
+  By setting the environment variable `ANSIBLE_PYTHON_INTERPRETER="path-to-python3"` we can tell Ansible which Python interpreter to use.
+
+.. code-block:: bash
+
+  # manually
   $ export ANSIBLE_PYTHON_INTERPRETER={path-to-your-python-3-bin}
-   # dynamically
+  # dynamically
   $ export ANSIBLE_PYTHON_INTERPRETER=$(python3 -c "import sys; print(sys.executable)")
 
+**Ansible Playbook Error when using Python 2.x:**
+
+.. code-block::
+
+  fatal: [local_broker]: FAILED! => {
+      "msg": "Unable to import ('ansible_collections', 'solace', 'pubsub_plus', 'plugins', 'module_utils', 'solace_api') due to invalid syntax"
+  }
+
+Solution: set the `ANSIBLE_PYTHON_INTERPRETER={path-to-your-python-3-bin}`
 
 Example Installation: MacOs
 ---------------------------
@@ -171,7 +194,35 @@ Example Installation: Ubuntu
   $ sudo python -m pip install --upgrade pip
   $ pip -V
 
-**Ansible & Collection**
+**Ansible & Solace Collection**
+
+.. code-block:: bash
+
+  $ sudo pip install ansible
+  $ pip show ansible
+  $ ansible --version
+
+  # collection dependencies & collection
+  $ sudo pip install -r requirements.txt
+  $ ansible-galaxy collection install solace.pubsub_plus
+  # check install path
+  $ ansible-galaxy collection list
+
+
+Example Installation: Centos7
+-----------------------------
+
+**Python 3**
+
+.. code-block:: bash
+
+  $ sudo yum install python3
+  $ sudo yum install libselinux-python3
+
+  $ sudo python -m pip install --upgrade pip
+  $ pip -V
+
+**Ansible & Solace Collection**
 
 .. code-block:: bash
 

@@ -23,7 +23,6 @@ The collection is available on `Ansible Galaxy`_.
 
   basics
   inventory-files
-  concepts
 
 .. toctree::
   :maxdepth: 1
@@ -32,7 +31,7 @@ The collection is available on `Ansible Galaxy`_.
   facts_and_general_modules
   solace_cloud_modules
   solace_config_modules
-  solace_monitor_modules
+  solace_get_modules
   roles
 
 Repos

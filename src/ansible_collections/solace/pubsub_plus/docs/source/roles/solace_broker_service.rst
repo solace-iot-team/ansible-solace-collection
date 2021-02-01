@@ -1,4 +1,7 @@
-solace_broker_service - Manage a Broker Service
+
+.. _solace_broker_service_role:
+
+solace_broker_service - manage a broker service
 ===============================================
 
 Manage a Broker Service running in Docker.
