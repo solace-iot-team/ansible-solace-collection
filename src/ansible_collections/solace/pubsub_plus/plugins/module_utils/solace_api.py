@@ -515,7 +515,12 @@ class SolaceCloudApi(SolaceApi):
     def get_service_request_status(self, config: SolaceTaskBrokerConfig, service_id: str, request_id: str):
         # GET https://api.solace.cloud/api/v0/services/{paste-your-serviceId-here}/requests/{{requestId}}
         path_array = [self.API_BASE_PATH, self.API_SERVICES, service_id, self.API_REQUESTS, request_id]
-        return self.make_get_request(config, path_array)
+        resp = self.make_get_request(config, path_array)
+        # resp may not yet contain 'adminProgress' depending on whether this creation has started yet
+        # add it in
+        if 'adminProgress' not in resp:
+            resp['adminProgress'] = 'inProgress'
+        return resp
 
     def make_service_post_request(self, config: SolaceTaskBrokerConfig, path_array: list, service_id: str, json=None):
         resp = self.make_request(config, requests.post, path_array, json)
@@ -528,7 +533,8 @@ class SolaceCloudApi(SolaceApi):
         try_count = -1
         delay = 5  # seconds
         max_retries = (timeout_minutes * 60) // delay
-
+        # wait 1 cycle before start polling
+        time.sleep(delay)
         while not is_completed and not is_failed and try_count < max_retries:
             resp = self.get_service_request_status(config, service_id, request_id)
             # import logging, json
