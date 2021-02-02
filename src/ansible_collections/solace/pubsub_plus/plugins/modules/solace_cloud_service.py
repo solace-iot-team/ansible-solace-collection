@@ -18,6 +18,9 @@ description:
 - Create & delete Solace Cloud services.
 - "Note that you can't change a service once it has been created. Only option: delete & re-create."
 - Creating a service in Solace Cloud is a long-running process. In case creation fails, module will delete the service and try again, up to 3 times.
+- >
+    The module operates at a Solace Cloud Account level, therefor, you don't necessarily require an inventory file.
+    Using `hosts: localhost` as a host and passing the Solace Cloud Api Token as an environment variable works as well.
 notes:
 - "The Solace Cloud API does not support updates to a service. Hence, changes are not supported here."
 - "Module Solace Cloud API: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm"
@@ -52,23 +55,30 @@ options:
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
 - solace.pubsub_plus.solace.state
+seealso:
+- module: solace_cloud_get_service
+- module: solace_cloud_get_services
+- module: solace_cloud_get_facts
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
-hosts: all
+hosts: localhost
 gather_facts: no
 any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 tasks:
-- set_fact:
-    api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+- name: check input
+  assert:
+    that:
+        - SOLACE_CLOUD_API_TOKEN is defined and SOLACE_CLOUD_API_TOKEN | length > 0
+    fail_msg: "one or more variables not defined"
 
-- name: "Create Solace Cloud Service"
+- name: create service
   solace_cloud_service:
-    api_token: "{{ api_token }}"
+    api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
     name: "foo"
     settings:
         msgVpnName: "foo"
@@ -79,25 +89,45 @@ tasks:
 
 - set_fact:
     service_info: "{{ result.response }}"
-    service_id: "{{ result.response.serviceId }}"
+
+- name: extract inventory from service info
+  solace_cloud_get_facts:
+    from_dict: "{{ service_info }}"
+    get_formattedHostInventory:
+        host_entry: "{{ service_info.name }}"
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+        meta:
+            service_name: "{{ service_info.name }}"
+            service_id: "{{ service_info.serviceId }}"
+            datacenterId: "{{ service_info.datacenterId }}"
+            serviceTypeId: "{{ service_info.serviceTypeId}}"
+            serviceClassId: "{{ service_info.serviceClassId }}"
+            serviceClassDisplayedAttributes: "{{ service_info.serviceClassDisplayedAttributes }}"
+    register: result
+
+- name: save inventory to file
+  copy:
+    content: "{{ result.facts.formattedHostInventory | to_nice_yaml }}"
+    dest: "./tmp/solace-cloud.{{ service_info.name }}.inventory.yml"
+    changed_when: false
+  delegate_to: localhost
+
+- name: save service info to file
+  copy:
+    content: "{{ service_info | to_nice_yaml }}"
+    dest: "./tmp/solace-cloud.{{ service_info.name }}.info.yml"
+  delegate_to: localhost
+
+- name: delete service
+  solace_cloud_service:
+    api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+    name: "{{ service_info.name }}"
+    state: absent
 '''
 
 RETURN = '''
-rc:
-    description: Return code. rc=0 on success, rc=1 on error.
-    type: int
-    returned: always
-    sample:
-        success:
-            rc: 0
-        error:
-            rc: 1
-msg:
-    description: error message if not ok
-    type: str
-    returned: error
 response:
-    description: the response from the call
+    description: response from the Api call. contains the service info.
     type: dict
     returned: success
     sample:
@@ -137,6 +167,19 @@ response:
             timestamp: 0
             type: service
             userId: xxx
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
+msg:
+    description: error message if not ok
+    type: str
+    returned: error
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys

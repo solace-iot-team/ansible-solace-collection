@@ -47,9 +47,9 @@ EXAMPLES = '''
       register: result
 
     - set_fact:
-        service_info: "{{ result.response }}"
-        service_name: "{{ result.response.name }}"
-        admin_state: "{{ result.response.adminState }}"
+        service_info: "{{ result.service }}"
+        service_name: "{{ result.service.name }}"
+        admin_state: "{{ result.service.adminState }}"
 
     - name: "Save Solace Cloud Service Info to File"
       copy:
@@ -59,8 +59,8 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-response:
-    description: The response from the get call. Content differs depending on state of service.
+service:
+    description: The retrieved service details. Content differs depending on state of service.
     type: dict
     returned: success
     sample:
