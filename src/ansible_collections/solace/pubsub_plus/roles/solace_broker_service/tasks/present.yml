@@ -21,6 +21,40 @@
     fail_msg: "cannot reach broker on {{ broker_url }}"
   when: service_type == 'docker_single_node'
 
+# check if spool is fully activated, using create a queue as test
+- name: "Check if message spool is available"
+  solace.pubsub_plus.solace_queue:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    msg_vpn: "{{ vpn }}"
+    name: test_message_spool
+    state: present
+  register: result
+  until: result.rc == 0
+  retries: 20
+  delay: 5
+  when: service_type == 'docker_single_node'
+
+- assert:
+    that: result.rc == 0
+    fail_msg: "failed to create queue: {{ result.msg }}"
+  when: service_type == 'docker_single_node'
+
+- name: "clean up queue"
+  solace.pubsub_plus.solace_queue:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    msg_vpn: "{{ vpn }}"
+    name: test_message_spool
+    state: absent
+  when: service_type == 'docker_single_node'
+
 - name: create inventory
   set_fact:
     inventory: "{{ lookup('template', 'docker_single_node.j2') | from_json}}"

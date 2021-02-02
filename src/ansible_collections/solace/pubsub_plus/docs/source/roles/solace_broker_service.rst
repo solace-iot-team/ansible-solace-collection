@@ -19,7 +19,7 @@ Example playbooks
 This playbook will:
   - download the latest Solace PubSub+ standard edition image from docker hub
   - start the docker container
-  - wait until the broker service is up and running
+  - wait until the broker service is up and running, including a test if message spool is availabe (by creating/deleting a queue)
   - create the inventory file in the ``.tmp`` directory
   - uses the default ```definition`` values for ``docker-compose``
 
