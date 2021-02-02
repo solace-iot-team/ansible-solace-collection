@@ -83,7 +83,8 @@ class SolaceTask(object):
             self.module.exit_json(msg=str(e), **result)
         except Exception as e:
             ex = traceback.format_exc()
-            msg = [str(e)] + ex.split('\n')
+            ex_msg_list = [str(e)]
+            msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
             result = self.create_result(rc=1, changed=self.changed)
             self.module.exit_json(msg=msg, **result)
 

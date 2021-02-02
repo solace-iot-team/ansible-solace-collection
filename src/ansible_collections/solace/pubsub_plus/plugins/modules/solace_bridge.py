@@ -16,6 +16,11 @@ module: solace_bridge
 short_description: bridge
 description:
   - "Configure a Bridge object. Allows addition, removal and update of a Bridge Object in an idempotent manner."
+  - >
+    Before configuring a Bridge object, consider deleting it first.
+    This ensures that the set-up starts completely fresh.
+    For example, adding a new remote vpn to a bridge will not result in any existing remote vpns to be deleted.
+    This could mean that invalid remote vpns are 'hanging around', causing the bridge to be not operational.
 notes:
 - "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge"
 seealso:
@@ -26,7 +31,7 @@ options:
     required: true
     type: str
   bridge_virtual_router:
-    description: The virtual router.
+    description: The virtual router. Maps to 'bridgeVirtualRouter' in the API.
     required: false
     type: str
     default: auto
@@ -60,28 +65,33 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-  - name: add
-    solace_bridge:
-      name: foo
-      virtual_router: auto
-      settings:
-        enabled: false
-        remoteAuthenticationBasicClientUsername: default
-        remoteAuthenticationBasicPassword: password
-        remoteAuthenticationScheme: basic
+- name: delete the bridge first  - starting fresh
+  solace_bridge:
+    name: foo
+    state: absent
 
-  - name: update
-    solace_bridge:
-      name: foo
-      virtual_router: auto
-      settings:
-        enabled: true
+- name: add
+  solace_bridge:
+    name: foo
+    bridge_virtual_router: auto
+    settings:
+      enabled: false
+      remoteAuthenticationBasicClientUsername: default
+      remoteAuthenticationBasicPassword: password
+      remoteAuthenticationScheme: basic
 
-  - name: remove
-    solace_bridge:
-      name: foo
-      virtual_router: auto
-      state: absent
+- name: update
+  solace_bridge:
+    name: foo
+    bridge_virtual_router: auto
+    settings:
+      enabled: true
+
+- name: remove
+  solace_bridge:
+    name: foo
+    bridge_virtual_router: auto
+    state: absent
 '''
 
 RETURN = '''
@@ -121,7 +131,7 @@ class SolaceBridgeTask(SolaceBrokerCRUDTask):
 
     def get_args(self):
         params = self.get_module().params
-        return [params['msg_vpn'], params['virtual_router'], params['name']]
+        return [params['msg_vpn'], params['bridge_virtual_router'], params['name']]
 
     def get_func(self, vpn_name, virtual_router, bridge_name):
         # GET /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}

@@ -89,13 +89,13 @@ tasks:
 
 - set_fact:
     service_info: "{{ result.response }}"
+    trust_store_uri: "{{ result.response.msgVpnAttributes.truststoreUri }}"
 
 - name: extract inventory from service info
   solace_cloud_get_facts:
     from_dict: "{{ service_info }}"
     get_formattedHostInventory:
         host_entry: "{{ service_info.name }}"
-        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
         meta:
             service_name: "{{ service_info.name }}"
             service_id: "{{ service_info.serviceId }}"
@@ -117,6 +117,17 @@ tasks:
     content: "{{ service_info | to_nice_yaml }}"
     dest: "./tmp/solace-cloud.{{ service_info.name }}.info.yml"
   delegate_to: localhost
+
+- name: save service info to file
+  copy:
+    content: "{{ service_info | to_nice_yaml }}"
+    dest: "./tmp/solace-cloud.{{ service_info.name }}.info.yml"
+  delegate_to: localhost
+
+- name: download certificate
+  get_url:
+    url: "{{ trust_store_uri }}"
+    dest: "./tmp/solace-cloud.{{ service_info.name }}.pem"
 
 - name: delete service
   solace_cloud_service:

@@ -26,6 +26,11 @@ _**Note: the release breaks existing playbooks. some module args have changed.**
   * [solace_get_topic_endpoints](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_topic_endpoints.html)
   * [solace_get_vpn_clients](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_vpn_clients.html)
   * [solace_get_vpns](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_vpns.html)
+  * [solace_get_facts](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_facts.html)
+
+#### Removed Modules
+
+  * **solace_bridge_tls_cn** - renamed to [solace_bridge_trusted_cn](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_bridge_trusted_cn.html)
 
 #### Refactored Framework
 
