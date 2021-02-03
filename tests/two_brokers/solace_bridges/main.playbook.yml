@@ -239,7 +239,7 @@
           enabled: true
         state: present
 
-    - name: "main: solace_get_bridge_remote_vpns"
+    - name: "main: solace_get_bridge_remote_vpns: until remote vpn is up"
       solace_get_bridge_remote_vpns:
         bridge_name: "{{ bridge_name }}"
         api: monitor
@@ -255,15 +255,23 @@
             - compressedDataEnabled
             - tlsEnabled
       register: result
+      until:
+        - result.result_list[0].up == True
+      retries: 3
+      delay: 5
     - assert:
         that:
           - result.rc==0
           - result.result_list | length == 1
           - result.result_list_count==1
-    - name: "main: assert remote vpn is up"
+    - name: "main: assert bridge remote vpn is up"
       assert:
         that:
           - result.result_list[0].up == True
+        fail_msg: "lastConnectionFailureReason={{ result.result_list[0].lastConnectionFailureReason }}"
+
+    - fail:
+        msg: continue here - check remote vpn is up    
 
     - name: "main: solace_get_bridges: until bridge is up"
       solace_get_bridges:
