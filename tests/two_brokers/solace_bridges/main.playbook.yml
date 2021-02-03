@@ -270,9 +270,6 @@
           - result.result_list[0].up == True
         fail_msg: "lastConnectionFailureReason={{ result.result_list[0].lastConnectionFailureReason }}"
 
-    - fail:
-        msg: continue here - check remote vpn is up    
-
     - name: "main: solace_get_bridges: until bridge is up"
       solace_get_bridges:
         api: monitor
