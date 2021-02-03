@@ -13,29 +13,27 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_vpn
-
 short_description: vpn
-
 description:
-- "Allows addition, removal and configuration of VPNs on Solace Brokers in an idempotent manner."
-- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/msgVpn."
-
+- "Allows addition, removal and configuration of VPN objects in an idempotent manner."
 notes:
 - "Only applicable for software brokers, does not apply to Solace Cloud."
-
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/msgVpn"
 options:
   name:
     description: Name of the vpn. Maps to 'msgVpnName' in the API.
     required: true
     type: str
-
+    aliases: [msg_vpn_name]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_get_vpns
+- module: solace_get_vpn_clients
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -57,13 +55,13 @@ tasks:
   solace_vpn:
     name: foo
 
-- name: set mqtt listen port to 1234
+- name: update
   solace_vpn:
     name: foo
     settings:
       serviceMqttPlainTextListenPort: 1234
 
-- name: remove
+- name: delete
   solace_vpn:
     name: foo
     state: absent
@@ -74,57 +72,76 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceVpnTask(su.SolaceTask):
+class SolaceVpnTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'msgVpnName'
+    OBJECT_KEY = 'msgVpnName'
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
-        # placeholder, does not do anything
-        self.assert_is_not_solace_cloud()
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
-    def lookup_item(self):
-        return self.module.params['name']
+    def validate_params(self):
+        if self.get_config().is_solace_cloud():
+            raise SolaceError("cannot configure vpn objects for solace cloud")
 
-    def get_func(self, solace_config, lookup_item_value):
+    def get_args(self):
+        params = self.get_module().params
+        return [params['name']]
+
+    def get_func(self, vpn_name):
         # GET /msgVpns/{msgVpnName}
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def create_func(self, solace_config, vpn, settings=None):
-        defaults = {
-            'enabled': True
+    def create_func(self, vpn_name, settings=None):
+        # POST /msgVpns
+        data = {
+            self.OBJECT_KEY: vpn_name
         }
-        mandatory = {
-            'msgVpnName': vpn
-        }
-        data = su.merge_dicts(defaults, mandatory, settings)
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS]
-        return su.make_post_request(solace_config, path_array, data)
+        data.update(settings if settings else {})
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def update_func(self, solace_config, lookup_item_value, settings):
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, lookup_item_value]
-        return su.make_patch_request(solace_config, path_array, settings)
+    def update_func(self, vpn_name, settings=None, delta_settings=None):
+        # PATCH /msgVpns/{msgVpnName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name]
+        return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
-    def delete_func(self, solace_config, lookup_item_value):
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array)
+    def delete_func(self, vpn_name):
+        # DELETE /msgVpns/{msgVpnName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True),
+        name=dict(type='str', required=True, aliases=['msg_vpn_name'])
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_crud())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -133,9 +150,7 @@ def run_module():
     )
 
     solace_task = SolaceVpnTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():

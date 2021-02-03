@@ -13,32 +13,26 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_cert_authority
-
 short_description: certificate authority
-
 description:
 - "Allows addition, removal and configuration of certificate authority objects on Solace Brokers in an idempotent manner."
-
+- "Supports standalone brokers and Solace Cloud."
 notes:
-- "Solace Cloud currently does not support managing certificate authorities."
-- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority."
-
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority"
+- "Module Solace Cloud API: not available"
+- "Uses deprecated SempV2 API. Since 2.19, broker supports 'clientCertAuthority' & 'domainCertAuthority' instead. Raise an issue if these are required."
+seealso:
+- module: solace_get_cert_authorities
 options:
-    name:
-        description: The name of the Certificate Authority. Maps to 'certAuthorityName' in the API.
-        required: true
-        type: str
-    cert_content:
-        description: The certificate.
-        required: false
-        default: ''
-        type: str
-
+  name:
+    description: The name of the Certificate Authority. Maps to 'certAuthorityName' in the Sempv2 API.
+    required: true
+    type: str
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+- solace.pubsub_plus.solace.broker_config_solace_cloud
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -50,20 +44,22 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-    solace_cert_authority:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
+  solace_cert_authority:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+    solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 tasks:
   - name: set files
     set_fact:
       cert_key_file: ./tmp/key.pem
       cert_file: ./tmp/cert.pem
 
-  - name: create certificate
+  - name: generate certificate
     command: >
       openssl req
       -x509
@@ -77,15 +73,15 @@ tasks:
 
   - name: add
     solace_cert_authority:
-      name: bar
-      cert_content: "{{ lookup('file', cert_file) }}"
+      name: foo
       settings:
+        certContent: "{{ lookup('file', cert_file) }}"
         revocationCheckEnabled: false
       state: present
 
   - name: remove
     solace_cert_authority:
-      name: bar
+      name: foo
       state: absent
 '''
 
@@ -94,76 +90,158 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceCertAuthorityTask(su.SolaceTask):
+class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'certAuthorityName'
+    OBJECT_KEY = 'certAuthorityName'
+    SOLACE_CLOUD_DEFAULTS = {
+        # 'revocationCheckEnabled': False,
+        # 'ocspOverrideUrl': None,
+        # 'ocspTimeout': None,
+        # 'ocspNonResponderCertEnabled': False
+    }
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
-        # placeholder, does not do anything
-        self.assert_is_not_solace_cloud()
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
+        self.solace_cloud_api = SolaceCloudApi(module)
+
+    def validate_params(self):
+        params = self.get_module().params
+        name = params['name']
+        if '-' in name:
+            raise SolaceParamsValidationError('name', name, "must not contain '-'")
 
     def get_args(self):
-        return [self.module.params['cert_content']]
+        params = self.get_module().params
+        return [params['name']]
 
-    def lookup_item(self):
-        return self.module.params['name']
+    def _get_func_solace_cloud(self, cert_authority_name):
+        # GET services/{serviceId}/serviceCertificateAuthorities/{certAuthorityName}
+        service_id = self.get_config().get_params()['solace_cloud_service_id']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, 'serviceCertificateAuthorities', cert_authority_name]
+        return self.solace_cloud_api.get_object_settings(self.get_config(), path_array)
 
-    def get_func(self, solace_config, cert_content, lookup_item_value):
-        path_array = [su.SEMP_V2_CONFIG, su.CERT_AUTHORITIES, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
+    def get_func(self, cert_authority_name):
+        if self.get_config().is_solace_cloud():
+            return self._get_func_solace_cloud(cert_authority_name)
+        # GET /certAuthorities/{certAuthorityName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'certAuthorities', cert_authority_name]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def create_func(self, solace_config, cert_content, cert_authority, settings=None):
-        defaults = {
-            'certContent': cert_content
+    def _create_func_solace_cloud(self, cert_authority_name, settings):
+        # POST /services/${serviceId}/requests/serviceCertificateAuthorityRequests
+        cert_content = (settings['certContent'] if settings else None)
+        if settings:
+            settings.pop('certContent', None)
+        body = {
+            'certificate': {
+                'name': cert_authority_name,
+                'content': cert_content,
+                'action': 'create'
+            }
         }
-        mandatory = {
-            'certAuthorityName': cert_authority,
+        body.update(self.SOLACE_CLOUD_DEFAULTS)
+        body.update(settings if settings else {})
+        service_id = self.get_config().get_params()['solace_cloud_service_id']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
+        return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)
+
+    def create_func(self, cert_authority_name, settings=None):
+        if self.get_config().is_solace_cloud():
+            return self._create_func_solace_cloud(cert_authority_name, settings)
+        # POST /certAuthorities
+        data = {
+            self.OBJECT_KEY: cert_authority_name
         }
-        data = su.merge_dicts(defaults, mandatory, settings)
-        path_array = [su.SEMP_V2_CONFIG, su.CERT_AUTHORITIES]
-        return su.make_post_request(solace_config, path_array, data)
+        data.update(settings if settings else {})
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'certAuthorities']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def update_func(self, solace_config, cert_content, lookup_item_value, settings):
-        path_array = [su.SEMP_V2_CONFIG, su.CERT_AUTHORITIES, lookup_item_value]
-        return su.make_patch_request(solace_config, path_array, settings)
+    def _update_func_solace_cloud(self, cert_authority_name, settings, delta_settings):
+        # POST /services/${serviceId}/requests/serviceCertificateAuthorityRequests
+        cert_content = None
+        if settings:
+            cert_content = settings.pop('certContent', None)
+        body = {
+            'certificate': {
+                'name': cert_authority_name,
+                'action': 'update'
+            }
+        }
+        if cert_content:
+            body['certificate'].update({'content': cert_content})
+        body.update(settings if settings else {})
+        service_id = self.get_config().get_params()['solace_cloud_service_id']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
+        return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)
 
-    def delete_func(self, solace_config, cert_content, lookup_item_value):
-        path_array = [su.SEMP_V2_CONFIG, su.CERT_AUTHORITIES, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array)
+    def update_func(self, cert_authority_name, settings=None, delta_settings=None):
+        if self.get_config().is_solace_cloud():
+            return self._update_func_solace_cloud(cert_authority_name, settings, delta_settings)
+        # PATCH /certAuthorities/{certAuthorityName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'certAuthorities', cert_authority_name]
+        return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
+
+    def _delete_func_solace_cloud(self, cert_authority_name):
+        # POST /services/{serviceId}/requests/serviceCertificateAuthorityRequests
+        body = {
+            'certificate': {
+                'name': cert_authority_name,
+                'action': 'delete'
+            }
+        }
+        service_id = self.get_config().get_params()['solace_cloud_service_id']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
+        return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)
+
+    def delete_func(self, cert_authority_name):
+        if self.get_config().is_solace_cloud():
+            return self._delete_func_solace_cloud(cert_authority_name)
+        # DELETE /certAuthorities/{certAuthorityName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'certAuthorities', cert_authority_name]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        cert_content=dict(type='str', default='')
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_settings())
-    arg_spec.update(su.arg_spec_state())
-    arg_spec.update(su.arg_spec_name())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_solace_cloud())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
         argument_spec=arg_spec,
         supports_check_mode=True
     )
-
     solace_task = SolaceCertAuthorityTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():
-
     run_module()
 
 

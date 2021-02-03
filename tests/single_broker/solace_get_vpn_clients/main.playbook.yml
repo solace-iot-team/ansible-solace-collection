@@ -20,23 +20,18 @@
 
   tasks:
 
-    - name: "main: get list of all vpn clients"
+    - name: "main: solace_get_vpn_clients"
       solace_get_vpn_clients:
         query_params:
           # where:
           #   - "clientUsername==*ansible*"
           select:
-              # - txByteCount
-              # - clientAddress
+              - txByteCount
+              - clientAddress
               # - clientName
               # - uptime
       register: result
 
-    - name: "main: print result"
-      debug:
-        msg:
-          - "{{ result.result_list }}"
-          - "{{ result.result_list_count }}"
 
 ###
 # The End.

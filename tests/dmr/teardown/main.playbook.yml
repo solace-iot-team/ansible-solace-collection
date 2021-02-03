@@ -1,0 +1,40 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  tasks:
+    - name: "create-services: check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+        sc_service_inventory_file_name_ext: "{{ SOLACE_CLOUD_SERVICE_INVENTORY_FILE_NAME_EXT }}"
+        sc_service_name: "{{ inventory_hostname }}"
+        sc_api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+        do_teardown: "{{ TEARDOWN_SOLACE_CLOUD | default(True) }}"
+    - set_fact:
+        sc_service_inventory_file: "{{ working_dir }}/{{ sc_service_name }}.{{ sc_service_inventory_file_name_ext }}"
+
+    - name: "main: check if teardown is set"
+      meta: end_play
+      when: not do_teardown
+
+    - name: "main: solace_cloud_service: delete {{ sc_service_name }}"
+      solace_cloud_service:
+        api_token: "{{ sc_api_token }}"
+        name: "{{ sc_service_name }}"
+        state: absent
+      register: result
+
+    - name: "main: Delete Solace Cloud Service Inventory File for {{ sc_service_name }}"
+      file:
+        path: "{{ sc_service_inventory_file }}"
+        state: absent
+      delegate_to: localhost
+
+###
+# The End.

@@ -46,7 +46,7 @@
     - name: "EX_1: Check vars"
       set_fact:
         working_dir: "{{ WORKING_DIR }}"
-        acl_profile_name: "test_ansible_solace"
+        acl_profile_name: "test_ansible_solace_ex_1"
 
     - name: "EX_1: Create ACL Profile"
       solace_acl_profile:
@@ -57,17 +57,63 @@
           subscribeTopicDefaultAction: "disallow"
         state: present
 
-    - name: "EX_1: missing semp_version"
-      solace_acl_subscribe_topic_exception:
-        acl_profile_name: "{{ acl_profile_name }}"
-        name: "test/ansible/solace"
+    - name: "EX_1: acl profile name > 32 chars"
+      solace_acl_profile:
+        name: "1234567890123456789012345678901234567890"
         state: present
-      failed_when: false
+      ignore_errors: yes
       register: result
     - assert:
         that:
-          - "'missing required arguments: semp_version' in result.msg"
+          - result.rc == 1
+          - "'must not be longer than 32 chars' in result.msg[1]"
 
+    - name: "EX_1: unknown setting"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        settings:
+          unknown_setting: "value"
+        state: present
+      ignore_errors: yes
+      register: result
+    - assert:
+        that: result.rc == 1
+
+    - name: "EX_1: no float semp_version"
+      solace_acl_subscribe_topic_exception:
+        acl_profile_name: "{{ acl_profile_name }}"
+        semp_version: "2.x"
+        name: "test/ansible/solace"
+        state: present
+      ignore_errors: yes
+      register: result
+    - assert:
+        that:
+          - result.rc == 1
+          - "'value cannot be converted to a float' in result.msg[1]"
+
+    - name: "EX_1: Delete ACL Profile"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        state: absent
+
+    - name: "EX_1: Wrong password"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        password: "unknown_password"
+      register: result
+      ignore_errors: true
+    - assert:
+        that: result.rc == 1 and result.msg.reason == 'Unauthorized'
+
+    - name: "EX_1: Wrong username"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        username: "unknown_username"
+      register: result
+      ignore_errors: true
+    - assert:
+        that: result.rc == 1 and result.msg.reason == 'Unauthorized'
 
 ###
 # The End.

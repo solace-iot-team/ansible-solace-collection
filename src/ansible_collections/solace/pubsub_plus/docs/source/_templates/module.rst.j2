@@ -37,8 +37,7 @@ Notes
 
 .. note::
 {%   for note in notes %}
-   {{ note | rst_ify }}
-
+   - {{ note | rst_ify }}
 {%   endfor %}
 {% endif %}
 
@@ -58,18 +57,21 @@ See Also
 {% macro option_desc(opts, level) %}
 {%   for name, spec in opts | dictsort recursive %}
 {%     set req = "required" if spec.required else "optional" %}
-{%     set default = ", default: " + spec.default|string if spec.default else "" %}
+{%     set default = ", default: " + spec.default|string if spec.default is defined else "" %}
 {{ "  " * level }}{{ name }} ({{ req }})
 {%     for para in spec.description %}
   {{ "  " * level }}{{ para | rst_ify }}
 
 {%     endfor %}
   {{ "  " * level }}| **type**: {{ spec.type | default("str") }}
-{%     if spec.default %}
-  {{ "  " * level }}| **default**: {{ spec.default }}
+{%     if spec.default is defined %}
+  {{ "  " * level }}| **default**: {{ spec.default|string }}
 {%     endif %}
 {%     if spec.choices %}
   {{ "  " * level }}| **choices**: {{ ", ".join(spec.choices) }}
+{%     endif %}
+{%     if spec.aliases %}
+  {{ "  " * level }}| **aliases**: {{ ", ".join(spec.aliases) }}
 {%     endif %}
 
 {%     if spec.suboptions %}
@@ -98,11 +100,13 @@ Parameters
 
   {{ "  " * level }}| **returned**: {{ ret }}
   {{ "  " * level }}| **type**: {{ typ }}
+{% if spec.sample is defined %}
   {{ "  " * level }}| **sample**:
 
   {{ "  " * level }}.. code-block:: json
 
   {{ sample|tojson(indent=2) | indent(3, True) }}
+{% endif %}
 
 {%     if spec.contains %}
 {{ result_desc(spec.contains, level + 1) }}

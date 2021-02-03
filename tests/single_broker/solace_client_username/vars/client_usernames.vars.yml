@@ -1,0 +1,6 @@
+---
+search_pattern: ansible-solace*
+clientUsernames:
+- name: ansible-solace__test__1__
+- name: ansible-solace__test__2__
+- name: ansible-solace__test__3__

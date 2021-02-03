@@ -17,19 +17,67 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
+    solace_get_topic_endpoints:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
 
   tasks:
 
-  - name: add
-    solace_topic_endpoint:
-      name: bar
-      state: present
-
-  - name: remove
+  - name: "main: solace_topic_endpoint: remove"
     solace_topic_endpoint:
       name: bar
       state: absent
 
+  - name: "main: solace_topic_endpoint: add"
+    solace_topic_endpoint:
+      name: bar
+      state: present
+
+  - name: "main: solace_get_topic_endpoints(config)"
+    solace_get_topic_endpoints:
+    register: result
+  - assert:
+      that:
+        - "result.rc == 0"
+        - "result.result_list_count == 1"
+        - "result.result_list | length == 1"
+
+  - name: "main: solace_get_topic_endpoints(monitor)"
+    solace_get_topic_endpoints:
+      api: monitor
+    register: result
+  - assert:
+      that:
+        - "result.rc == 0"
+        - "result.result_list_count == 1"
+        - "result.result_list | length == 1"
+
+  - name: "main: solace_topic_endpoint: update"
+    solace_topic_endpoint:
+      name: bar
+      settings:
+        egressEnabled: true
+        ingressEnabled: true
+      state: present
+
+  - name: "main: solace_topic_endpoint: remove"
+    solace_topic_endpoint:
+      name: bar
+      state: absent
+
+  - name: "main: solace_get_topic_endpoints(config)"
+    solace_get_topic_endpoints:
+    register: result
+  - assert:
+      that:
+        - "result.rc == 0"
+        - "result.result_list_count == 0"
+        - "result.result_list | length == 0"
 
 ###
 # The End.

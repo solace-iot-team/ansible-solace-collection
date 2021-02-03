@@ -13,38 +13,33 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_mqtt_session_subscription
-
 short_description: subscription for mqtt session
-
 description:
-- "Configure a MQTT Session Subscription object. Allows addition, removal and update of a MQTT Session Subscription object in an idempotent manner."
+- "Configure a MQTT Session Subscription object on a MQTT Session. Allows addition, removal and update of a MQTT Session Subscription object in an idempotent manner."
 notes:
-- >
-    Depending on the Broker version, a QoS=1 subscription results in the 'magic queue' ('#mqtt/{client_id}/{number}') to
-    have ingress / egress ON or OFF. Module uses SEMP v1 <no><shutdown><full/> to ensure they are ON.
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/mqttSession/createMsgVpnMqttSessionSubscription)."
-
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/mqttSession/createMsgVpnMqttSessionSubscription"
 options:
   name:
     description: The subscription topic. Maps to 'subscriptionTopic' in the API.
     type: str
     required: true
-    aliases: [mqtt_session_subscription_topic, topic]
+    aliases: [subscription_topic, topic]
   mqtt_session_client_id:
     description: The MQTT session client id. Maps to 'mqttSessionClientId' in the API.
     type: str
     required: true
-    aliases: [client_id, client]
-
+    aliases: [client_id]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
 - solace.pubsub_plus.solace.virtual_router
-
+seealso:
+- module: solace_mqtt_session
+- module: solace_get_mqtt_session_subscriptions
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -71,38 +66,30 @@ module_defaults:
         timeout: "{{ sempv2_timeout }}"
         msg_vpn: "{{ vpn }}"
 tasks:
-  - name: create session
-    solace_mqtt_session:
-        name: foo
-        state: present
+- name: create session
+  solace_mqtt_session:
+    name: foo
+    state: present
 
-  - name: add subscription
-    solace_mqtt_session_subscription:
-        virtual_router: "{{ virtual_router }}"
-        client_id: foo-client
-        topic: "test/v1/event/+"
-        state: present
+- name: add subscription
+  solace_mqtt_session_subscription:
+    client_id: foo-client
+    topic: "foo/bar/+"
+    state: present
 
-  - name: update subscription
-    solace_mqtt_session_subscription:
-        virtual_router: "{{ virtual_router }}"
-        client_id: foo-client
-        topic: "test/+/#"
-        settings:
-          subscriptionQos: 1
-        state: present
+- name: update subscription
+  solace_mqtt_session_subscription:
+    client_id: foo-client
+    topic: "foo/bar/+"
+    settings:
+        subscriptionQos: 1
+    state: present
 
-  - name: delete subscription
-    solace_mqtt_session_subscription:
-        virtual_router: "{{ virtual_router }}"
-        client_id: "{{ mqtt_session_item.mqttSessionClientId }}"
-        topic: "test/v1/#"
-        state: absent
-
-  - name: delete session
-    solace_mqtt_session:
-        name: foo
-        state: absent
+- name: delete subscription
+  solace_mqtt_session_subscription:
+    client_id: foo-client
+    topic: "foo/bar/+"
+    state: absent
 '''
 
 RETURN = '''
@@ -110,141 +97,80 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
-if not sc.HAS_IMPORT_ERROR:
-    import xmltodict
 
 
-class SolaceMqttSessionSubscriptionTask(su.SolaceTask):
+class SolaceMqttSessionSubscriptionTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'subscriptionTopic'
+    OBJECT_KEY = 'subscriptionTopic'
 
     def __init__(self, module):
-        sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
-        su.SolaceTask.__init__(self, module)
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
     def get_args(self):
-        return [self.module.params['msg_vpn'], self.module.params['mqtt_session_client_id'], self.module.params['virtual_router']]
+        params = self.get_module().params
+        return [params['msg_vpn'], params['virtual_router'], params['mqtt_session_client_id'], params['name']]
 
-    def lookup_item(self):
-        return self.module.params['name']
-
-    def get_magic_queue(self, where_name, vpn):
-        request = {
-            'rpc': {
-                'show': {
-                    'queue': {
-                        'name': where_name,
-                        'vpn-name': vpn,
-                    }
-                }
-            }
-        }
-        list_path_array = ['rpc-reply', 'rpc', 'show', 'queue', 'queues', 'queue']
-        return sc.execute_sempv1_get_list(self.solace_config, request, list_path_array)
-
-    def execute_queue_no_shutdown(self, queue_name, vpn):
-        request = {
-            'rpc': {
-                'message-spool': {
-                    'vpn-name': vpn,
-                    'queue': {
-                        'name': queue_name,
-                        'no': {
-                            'shutdown': {
-                                'full': None
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        xml_data = xmltodict.unparse(request)
-        ok, semp_resp = sc.make_sempv1_post_request(self.solace_config, xml_data)
-        if not ok:
-            resp = dict(request=xml_data, response=semp_resp)
-        else:
-            resp = semp_resp
-        return ok, resp
-
-    def get_func(self, solace_config, vpn, client_id, virtual_router, lookup_item_value):
+    def get_func(self, vpn_name, virtual_router, mqtt_session_client_id, subscription_topic):
         # GET /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}/subscriptions/{subscriptionTopic}
-        uri_ext = ','.join([client_id, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.MQTT_SESSIONS, uri_ext, su.MQTT_SESSION_SUBSCRIPTIONS, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
+        uri_ext = ','.join([mqtt_session_client_id, virtual_router])
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions', uri_ext, 'subscriptions', subscription_topic]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def create_func(self, solace_config, vpn, client_id, virtual_router, topic, settings=None):
-        # POST /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}/subscriptions
-        defaults = {
-            'msgVpnName': vpn,
-            'mqttSessionClientId': client_id,
-            'mqttSessionVirtualRouter': virtual_router
+    def create_func(self, vpn_name, virtual_router, mqtt_session_client_id, subscription_topic, settings=None):
+        # POST  /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}/subscriptions
+        data = {
+            self.OBJECT_KEY: subscription_topic,
+            'mqttSessionVirtualRouter': virtual_router,
+            'mqttSessionClientId': mqtt_session_client_id
         }
-        mandatory = {
-            self.LOOKUP_ITEM_KEY: topic
-        }
-        data = su.merge_dicts(defaults, mandatory, settings)
-        uri_ext = ','.join([client_id, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.MQTT_SESSIONS, uri_ext, su.MQTT_SESSION_SUBSCRIPTIONS]
-        ok, resp = su.make_post_request(solace_config, path_array, data)
-        if not ok:
-            return False, resp
-        # QoS==1? ==> ensure magic queue is ON/ON
-        if settings and settings['subscriptionQos'] == 1:
-            # search = "#mqtt/" + client_id + "/does-not-exist"
-            search = "#mqtt/" + client_id + "/*"
-            ok_gmq, resp_gmq = self.get_magic_queue(search, vpn)
-            if not ok_gmq:
-                resp['error'] = dict(
-                    msg=f"error retrieving magic queue: {search}",
-                    details=resp_gmq
-                )
-                return False, resp
-            elif len(resp_gmq) != 1:
-                resp['error'] = dict(
-                    msg=f"could not find magic queue: {search}"
-                )
-                return False, resp
-            # make sure magic queue is ON/ON
-            # depending on Broker version, no-shutdown is allowed or not.
-            # here: ignore error
-            mq_name = resp_gmq[0]['name']
-            _ok_no_shut, _resp_no_shut = self.execute_queue_no_shutdown(mq_name, vpn)
-            # if not ok_no_shut:
-            #     resp['error'] = dict(
-            #         msg="error executing no-shutdown for magic queue: {}".format(mq_name),
-            #         details=resp_no_shut
-            #     )
-            #     return False, resp
-        return True, resp
+        data.update(settings if settings else {})
+        uri_ext = ','.join([mqtt_session_client_id, virtual_router])
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions', uri_ext, 'subscriptions']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def update_func(self, solace_config, vpn, client_id, virtual_router, lookup_item_value, settings=None):
+    def update_func(self, vpn_name, virtual_router, mqtt_session_client_id, subscription_topic, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}/subscriptions/{subscriptionTopic}
-        uri_ext = ','.join([client_id, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.MQTT_SESSIONS, uri_ext, su.MQTT_SESSION_SUBSCRIPTIONS, lookup_item_value]
-        return su.make_patch_request(solace_config, path_array, settings)
+        uri_ext = ','.join([mqtt_session_client_id, virtual_router])
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions', uri_ext, 'subscriptions', subscription_topic]
+        return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
-    def delete_func(self, solace_config, vpn, client_id, virtual_router, lookup_item_value):
+    def delete_func(self, vpn_name, virtual_router, mqtt_session_client_id, subscription_topic):
         # DELETE /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}/subscriptions/{subscriptionTopic}
-        uri_ext = ','.join([client_id, virtual_router])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.MQTT_SESSIONS, uri_ext, su.MQTT_SESSION_SUBSCRIPTIONS, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array, None)
+        uri_ext = ','.join([mqtt_session_client_id, virtual_router])
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions', uri_ext, 'subscriptions', subscription_topic]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', aliases=['mqtt_session_subscription_topic', 'topic'], required=True),
-        mqtt_session_client_id=dict(type='str', aliases=['client_id', 'client'], required=True),
+        name=dict(type='str', aliases=['subscription_topic', 'topic'], required=True),
+        mqtt_session_client_id=dict(type='str', aliases=['client_id'], required=True),
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_virtual_router())
-    arg_spec.update(su.arg_spec_crud())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_virtual_router())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -253,9 +179,7 @@ def run_module():
     )
 
     solace_task = SolaceMqttSessionSubscriptionTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():

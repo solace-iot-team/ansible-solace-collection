@@ -33,6 +33,8 @@
     - set_fact:
         created_services_dict: {}
 
+    - set_fact:
+        run_number: 1
     - name: "Solace Cloud Service: Create"
       include_tasks: ./tasks/setup.solace-cloud.yml
       register: create_task_result
@@ -40,7 +42,9 @@
       loop_control:
         loop_var: sc_service
 
-        # run again to test idempotency
+    # run again to test idempotency
+    - set_fact:
+        run_number: 2
     - name: "Solace Cloud Service: Create"
       include_tasks: ./tasks/setup.solace-cloud.yml
       register: create_task_result
@@ -58,13 +62,13 @@
         dest: "{{ sc_created_inventory_file }}"
       delegate_to: localhost
 
-    # now run it again to test idempotency
-    - name: "Solace Cloud Service: Create"
-      include_tasks: ./tasks/setup.solace-cloud.yml
-      register: create_task_result
-      loop: "{{ sc_services.solace_cloud_services }}"
-      loop_control:
-        loop_var: sc_service
+    # # now run it again to test idempotency
+    # - name: "Solace Cloud Service: Create"
+    #   include_tasks: ./tasks/setup.solace-cloud.yml
+    #   register: create_task_result
+    #   loop: "{{ sc_services.solace_cloud_services }}"
+    #   loop_control:
+    #     loop_var: sc_service
 
 ###
 # The End.

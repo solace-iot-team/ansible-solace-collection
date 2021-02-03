@@ -28,14 +28,14 @@
 
   tasks:
 
-    - name: Create RDP - Disabled
+    - name: "required_together: Create RDP - Disabled"
       solace_rdp:
         name: "rdp-test-ansible-solace"
         settings:
           enabled: false
         state: present
 
-    - name: Create RDP RestConsumer
+    - name: "required_together: Create RDP RestConsumer"
       solace_rdp_rest_consumer:
         rdp_name: "rdp-test-ansible-solace"
         name: "rdp-test-ansible-solace"
@@ -45,7 +45,7 @@
           tlsEnabled: true
         state: present
 
-    - name: Update RDP RestConsumer
+    - name: "required_together: Update RDP RestConsumer"
       solace_rdp_rest_consumer:
         rdp_name: "rdp-test-ansible-solace"
         name: "rdp-test-ansible-solace"
@@ -56,22 +56,11 @@
       ignore_errors: true
     - assert:
         that:
-          - "'missing key' in result.msg"
-          - "'tlsEnabled' in result.msg"
+          - "'Missing attribute' in result.msg | string"
+          - "'tlsEnabled' in result.msg | string"
+          - "'required with' in result.msg | string"
+          - "'remotePort' in result.msg | string"
 
-    - name: Update RDP RestConsumer
-      solace_rdp_rest_consumer:
-        rdp_name: "rdp-test-ansible-solace"
-        name: "rdp-test-ansible-solace"
-        settings:
-          authenticationHttpBasicUsername: 'username'
-        state: present
-      register: result
-      ignore_errors: true
-    - assert:
-        that:
-          - "'missing key' in result.msg"
-          - "'authenticationHttpBasicPassword' in result.msg"
 
 ###
 # The End.

@@ -24,49 +24,51 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-
+    solace_queue_subscription:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_queue_subscriptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  pre_tasks:
+  - include_vars:
+      file: "queues.vars.yml"
+      name: target_list
   tasks:
 
-    - name: "get: get all pre-existing queues"
-      solace_get_queues:
-        query_params:
-          where:
-            - "queueName==ansible-solace/test*"
-            - "ingressEnabled==true"
-            - "maxMsgSpoolUsage<2000"
-            - "eventMsgSpoolUsageThreshold.clearPercent<=60"
-          select:
-            - "queueName"
-            - "eventMsgSpoolUsageThreshold"
-      register: pre_existing_queues_result
-
-    - name: Print pre-existing queue list
-      debug:
-        msg: "{{ pre_existing_queues_result.result_list }}"
-
-    - name: Print count of pre-existing queue list
-      debug:
-        msg: "{{ pre_existing_queues_result.result_list_count }}"
-
-    - name: "get: remove all queues"
+    - name: "get: solace_queue: remove all queues"
       solace_queue:
-        name: "{{ item.queueName }}"
+        name: "{{ item.name }}"
         state: absent
+      loop: "{{ target_list.queues }}"
+
+    - name: "get: solace_get_queues:config:all"
+      solace_get_queues:
       register: result
-      loop: "{{ pre_existing_queues_result.result_list }}"
+    - assert:
+        that:
+          - result.rc==0
+          - result.result_list==[]
+          - result.result_list_count==0
 
-    - include_vars:
-        file: "queues.vars.json"
-        name: target_result_list
-
-    - name: "get: call tasks"
+    - name: "get: call tasks to create queues & subscriptions"
       include_tasks: ./tasks/queue.tasks.yml
       register: result
-      loop: "{{ target_result_list.queues }}"
+      loop: "{{ target_list.queues }}"
       loop_control:
         loop_var: queue_item
 
-    - name: "get: config: new queues"
+    - name: "get: solace_get_queues(config)"
       solace_get_queues:
         api: config
         query_params:
@@ -78,40 +80,55 @@
           select:
             - "queueName"
             - "eventMsgSpoolUsageThreshold"
-      register: new_queues_result
+      register: result
+    - assert:
+        that: result.result_list_count == 3
 
-    - name: "get: config: print new queue list"
-      debug:
-        msg:
-          - "{{ new_queues_result.result_list }}"
-          - "{{ new_queues_result.result_list_count }}"
-
-    - name: "get: config: fail when new queue list count != 4"
-      fail:
-        msg: "new queue count != 4"
-      when: new_queues_result.result_list_count != 4
-
-    - name: "get: monitor: new queues"
+    - name: "get: solace_get_queues(monitor)"
       solace_get_queues:
         api: monitor
         query_params:
           where:
             - "queueName==ansible-solace/test*"
-          select:
-      register: new_queues_monitor_result
+      register: result
+    - assert:
+        that: result.result_list_count == 3
 
-    - name: "get: monitor: print queue list"
-      debug:
-        msg:
-          - "{{ new_queues_monitor_result.result_list }}"
-          - "{{ new_queues_result.result_list_count }}"
+    - name: "get: solace_get_queue_subscriptions(config)"
+      solace_get_queue_subscriptions:
+        queue_name: "{{ item.name }}"
+        query_params:
+          where:
+            - "subscriptionTopic==ansible-solace/test*"
+      register: result
+      failed_when: result.result_list_count!=3
+      loop: "{{ target_list.queues }}"
+
+    - name: "get: solace_get_queue_subscriptions(monitor)"
+      solace_get_queue_subscriptions:
+        queue_name: "{{ item.name }}"
+        api: monitor
+        query_params:
+          where:
+            - "subscriptionTopic==ansible-solace/test*"
+      register: result
+      failed_when: result.result_list_count!=3
+      loop: "{{ target_list.queues }}"
 
     - name: "get: remove all queues"
       solace_queue:
         name: "{{ item.name }}"
         state: absent
+      loop: "{{ target_list.queues }}"
+
+    - name: "get: solace_get_queues(monitor)"
+      solace_get_queues:
+        query_params:
+          where:
+            - "queueName==ansible-solace/test*"
       register: result
-      loop: "{{ target_result_list.queues }}"
+    - assert:
+        that: result.result_list_count == 0
 
 ###
 # The End.

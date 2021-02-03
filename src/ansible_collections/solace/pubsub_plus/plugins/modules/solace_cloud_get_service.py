@@ -13,38 +13,20 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_cloud_get_service
-
-version_added: '2.9.11'
-
-short_description: Get the Solace Cloud Service details.
-
-description: Get the Solace Cloud Service details by name or serviceId.
-
+short_description: get Solace Cloud service details
+description:
+- Get the Solace Cloud Service details by service id.
 notes:
-- "Reference: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm)."
-
-options:
-  name:
-    description:
-        - The name of the service.
-        - "Note: If name is not provided, service_id must."
-    required: false
-    type: str
-  service_id:
-    description:
-        - The service id.
-        - "Note: If service_id is not provided, name must."
-    required: false
-    type: str
-
+- "Module Solace Cloud API: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm"
 extends_documentation_fragment:
-- solace.pubsub_plus.solace.solace_cloud_service_config
-
+- solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
+- solace.pubsub_plus.solace.solace_cloud_service_config_service_id
 seealso:
+- module: solace_cloud_get_services
 - module: solace_cloud_service
-
-author: Ricardo Gomez-Ulmke (@rjgu)
-
+- module: solace_cloud_get_facts
+author:
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -54,152 +36,80 @@ EXAMPLES = '''
   collections:
     - solace.pubsub_plus
   tasks:
+    - set_fact:
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+        service_id: "the-service-id"
+
     - name: "Get service details"
       solace_cloud_get_service:
-        api_token: "{{ api_token_all_permissions }}"
-        service_id: "{{ sc_service_created_id }}"
-      register: get_service_result
+        api_token: "{{ api_token }}"
+        service_id: "{{ service_id }}"
+      register: result
 
     - set_fact:
-        sc_service_created_info: "{{ result.response }}"
+        service_info: "{{ result.service }}"
+        service_name: "{{ result.service.name }}"
+        admin_state: "{{ result.service.adminState }}"
 
-    - name: "Save Solace Cloud Service Facts to File"
+    - name: "Save Solace Cloud Service Info to File"
       copy:
-        content: "{{ sc_service_created_info | to_nice_json }}"
-        dest: "./tmp/facts.solace_cloud_service.{{ sc_service.name }}.json"
+        content: "{{ service_info | to_nice_json }}"
+        dest: "./tmp/solace_cloud.service_info.{{ service_name }}.json"
       delegate_to: localhost
 '''
 
 RETURN = '''
-
+service:
+    description: The retrieved service details. Content differs depending on state of service.
+    type: dict
+    returned: success
+    sample:
+        name: "the-service-name"
+        serviceId: "the-service-id"
+        adminState: "the-admin-state"
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
 rc:
-    description: return code, either 0 (ok), 1 (not ok)
+    description: Return code. rc=0 on success, rc=1 on error.
     type: int
     returned: always
     sample:
-        rc: 0
-msg:
-    description: error message if not ok
-    type: str
-    returned: error
-response:
-    description: The response from the get call. Differs depending on state of service.
-    type: complex
-    returned: success
-    contains:
-        serviceId:
-            description: The service Id of the created service
-            returned: if service exists
-            type: str
-        adminState:
-            description: The state of the service
-            returned: if service exists
-            type: str
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_cloud_utils as scu
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceCloudGetTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceCloudApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudConfig, SolaceTaskSolaceCloudServiceConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceCloudGetServiceTask(scu.SolaceCloudTask):
-
-    LOOKUP_ITEM_KEY_SERVICE_ID = 'serviceId'
-    LOOKUP_ITEM_KEY_NAME = 'name'
+class SolaceCloudGetServiceTask(SolaceCloudGetTask):
 
     def __init__(self, module):
-        sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
-        scu.SolaceCloudTask.__init__(self, module)
-        self._service_id = None
-        self.validate_args(*(self.get_args() + self.lookup_item_kv()))
-        return
+        super().__init__(module)
 
-    def lookup_item_kv(self):
-        # state=present: name is required, return key=name, value=name
-        # state=absent: name or service_id required. service_id takes precedence. return k,v depending on presence
-        # return [k, v]
-        # fail module on error
-        # exception on code error
-        if self.module.params['service_id'] is not None:
-            return [self.LOOKUP_ITEM_KEY_SERVICE_ID, self.module.params['service_id']]
-        elif self.module.params['name'] is not None:
-            return [self.LOOKUP_ITEM_KEY_NAME, self.module.params['name']]
-        else:
-            msg = "Neither key specified: 'service_id' nor 'name'. At least one is required."
-            result = dict(changed=False, rc=1)
-            self.module.fail_json(msg=msg, **result)
-        return
-
-    def validate_args(self, lookup_item_key, lookup_item_value):
-        return
-
-    def get(self, sc_config, lookup_item_key, lookup_item_value):
-        service_id = None
-        if lookup_item_key == self.LOOKUP_ITEM_KEY_NAME:
-            # GET https://api.solace.cloud/api/v0/services
-            # retrieves a list of services (either 'owned by me' or 'owned by org', depending on permissions)
-            path_array = [scu.SOLACE_CLOUD_API_SERVICES_BASE_PATH]
-            ok, resp = self.get_configuration(sc_config, path_array, lookup_item_key, lookup_item_value)
-            if not ok:
-                return False, resp
-            # if found, retrieve the full configuration
-            if resp is not None:
-                if self.LOOKUP_ITEM_KEY_SERVICE_ID in resp:
-                    service_id = resp[self.LOOKUP_ITEM_KEY_SERVICE_ID]
-                else:
-                    raise KeyError(f"Could not find key:'{self.LOOKUP_ITEM_KEY_SERVICE_ID}' in Solace Cloud GET services response. Pls raise an issue.")
-            else:
-                return True, None
-        elif lookup_item_key == self.LOOKUP_ITEM_KEY_SERVICE_ID:
-            service_id = lookup_item_value
-        else:
-            raise ValueError(f"unknown lookup_item_key='{lookup_item_key}'. pls raise an issue.")
-
-        # not found
-        if not service_id:
-            return True, None
-        # save service_id
-        self._service_id = service_id
-        # GET https://api.solace.cloud/api/v0/services/{{serviceId}}
-        # retrieves a single service
-        path_array = [scu.SOLACE_CLOUD_API_SERVICES_BASE_PATH, service_id]
-        return self.get_configuration(sc_config, path_array)
-
-    def get_configuration(self, sc_config, path_array, lookup_item_key=None, lookup_item_value=None):
-        """Return ok flag and dict of object if found, otherwise None."""
-        ok, resp = scu.make_get_request(sc_config, path_array)
-        if not ok:
-            return False, resp
-        if lookup_item_key and lookup_item_value:
-            service = self._find_service(resp, lookup_item_key, lookup_item_value)
-        else:
-            service = resp
-        return True, service
-
-    def _find_service(self, resp, lookup_item_key, lookup_item_value):
-        """Return a dict of object if found, otherwise None."""
-        if isinstance(resp, dict):
-            value = resp.get(lookup_item_key)
-            if value == lookup_item_value:
-                return resp
-        elif isinstance(resp, list):
-            for item in resp:
-                value = item.get(lookup_item_key)
-                if value == lookup_item_value:
-                    return item
-        else:
-            raise TypeError(f"argument 'resp' is not a 'dict' nor 'list' but {type(resp)}. Pls raise an issue.")
-        return None
+    def do_task(self):
+        service_id = self.get_module().params['solace_cloud_service_id']
+        service = self.get_solace_cloud_api().get_service(self.get_config(), service_id)
+        result = self.create_result()
+        result.update(dict(
+            service=service
+        ))
+        return None, result
 
 
 def run_module():
 
     module_args = dict(
-        name=dict(type='str', required=False, default=None),
-        service_id=dict(type='str', required=False, default=None)
     )
-    arg_spec = scu.arg_spec_solace_cloud()
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskSolaceCloudConfig.arg_spec_solace_cloud()
+    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service_id())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -207,23 +117,8 @@ def run_module():
         supports_check_mode=True
     )
 
-    result = dict(
-        rc=0,
-        exists=False,
-        changed=False
-    )
-
     solace_task = SolaceCloudGetServiceTask(module)
-    ok, resp = solace_task.get(solace_task.sc_config, *solace_task.lookup_item_kv())
-    if not ok:
-        result['rc'] = 1
-        module.fail_json(msg=resp, **result)
-
-    if resp:
-        result['exists'] = True
-    result['response'] = resp
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():

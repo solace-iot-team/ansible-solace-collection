@@ -9,15 +9,6 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_gather_facts:
-      host: "{{ sempv2_host }}"
-      port: "{{ sempv2_port }}"
-      secure_connection: "{{ sempv2_is_secure_connection }}"
-      username: "{{ sempv2_username }}"
-      password: "{{ sempv2_password }}"
-      timeout: "{{ sempv2_timeout }}"
-      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
-      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
     solace_client_username:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
@@ -60,14 +51,6 @@
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       virtual_router: "{{ virtual_router }}"
-    solace_get_queues:
-      host: "{{ sempv2_host }}"
-      port: "{{ sempv2_port }}"
-      secure_connection: "{{ sempv2_is_secure_connection }}"
-      username: "{{ sempv2_username }}"
-      password: "{{ sempv2_password }}"
-      timeout: "{{ sempv2_timeout }}"
-      msg_vpn: "{{ vpn }}"
     solace_get_magic_queues:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
@@ -76,25 +59,16 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-
-
+  pre_tasks:
+  - include_vars:
+      file: "mqtt-qos1.vars.yml"
+      name: mqtt
   vars:
     mqtt_client_username: "ansible_solace_test_mqtt_qos_1_cu"
 
   tasks:
 
-    - name: "Check vars"
-      set_fact:
-        working_dir: "{{ WORKING_DIR }}"
-
-    - include_vars:
-        file: "mqtt-qos1.vars.yml"
-        name: mqtt
-
-    - name: Gather Solace Facts
-      solace_gather_facts:
-
-    - name: Create Client Username
+    - name: "qos1: solace_client_username: create"
       solace_client_username:
         name: "{{ mqtt_client_username }}"
         settings:
@@ -103,28 +77,26 @@
           password: "{{ mqtt_client_username }}"
         state: present
 
-    - name: Adding Mqtt Sessions
+    - name: "qos1: include mqtt-qos1.tasks"
       include_tasks: ./tasks/mqtt-qos1.tasks.yml
       loop: "{{ mqtt.mqtt_sessions }}"
       loop_control:
         loop_var: mqtt_session
 
-    - name: "Get MQTT Magic Queues"
+    - name: "qos1: solace_get_magic_queues(mqtt)"
       solace_get_magic_queues:
         where_name: "#mqtt/*"
       register: result
+    - assert:
+        that:
+          - "result.rc == 0"
+          - "result.result_list_count == 3"
+          - "result.result_list | length == 3"
 
     - set_fact:
         magic_queues: "{{ result.result_list }}"
 
-    - name: "Save Queues to File"
-      copy:
-        content: "{{ magic_queues | to_nice_json }}"
-        dest: "{{ working_dir }}/magic_queues.{{ inventory_hostname }}.json"
-      no_log: true
-      changed_when: false
-
-    - name: "Check: All magic Queues are ON/ON"
+    - name: "qos1: Check all magic queues are ON/ON"
       fail:
         msg: "Magic queue: ingress or egress is 'Down' for magic_queue: {{ magic_queue.name }} "
       when: magic_queue.info['ingress-config-status'] == "Down" or magic_queue.info['egress-config-status'] == "Down"

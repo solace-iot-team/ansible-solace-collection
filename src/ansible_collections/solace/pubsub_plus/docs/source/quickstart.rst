@@ -31,7 +31,7 @@ Playbooks
 ---------
 
 We need to run two playbooks:
-  - ``service.playbook.yml``: creates a local broker service running in docker and the broker inventory file
+  - ``service.playbook.yml``: creates a local broker service running in docker and generates the broker inventory file
   - ``configure.playbook.yml``: configures the broker service we have just created
 
 :download:`service.playbook.yml <../examples/quickstart/service.playbook.yml>`:
@@ -68,3 +68,10 @@ Navigate to Queues to see the queue created.
 In the ``$WORKING_DIR`` you will find two files:
   - ``ansible-solace.log`` - the log file of all SEMP requests / responses to/from the broker service
   - ``broker.inventory.yml`` - the generated inventory for the created broker service
+
+Using an Existing Broker / Service
+----------------------------------
+
+To use an existing standalone broker or Solace Cloud Service, you must provide the inventory file to the playbook `configure.playbook.yml`.
+
+For a discussion on Ansible Solace Inventory Files, see :ref:`inventory_files`.

@@ -13,18 +13,17 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_dmr_cluster_link_trusted_cn
-
 short_description: trusted common name for dmr cluster link
-
 description:
-  - "Allows addition, removal and configuration of trusted common name objects on DMR cluster links."
-  - "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLinkTlsTrustedCommonName."
-
+- "Allows addition, removal and configuration of Trusted Common Name Objects on DMR Cluster links."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/createDmrClusterLinkTlsTrustedCommonName"
 options:
   name:
     description: The expected trusted common name of the remote certificate. Maps to 'tlsTrustedCommonName' in the API.
     required: true
     type: str
+    aliases: [tls_trusted_common_name]
   dmr_cluster_name:
     description: The name of the DMR cluster. Maps to 'dmrClusterName' in the API.
     required: true
@@ -33,13 +32,14 @@ options:
     description: The name of the remote node. Maps to 'remoteNodeName' in the API.
     required: true
     type: str
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-- solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
+seealso:
+- module: solace_dmr_cluster
+- module: solace_dmr_cluster_link
+- module: solace_get_dmr_cluster_link_trusted_cns
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -58,7 +58,6 @@ module_defaults:
     username: "{{ sempv2_username }}"
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
 tasks:
   - name: remove
     solace_dmr_cluster_link_trusted_cn:
@@ -80,57 +79,70 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceLinkTrustedCNTask(su.SolaceTask):
+class SolaceDmrClusterLinkTrustedCommonNameTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'tlsTrustedCommonName'
+    OBJECT_KEY = 'tlsTrustedCommonName'
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
-
-    def lookup_item(self):
-        return self.module.params['name']
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
     def get_args(self):
-        return [self.module.params['dmr_cluster_name'], self.module.params['remote_node_name']]
+        params = self.get_module().params
+        return [params['dmr_cluster_name'], params['remote_node_name'], params['name']]
 
-    def get_func(self, solace_config, dmr_cluster_name, link, lookup_item_value):
-        path_array = [su.SEMP_V2_CONFIG, su.DMR_CLUSTERS, dmr_cluster_name, su.LINKS, link, su.TLS_TRUSTED_COMMON_NAMES, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
+    def get_func(self, dmr_cluster_name, remote_node_name, tls_trusted_cn):
+        # GET /dmrClusters/{dmrClusterName}/links/{remoteNodeName}/tlsTrustedCommonNames/{tlsTrustedCommonName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'dmrClusters', dmr_cluster_name, 'links', remote_node_name, 'tlsTrustedCommonNames', tls_trusted_cn]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def create_func(self, solace_config, dmr_cluster_name, link, trusted_cn, settings=None):
-        defaults = {
+    def create_func(self, dmr_cluster_name, remote_node_name, tls_trusted_cn, settings=None):
+        # POST /dmrClusters/{dmrClusterName}/links/{remoteNodeName}/tlsTrustedCommonNames
+        data = {
             'dmrClusterName': dmr_cluster_name,
-            'remoteNodeName': link
+            'remoteNodeName': remote_node_name,
+            self.OBJECT_KEY: tls_trusted_cn
         }
-        mandatory = {
-            'tlsTrustedCommonName': trusted_cn
-        }
-        data = su.merge_dicts(defaults, mandatory, settings)
-        path_array = [su.SEMP_V2_CONFIG, su.DMR_CLUSTERS, dmr_cluster_name, su.LINKS, link, su.TLS_TRUSTED_COMMON_NAMES]
-        return su.make_post_request(solace_config, path_array, data)
+        data.update(settings if settings else {})
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'dmrClusters', dmr_cluster_name, 'links', remote_node_name, 'tlsTrustedCommonNames']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def delete_func(self, solace_config, dmr_cluster_name, link, lookup_item_value):
-        path_array = [su.SEMP_V2_CONFIG, su.DMR_CLUSTERS, dmr_cluster_name, su.LINKS, link, su.TLS_TRUSTED_COMMON_NAMES, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array)
+    def delete_func(self, dmr_cluster_name, remote_node_name, tls_trusted_cn):
+        # DELETE /dmrClusters/{dmrClusterName}/links/{remoteNodeName}/tlsTrustedCommonNames/{tlsTrustedCommonName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'dmrClusters', dmr_cluster_name, 'links', remote_node_name, 'tlsTrustedCommonNames', tls_trusted_cn]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True),
+        name=dict(type='str', required=True, aliases=['tls_trusted_common_name']),
         dmr_cluster_name=dict(type='str', required=True),
         remote_node_name=dict(type='str', required=True)
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_crud())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -138,10 +150,8 @@ def run_module():
         supports_check_mode=True
     )
 
-    solace_task = SolaceLinkTrustedCNTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task = SolaceDmrClusterLinkTrustedCommonNameTask(module)
+    solace_task.execute()
 
 
 def main():

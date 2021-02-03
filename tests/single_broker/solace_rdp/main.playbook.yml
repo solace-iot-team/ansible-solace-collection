@@ -33,6 +33,14 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
+    solace_get_rdp_rest_consumers:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
     solace_rdp_rest_consumer_trusted_cn:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
@@ -41,7 +49,23 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
+    solace_get_rdp_rest_consumer_trusted_cns:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
     solace_rdp_queue_binding:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_rdp_queue_bindings:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -60,26 +84,26 @@
 
   tasks:
 
-    - name: Create RDP - Disabled
+    - name: "main: Create RDP - Disabled"
       solace_rdp:
         name: "rdp-test-ansible-solace"
         settings:
           enabled: false
         state: present
 
-    - name: Get List of RDPs - Config
+    - name: "main: Get List of RDPs - Config"
       solace_get_rdps:
         query_params:
           where:
             - "restDeliveryPointName==rdp-test-ansible*"
       register: result
 
-    - name: Get List of RDPs - Monitor
+    - name: "main: Get List of RDPs - Monitor"
       solace_get_rdps:
         api: monitor
       register: result
 
-    - name: Create RDP RestConsumer - Disabled
+    - name: "main: Create RDP RestConsumer - Disabled"
       solace_rdp_rest_consumer:
         rdp_name: "rdp-test-ansible-solace"
         name: "rdp-test-ansible-solace"
@@ -93,19 +117,56 @@
           retryDelay: 5
         state: present
 
-    - name: Add the TLS Trusted Common Name
+    - name: "main: solace_get_rdp_rest_consumers: config"
+      solace_get_rdp_rest_consumers:
+        rdp_name: "rdp-test-ansible-solace"
+        query_params:
+          where:
+            - "restConsumerName==rdp-test-ansible*"
+
+    - name: "main: solace_get_rdp_rest_consumers: monitor"
+      solace_get_rdp_rest_consumers:
+        rdp_name: "rdp-test-ansible-solace"
+        api: monitor
+        query_params:
+          where:
+            - "restConsumerName==rdp-test-ansible*"
+
+    - name: "main: Add the TLS Trusted Common Name"
       solace_rdp_rest_consumer_trusted_cn:
         rdp_name: "rdp-test-ansible-solace"
         rest_consumer_name: "rdp-test-ansible-solace"
         name: "*.domain.com"
         state: present
 
-    - name: Create Queue
+    - name: "main: solace_get_rdp_rest_consumer_trusted_cns: config - no query params"
+      solace_get_rdp_rest_consumer_trusted_cns:
+        rdp_name: "rdp-test-ansible-solace"
+        rest_consumer_name: "rdp-test-ansible-solace"
+
+    - name: "main: solace_get_rdp_rest_consumer_trusted_cns: config"
+      solace_get_rdp_rest_consumer_trusted_cns:
+        rdp_name: "rdp-test-ansible-solace"
+        rest_consumer_name: "rdp-test-ansible-solace"
+        query_params:
+          where:
+            - "tlsTrustedCommonName==*.domain.*"
+
+    - name: "main: solace_get_rdp_rest_consumer_trusted_cns: monitor"
+      solace_get_rdp_rest_consumer_trusted_cns:
+        rdp_name: "rdp-test-ansible-solace"
+        rest_consumer_name: "rdp-test-ansible-solace"
+        api: monitor
+        query_params:
+          where:
+            - "tlsTrustedCommonName==*.domain.*"
+
+    - name: "main: Create Queue"
       solace_queue:
         name: "rdp-test-ansible-solace"
         state: present
 
-    - name: Create a Queue Binding
+    - name: "main: Create a Queue Binding"
       solace_rdp_queue_binding:
         rdp_name: "rdp-test-ansible-solace"
         queue_name: "rdp-test-ansible-solace"
@@ -113,7 +174,22 @@
           postRequestTarget: "/api/post/event?code=xxx"
         state: present
 
-    - name: Enable RDP RestConsumer
+    - name: "main: solace_get_rdp_queue_bindings: config"
+      solace_get_rdp_queue_bindings:
+        rdp_name: "rdp-test-ansible-solace"
+        query_params:
+          where:
+            - "queueBindingName==rdp-test*"
+
+    - name: "main: solace_get_rdp_queue_bindings: monitor"
+      solace_get_rdp_queue_bindings:
+        rdp_name: "rdp-test-ansible-solace"
+        api: monitor
+        query_params:
+          where:
+            - "queueBindingName==rdp-test*"
+
+    - name: "main: Enable RDP RestConsumer"
       solace_rdp_rest_consumer:
         rdp_name: "rdp-test-ansible-solace"
         name: "rdp-test-ansible-solace"
@@ -121,19 +197,53 @@
           enabled: true
         state: present
 
-    - name: Enable RDP
+    - name: "main: Enable RDP"
       solace_rdp:
         name: "rdp-test-ansible-solace"
         settings:
           enabled: true
         state: present
 
-    - name: Remove RDP
+    - name: "main: disable RDP RestConsumer"
+      solace_rdp_rest_consumer:
+        rdp_name: "rdp-test-ansible-solace"
+        name: "rdp-test-ansible-solace"
+        settings:
+          enabled: false
+        state: present
+
+    - name: "main: disable RDP"
+      solace_rdp:
+        name: "rdp-test-ansible-solace"
+        settings:
+          enabled: false
+        state: present
+
+    - name: "main: delete Queue Binding"
+      solace_rdp_queue_binding:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        state: absent
+
+    - name: "main: solace_rdp_rest_consumer_trusted_cn: delete "
+      solace_rdp_rest_consumer_trusted_cn:
+        rdp_name: "rdp-test-ansible-solace"
+        rest_consumer_name: "rdp-test-ansible-solace"
+        name: "*.domain.com"
+        state: absent
+
+    - name: "main: solace_rdp_rest_consumer: delete"
+      solace_rdp_rest_consumer:
+        rdp_name: "rdp-test-ansible-solace"
+        name: "rdp-test-ansible-solace"
+        state: absent
+
+    - name: "main: solace_rdp: delete"
       solace_rdp:
         name: "rdp-test-ansible-solace"
         state: absent
 
-    - name: Remove Queue
+    - name: "main: solace_queue: delete"
       solace_queue:
         name: "rdp-test-ansible-solace"
         state: absent

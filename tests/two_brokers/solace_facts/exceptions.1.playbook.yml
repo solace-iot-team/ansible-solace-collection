@@ -16,7 +16,7 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 
   tasks:
@@ -25,15 +25,18 @@
       solace_get_facts:
         hostvars: "{{ hostvars }}"
         host: local_broker
-        fields:
-          - serviceSmfPlainTextListenPort
-          - serviceSmfCompressionListenPort
-          - serviceSmfTlsListenPort
       register: result
-      failed_when: result.rc != 1
+      ignore_errors: yes
     - assert:
         that:
-          - "'Hint: Call \\'solace_gather_facts\\' module first' in result.msg"
+          - "result.rc == 1"
+          - "'cannot find \\'solace\\'' in result.msg | string"
+
+    #
+    #   failed_when: result.rc != 1
+    # - assert:
+    #     that:
+    #       - "'Hint: Call \\'solace_gather_facts\\' module first' in result.msg"
 
 ###
 # The End.

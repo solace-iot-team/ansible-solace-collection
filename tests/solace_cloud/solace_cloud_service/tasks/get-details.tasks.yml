@@ -13,7 +13,7 @@
 
     - name: "Set Fact: Solace Service Details"
       set_fact:
-        sc_service_details: "{{ result.response }}"
+        sc_service_details: "{{ result.service }}"
       no_log: true
 
     - name: "Save Solace Cloud Service Details to File"
@@ -21,6 +21,16 @@
         content: "{{ sc_service_details | to_nice_json }}"
         dest: "{{ working_dir }}/facts.solace_cloud_service.{{ sc_service.name }}.details.json"
       delegate_to: localhost
+
+    - name: "Get Semp Management Endpoints for: {{ sc_service.name }}"
+      solace_cloud_get_facts:
+        from_dict: "{{ sc_service_details }}"
+        field_funcs:
+          - get_doesNotExist
+      register: _r
+      ignore_errors: yes
+    - assert:
+        that: _r.rc == 1 and 'field_funcs=get_doesNotExist' in _r.msg[1]
 
     - name: "Get Semp Management Endpoints for: {{ sc_service.name }}"
       solace_cloud_get_facts:
@@ -56,7 +66,7 @@
         dest: "{{ working_dir }}/inventory.{{ sc_service.name }}.json"
       delegate_to: localhost
 
-    - name: "Set Fact: Solace Service SEMP"
+    - name: "Set Fact: Solace Service SEMP for {{ sc_service.name }}"
       set_fact:
         sempv2_host: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.host }}"
         sempv2_port: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.port }}"
@@ -76,16 +86,34 @@
         solace_cloud_api_token: "{{ api_token }}"
         solace_cloud_service_id: "{{ sc_service.serviceId }}"
 
-    - name: "Show ansible_facts.solace"
-      debug:
-        msg:
-          - "ansible_facts.solace:"
-          - "{{ ansible_facts.solace }}"
-
     - name: "Save Solace Cloud Service Facts to File"
       copy:
         content: "{{ ansible_facts.solace | to_nice_json }}"
-        dest: "{{ working_dir }}/solace_facts.solace_cloud_service.{{ sc_service.name }}.json"
+        dest: "{{ working_dir }}/ansible_facts.solace.{{ sc_service.name }}.json"
+      delegate_to: localhost
+
+    - name: "Save hostvars"
+      copy:
+        content: "{{ hostvars | to_nice_json }}"
+        dest: "{{ working_dir }}/hostvars.{{ inventory_hostname }}.json"
+      delegate_to: localhost
+
+    - name: "Get Facts: all client connection details"
+      solace_get_facts:
+        hostvars: "{{ hostvars }}"
+        host: "{{ inventory_hostname }}"
+        field_funcs:
+          - get_allClientConnectionDetails
+      register: result
+      # no_log: true
+
+    - set_fact:
+        client_connection_details: "{{ result.facts }}"
+
+    - name: "Save 'client_connection_details' to File"
+      copy:
+        content: "{{ client_connection_details | to_nice_json }}"
+        dest: "{{ working_dir }}/facts.solace_cloud_service.{{ sc_service.name }}.client_connection_details.json"
       delegate_to: localhost
 
 

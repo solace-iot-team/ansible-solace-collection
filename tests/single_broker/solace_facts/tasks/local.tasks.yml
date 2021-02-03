@@ -1,0 +1,212 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "local: create vpn for local broker"
+  solace_vpn:
+    name: "{{ vpn_2 }}"
+    settings:
+      enabled: true
+      authenticationBasicType: "none"
+      maxMsgSpoolUsage: 100
+      serviceMqttPlainTextEnabled: true
+      serviceMqttMaxConnectionCount: 10
+      serviceMqttPlainTextListenPort: 1884
+    state: present
+
+- name: "local: Gather Solace Facts"
+  solace_gather_facts:
+
+- name: "local: Save 'ansible_facts.solace' to File"
+  copy:
+    content: "{{ ansible_facts.solace | to_nice_json }}"
+    dest: "{{ working_dir }}/facts.{{ inventory_hostname }}.json"
+  delegate_to: localhost
+  # no_log: true
+
+- name: "local: solace_get_facts(no vpn)"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    host: "{{ inventory_hostname }}"
+    field_funcs:
+      - get_serviceSmfPlainTextListenPort
+  register: result
+  ignore_errors: yes
+- assert:
+    that: result.rc == 1 and 'arg \'msg_vpn=None' in result.msg[1]
+
+- name: "local: solace_get_facts(vpn={{ vpn_1 }})"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    host: "{{ inventory_hostname }}"
+    msg_vpn: "{{ vpn_1 }}"
+    field_funcs:
+      - get_serviceSmfPlainTextListenPort
+      - get_serviceSmfPlainTextListenPort
+      - get_serviceSmfCompressionListenPort
+      - get_serviceSmfTlsListenPort
+      - get_virtualRouterName
+      - get_serviceSMFMessagingEndpoints
+      - get_bridge_remoteMsgVpnLocations
+      - get_allClientConnectionDetails
+  register: result
+- debug:
+    msg:
+      - facts
+      - "{{ result.facts }}"
+- assert:
+    that:
+      - result.facts.serviceSmfPlainTextListenPort is defined
+      - result.facts.serviceSmfCompressionListenPort is defined
+      - result.facts.serviceSmfTlsListenPort is defined
+      - result.facts.virtualRouterName is defined
+      - result.facts.serviceMessagingEndpoints is defined
+      - result.facts.bridge_remoteMsgVpnLocations is defined
+      - result.facts.clientConnectionDetails is defined
+
+- set_fact:
+    content: "{{ result.facts.serviceSmfPlainTextListenPort }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_1 }}.serviceSmfPlainTextListenPort.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.serviceSmfCompressionListenPort }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_1 }}.serviceSmfCompressionListenPort.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.serviceSmfTlsListenPort }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_1 }}.serviceSmfTlsListenPort.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.virtualRouterName }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_1 }}.virtualRouterName.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.serviceMessagingEndpoints }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_1 }}.serviceMessagingEndpoints.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.bridge_remoteMsgVpnLocations }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_1 }}.bridge_remoteMsgVpnLocations.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.clientConnectionDetails }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_1 }}.clientConnectionDetails.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- name: "local: solace_get_facts(vpn={{ vpn_2 }})"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    host: "{{ inventory_hostname }}"
+    msg_vpn: "{{ vpn_2 }}"
+    field_funcs:
+      - get_serviceSmfPlainTextListenPort
+      - get_serviceSmfCompressionListenPort
+      - get_serviceSmfTlsListenPort
+      - get_virtualRouterName
+      - get_serviceSMFMessagingEndpoints
+      - get_bridge_remoteMsgVpnLocations
+      - get_allClientConnectionDetails
+  register: result
+- debug:
+    msg:
+      - facts
+      - "{{ result.facts }}"
+- assert:
+    that:
+      - result.facts.serviceSmfPlainTextListenPort is defined
+      - result.facts.serviceSmfCompressionListenPort is defined
+      - result.facts.serviceSmfTlsListenPort is defined
+      - result.facts.virtualRouterName is defined
+      - result.facts.serviceMessagingEndpoints is defined
+      - result.facts.bridge_remoteMsgVpnLocations is defined
+      - result.facts.clientConnectionDetails is defined
+
+- set_fact:
+    content: "{{ result.facts.serviceSmfPlainTextListenPort }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_2 }}.serviceSmfPlainTextListenPort.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.serviceSmfCompressionListenPort }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_2 }}.serviceSmfCompressionListenPort.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.serviceSmfTlsListenPort }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_2 }}.serviceSmfTlsListenPort.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.virtualRouterName }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_2 }}.virtualRouterName.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.serviceMessagingEndpoints }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_2 }}.serviceMessagingEndpoints.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.bridge_remoteMsgVpnLocations }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_2 }}.bridge_remoteMsgVpnLocations.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- set_fact:
+    content: "{{ result.facts.clientConnectionDetails }}"
+    dest: "{{ working_dir }}/local.facts.{{ vpn_2 }}.clientConnectionDetails.json"
+- copy:
+    content: "{{ content  | to_nice_json }}"
+    dest: "{{ dest }}"
+  delegate_to: localhost
+
+- name: "local: delete vpn"
+  solace_vpn:
+    name: "{{ vpn_2 }}"
+    state: absent
+###
+# The End.

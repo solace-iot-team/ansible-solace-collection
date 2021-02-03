@@ -13,19 +13,16 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_acl_subscribe_topic_exception
-
 short_description: subscribe topic exception for acl profile
-
 description:
 - "Configure a subscribe topic exception object for an ACL Profile."
 - "Allows addition and removal of a subscribe topic exception object for an ACL Profile."
-- "Supported versions: [ <=2.13, >=2.14 ]."
-- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeTopicException."
-- "Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeException."
-
+notes:
+- "Module Sempv2 Config (>=2.14): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeTopicException"
+- "Module Sempv2 Config (<=2.13): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeException"
 options:
   name:
-    description: The subscribe topic exception.
+    description: The name (topic) of the subscribe topic exception. Maps to 'subscribeTopicException' in the SEMP v2 API.
     required: true
     type: str
   acl_profile_name:
@@ -37,17 +34,16 @@ options:
     required: false
     default: "smf"
     type: str
-
+    choices:
+      - smf
+      - mqtt
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.state
-- solace.pubsub_plus.solace.semp_version
 - solace.pubsub_plus.solace.settings
-
 seealso:
 - module: solace_acl_profile
-
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -59,60 +55,41 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-    solace_gather_facts:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
-        solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
-        solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-    solace_acl_profile:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
-        msg_vpn: "{{ vpn }}"
-    solace_acl_subscribe_topic_exception:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
-        msg_vpn: "{{ vpn }}"
+  solace_acl_profile:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
+  solace_acl_subscribe_topic_exception:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
 tasks:
-  - name: "Gather Solace Facts"
-    solace_gather_facts:
-  - set_fact:
-        semp_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
-
   - name: Create ACL Profile
     solace_acl_profile:
-        name: "test_ansible_solace"
-        settings:
-          clientConnectDefaultAction: "disallow"
-          publishTopicDefaultAction: "disallow"
-          subscribeTopicDefaultAction: "disallow"
-        state: present
+      name: foo
+      settings:
+        subscribeTopicDefaultAction: "disallow"
+      state: present
 
   - name: Add Subscribe Topic Exceptions to ACL Profile
     solace_acl_subscribe_topic_exception:
-        semp_version: "{{ semp_version }}"
-        acl_profile_name: "test_ansible_solace"
-        name: "test/ansible/solace"
-        state: present
+      acl_profile_name: foo
+      name: "test/ansible/solace"
+      state: present
 
   - name: Delete Subscribe Topic Exceptions from ACL Profile
     solace_acl_subscribe_topic_exception:
-        semp_version: "{{ semp_version }}"
-        acl_profile_name: "test_ansible_solace"
-        name: "test/ansible/solace"
-        state: absent
-
+      acl_profile_name: foo
+      name: "test/ansible/solace"
+      state: absent
 '''
 
 RETURN = '''
@@ -125,95 +102,108 @@ response:
         msgVpnName: default
         subscribeTopicException: test/ansible/solace
         subscribeTopicExceptionSyntax: smf
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceACLSubscribeTopicExceptionTask(su.SolaceTask):
+class SolaceACLSubscribeTopicExceptionTask(SolaceBrokerCRUDTask):
 
-    KEY_LOOKUP_ITEM_KEY = "LOOKUP_ITEM_KEY"
-    KEY_URI_SUBSCR_EX = "URI_SUBSCR_EX"
-    KEY_TOPIC_SYNTAX_KEY = "TOPIC_SYNTAX_KEY"
-    SEMP_VERSION_KEY_LOOKUP = {
-        '2.13': {
-            KEY_LOOKUP_ITEM_KEY: 'subscribeExceptionTopic',
-            KEY_URI_SUBSCR_EX: 'subscribeExceptions',
-            KEY_TOPIC_SYNTAX_KEY: 'topicSyntax'
+    SEMP_VERSION_KEY_MAP = {
+        '<=2.13': {
+            'OBJECT_KEY': 'subscribeExceptionTopic',
+            'URI_SUBSCR_EX': 'subscribeExceptions',
+            'TOPIC_SYNTAX': 'topicSyntax'
         },
-        '2.14': {
-            KEY_LOOKUP_ITEM_KEY: 'subscribeTopicException',
-            KEY_URI_SUBSCR_EX: 'subscribeTopicExceptions',
-            KEY_TOPIC_SYNTAX_KEY: 'subscribeTopicExceptionSyntax'
+        '>=2.14': {
+            'OBJECT_KEY': 'subscribeTopicException',
+            'URI_SUBSCR_EX': 'subscribeTopicExceptions',
+            'TOPIC_SYNTAX': 'subscribeTopicExceptionSyntax'
         }
     }
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
     def get_args(self):
-        return [self.module.params['msg_vpn'], self.module.params['acl_profile_name'], self.module.params['topic_syntax']]
+        params = self.get_module().params
+        return [params['msg_vpn'], params['acl_profile_name'], params['topic_syntax'], params['name']]
 
-    def lookup_semp_version(self, semp_version):
+    def get_sempv2_version_map_key(self, semp_version: float) -> str:
         if semp_version <= 2.13:
-            return True, '2.13'
+            return '<=2.13'
         elif semp_version >= 2.14:
-            return True, '2.14'
-        return False, ''
+            return '>=2.14'
+        raise SolaceInternalError(f"sempv2_version: {semp_version} not supported")
 
-    def lookup_item(self):
-        return self.module.params['name']
+    def get_func(self, vpn_name, acl_profile_name, topic_syntax, subscribe_topic_exception):
+        # sempVersion <= "2.13" : GET /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeExceptions/{topicSyntax},{subscribeExceptionTopic}
+        # sempVersion >= "2.14": GET /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions/{subscribeTopicExceptionSyntax},{subscribeTopicException}
+        sempv2_version_float = self.get_sempv2_version_as_float()
+        sempv2_version_map_key = self.get_sempv2_version_map_key(sempv2_version_float)
 
-    def get_func(self, solace_config, vpn, acl_profile_name, topic_syntax, lookup_item_value):
-        # vmr_sempVersion <= "2.13" : GET /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeExceptions/{topicSyntax},{subscribeExceptionTopic}
-        # vmr_sempVersion >= "2.14": GET /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions/{subscribeTopicExceptionSyntax},{subscribeTopicException}
-        uri_subscr_ex = self.get_semp_version_key(self.SEMP_VERSION_KEY_LOOKUP, solace_config.vmr_sempVersion, self.KEY_URI_SUBSCR_EX)
-        lookup_item_key = self.get_semp_version_key(self.SEMP_VERSION_KEY_LOOKUP, solace_config.vmr_sempVersion, self.KEY_LOOKUP_ITEM_KEY)
+        uri_subscr_ex = self.SEMP_VERSION_KEY_MAP[sempv2_version_map_key]['URI_SUBSCR_EX']
 
-        ex_uri = ','.join([topic_syntax, lookup_item_value])
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.ACL_PROFILES, acl_profile_name, uri_subscr_ex, ex_uri]
-        return su.get_configuration(solace_config, path_array, lookup_item_key)
+        ex_uri = ','.join([topic_syntax, subscribe_topic_exception])
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, uri_subscr_ex, ex_uri]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def create_func(self, solace_config, vpn, acl_profile_name, topic_syntax, subscribe_topic_exception, settings=None):
-        # vmr_sempVersion: <=2.13 : POST /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeExceptions
-        # vmr_sempVersion: >=2.14: POST /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions
-        defaults = {
-            'msgVpnName': vpn,
+    def create_func(self, vpn_name, acl_profile_name, topic_syntax, subscribe_topic_exception, settings=None):
+        # sempVersion: <=2.13 : POST /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeExceptions
+        # sempVersion: >=2.14: POST /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions
+        sempv2_version_float = self.get_sempv2_version_as_float()
+        sempv2_version_map_key = self.get_sempv2_version_map_key(sempv2_version_float)
+        data = {
+            'msgVpnName': vpn_name,
             'aclProfileName': acl_profile_name,
-            self.get_semp_version_key(self.SEMP_VERSION_KEY_LOOKUP, solace_config.vmr_sempVersion, self.KEY_TOPIC_SYNTAX_KEY): topic_syntax
+            self.SEMP_VERSION_KEY_MAP[sempv2_version_map_key]['TOPIC_SYNTAX']: topic_syntax,
+            self.SEMP_VERSION_KEY_MAP[sempv2_version_map_key]['OBJECT_KEY']: subscribe_topic_exception
         }
-        mandatory = {
-            self.get_semp_version_key(self.SEMP_VERSION_KEY_LOOKUP, solace_config.vmr_sempVersion, self.KEY_LOOKUP_ITEM_KEY): subscribe_topic_exception
-        }
-        data = su.merge_dicts(defaults, mandatory, settings)
-        uri_subscr_ex = self.get_semp_version_key(self.SEMP_VERSION_KEY_LOOKUP, solace_config.vmr_sempVersion, self.KEY_URI_SUBSCR_EX)
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.ACL_PROFILES, acl_profile_name, uri_subscr_ex]
-        return su.make_post_request(solace_config, path_array, data)
+        data.update(settings if settings else {})
+        uri_subscr_ex = self.SEMP_VERSION_KEY_MAP[sempv2_version_map_key]['URI_SUBSCR_EX']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, uri_subscr_ex]
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def delete_func(self, solace_config, vpn, acl_profile_name, topic_syntax, lookup_item_value):
-        # vmr_sempVersion: <=2.13 : DELETE /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeExceptions/{topicSyntax},{subscribeExceptionTopic}
-        # vmr_sempVersion: >=2.14: DELETE /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions/{subscribeTopicExceptionSyntax},{subscribeTopicException}
-        ex_uri = ",".join([topic_syntax, lookup_item_value])
-        uri_subscr_ex = self.get_semp_version_key(self.SEMP_VERSION_KEY_LOOKUP, solace_config.vmr_sempVersion, self.KEY_URI_SUBSCR_EX)
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.ACL_PROFILES, acl_profile_name, uri_subscr_ex, ex_uri]
-        return su.make_delete_request(solace_config, path_array)
+    def delete_func(self, vpn_name, acl_profile_name, topic_syntax, subscribe_topic_exception):
+        # sempVersion: <=2.13 : DELETE /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeExceptions/{topicSyntax},{subscribeExceptionTopic}
+        # sempVersion: >=2.14: DELETE /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions/{subscribeTopicExceptionSyntax},{subscribeTopicException}
+        sempv2_version_float = self.get_sempv2_version_as_float()
+        sempv2_version_map_key = self.get_sempv2_version_map_key(sempv2_version_float)
+
+        uri_subscr_ex = self.SEMP_VERSION_KEY_MAP[sempv2_version_map_key]['URI_SUBSCR_EX']
+        ex_uri = ','.join([topic_syntax, subscribe_topic_exception])
+
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, uri_subscr_ex, ex_uri]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
-    """Entrypoint to module"""
-
-    """Compose module arguments"""
     module_args = dict(
         acl_profile_name=dict(type='str', required=True),
-        topic_syntax=dict(type='str', default='smf'),
+        topic_syntax=dict(type='str', default='smf', choices=['smf', 'mqtt'])
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_crud())
-    arg_spec.update(su.arg_spec_semp_version())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -222,13 +212,10 @@ def run_module():
     )
 
     solace_task = SolaceACLSubscribeTopicExceptionTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():
-    """Standard boilerplate"""
     run_module()
 
 

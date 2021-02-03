@@ -16,19 +16,17 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
   tasks:
 
-  - name: "end play for solace_cloud - doesn't support cert auths"
-    meta: end_host
-    when: broker_type == 'solace_cloud'
-
-  - name: "Check vars"
+  - name: "main: Check vars"
     set_fact:
       working_dir: "{{ WORKING_DIR }}"
       cert_file: "{{ WORKING_DIR }}/cert.pem"
+      cert_authority_name: asc_test
 
-  - name: create certificate
+  - name: "main: generate certificate"
     command: >
       openssl req
       -x509
@@ -40,17 +38,44 @@
       -nodes
       -subj "/C=UK/ST=London/L=London/O=Solace/OU=Org/CN=www.example.com"
 
-  - name: add
+  - name: "main: solace_cert_authority: absent"
     solace_cert_authority:
-      name: bar
-      cert_content: "{{ lookup('file', cert_file) }}"
+      name: "{{ cert_authority_name }}"
+      state: absent
+
+  - name: "main: solace_cert_authority: create"
+    solace_cert_authority:
+      name: "{{ cert_authority_name }}"
       settings:
+        certContent: "{{ lookup('file', cert_file) }}"
         revocationCheckEnabled: false
       state: present
 
-  - name: remove
+  - name: "main: solace_cert_authority: no change"
     solace_cert_authority:
-      name: bar
+      name: "{{ cert_authority_name }}"
+      settings:
+        # solace cloud api does not return the content
+        # certContent: "{{ lookup('file', cert_file) }}"
+        revocationCheckEnabled: false
+      state: present
+    register: result
+  - assert:
+      that: result.changed == False
+
+  - name: "main: solace_cert_authority: update"
+    solace_cert_authority:
+      name: "{{ cert_authority_name }}"
+      settings:
+        revocationCheckEnabled: true
+      state: present
+    register: result
+  - assert:
+      that: result.changed == True
+
+  - name: "main: solace_cert_authority: absent"
+    solace_cert_authority:
+      name: "{{ cert_authority_name }}"
       state: absent
 
 ###

@@ -13,37 +13,29 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_client_profile
-
 short_description: client profile
-
 description:
 - "Configure a Client Profile object. Allows addition, removal and configuration of Client Profile objects on Solace Brokers in an idempotent manner."
 - "Supports Solace Cloud Brokers as well as Solace Standalone Brokers."
-
-notes:
 - "Solace Cloud: Polls periodically until Client Profile created and only then returns."
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile)."
-- "Reference: U(https://docs.solace.com/Solace-Cloud/ght_use_rest_api_client_profiles.htm)."
-
-seealso:
-- module: solace_get_client_profiles
-
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile"
+- "Module Solace Cloud API: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_client_profiles.htm"
 options:
   name:
     description: Name of the client profile. Maps to 'clientProfileName' in the API.
     type: str
     required: true
     aliases: [client_profile, client_profile_name]
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-- solace.pubsub_plus.solace.solace_cloud_config
-
+- solace.pubsub_plus.solace.broker_config_solace_cloud
+seealso:
+- module: solace_get_client_profiles
 author:
-  - Mark Street (@mkst)
   - Swen-Helge Huber (@ssh)
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -55,59 +47,68 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-    solace_client_profile:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
-        msg_vpn: "{{ vpn }}"
-        solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
-        solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+  solace_client_profile:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+    msg_vpn: "{{ vpn }}"
+    solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+    solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 tasks:
-
   - name: Delete Client Profile
     solace_client_profile:
-        name: "test_ansible_solace"
+        name: foo
         state: absent
 
   - name: Create Client Profile
     solace_client_profile:
-        name: "test_ansible_solace"
+        name: foo
         state: present
 
   - name: Update Client Profile
     solace_client_profile:
-        name: "test_ansible_solace"
+        name: foo
         settings:
           allowGuaranteedMsgSendEnabled: true
           allowGuaranteedMsgReceiveEnabled: true
           allowGuaranteedEndpointCreateEnabled: true
         state: present
-
-  - name: Delete Client Profile
-    solace_client_profile:
-        name: "test_ansible_solace"
-        state: absent
 '''
 
 RETURN = '''
 response:
-    description: The response from the Solace Sempv2 / Solace Cloud request.
+    description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceClientProfileTask(su.SolaceTask):
+class SolaceClientProfileTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'clientProfileName'
-
+    OBJECT_KEY = 'clientProfileName'
+    OPERATION = 'clientProfile'
     SOLACE_CLOUD_DEFAULTS = {
         'allowTransactedSessionsEnabled': False,
         'allowBridgeConnectionsEnabled': False,
@@ -119,133 +120,112 @@ class SolaceClientProfileTask(su.SolaceTask):
     }
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
+        self.solace_cloud_api = SolaceCloudApi(module)
 
     def get_args(self):
-        return [self.module.params['msg_vpn']]
+        params = self.get_module().params
+        return [params['msg_vpn'], params['name']]
 
-    def lookup_item(self):
-        return self.module.params['name']
-
-    def _get_func_solace_cloud(self, solace_config, lookup_item_value):
-        # GET /{paste-your-serviceId-here}/clientProfiles/{{clientProfileName}}
-        path_array = [su.SOLACE_CLOUD_API_SERVICES_BASE_PATH, solace_config.solace_cloud_config['service_id'], su.CLIENT_PROFILES, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
-
-    def _get_func(self, solace_config, vpn, lookup_item_value):
-        # GET /msgVpns/{msgVpnName}/clientProfiles/{clientProfileName}
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.CLIENT_PROFILES, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
-
-    def get_func(self, solace_config, vpn, lookup_item_value):
-        if(su.is_broker_solace_cloud(solace_config)):
-            return self._get_func_solace_cloud(solace_config, lookup_item_value)
-        else:
-            return self._get_func(solace_config, vpn, lookup_item_value)
-
-    def _create_func_solace_cloud(self, solace_config, client_profile_name, data):
-        # POST /{paste-your-serviceId-here}/requests/clientProfileRequests
-        body = su.compose_solace_cloud_body('create', 'clientProfile', data)
-        path_array = [su.SOLACE_CLOUD_API_SERVICES_BASE_PATH,
-                      solace_config.solace_cloud_config['service_id'],
-                      su.SOLACE_CLOUD_REQUESTS,
-                      su.SOLACE_CLOUD_CLIENT_PROFILE_REQUESTS]
-        return su.make_post_request(solace_config, path_array, body)
-
-    def _create_func(self, solace_config, vpn, client_profile_name, data):
-        # POST /msgVpns/{msgVpnName}/clientProfiles
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.CLIENT_PROFILES]
-        return su.make_post_request(solace_config, path_array, data)
-
-    def create_func(self, solace_config, vpn, client_profile_name, settings=None):
-        mandatory = {
-            self.LOOKUP_ITEM_KEY: client_profile_name,
+    def _compose_request_body(self, operation: str, operation_type: str, settings: dict) -> dict:
+        return {
+            'operation': operation,
+            operation_type: settings
         }
-        data = su.merge_dicts(self.SOLACE_CLOUD_DEFAULTS, mandatory, settings)
-        if(su.is_broker_solace_cloud(solace_config)):
-            return self._create_func_solace_cloud(solace_config, client_profile_name, data)
-        else:
-            return self._create_func(solace_config, vpn, client_profile_name, data)
 
-    def _update_func_solace_cloud(self, solace_config, lookup_item_value, delta_settings, current_settings):
-        # POST /{paste-your-serviceId-here}/requests/clientProfileRequests
+    def _get_func_solace_cloud(self, vpn_name, client_profile_name):
+        # GET services/{paste-your-serviceId-here}/clientProfiles/{{clientProfileName}}
+        service_id = self.get_config().get_params()['solace_cloud_service_id']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, 'clientProfiles', client_profile_name]
+        return self.solace_cloud_api.get_object_settings(self.get_config(), path_array)
+
+    def get_func(self, vpn_name, client_profile_name):
+        if self.get_config().is_solace_cloud():
+            return self._get_func_solace_cloud(vpn_name, client_profile_name)
+        # GET /msgVpns/{msgVpnName}/clientProfiles/{clientProfileName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientProfiles', client_profile_name]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
+
+    def _create_func_solace_cloud(self, vpn_name, client_profile_name, settings):
+        # POST services/{paste-your-serviceId-here}/requests/clientProfileRequests
+        data = {
+            self.OBJECT_KEY: client_profile_name
+        }
+        data.update(self.SOLACE_CLOUD_DEFAULTS)
+        data.update(settings if settings else {})
+        body = self._compose_request_body(operation='create', operation_type=self.OPERATION, settings=data)
+        service_id = self.get_config().get_params()['solace_cloud_service_id']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'clientProfileRequests']
+        return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)
+
+    def create_func(self, vpn_name, client_profile_name, settings=None):
+        if self.get_config().is_solace_cloud():
+            return self._create_func_solace_cloud(vpn_name, client_profile_name, settings)
+        # POST /msgVpns/{msgVpnName}/clientProfiles
+        data = {
+            self.OBJECT_KEY: client_profile_name
+        }
+        data.update(settings if settings else {})
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientProfiles']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
+
+    def _update_func_solace_cloud(self, vpn_name, client_profile_name, settings, delta_settings):
+        # POST services/{paste-your-serviceId-here}/requests/clientProfileRequests
         # for POST: add the current_settings, override with delta_settings
-
-        # check that only 1 item and extract current settings
-        if len(list(current_settings.keys())) != 1:
-            resp = dict(
-                error="Error parsing Solace Cloud Client Profile current settings.",
-                current_settings=current_settings
-            )
-            return False, resp
-        else:
-            curr_settings = list(current_settings.values())[0]
-
+        current_settings = self._get_func_solace_cloud(vpn_name, client_profile_name)
         # inconsistency in Solace Cloud API:
-        # elidingEnabled:
+        # boolean values:
         #   create: must be provided as boolean (true or false)
         #   get: returns it as null if it was false
         #   update: must be provided as true or false
-
-        if curr_settings and curr_settings['elidingEnabled'] is None:
-            curr_settings['elidingEnabled'] = False
-
+        for key in self.SOLACE_CLOUD_DEFAULTS:
+            if key in current_settings and current_settings[key] is None:
+                current_settings[key] = False
         mandatory = {
-            self.LOOKUP_ITEM_KEY: lookup_item_value,
+            self.OBJECT_KEY: client_profile_name
         }
-        data = su.merge_dicts(curr_settings, mandatory, delta_settings)
-        body = su.compose_solace_cloud_body('update', 'clientProfile', data)
-        path_array = [su.SOLACE_CLOUD_API_SERVICES_BASE_PATH,
-                      solace_config.solace_cloud_config['service_id'],
-                      su.SOLACE_CLOUD_REQUESTS,
-                      su.SOLACE_CLOUD_CLIENT_PROFILE_REQUESTS]
-        return su.make_post_request(solace_config, path_array, body)
+        data = current_settings
+        data.update(mandatory)
+        data.update(settings if settings else {})
+        body = self._compose_request_body(operation='update', operation_type=self.OPERATION, settings=data)
+        service_id = self.get_config().get_params()['solace_cloud_service_id']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'clientProfileRequests']
+        return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)
 
-    def _update_func(self, solace_config, vpn, lookup_item_value, delta_settings, current_settings):
+    def update_func(self, vpn_name, client_profile_name, settings=None, delta_settings=None):
+        if self.get_config().is_solace_cloud():
+            return self._update_func_solace_cloud(vpn_name, client_profile_name, settings, delta_settings)
         # PATCH /msgVpns/{msgVpnName}/clientProfiles/{clientProfileName}
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.CLIENT_PROFILES, lookup_item_value]
-        return su.make_patch_request(solace_config, path_array, delta_settings)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientProfiles', client_profile_name]
+        return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
-    def update_func(self, solace_config, vpn, lookup_item_value, delta_settings=None, current_settings=None):
-        if(su.is_broker_solace_cloud(solace_config)):
-            return self._update_func_solace_cloud(solace_config, lookup_item_value, delta_settings, current_settings)
-        else:
-            return self._update_func(solace_config, vpn, lookup_item_value, delta_settings, current_settings)
-
-    def _delete_func_solace_cloud(self, solace_config, client_profile_name):
-        # POST /{paste-your-serviceId-here}/requests/clientProfileRequests
+    def _delete_func_solace_cloud(self, vpn_name, client_profile_name):
+        # POST services/{paste-your-serviceId-here}/requests/clientProfileRequests
         data = {
-            self.LOOKUP_ITEM_KEY: client_profile_name,
+            self.OBJECT_KEY: client_profile_name
         }
-        body = su.compose_solace_cloud_body('delete', 'clientProfile', data)
-        path_array = [su.SOLACE_CLOUD_API_SERVICES_BASE_PATH,
-                      solace_config.solace_cloud_config['service_id'],
-                      su.SOLACE_CLOUD_REQUESTS,
-                      su.SOLACE_CLOUD_CLIENT_PROFILE_REQUESTS]
-        return su.make_post_request(solace_config, path_array, body)
+        body = self._compose_request_body(operation='delete', operation_type=self.OPERATION, settings=data)
+        service_id = self.get_config().get_params()['solace_cloud_service_id']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'clientProfileRequests']
+        return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)
 
-    def _delete_func(self, solace_config, vpn, lookup_item_value):
+    def delete_func(self, vpn_name, client_profile_name):
+        if self.get_config().is_solace_cloud():
+            return self._delete_func_solace_cloud(vpn_name, client_profile_name)
         # DELETE /msgVpns/{msgVpnName}/clientProfiles/{clientProfileName}
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.CLIENT_PROFILES, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array)
-
-    def delete_func(self, solace_config, vpn, lookup_item_value):
-        if(su.is_broker_solace_cloud(solace_config)):
-            return self._delete_func_solace_cloud(solace_config, lookup_item_value)
-        else:
-            return self._delete_func(solace_config, vpn, lookup_item_value)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientProfiles', client_profile_name]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
-    """Entrypoint to module."""
     module_args = dict(
         name=dict(type='str', aliases=['client_profile', 'client_profile_name'], required=True)
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_crud())
-    arg_spec.update(su.arg_spec_solace_cloud_config())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_solace_cloud())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
@@ -254,13 +234,10 @@ def run_module():
     )
 
     solace_task = SolaceClientProfileTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():
-
     run_module()
 
 

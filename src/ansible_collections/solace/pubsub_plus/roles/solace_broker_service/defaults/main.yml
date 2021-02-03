@@ -15,6 +15,7 @@ sempv2_port: 8080
 sempv2_username: admin
 sempv2_password: admin
 sempv2_is_secure_connection: false
+vpn: default
 definition:
   version: '3.3'
   services:

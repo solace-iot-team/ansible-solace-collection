@@ -1,0 +1,62 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "delete.ext-link.tasks: check vars"
+  assert:
+    that:
+      - remote_host_name is defined
+      - dmr_cluster_name is defined
+    fail_msg: "one or more variables not defined"
+
+- name: "delete.ext-link.tasks: solace_get_facts: get_dmrClusterConnectionDetails & get_msgVpnAttributes"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    host: "{{ remote_host_name }}"
+    field_funcs:
+      - get_dmrClusterConnectionDetails
+      - get_msgVpnAttributes
+  register: result
+  no_log: true
+
+- set_fact:
+    remote_address: "{{ result.facts.dmrClusterConnectionDetails.remoteAddress }}"
+    remote_password: "{{ result.facts.dmrClusterConnectionDetails.password }}"
+    remote_node_name: "{{ result.facts.dmrClusterConnectionDetails.primaryRouterName }}"
+    remote_msg_vpn_name: "{{ result.facts.msgVpnAttributes.vpnName }}"
+
+- name: "delete.ext-link.tasks: solace_dmr_cluster_link: disable"
+  solace_dmr_cluster_link:
+    remote_node_name: "{{ remote_node_name }}"
+    dmr_cluster_name: "{{ dmr_cluster_name }}"
+    settings:
+      enabled: false
+    state: present
+
+- name: "delete.ext-link.tasks: solace_dmr_bridge: delete"
+  solace_dmr_bridge:
+    remote_node_name: "{{ remote_node_name }}"
+    state: absent
+
+- name: "delete.ext-link.tasks: solace_dmr_cluster_link_trusted_cn: delete"
+  solace_dmr_cluster_link_trusted_cn:
+    name: "{{ dmr_cluster_link_trusted_cn }}"
+    remote_node_name: "{{ remote_node_name }}"
+    dmr_cluster_name: "{{ dmr_cluster_name }}"
+    state: absent
+
+- name: "delete.ext-link.tasks: solace_dmr_cluster_link_remote_address: add"
+  solace_dmr_cluster_link_remote_address:
+    remote_address: "{{ remote_address }}"
+    remote_node_name: "{{ remote_node_name }}"
+    dmr_cluster_name: "{{ dmr_cluster_name }}"
+    state: absent
+
+- name: "delete.ext-link.tasks: solace_dmr_cluster_link: delete"
+  solace_dmr_cluster_link:
+    remote_node_name: "{{ remote_node_name }}"
+    dmr_cluster_name: "{{ dmr_cluster_name }}"
+    state: absent
+
+###
+# The End.

@@ -25,101 +25,68 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-
+  pre_tasks:
+  - include_vars:
+      file: "client_usernames.vars.yml"
+      name: target_list
   tasks:
 
-    - name: "main: get pre-existing client usernames"
-      solace_get_client_usernames:
-        query_params:
-          where:
-            - "clientUsername==ansible-solace__test*"
-          select:
-            - "clientUsername"
-      register: pre_existing_list
-
-    - name: "main: print pre-existing list"
-      debug:
-        msg:
-          - "{{ pre_existing_list.result_list }}"
-          - "{{ pre_existing_list.result_list_count }}"
-
-    - name: "main: remove all found client usernames"
+    - name: "main: solace_client_username: remove all - start"
       solace_client_username:
-        name: "{{ item.clientUsername }}"
+        name: "{{ item.name }}"
         state: absent
-      register: result
-      loop: "{{ pre_existing_list.result_list }}"
+      loop: "{{ target_list.clientUsernames }}"
 
-    - include_vars:
-        file: "client_usernames.vars.json"
-        name: target_list
-
-    - name: "main: adding / updating client usernames"
+    - name: "main: solace_client_username: creating all"
       solace_client_username:
         name: "{{ item.name }}"
         state: present
       loop: "{{ target_list.clientUsernames }}"
 
-    - name: "main: get new client usernames"
+    - name: "main: solace_client_username: updating all"
+      solace_client_username:
+        name: "{{ item.name }}"
+        settings:
+          enabled: true
+          guaranteedEndpointPermissionOverrideEnabled: true
+        state: present
+      loop: "{{ target_list.clientUsernames }}"
+
+    - name: "main: solace_get_client_usernames(config) - check updates ok"
       solace_get_client_usernames:
         query_params:
           where:
-            - "clientUsername==ansible-solace__test*"
+            - "clientUsername=={{ target_list.search_pattern }}"
+            - "enabled==true"
+            - "guaranteedEndpointPermissionOverrideEnabled==true"
           select:
             - "clientUsername"
-      register: new_list_result
-
-    - name: "main: print new client username list"
-      debug:
-        msg:
-          - "{{ new_list_result.result_list }}"
-          - "{{ new_list_result.result_list_count }}"
-    - assert:
-        that:
-          - new_list_result.result_list_count == 4
-
-    - name: "get: config: new client usernames"
-      solace_get_client_usernames:
-        api: config
-        query_params:
-          where:
-            - "clientUsername==ansible-solace__test*"
-          select:
+            - enabled
+            - guaranteedEndpointPermissionOverrideEnabled
       register: result
-
-    - name: "main: config: print"
-      debug:
-        msg:
-          - "{{ result.result_list }}"
-          - "{{ result.result_list_count }}"
     - assert:
         that:
-          - result.result_list_count == 4
+          - result.result_list_count == 3
+          - result.result_list[0].enabled == True and result.result_list[0].guaranteedEndpointPermissionOverrideEnabled == True
+          - result.result_list[1].enabled == True and result.result_list[1].guaranteedEndpointPermissionOverrideEnabled == True
+          - result.result_list[2].enabled == True and result.result_list[2].guaranteedEndpointPermissionOverrideEnabled == True
 
-    - name: "get: monitor: new client usernames"
-      solace_get_client_usernames:
-        api: monitor
-        query_params:
-          where:
-            - "clientUsername==ansible-solace__test*"
-          select:
-      register: result
-
-    - name: "main: monitor: print"
-      debug:
-        msg:
-          - "{{ result.result_list }}"
-          - "{{ result.result_list_count }}"
-    - assert:
-        that:
-          - result.result_list_count == 4
-
-    - name: "main: remove all client usernames"
+    - name: "main: solace_client_username: remove all - end"
       solace_client_username:
         name: "{{ item.name }}"
         state: absent
-      register: result
       loop: "{{ target_list.clientUsernames }}"
+
+    - name: "main: solace_get_client_usernames(config) - check none exist"
+      solace_get_client_usernames:
+        query_params:
+          where:
+            - "clientUsername=={{ target_list.search_pattern }}"
+          select:
+            - "clientUsername"
+      register: result
+    - assert:
+        that: result.result_list_count == 0
 
 
 ###

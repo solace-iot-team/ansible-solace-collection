@@ -13,43 +13,36 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_available
-
-short_description: Check if broker/service is reachable and responsive.
-
-description: >
-  Check if broker/service is reachable and responsive.
-  Calls "GET /about" and sets "is_available=True/False".
-
+short_description: check if broker is available
+description:
+- Check if broker/service is reachable and responsive. Calls "GET /about".
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about/getAbout"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-
-author: Ricardo Gomez-Ulmke (@rjgu)
-
+author:
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
--
-  name: "Check/wait until brokers available"
-  hosts: "{{ brokers }}"
-  gather_facts: no
-  any_errors_fatal: true
-  module_defaults:
-    solace_get_available:
-      host: "{{ sempv2_host }}"
-      port: "{{ sempv2_port }}"
-      secure_connection: "{{ sempv2_is_secure_connection }}"
-      username: "{{ sempv2_username }}"
-      password: "{{ sempv2_password }}"
-      timeout: "{{ sempv2_timeout }}"
-
-  tasks:
-
-    - name: "Pause Until Broker/Service available"
-      solace_get_available:
-      register: _result
-      until: "_result.is_available"
-      retries: 25 # 25 * 5 seconds
-      delay: 5 # Every 5 seconds
+hosts: all
+gather_facts: no
+any_errors_fatal: true
+module_defaults:
+  solace_get_available:
+    host: "{{ sempv2_host }}"
+    port: "{{ sempv2_port }}"
+    secure_connection: "{{ sempv2_is_secure_connection }}"
+    username: "{{ sempv2_username }}"
+    password: "{{ sempv2_password }}"
+    timeout: "{{ sempv2_timeout }}"
+tasks:
+- name: "Pause Until Broker/Service available"
+  solace_get_available:
+  register: _result
+  until: "_result.is_available"
+  retries: 25 # 25 * 5 seconds
+  delay: 5 # Every 5 seconds
 '''
 
 RETURN = '''
@@ -58,77 +51,52 @@ is_available:
     type: bool
     returned: always
 msg:
-    description: The response from the HTTP call or error description.
-    type: str
+    description: The response from the HTTP call in case of error.
+    type: dict
     returned: error
-
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible.module_utils.basic import AnsibleModule
-if not sc.HAS_IMPORT_ERROR:
-    import requests
 
 
-class SolaceGetAvailableTask(su.SolaceTask):
+class SolaceGetAvailableTask(SolaceBrokerGetTask):
 
     def __init__(self, module):
-        sc.module_fail_on_import_error(module, sc.HAS_IMPORT_ERROR, sc.IMPORT_ERR_TRACEBACK)
-        su.SolaceTask.__init__(self, module)
-        return
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
-    def get_available(self):
-        ok, resp = make_get_request(self.solace_config, [su.SEMP_V2_CONFIG] + ["about"])
-        if not ok:
-            return False, resp
-        return True, resp
-
-
-def make_get_request(solace_config, path_array):
-
-    path = su.compose_path(path_array)
-
-    try:
-        resp = requests.get(
-            solace_config.vmr_url + path,
-            json=None,
-            auth=solace_config.vmr_auth,
-            timeout=solace_config.vmr_timeout,
-            headers={'x-broker-name': solace_config.x_broker},
-            params=None
-        )
-        if sc.ENABLE_LOGGING:
-            sc.log_http_roundtrip(resp)
-        if resp.status_code != 200:
-            return False, su.parse_bad_response(resp)
-        return True, su.parse_good_response(resp)
-
-    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
-        return False, str(e)
+    def do_task(self):
+        resp = self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + ["about"])
+        result = self.create_result()
+        result.update({'is_available': True})
+        return resp, result
 
 
 def run_module():
     module_args = dict(
     )
-    arg_spec = su.arg_spec_broker()
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(module_args)
 
     module = AnsibleModule(
         argument_spec=arg_spec,
         supports_check_mode=True
     )
-
-    result = dict(
-        changed=False,
-        rc=0,
-        is_available=True
-    )
-
     solace_task = SolaceGetAvailableTask(module)
-    ok, resp = solace_task.get_available()
-    result['is_available'] = ok
-    module.exit_json(msg=resp, **result)
+    solace_task.execute()
 
 
 def main():

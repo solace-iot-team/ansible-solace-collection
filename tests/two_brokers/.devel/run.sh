@@ -12,15 +12,16 @@ export PROJECT_HOME=$projectHome
 
 
 ansibleSolaceTests=(
-  # "setup"
-  # "solace_facts"
+  "setup"
+  "solace_facts"
   "solace_bridges"
-  # "teardown"
+  "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
 # local broker
   export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
+  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.8.0.12"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.7.0.29"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.3.1.28"
   export LOCAL_BROKER_INVENTORY_FILE="$projectHome/test-runner/files/local.broker.inventory.yml"
@@ -29,7 +30,7 @@ export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 # solace cloud broker
   export SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE="$projectHome/test-runner/files/solace-cloud-account.inventory.yml"
   export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
-  export TEARDOWN_SOLACE_CLOUD=False
+  # export TEARDOWN_SOLACE_CLOUD=False
 
 export CLEAN_WORKING_DIR=False
 

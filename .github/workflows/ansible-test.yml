@@ -3,24 +3,35 @@
 
 name: ansible-test
 on:
-  # for testing
-  workflow_dispatch:
+  # # for testing
+  # workflow_dispatch:
+  # # testing branches
+  # push:
+  #   branches:
+  #     - feature-refactor
 
   schedule:
     # - cron: '0 1 * * THU'
     - cron: '0 1 * * *'
+  pull_request:
+    branches:
+      - main
 
 env:
   # DEBUG_FLAG: ${{ true }}
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
+  PIP_DEVEL_REQUIREMENTS_FILE: "devel/devel.requirements.txt"
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
+      # pre-installed: /usr/bin/python=2.7.17 and /usr/bin/python3=3.6.9
     strategy:
       matrix:
-        # python-version: [ '3.6' ]
-        python-version: [ '3.6', '3.8', '3.9' ]
+        # python-version: [ '3.9' ]
+        # 3.6 is always tested
+        python-version: [ '3.8', '3.9' ]
         ansible-version: [ 'ansible>=2.10.3' ]
         # ansible-version: [ 'ansible>=2.9.11,<2.10.0', 'ansible>=2.10.3' ]
         # ansible-version: [ 'ansible>=2.9.11,<2.10.0' ]
@@ -35,12 +46,45 @@ jobs:
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
         uses: andymckay/cancel-action@0.2
 
+      - name: update packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install libyaml-dev
+          sudo apt-get install shellcheck
+
+      - name: check pre-installed versions
+        run: |
+          lsb_release -a
+          which python
+          python --version
+          which python3
+          python3 --version
+
       - name: Checkout Current Branch
         uses: actions/checkout@v2
         with:
           ref: ${{ github.ref }}
 
-      - name: Set up Python
+
+        # vm comes with a pre-installed python3.6
+        # ansible-test will also use that
+        # ==> install all devel requirements on that python3.6 version first
+
+      - name: set up python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+
+      - name: Install ansible and devel requirements
+        env:
+          ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
+        run: |
+          python -m pip install --upgrade pip
+          pip install "$ANSIBLE_VERSION"
+          pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
+          pip install -r "${PIP_DEVEL_REQUIREMENTS_FILE}"
+
+      - name: setup python matrix version
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
@@ -49,13 +93,16 @@ jobs:
         env:
           ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
         run: |
-          sudo apt-get update
-          sudo apt-get install libyaml-dev
-          sudo apt-get install shellcheck
           python -m pip install --upgrade pip
           pip install "$ANSIBLE_VERSION"
           pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
-          pip install -r devel/devel.requirements.txt
+          pip install -r "${PIP_DEVEL_REQUIREMENTS_FILE}"
+
+      - name: Print versions
+        run: |
+          ansible --version
+          which ansible-test
+          pip3 show ansible-doc-extractor
 
       - name: Run ansible-test
         run: |

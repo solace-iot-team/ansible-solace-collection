@@ -13,31 +13,26 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_queue
-
 short_description: queue
-
 description:
-- "Configure a queue object on a message vpn. Allows addition, removal and configuration of queue objects in an idempotent manner."
-- "Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue)."
-
+- "Configure a Queue object on a Message Vpn. Allows addition, removal and configuration of Queue objects in an idempotent manner."
+notes:
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue"
 options:
   name:
     description: Name of the queue. Maps to 'queueName' in the API.
     required: true
     type: str
     aliases: [queue, queue_name]
-
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
-
 seealso:
-  - module: solace_get_queues
-
+- module: solace_get_queues
 author:
-  - Ricardo Gomez-Ulmke (@rjgu)
+- Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
@@ -56,16 +51,22 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
+- name: add queue
+  solace_queue:
+    name: bar
+    state: present
 
-  - name: add queue
-    solace_queue:
-      name: bar
-      state: present
+- name: update queue
+  solace_queue:
+    name: bar
+    setttings:
+      egressEnabled: false
+    state: present
 
-  - name: remove queue
-    solace_queue:
-      name: bar
-      state: absent
+- name: remove queue
+  solace_queue:
+    name: bar
+    state: absent
 '''
 
 RETURN = '''
@@ -73,69 +74,81 @@ response:
     description: The response from the Solace Sempv2 request.
     type: dict
     returned: success
+msg:
+    description: The response from the HTTP call in case of error.
+    type: dict
+    returned: error
+rc:
+    description: Return code. rc=0 on success, rc=1 on error.
+    type: int
+    returned: always
+    sample:
+        success:
+            rc: 0
+        error:
+            rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_common as sc
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils as su
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceQueueTask(su.SolaceTask):
+class SolaceQueueTask(SolaceBrokerCRUDTask):
 
-    LOOKUP_ITEM_KEY = 'queueName'
+    OBJECT_KEY = 'queueName'
 
     def __init__(self, module):
-        su.SolaceTask.__init__(self, module)
-
-    def lookup_item(self):
-        return self.module.params['name']
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
 
     def get_args(self):
-        return [self.module.params['msg_vpn']]
+        params = self.get_module().params
+        return [params['msg_vpn'], params['name']]
 
-    def get_func(self, solace_config, vpn, lookup_item_value):
+    def get_func(self, vpn_name, queue_name):
         # GET /msgVpns/{msgVpnName}/queues/{queueName}
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.QUEUES, lookup_item_value]
-        return su.get_configuration(solace_config, path_array, self.LOOKUP_ITEM_KEY)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues', queue_name]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
-    def create_func(self, solace_config, vpn, queue, settings=None):
-        defaults = {}
-        mandatory = {
-            'msgVpnName': vpn,
-            'queueName': queue
+    def create_func(self, vpn_name, queue_name, settings=None):
+        # POST /msgVpns/{msgVpnName}/queues
+        data = {
+            'msgVpnName': vpn_name,
+            self.OBJECT_KEY: queue_name
         }
-        data = su.merge_dicts(defaults, mandatory, settings)
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.QUEUES]
-        return su.make_post_request(solace_config, path_array, data)
+        data.update(settings if settings else {})
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues']
+        return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
-    def update_func(self, solace_config, vpn, lookup_item_value, settings):
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.QUEUES, lookup_item_value]
-        return su.make_patch_request(solace_config, path_array, settings)
+    def update_func(self, vpn_name, queue_name, settings=None, delta_settings=None):
+        # PATCH /msgVpns/{msgVpnName}/queues/{queueName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues', queue_name]
+        return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
-    def delete_func(self, solace_config, vpn, lookup_item_value):
-        path_array = [su.SEMP_V2_CONFIG, su.MSG_VPNS, vpn, su.QUEUES, lookup_item_value]
-        return su.make_delete_request(solace_config, path_array)
+    def delete_func(self, vpn_name, queue_name):
+        # DELETE /msgVpns/{msgVpnName}/queues/{queueName}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues', queue_name]
+        return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', aliases=['queue', 'queue_name'], required=True)
+        name=dict(type='str', required=True, aliases=['queue_name', 'queue'])
     )
-    arg_spec = su.arg_spec_broker()
-    arg_spec.update(su.arg_spec_vpn())
-    arg_spec.update(su.arg_spec_crud())
-    # module_args override standard arg_specs
+    arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
         argument_spec=arg_spec,
         supports_check_mode=True
     )
-
     solace_task = SolaceQueueTask(module)
-    result = solace_task.do_task()
-
-    module.exit_json(**result)
+    solace_task.execute()
 
 
 def main():

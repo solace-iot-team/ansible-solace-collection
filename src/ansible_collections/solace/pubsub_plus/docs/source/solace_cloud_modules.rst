@@ -1,13 +1,14 @@
 Solace Cloud Modules
 ====================
 
-- API token
-- and others 
+Some Solace Cloud modules require the Solace Cloud API Token as an argument.
+This can either be provided in the inventory file or as an environment variable for example.
+
+See a detailed discussion here: :ref:`inventory_files_solace_cloud_account`.
 
 
-
-Solace Cloud Module Reference
------------------------------
+Module Reference
+----------------
 
 .. toctree::
    :glob:

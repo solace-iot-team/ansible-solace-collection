@@ -16,7 +16,7 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
     solace_client_profile:
       host: "{{ sempv2_host }}"
@@ -26,21 +26,30 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-      solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-
+    solace_get_client_profiles:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
   tasks:
 
-    - name: Gather Solace Facts
+    - name: "update: Gather Solace Facts"
       solace_gather_facts:
-      no_log: true
+      # no_log: true
+    - set_fact:
+        is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud }}"
 
-    - name: "Client Profile: Delete"
+    - name: "update: Client Profile: Delete"
       solace_client_profile:
         name: "test_ansible_solace"
         state: absent
 
-    - name: "Client Profile: Create"
+    - name: "update: Client Profile: Create"
       solace_client_profile:
         name: "test_ansible_solace"
         settings:
@@ -51,49 +60,40 @@
           allowGuaranteedEndpointCreateEnabled: true
         state: present
 
-    - name: "Client Profile: Update Settings"
+    - name: "update: Client Profile: Update Settings"
       solace_client_profile:
         name: "test_ansible_solace"
         settings:
           allowGuaranteedMsgSendEnabled: false
         state: present
-      register: res
 
-    - name: "Set Fact: Solace Cloud Client Profile"
-      set_fact:
-        client_profile: "{{ res.response.data.clientProfile }}"
-      no_log: true
-      when: ansible_facts.solace.isSolaceCloud == true
+    - name: "update: get client profile"
+      solace_get_client_profiles:
+        query_params:
+          where:
+            - "clientProfileName==test_ansible_solace"
+      register: result
+    - set_fact:
+          client_profile: "{{ result.result_list[0] }}"
 
-    - name: "Set Fact: Broker Client Profile"
-      set_fact:
-        client_profile: "{{ res.response }}"
-      no_log: true
-      when: ansible_facts.solace.isSolaceCloud == false
-
-    - name: "Solace Cloud: Assert that Updates worked"
+    - name: "update: Solace Cloud: Assert that Updates worked"
       assert:
         that:
-          - client_profile.allowGuaranteedMsgSendEnabled == "false"
-          - client_profile.allowGuaranteedMsgReceiveEnabled == "true"
-          - client_profile.allowTransactedSessionsEnabled == "true"
-          - client_profile.allowBridgeConnectionsEnabled == "true"
-          - client_profile.allowGuaranteedEndpointCreateEnabled == "true"
-        fail_msg: "Solace Cloud Client Profile: Update FAILED!"
-      when: ansible_facts.solace.isSolaceCloud == true
+          - not client_profile.allowGuaranteedMsgSendEnabled
+          - client_profile.allowGuaranteedMsgReceiveEnabled
+          - client_profile.allowTransactedSessionsEnabled
+          - client_profile.allowBridgeConnectionsEnabled
+          - client_profile.allowGuaranteedEndpointCreateEnabled
 
-    - name: "Broker: Assert that Updates worked"
-      assert:
-        that:
-          - client_profile.allowGuaranteedMsgSendEnabled == false
-          - client_profile.allowGuaranteedMsgReceiveEnabled == true
-          - client_profile.allowTransactedSessionsEnabled == true
-          - client_profile.allowBridgeConnectionsEnabled == true
-          - client_profile.allowGuaranteedEndpointCreateEnabled == true
-        fail_msg: "Broker Client Profile: Update FAILED!"
-      when: ansible_facts.solace.isSolaceCloud == false
+    - name: "update: Client Profile: no changes"
+      solace_client_profile:
+        name: "test_ansible_solace"
+        state: present
+      register: result
+    - assert:
+        that: not result.changed
 
-    - name: Delete Client Profile
+    - name: "update: Delete Client Profile"
       solace_client_profile:
         name: "test_ansible_solace"
         state: absent

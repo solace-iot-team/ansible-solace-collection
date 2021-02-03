@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "Exception_Test_1: solace_cloud_service"
+  name: "ex_1: solace_cloud_service"
   hosts: all
   gather_facts: no
   any_errors_fatal: true
@@ -17,118 +17,130 @@
         api_token_restriced: "{{ SOLACE_CLOUD_API_TOKEN_RESTRICTED }}"
         sc_account_name: "{{ inventory_hostname }}"
 
-    - name: "Exception_Test: no name, state=present"
+    - name: "ex_1: no name, state=present"
       solace_cloud_service:
         api_token: "{{ api_token }}"
-        # name: this-service-should-never-be-created
         settings:
           msgVpnName: "not-created-vpn"
-          # datacenterId: "aws-eu-west-2a"
           datacenterId: "aws-ca-central-1a"
           serviceTypeId: "enterprise"
           serviceClassId: "enterprise-giga"
         state: present
       register: result
-      failed_when: "result.rc != 1"
+      ignore_errors: yes
+    - assert:
+        that: result.rc == 1 and 'arg \'name=None\'' in result.msg[1]
 
-    - name: "Exception_Test: no name, state=absent"
+    - name: "ex_1: no name, state=absent"
       solace_cloud_service:
         api_token: "{{ api_token }}"
-        # name: this-service-should-never-be-created
         state: absent
       register: result
-      failed_when: "result.rc != 1"
+      ignore_errors: yes
+    - assert:
+        that: result.rc == 1 and 'at least one is required for state=\'absent\'' in result.msg[1]
 
-    - name: "Exception_Test: wrong service_id, state=absent"
+    - name: "ex_1: non-existent service_id, state=absent"
       solace_cloud_service:
         api_token: "{{ api_token }}"
-        # name: this-service-should-never-be-created
         service_id: xxxxx
         state: absent
       register: result
-      failed_when: "result.rc != 0"
+    - assert:
+        that: result.changed == False
 
-    - name: "Exception_Test: Plan not available"
+    - name: "ex_1: Plan not available"
       solace_cloud_service:
         api_token: "{{ api_token }}"
         name: this-service-should-never-be-created
         settings:
           msgVpnName: "not-created-vpn"
-          # datacenterId: "aws-eu-west-2a"
           datacenterId: "aws-ca-central-1a"
           serviceTypeId: "enterprise"
           serviceClassId: "enterprise-giga"
         state: present
       register: result
-      failed_when: "result.rc != 1"
+      ignore_errors: yes
+    - assert:
+        that: result.rc == 1 and 'Limit Exceeded' in result.msg.body.message
 
-    - name: "Exception_Test: Token has no permissions"
+    - name: "ex_1: Token has wrong permissions"
       solace_cloud_service:
         api_token: "{{ api_token_restriced }}"
         name: never-created-service
         settings:
           msgVpnName: "not-created-vpn"
-          # datacenterId: "aws-eu-west-2a"
           datacenterId: "aws-ca-central-1a"
           serviceTypeId: "enterprise"
           serviceClassId: "enterprise-250-nano"
         state: present
       register: result
-      failed_when: "result.rc != 1"
+      ignore_errors: yes
+    - assert:
+        that: result.rc == 1 and 'Subject does not have permission' in result.msg.body.message
 
-    - name: "Exception_Test: not a token"
+    - name: "ex_1: not a token"
       solace_cloud_service:
         api_token: "xxxx-yyyy"
         name: never-created-service
         settings:
           msgVpnName: "not-created-vpn"
-          # datacenterId: "aws-eu-west-2a"
           datacenterId: "aws-ca-central-1a"
           serviceTypeId: "enterprise"
           serviceClassId: "enterprise-250-nano"
         state: present
       register: result
-      failed_when: "result.rc != 1"
+      ignore_errors: yes
+    - assert:
+        that: result.rc == 1 and 'Your permissions have changed' in result.msg.body.message
 
-    - name: "Exception_Test: no settings"
+    - name: "ex_1: missing settings"
       solace_cloud_service:
         api_token: "{{ api_token }}"
         name: this-service-should-never-be-created
-        # settings:
-        #   msgVpnName: "not-created-vpn"
-        #   datacenterId: "aws-eu-west-2a"
-        #   serviceTypeId: "enterprise"
-        #   serviceClassId: "enterprise-giga"
         state: present
       register: result
-      failed_when: "result.rc != 1"
+      ignore_errors: yes
+    - assert:
+        that: result.rc == 1 and 'arg \'settings=None\'' in result.msg[1]
 
-    - name: "Exception_Test: empty settings"
+    - name: "ex_1: empty settings"
       solace_cloud_service:
         api_token: "{{ api_token }}"
         name: this-service-should-never-be-created
         settings:
-        #   msgVpnName: "not-created-vpn"
-        #   datacenterId: "aws-eu-west-2a"
-        #   serviceTypeId: "enterprise"
-        #   serviceClassId: "enterprise-giga"
         state: present
       register: result
-      failed_when: "result.rc != 1"
+      ignore_errors: yes
+    - assert:
+        that: result.rc == 1 and 'arg \'settings=None\'' in result.msg[1]
 
-    - name: "Exception_Test: insufficient settings"
+    - name: "ex_1: insufficient settings"
       solace_cloud_service:
         api_token: "{{ api_token }}"
         name: this-service-should-never-be-created
         settings:
           msgVpnName: "not-created-vpn"
-        #   datacenterId: "aws-eu-west-2a"
-        #   serviceTypeId: "enterprise"
-        #   serviceClassId: "enterprise-giga"
         state: present
       register: result
-      failed_when: "result.rc != 1"
+      ignore_errors: yes
+    - assert:
+        that: result.rc == 1 and 'must not be blank' in result.msg | string
 
+        # API does not catch this
+    # - name: "ex_1: unknown settings"
+    #   solace_cloud_service:
+    #     api_token: "{{ api_token }}"
+    #     name: this-service-should-never-be-created
+    #     settings:
+    #       unknown_setting: xxx
+    #       datacenterId: "aws-ca-central-1a"
+    #       serviceTypeId: "enterprise"
+    #       serviceClassId: "enterprise-250-nano"
+    #     state: present
+    #   ignore_errors: yes
+    # - assert:
+    #     that: result.rc == 1 and 'must not be blank' in result.msg | string
 
 ###
 # The End.

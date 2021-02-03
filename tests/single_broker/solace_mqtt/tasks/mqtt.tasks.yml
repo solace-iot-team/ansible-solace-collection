@@ -3,86 +3,89 @@
 
 ---
 
-    - name: Create Mqtt Session
-      solace_mqtt_session:
-        name: "{{ mqtt_session_item.mqttSessionClientId }}"
-        settings:
-          enabled: false
-          owner: "{{ mqtt_client_username }}"
-        state: present
+- name: "mqtt.tasks: solace_mqtt_session: create"
+  solace_mqtt_session:
+    name: "{{ mqtt_session.mqttSessionClientId }}"
+    settings:
+      enabled: false
+      owner: "{{ mqtt_client_username }}"
+    state: present
 
-    - name: Update Mqtt Session 1
-      # switch settings from vars
-      solace_mqtt_session:
-        mqtt_session_client_id: "{{ mqtt_session_item.mqttSessionClientId }}"
-        settings: "{{ mqtt.settings._gt_eq_2_14 if ansible_facts.solace.about.api.sempVersion | float >= 2.14 else omit }}"
-        state: present
+- name: "mqtt.tasks: solace_mqtt_session: update >= 2.14"
+  solace_mqtt_session:
+    name: "{{ mqtt_session.mqttSessionClientId }}"
+    settings: "{{ mqtt.settings._gt_eq_2_14 }}"
+    state: present
+  when: sempv2_version|float >= 2.14
 
-    - name: Update Mqtt Session 2
-      # skip task if version not correct
-      solace_mqtt_session:
-        mqtt_session_client_id: "{{ mqtt_session_item.mqttSessionClientId }}"
-        settings:
-          queueMaxMsgSize: 300000
-          queueMaxBindCount: 30
-        state: present
-      when: ansible_facts['solace']['about']['api']['sempVersion'] | float >= 2.14
+- name: "mqtt.tasks: solace_mqtt_session_subscription: add all: qos=1"
+  solace_mqtt_session_subscription:
+    mqtt_session_client_id: "{{ mqtt_session.mqttSessionClientId }}"
+    topic: "{{ item }}"
+    settings:
+      subscriptionQos: 1
+    state: present
+  loop: "{{ mqtt_session.subscriptions }}"
 
-    - name: Add / Update all subscriptions
-      solace_mqtt_session_subscription:
-        client_id: "{{ mqtt_session_item.mqttSessionClientId }}"
-        topic: "{{ item }}"
-        settings:
-          subscriptionQos: 1
-        state: present
-      loop: "{{ mqtt_session_item.subscriptions }}"
+- name: "mqtt.tasks: solace_get_mqtt_session_subscriptions(config)"
+  solace_get_mqtt_session_subscriptions:
+    client_id: "{{ mqtt_session.mqttSessionClientId }}"
+    query_params:
+      where:
+        - "subscriptionTopic==ansible-solace/test/*"
+      # select:
+      #   - "mqttSessionClientId"
+      #   - "mqttSessionVirtualRouter"
+      #   - "subscriptionTopic"
+      #   - "subscriptionQos"
+  register: result
+- assert:
+    that:
+      - "result.rc == 0"
+      - "result.result_list_count == 3"
+      - "result.result_list | length == 3"
 
-    - name: Get Config of all Subscriptions
-      solace_get_mqtt_session_subscriptions:
-        client_id: "{{ mqtt_session_item.mqttSessionClientId }}"
-        query_params:
-          where:
-            - "subscriptionTopic==ansible-solace/test/*"
-          select:
-            - "mqttSessionClientId"
-            - "mqttSessionVirtualRouter"
-            - "subscriptionTopic"
-            - "subscriptionQos"
-      register: get_subscription_result
+- name: "mqtt.tasks: solace_get_mqtt_session_subscriptions(monitor)"
+  solace_get_mqtt_session_subscriptions:
+    client_id: "{{ mqtt_session.mqttSessionClientId }}"
+    api: monitor
+    query_params:
+      where:
+        - "subscriptionTopic==ansible-solace/test/*"
+      select:
+  register: result
+- assert:
+    that:
+      - "result.rc == 0"
+      - "result.result_list_count == 3"
+      - "result.result_list | length == 3"
 
-    - name: Fail when new subscription list count != 3
-      fail:
-        msg: "new mqtt session subscription count != 3"
-      when: get_subscription_result.result_list_count != 3
+- name: "mqtt.tasks: solace_mqtt_session: enable all"
+  solace_mqtt_session:
+    name: "{{ mqtt_session.mqttSessionClientId }}"
+    settings:
+      enabled: true
+    state: present
 
-    - name: Get Monitor of all Subscriptions
-      solace_get_mqtt_session_subscriptions:
-        client_id: "{{ mqtt_session_item.mqttSessionClientId }}"
-        api: monitor
-        query_params:
-          where:
-            - "subscriptionTopic==ansible-solace/test/*"
-          select:
-      register: get_subscription_monitor_result
+- name: "mqtt.tasks: solace_mqtt_session_subscription: delete"
+  solace_mqtt_session_subscription:
+    client_id: "{{ mqtt_session.mqttSessionClientId }}"
+    topic: "{{ item }}"
+    state: absent
+  loop: "{{ mqtt_session.subscriptions }}"
 
-    - name: Print Monitor Result of MQTT Session Subscriptions
-      debug:
-        msg: "{{ get_subscription_monitor_result.result_list }}"
-
-    - name: Enable Mqtt Session
-      solace_mqtt_session:
-        name: "{{ mqtt_session_item.mqttSessionClientId }}"
-        settings:
-          enabled: true
-        state: present
-
-    - name: Delete all subscriptions
-      solace_mqtt_session_subscription:
-        client_id: "{{ mqtt_session_item.mqttSessionClientId }}"
-        topic: "{{ item }}"
-        state: absent
-      loop: "{{ mqtt_session_item.subscriptions }}"
-
-
+- name: "mqtt.tasks: solace_get_mqtt_session_subscriptions(config)"
+  solace_get_mqtt_session_subscriptions:
+    client_id: "{{ mqtt_session.mqttSessionClientId }}"
+    query_params:
+      where:
+        - "subscriptionTopic==ansible-solace/test/*"
+      select:
+  register: result
+- assert:
+    that:
+      - "result.rc == 0"
+      - "result.result_list_count == 0"
+      - "result.result_list | length == 0"
 ###
 # The End.

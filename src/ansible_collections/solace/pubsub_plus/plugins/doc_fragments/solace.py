@@ -15,7 +15,8 @@ class ModuleDocFragment(object):
     BROKER = r'''
 ---
 notes:
-- "Sempv2 Config Reference: U(https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/)."
+- "Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/"
+- "Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/"
 
 options:
   host:
@@ -52,6 +53,13 @@ options:
     description: Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
     required: false
     type: str
+  sempv2_version:
+    description:
+      - The SEMP V2 API version of the broker. See M(solace_get_facts) for info on how to retrieve the version from the broker.
+      - "Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'."
+    required: false
+    type: str
+    aliases: [semp_version]
 '''
 
     VPN = r'''
@@ -62,7 +70,7 @@ options:
     type: str
 '''
 
-    SOLACE_CLOUD_CONFIG = r'''
+    BROKER_CONFIG_SOLACE_CLOUD = r'''
 options:
   solace_cloud_api_token:
     description:
@@ -80,19 +88,31 @@ options:
     required: false
 '''
 
-    SOLACE_CLOUD_SERVICE_CONFIG = r'''
+    SOLACE_CLOUD_CONFIG_SOLACE_CLOUD = r'''
 options:
-  api_token:
+  solace_cloud_api_token:
     description:
       - The API Token.
       - Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
     type: str
     required: true
+    aliases: [api_token]
   timeout:
-    description: Connection timeout in seconds for the http/s request.
+    description: Connection timeout in seconds for the http request.
     required: false
     default: 60
     type: int
+'''
+
+    SOLACE_CLOUD_SERVICE_CONFIG_SERVICE_ID = r'''
+options:
+  solace_cloud_service_id:
+    description:
+      - The service id of a service in Solace Cloud.
+      - Click on the service in Solace Cloud - the service id is in the URL.
+    type: str
+    required: false
+    aliases: [service_id]
 '''
 
     VIRTUAL_ROUTER = r'''
@@ -113,14 +133,6 @@ options:
     description: JSON dictionary of additional configuration, see Reference documentation.
     required: false
     type: dict
-'''
-
-    SEMP_VERSION = r'''
-options:
-  semp_version:
-    description: The Semp API version of the broker. See M(solace_get_facts) for info on how to retrieve the version from the broker.
-    required: true
-    type: str
 '''
 
     STATE = r'''
@@ -175,6 +187,13 @@ description:
 - "Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter."
 
 options:
+  api:
+   description: The API the query should run against.
+   required: false
+   type: str
+   default: monitor
+   choices:
+     - monitor
   query_params:
     description: The query parameters.
     required: false
