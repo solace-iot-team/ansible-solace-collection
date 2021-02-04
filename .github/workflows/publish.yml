@@ -90,7 +90,7 @@ jobs:
           ANSIBLE_GALAXY_TOKEN: ${{ secrets.ANSIBLE_GALAXY_TOKEN }}
         run: |
           cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
-          ansible-galaxy collection publish *.tar.gz --api-key $ANSIBLE_GALAXY_TOKEN
+          ansible-galaxy collection publish *.tar.gz --api-key $ANSIBLE_GALAXY_TOKEN --import-timeout 300
 
       - name: Archive logs
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED != 'false' && github.event_name == 'workflow_dispatch' }}
