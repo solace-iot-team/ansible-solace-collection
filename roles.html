@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Roles &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
   
@@ -17,7 +17,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -37,8 +40,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="solace_broker_service - Manage a Broker Service" href="roles/solace_broker_service.html" />
-    <link rel="prev" title="solace_get_vpn_clients – list of vpn clients" href="modules/solace_get_vpn_clients.html" /> 
+    <link rel="next" title="solace_broker_service - manage a broker service" href="roles/solace_broker_service.html" />
+    <link rel="prev" title="solace_get_vpns – get list of vpns" href="modules/solace_get_vpns.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -52,7 +55,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Solace PubSub+ Ansible Collection 
+            <a href="index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
           
 
           
@@ -91,16 +94,17 @@
 </ul>
 <p class="caption"><span class="caption-text">Guides</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts of Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics.html">The Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inventory-files.html">Best Practices for Ansible-Solace Inventory Files</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Modules &amp; Roles</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="facts_and_general_modules.html">Fact &amp; General Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="solace_cloud_modules.html">Solace Cloud Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="solace_config_modules.html">Solace Configuration Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="solace_monitor_modules.html">Solace Monitor Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solace_get_modules.html">Solace Get Object List Modules</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Roles</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="roles/solace_broker_service.html">solace_broker_service - Manage a Broker Service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roles/solace_broker_service.html">solace_broker_service - manage a broker service</a></li>
 </ul>
 </li>
 </ul>
@@ -143,6 +147,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -154,7 +160,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/roles.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -172,7 +178,7 @@
 <h1>Roles<a class="headerlink" href="#roles" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="roles/solace_broker_service.html">solace_broker_service - Manage a Broker Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roles/solace_broker_service.html">solace_broker_service - manage a broker service</a></li>
 </ul>
 </div>
 </div>
@@ -182,25 +188,18 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="roles/solace_broker_service.html" class="btn btn-neutral float-right" title="solace_broker_service - Manage a Broker Service" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="modules/solace_get_vpn_clients.html" class="btn btn-neutral float-left" title="solace_get_vpn_clients – list of vpn clients" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="roles/solace_broker_service.html" class="btn btn-neutral float-right" title="solace_broker_service - manage a broker service" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="modules/solace_get_vpns.html" class="btn btn-neutral float-left" title="solace_get_vpns – get list of vpns" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
+        &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 29 Dec 2020 at 11:26.
+        Last updated on 04 Feb 2021 at 14:29.
       </span>
 
     </p>
@@ -208,14 +207,13 @@
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

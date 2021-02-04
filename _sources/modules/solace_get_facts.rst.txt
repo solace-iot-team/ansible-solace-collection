@@ -2,11 +2,10 @@
 
 .. _solace_get_facts_module:
 
-solace_get_facts -- get facts from :ref:`solace_gather_facts <solace_gather_facts_module>`
-==========================================================================================
+solace_get_facts -- get facts from ansible_facts.solace
+=======================================================
 
 Provides convenience functions to access solace facts retrieved from broker service using :ref:`solace_gather_facts <solace_gather_facts_module>` from 'ansible_facts.solace'.
-
 
 
 
@@ -17,67 +16,43 @@ Examples
 .. code-block:: yaml+jinja
 
    
+   hosts: all
+   gather_facts: no
+   any_errors_fatal: true
+   collections:
+   - solace.pubsub_plus
+   module_defaults:
+     solace_gather_facts:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 
-     name: "Example for solace_get_facts"
-     hosts: all
-     gather_facts: no
-     any_errors_fatal: true
-     collections:
-       - solace.pubsub_plus
-     module_defaults:
-       solace_gather_facts:
-         host: "{{ sempv2_host }}"
-         port: "{{ sempv2_port }}"
-         secure_connection: "{{ sempv2_is_secure_connection }}"
-         username: "{{ sempv2_username }}"
-         password: "{{ sempv2_password }}"
-         timeout: "{{ sempv2_timeout }}"
-         solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
-         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+   tasks:
+   - name: Gather Solace Facts
+     solace_gather_facts:
 
-     tasks:
-       - name: Gather Solace Facts
-         solace_gather_facts:
+   - name: "Get Host SMF Messaging Endpoints Facts: solace-cloud-1"
+     solace_get_facts:
+       hostvars: "{{ hostvars }}"
+       # solace-cloud-1 is a host in the inventory
+       host: solace-cloud-1
+       field_funcs:
+       - get_serviceSMFMessagingEndpoints
+       - get_serviceSmfPlainTextListenPort
+       - get_serviceSmfCompressionListenPort
+       - get_serviceSmfTlsListenPort
+       - get_virtualRouterName
+     register: results
 
-       - name: "Get Host SMF Messaging Endpoints Facts: solace-cloud-1"
-         solace_get_facts:
-           hostvars: "{{ hostvars }}"
-           host: solace-cloud-1
-           fields:
-           field_funcs:
-             - get_serviceSMFMessagingEndpoints
-         register: solace_cloud_1_smf_enpoints_facts
-
-       - name: "Get Host Service Items: local"
-         solace_get_facts:
-           hostvars: "{{ hostvars }}"
-           host: local
-           fields:
-           field_funcs:
-             - get_serviceSmfPlainTextListenPort
-             - get_serviceSmfCompressionListenPort
-             - get_serviceSmfTlsListenPort
-             - get_virtualRouterName
-         register: local_service_facts
-
-       - name: "Get Host Service Items: solace-cloud-1"
-         solace_get_facts:
-           hostvars: "{{ hostvars }}"
-           host: solace-cloud-1
-           field_funcs:
-             - get_serviceSmfPlainTextListenPort
-             - get_serviceSmfCompressionListenPort
-             - get_serviceSmfTlsListenPort
-             - get_virtualRouterName
-         register: solace_cloud_1_service_facts
-
-       - name: "Show Host Service Facts"
-         debug:
-           msg:
-             - "local_service_facts:"
-             - "{{ local_service_facts }}"
-             - "solace_cloud_1_service_facts:"
-             - "{{ solace_cloud_1_service_facts }}"
+   - name: print results
+     debug:
+       msg:
+       - "{{ results.facts }}"
 
 
 
@@ -85,8 +60,7 @@ Notes
 -----
 
 .. note::
-   In order to access other hosts' (other than the current 'inventory_host') facts, you must not use the 'serial' strategy for the playbook.
-
+   - In order to access other hosts' facts (other than the current 'inventory_host'), you must not use the 'serial' strategy for the playbook.
 
 
 See Also
@@ -105,6 +79,7 @@ field_funcs (optional)
   List of pre-built field functions that retrieve values from hostvars.
 
   | **type**: list
+  | **default**: []
 
   get_allClientConnectionDetails (optional)
     Retrieve all enabled client connection details for the various protocols for the service/broker.
@@ -117,6 +92,11 @@ field_funcs (optional)
     For Solace Cloud: {hostname}:{port}.
 
     For broker: v:{virtualRouterName}.
+
+    | **type**: str
+
+  get_dmrClusterConnectionDetails (optional)
+    Retrieve all DMR cluster connection details for the service/broker.
 
     | **type**: str
 
@@ -145,11 +125,6 @@ field_funcs (optional)
 
     | **type**: str
 
-
-fields (optional)
-  List of field names to retrieve from hostvars. Note: Retrieves the first occurrence of the field name only.
-
-  | **type**: list
 
 host (required)
   The playbook host to retrieve the facts from.
@@ -188,6 +163,30 @@ facts
        "serviceSmfPlainTextListenPort": 55555,
        "serviceSmfTlsListenPort": 55443,
        "virtualRouterName": "single-aws-eu-west-6e-4ftdf"
+     }
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
      }
    }
 

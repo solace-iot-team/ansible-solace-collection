@@ -1,0 +1,249 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_cert_authorities.py
+
+.. _solace_get_cert_authorities_module:
+
+solace_get_cert_authorities -- get list of cert authorities
+===========================================================
+
+Get a list of Certificate Authority objects.
+
+Implements the config and monitor API.
+
+Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter.
+
+Supports Solace Cloud Brokers as well as Solace Standalone Brokers.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   hosts: all
+   gather_facts: no
+   any_errors_fatal: true
+   collections:
+     - solace.pubsub_plus
+   module_defaults:
+     solace_cert_authority:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
+       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+     solace_get_cert_authorities:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
+       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+   tasks:
+   - name: create cert authority
+     solace_cert_authority:
+       name: foo
+       settings:
+         certContent: "the-cert"
+         state: present
+
+   - name: get list config
+     solace_get_cert_authorities:
+       query_params:
+         where:
+           - "certAuthorityName==foo"
+     register: result
+
+   - name: print result
+     debug:
+       msg:
+         - "{{ result.result_list }}"
+         - "{{ result.result_list_count }}"
+
+   - name: get list monitor
+     solace_get_cert_authorities:
+       api: monitor
+       query_params:
+         where:
+           - "certAuthorityName==foo"
+     register: result
+
+   - name: print result
+     debug:
+       msg:
+         - "{{ result.result_list }}"
+         - "{{ result.result_list_count }}"
+
+
+
+Notes
+-----
+
+.. note::
+   - Using Solace Cloud: where clause only supports operations: '=='
+   - 
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority/getCertAuthorities
+   - Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/certAuthority/getCertAuthorities
+   - Module Solace Cloud API: not available
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_cert_authority_module`
+
+
+
+Parameters
+----------
+
+api (optional)
+  The API the query should run against.
+
+  | **type**: str
+  | **default**: config
+  | **choices**: config, monitor
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+query_params (optional)
+  The query parameters.
+
+  | **type**: dict
+  | **default**: {}
+
+  select (optional)
+    Include in the response only selected attributes of the object, or exclude from the response selected attributes of the object. See the documentation for the select parameter.
+
+    | **type**: list
+    | **default**: []
+
+  where (optional)
+    Include in the response only objects where certain conditions are true. See the the documentation for the where parameter.
+
+    Note: URL encoded automatically, you can safely use '/, <, <=, >, >=, != .. '
+
+    | **type**: list
+    | **default**: []
+
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+  | **default**: False
+
+sempv2_version (optional)
+  The SEMP V2 API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
+
+  Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'.
+
+  | **type**: str
+  | **aliases**: semp_version
+
+solace_cloud_api_token (optional)
+  The API Token.
+
+  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
+  | **type**: str
+
+solace_cloud_service_id (optional)
+  The service id in Solace Cloud.
+
+  Click on the service in Solace Cloud - the service id is in the URL.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
+  | **type**: str
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+result_list
+  The list of objects found containing requested fields. Payload depends on API called.
+
+  | **returned**: success
+  | **type**: list
+
+result_list_count
+  Number of items in result_list.
+
+  | **returned**: success
+  | **type**: int
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+

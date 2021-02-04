@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Fact &amp; General Modules &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
   
@@ -17,7 +17,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -37,8 +40,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="solace_gather_facts – Retrieve facts from the Solace event broker and set ‘ansible_facts.solace’." href="modules/solace_gather_facts.html" />
-    <link rel="prev" title="Concepts of Solace PubSub+ Ansible Collection" href="concepts.html" /> 
+    <link rel="next" title="solace_gather_facts – gather broker facts" href="modules/solace_gather_facts.html" />
+    <link rel="prev" title="Best Practices for Ansible-Solace Inventory Files" href="inventory-files.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -52,7 +55,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Solace PubSub+ Ansible Collection 
+            <a href="index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
           
 
           
@@ -91,24 +94,26 @@
 </ul>
 <p class="caption"><span class="caption-text">Guides</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts of Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics.html">The Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inventory-files.html">Best Practices for Ansible-Solace Inventory Files</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Modules &amp; Roles</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Fact &amp; General Modules</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#facts-general-module-reference">Facts &amp; General Module Reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="modules/solace_gather_facts.html">solace_gather_facts – Retrieve facts from the Solace event broker and set ‘ansible_facts.solace’.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="modules/solace_get_facts.html">solace_get_facts – get facts from <span class="xref std std-ref">solace_gather_facts</span></a></li>
-<li class="toctree-l3"><a class="reference internal" href="modules/solace_get_available.html">solace_get_available – Check if broker/service is reachable and responsive.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_account_gather_facts.html">solace_cloud_account_gather_facts – Facts from all services in Solace Cloud Account.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_get_facts.html">solace_cloud_get_facts – access solace facts from <span class="xref std std-ref">solace_cloud_account_gather_facts</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-usage">Example Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-reference">Module Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_gather_facts.html">solace_gather_facts – gather broker facts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_get_facts.html">solace_get_facts – get facts from ansible_facts.solace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_get_available.html">solace_get_available – check if broker is available</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_account_gather_facts.html">solace_cloud_account_gather_facts – gather account services facts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_get_facts.html">solace_cloud_get_facts – get Solace Cloud service facts</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="solace_cloud_modules.html">Solace Cloud Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="solace_config_modules.html">Solace Configuration Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="solace_monitor_modules.html">Solace Monitor Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solace_get_modules.html">Solace Get Object List Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="roles.html">Roles</a></li>
 </ul>
 
@@ -150,6 +155,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -161,7 +168,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/facts_and_general_modules.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -176,17 +183,58 @@
            <div itemprop="articleBody">
             
   <div class="section" id="fact-general-modules">
-<h1>Fact &amp; General Modules<a class="headerlink" href="#fact-general-modules" title="Permalink to this headline">¶</a></h1>
-<p>Facts of a Solace Service…</p>
-<div class="section" id="facts-general-module-reference">
-<h2>Facts &amp; General Module Reference<a class="headerlink" href="#facts-general-module-reference" title="Permalink to this headline">¶</a></h2>
+<span id="facts-and-general-modules"></span><h1>Fact &amp; General Modules<a class="headerlink" href="#fact-general-modules" title="Permalink to this headline">¶</a></h1>
+<p>To gather facts about Brokers / Solace Cloud Services and Solace Cloud accounts specialized modules exist.</p>
+<div class="section" id="example-usage">
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
+<p>Call the module <a class="reference internal" href="modules/solace_gather_facts.html#solace-gather-facts-module"><span class="std std-ref">solace_gather_facts – gather broker facts</span></a> at the beginning of your playbook, so all broker facts are available for the rest of the playbook.</p>
+<p><cite>solace_gather_facts</cite> places the facts gathered in <cite>ansible_facts.solace[inventory_hostname]</cite> as a JSON.
+You can save it to file, print it out and find where the fact you are interested in is located.
+Using <a class="reference external" href="https://palletsprojects.com/p/jinja/">jinja2</a>, you can dynamically retrieve facts based on certain settings.</p>
+<p>Here is a gotcha:</p>
+<p>When using modules that require access to multiple brokers at the same time, for example <a class="reference internal" href="modules/solace_bridge_remote_vpn.html#solace-bridge-remote-vpn-module"><span class="std std-ref">solace_bridge_remote_vpn – bridge remote vpn</span></a>, we need to ensure that <cite>solace_gather_facts</cite> is executed for
+each host in the inventory BEFORE the <cite>solace_bridge_remote_vpn</cite> is called.</p>
+<p>The solution is to tell Ansible that by setting <strong>forks 1</strong> parameter for <cite>ansible-playbook</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook <span class="se">\</span>
+        --forks <span class="m">1</span> <span class="se">\</span>
+        -i inventory-with-two-brokers.yml <span class="se">\</span>
+        my.playbook.yml
+</pre></div>
+</div>
+<p>This tells Ansible to execute each task for all hosts BEFORE moving onto the next task.</p>
+<p>An additional convenience module allows you to retrieve certain facts from Ansible’s <cite>hostvars</cite>: <a class="reference internal" href="modules/solace_get_facts.html#solace-get-facts-module"><span class="std std-ref">solace_get_facts – get facts from ansible_facts.solace</span></a>.</p>
+<p>It implements a few functions to directly collect a set of facts without the need to understand the JSON structure.
+For example, to get the connection details of a newly created Solace Cloud service use the following in your playbook:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Gather</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Facts&quot;</span>
+  <span class="nt">solace_gather_facts</span><span class="p">:</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Get</span><span class="nv"> </span><span class="s">Facts:</span><span class="nv"> </span><span class="s">all</span><span class="nv"> </span><span class="s">client</span><span class="nv"> </span><span class="s">connection</span><span class="nv"> </span><span class="s">details&quot;</span>
+  <span class="nt">solace_get_facts</span><span class="p">:</span>
+    <span class="nt">hostvars</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">hostvars</span><span class="nv"> </span><span class="s">}}&quot;</span>
+    <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">inventory_hostname</span><span class="nv"> </span><span class="s">}}&quot;</span>
+    <span class="nt">field_funcs</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_allClientConnectionDetails</span>
+  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">set_fact</span><span class="p">:</span>
+    <span class="nt">client_connection_details</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">result.facts</span><span class="nv"> </span><span class="s">}}&quot;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Save</span><span class="nv"> </span><span class="s">&#39;client_connection_details&#39;</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">File&quot;</span>
+  <span class="nt">copy</span><span class="p">:</span>
+    <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">client_connection_details</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">to_nice_json</span><span class="nv"> </span><span class="s">}}&quot;</span>
+    <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./tmp/generated/{{</span><span class="nv"> </span><span class="s">inventory_hostname</span><span class="nv"> </span><span class="s">}}.client_connection_details.json&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="module-reference">
+<h2>Module Reference<a class="headerlink" href="#module-reference" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules/solace_gather_facts.html">solace_gather_facts – Retrieve facts from the Solace event broker and set ‘ansible_facts.solace’.</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/solace_get_facts.html">solace_get_facts – get facts from <span class="xref std std-ref">solace_gather_facts</span></a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/solace_get_available.html">solace_get_available – Check if broker/service is reachable and responsive.</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_account_gather_facts.html">solace_cloud_account_gather_facts – Facts from all services in Solace Cloud Account.</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_get_facts.html">solace_cloud_get_facts – access solace facts from <span class="xref std std-ref">solace_cloud_account_gather_facts</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_gather_facts.html">solace_gather_facts – gather broker facts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_get_facts.html">solace_get_facts – get facts from ansible_facts.solace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_get_available.html">solace_get_available – check if broker is available</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_account_gather_facts.html">solace_cloud_account_gather_facts – gather account services facts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_get_facts.html">solace_cloud_get_facts – get Solace Cloud service facts</a></li>
 </ul>
 </div>
 </div>
@@ -197,25 +245,18 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="modules/solace_gather_facts.html" class="btn btn-neutral float-right" title="solace_gather_facts – Retrieve facts from the Solace event broker and set ‘ansible_facts.solace’." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="concepts.html" class="btn btn-neutral float-left" title="Concepts of Solace PubSub+ Ansible Collection" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="modules/solace_gather_facts.html" class="btn btn-neutral float-right" title="solace_gather_facts – gather broker facts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="inventory-files.html" class="btn btn-neutral float-left" title="Best Practices for Ansible-Solace Inventory Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
+        &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 29 Dec 2020 at 11:26.
+        Last updated on 04 Feb 2021 at 14:29.
       </span>
 
     </p>
@@ -223,14 +264,13 @@
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

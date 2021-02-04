@@ -1,0 +1,210 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_acl_subscribe_share_name_exception.py
+
+.. _solace_acl_subscribe_share_name_exception_module:
+
+solace_acl_subscribe_share_name_exception -- subscribe share name exception for acl profile
+===========================================================================================
+
+Configure Subscribe Share Name Exeption objects for an ACL Profile.
+
+Allows addition and removal of Subscribe Share Name Exception objects for ACL Profiles.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   hosts: all
+   gather_facts: no
+   any_errors_fatal: true
+   collections:
+   - solace.pubsub_plus
+   module_defaults:
+     solace_acl_profile:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       msg_vpn: "{{ vpn }}"
+     solace_acl_subscribe_share_name_exception:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       msg_vpn: "{{ vpn }}"
+   tasks:
+     - name: Create ACL Profile
+       solace_acl_profile:
+         name: foo
+         settings:
+           subscribeShareNameDefaultAction: "disallow"
+         state: present
+
+     - name: Remove
+       solace_acl_subscribe_share_name_exception:
+         name: "bar"
+         acl_profile_name: foo
+         state: absent
+
+     - name: Add
+       solace_acl_subscribe_share_name_exception:
+         name: "bar"
+         acl_profile_name: foo
+         state: present
+
+
+
+Notes
+-----
+
+.. note::
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfileSubscribeShareNameExceptions
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
+
+
+
+
+
+Parameters
+----------
+
+acl_profile_name (required)
+  The ACL Profile.
+
+  | **type**: str
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+msg_vpn (required)
+  The message vpn.
+
+  | **type**: str
+
+name (required)
+  Name of the subscribe share name exception topic. Maps to 'subscribeShareNameException' in the API.
+
+  | **type**: str
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+  | **default**: False
+
+sempv2_version (optional)
+  The SEMP V2 API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
+
+  Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'.
+
+  | **type**: str
+  | **aliases**: semp_version
+
+settings (optional)
+  JSON dictionary of additional configuration, see Reference documentation.
+
+  | **type**: dict
+
+state (optional)
+  Target state.
+
+  | **type**: str
+  | **default**: present
+  | **choices**: present, absent
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+topic_syntax (optional)
+  The topic syntax. Maps to 'subscribeShareNameExceptionSyntax' in the SEMP v2 API.
+
+  | **type**: str
+  | **default**: smf
+  | **choices**: smf, mqtt
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+response
+  The response from the Solace Sempv2 request.
+
+  | **returned**: success
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "aclProfileName": "foo",
+     "msgVpnName": "default",
+     "subscribeShareNameException": "bar",
+     "subscribeShareNameExceptionSyntax": "smf"
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+

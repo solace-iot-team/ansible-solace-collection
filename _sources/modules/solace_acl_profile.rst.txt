@@ -7,8 +7,6 @@ solace_acl_profile -- configure acl profile
 
 Configure an ACL Profile on a message vpn. Allows addition, removal and configuration of ACL Profile(s) on Solace Brokers in an idempotent manner.
 
-Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile.
-
 
 
 
@@ -24,32 +22,29 @@ Examples
    collections:
    - solace.pubsub_plus
    module_defaults:
-       solace_acl_profile:
-           host: "{{ sempv2_host }}"
-           port: "{{ sempv2_port }}"
-           secure_connection: "{{ sempv2_is_secure_connection }}"
-           username: "{{ sempv2_username }}"
-           password: "{{ sempv2_password }}"
-           timeout: "{{ sempv2_timeout }}"
-           msg_vpn: "{{ vpn }}"
+     solace_acl_profile:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       msg_vpn: "{{ vpn }}"
    tasks:
      - name: Remove ACL Profile
        solace_acl_profile:
-         name: "{{ acl_profile }}"
-         msg_vpn: "{{ msg_vpn }}"
+         name: foo
          state: absent
 
      - name: Add ACL Profile
        solace_acl_profile:
-         name: "{{ acl_profile }}"
-         msg_vpn: "{{ msg_vpn }}"
+         name: foo
          settings:
            clientConnectDefaultAction: allow
 
      - name: Update ACL Profile
        solace_acl_profile:
-         name: "{{ acl_profile }}"
-         msg_vpn: "{{ msg_vpn }}"
+         name: foo
          settings:
            publishTopicDefaultAction: allow
 
@@ -59,10 +54,17 @@ Notes
 -----
 
 .. note::
-   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
 
 
+See Also
+--------
 
+.. seealso::
+
+   - :ref:`solace_get_acl_profiles_module`
 
 
 
@@ -101,6 +103,15 @@ secure_connection (optional)
   If true, use https rather than http.
 
   | **type**: bool
+  | **default**: False
+
+sempv2_version (optional)
+  The SEMP V2 API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
+
+  Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'.
+
+  | **type**: str
+  | **aliases**: semp_version
 
 settings (optional)
   JSON dictionary of additional configuration, see Reference documentation.
@@ -154,6 +165,30 @@ response
      "publishTopicDefaultAction": "disallow",
      "subscribeShareNameDefaultAction": "allow",
      "subscribeTopicDefaultAction": "disallow"
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
    }
 
 

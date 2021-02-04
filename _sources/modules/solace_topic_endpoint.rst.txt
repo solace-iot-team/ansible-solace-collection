@@ -5,9 +5,7 @@
 solace_topic_endpoint -- topic endpoint
 =======================================
 
-Allows addition, removal and configuration of topic endpoint objects.
-
-Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/topicEndpoint.
+Allows addition, removal and configuration of Topic Endpoint objects in an idempotent manner.
 
 
 
@@ -33,16 +31,22 @@ Examples
        timeout: "{{ sempv2_timeout }}"
        msg_vpn: "{{ vpn }}"
    tasks:
+   - name: create
+     solace_topic_endpoint:
+       name: bar
+       state: present
 
-     - name: add
-       solace_topic_endpoint:
-         name: bar
-         state: present
+   - name: update
+     solace_topic_endpoint:
+       name: bar
+       settings:
+         egressEnabled: true
+       state: present
 
-     - name: remove
-       solace_topic_endpoint:
-         name: bar
-         state: absent
+   - name: delete
+     solace_topic_endpoint:
+       name: bar
+       state: absent
 
 
 
@@ -50,10 +54,17 @@ Notes
 -----
 
 .. note::
-   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/topicEndpoint
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
 
 
+See Also
+--------
 
+.. seealso::
+
+   - :ref:`solace_get_topic_endpoints_module`
 
 
 
@@ -75,6 +86,7 @@ name (required)
   The topic endpoint name. Maps to 'topicEndpointName' in the API.
 
   | **type**: str
+  | **aliases**: topic_endpoint_name
 
 password (optional)
   Administrator password for Solace Broker.
@@ -92,6 +104,15 @@ secure_connection (optional)
   If true, use https rather than http.
 
   | **type**: bool
+  | **default**: False
+
+sempv2_version (optional)
+  The SEMP V2 API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
+
+  Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'.
+
+  | **type**: str
+  | **aliases**: semp_version
 
 settings (optional)
   JSON dictionary of additional configuration, see Reference documentation.
@@ -134,10 +155,29 @@ response
 
   | **returned**: success
   | **type**: dict
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
   | **sample**:
 
   .. code-block:: json
 
-     "{}"
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
 
 

@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>solace_dmr_cluster – dmr cluster &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
   
@@ -17,7 +17,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -37,7 +40,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="solace_dmr_cluster_link – Configure a link object on a DMR cluster." href="solace_dmr_cluster_link.html" />
+    <link rel="next" title="solace_dmr_cluster_link – link on a dmr cluster" href="solace_dmr_cluster_link.html" />
     <link rel="prev" title="solace_dmr_bridge – dmr bridge" href="solace_dmr_bridge.html" /> 
 </head>
 
@@ -52,7 +55,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Solace PubSub+ Ansible Collection 
+            <a href="../index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
           
 
           
@@ -91,60 +94,56 @@
 </ul>
 <p class="caption"><span class="caption-text">Guides</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts of Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics.html">The Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inventory-files.html">Best Practices for Ansible-Solace Inventory Files</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Modules &amp; Roles</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration Modules</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../solace_config_modules.html#solace-configuration-module-reference">Solace Configuration Module Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../solace_config_modules.html#configuration-settings-for-modules">Configuration Settings for Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../solace_config_modules.html#idempotency">Idempotency</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../solace_config_modules.html#module-reference">Module Reference</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_client_connect_exception.html">solace_acl_client_connect_exception – client connect exception for acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_profile.html">solace_acl_profile – configure acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_publish_topic_exception.html">solace_acl_publish_topic_exception – publish topic exception for acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_share_name_exception.html">solace_acl_subscribe_share_name_exception – subscribe share name exception for acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_topic_exception.html">solace_acl_subscribe_topic_exception – subscribe topic exception for acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge.html">solace_bridge – bridge</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_subscription.html">solace_bridge_remote_subscription – remote subscription on a bridge.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_subscription.html">solace_bridge_remote_subscription – remote subscription on a bridge</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_vpn.html">solace_bridge_remote_vpn – bridge remote vpn</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_bridge_tls_cn.html">solace_bridge_tls_cn – trusted common name for bridge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_bridge_trusted_cn.html">solace_bridge_trusted_cn – trusted common name for bridge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cert_authority.html">solace_cert_authority – certificate authority</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_client_profile.html">solace_client_profile – client profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_client_username.html">solace_client_username – client username</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_cert_authority.html">solace_cert_authority – certificate authority</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_dmr_bridge.html">solace_dmr_bridge – dmr bridge</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">solace_dmr_cluster – dmr cluster</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="solace_dmr_cluster_link.html">solace_dmr_cluster_link – Configure a link object on a DMR cluster.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_dmr_cluster_link.html">solace_dmr_cluster_link – link on a dmr cluster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_dmr_cluster_link_remote_address.html">solace_dmr_cluster_link_remote_address – remote address for dmr cluster link</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_dmr_cluster_link_trusted_cn.html">solace_dmr_cluster_link_trusted_cn – trusted common name for dmr cluster link</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_bridge_remote_vpns.html">solace_get_bridge_remote_vpns – get remote vpns of bridge</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_bridges.html">solace_get_bridges – get bridges</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_queues.html">solace_get_queues – get list of queues</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_session_subscriptions.html">solace_get_mqtt_session_subscriptions – list of mqtt session subscriptions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_sessions.html">solace_get_mqtt_sessions – list of mqtt sessions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_magic_queues.html">solace_get_magic_queues – get ‘magic’ queues</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_client_profiles.html">solace_get_client_profiles – get client profiles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_client_usernames.html">solace_get_client_usernames – get client usernames</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_rdps.html">solace_get_rdps – get list of rdps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_mqtt_session.html">solace_mqtt_session – mqtt session</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_mqtt_session_subscription.html">solace_mqtt_session_subscription – subscription for mqtt session</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_queue.html">solace_queue – queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_queue_subscription.html">solace_queue_subscription – subscription on a queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp.html">solace_rdp – rest delivery point</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_rdp_queue_binding.html">solace_rdp_queue_binding – queue bindining for rdp</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer.html">solace_rdp_rest_consumer – rest consumer for rdp</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer_trusted_cn.html">solace_rdp_rest_consumer_trusted_cn – trusted common name for rest consumer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_rdp_queue_binding.html">solace_rdp_queue_binding – queue bindining on rdp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer.html">solace_rdp_rest_consumer – rest consumer on rdp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer_trusted_cn.html">solace_rdp_rest_consumer_trusted_cn – trusted common name on rdp rest consumer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_topic_endpoint.html">solace_topic_endpoint – topic endpoint</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_vpn.html">solace_vpn – vpn</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../solace_monitor_modules.html">Solace Monitor Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_get_modules.html">Solace Get Object List Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../roles.html">Roles</a></li>
 </ul>
 
@@ -188,6 +187,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -201,7 +202,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             
               <!-- User defined GitHub URL -->
               <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_dmr_cluster.py" class="fa fa-github"> Edit on GitHub</a>
@@ -236,8 +237,8 @@
     <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="nt">tasks</span><span class="p">:</span>
+
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create</span>
   <span class="nt">solace_dmr_cluster</span><span class="p">:</span>
     <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
@@ -246,7 +247,9 @@
   <span class="nt">solace_dmr_cluster</span><span class="p">:</span>
     <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
     <span class="nt">settings</span><span class="p">:</span>
-      <span class="nt">tlsServerCertMaxChainDepth</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+        <span class="nt">authenticationBasicEnabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">authenticationBasicType</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">internal</span>
+        <span class="nt">tlsServerCertMaxChainDepth</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">remove</span>
   <span class="nt">solace_dmr_cluster</span><span class="p">:</span>
@@ -259,8 +262,20 @@
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster</a>.</p>
-<p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a>.</p>
+<ul class="simple">
+<li><p>Module Sempv2 Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster</a></p></li>
+<li><p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a></p></li>
+<li><p>Sempv2 Monitor Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/</a></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="solace_get_dmr_clusters.html#solace-get-dmr-clusters-module"><span class="std std-ref">solace_get_dmr_clusters – get list of dmr clusters</span></a></p></li>
+</ul>
 </div>
 </div>
 <div class="section" id="parameters">
@@ -272,14 +287,10 @@
 <div class="line"><strong>default</strong>: localhost</div>
 </div>
 </dd>
-<dt>msg_vpn (required)</dt><dd><p>The message vpn.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
 <dt>name (required)</dt><dd><p>Name of the DMR cluster. Maps to ‘dmrClusterName’ in the API.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>aliases</strong>: dmr_cluster_name</div>
 </div>
 </dd>
 <dt>password (optional)</dt><dd><p>Administrator password for Solace Broker.</p>
@@ -297,6 +308,14 @@
 <dt>secure_connection (optional)</dt><dd><p>If true, use https rather than http.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
+</div>
+</dd>
+<dt>sempv2_version (optional)</dt><dd><p>The SEMP V2 API version of the broker. See <a class="reference internal" href="solace_get_facts.html#solace-get-facts-module"><span class="std std-ref">solace_get_facts</span></a> for info on how to retrieve the version from the broker.</p>
+<p>Note: If the module requires it and not provided, the module will fetch it using the SEMP call ‘about/api’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>aliases</strong>: semp_version</div>
 </div>
 </dd>
 <dt>settings (optional)</dt><dd><p>JSON dictionary of additional configuration, see Reference documentation.</p>
@@ -337,9 +356,28 @@
 <div class="line-block">
 <div class="line"><strong>returned</strong>: success</div>
 <div class="line"><strong>type</strong>: dict</div>
+</div>
+</dd>
+<dt>msg</dt><dd><p>The response from the HTTP call in case of error.</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: error</div>
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+</dd>
+<dt>rc</dt><dd><p>Return code. rc=0 on success, rc=1 on error.</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;{}&quot;</span>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;rc&quot;</span><span class="p">:</span> <span class="mi">1</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;success&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;rc&quot;</span><span class="p">:</span> <span class="mi">0</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </dd>
@@ -352,25 +390,18 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="solace_dmr_cluster_link.html" class="btn btn-neutral float-right" title="solace_dmr_cluster_link – Configure a link object on a DMR cluster." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="solace_dmr_bridge.html" class="btn btn-neutral float-left" title="solace_dmr_bridge – dmr bridge" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="solace_dmr_cluster_link.html" class="btn btn-neutral float-right" title="solace_dmr_cluster_link – link on a dmr cluster" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="solace_dmr_bridge.html" class="btn btn-neutral float-left" title="solace_dmr_bridge – dmr bridge" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
+        &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 29 Dec 2020 at 11:26.
+        Last updated on 04 Feb 2021 at 14:29.
       </span>
 
     </p>
@@ -378,14 +409,13 @@
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

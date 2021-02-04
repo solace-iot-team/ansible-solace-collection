@@ -7,6 +7,8 @@ solace_cert_authority -- certificate authority
 
 Allows addition, removal and configuration of certificate authority objects on Solace Brokers in an idempotent manner.
 
+Supports standalone brokers and Solace Cloud.
+
 
 
 
@@ -22,20 +24,22 @@ Examples
    collections:
    - solace.pubsub_plus
    module_defaults:
-       solace_cert_authority:
-           host: "{{ sempv2_host }}"
-           port: "{{ sempv2_port }}"
-           secure_connection: "{{ sempv2_is_secure_connection }}"
-           username: "{{ sempv2_username }}"
-           password: "{{ sempv2_password }}"
-           timeout: "{{ sempv2_timeout }}"
+     solace_cert_authority:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
    tasks:
      - name: set files
        set_fact:
          cert_key_file: ./tmp/key.pem
          cert_file: ./tmp/cert.pem
 
-     - name: create certificate
+     - name: generate certificate
        command: >
          openssl req
          -x509
@@ -49,15 +53,15 @@ Examples
 
      - name: add
        solace_cert_authority:
-         name: bar
-         cert_content: "{{ lookup('file', cert_file) }}"
+         name: foo
          settings:
+           certContent: "{{ lookup('file', cert_file) }}"
            revocationCheckEnabled: false
          state: present
 
      - name: remove
        solace_cert_authority:
-         name: bar
+         name: foo
          state: absent
 
 
@@ -66,24 +70,24 @@ Notes
 -----
 
 .. note::
-   Solace Cloud currently does not support managing certificate authorities.
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority
+   - Module Solace Cloud API: not available
+   - Uses deprecated SempV2 API. Since 2.19, broker supports 'clientCertAuthority' & 'domainCertAuthority' instead. Raise an issue if these are required.
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
 
-   Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority.
 
-   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
+See Also
+--------
 
+.. seealso::
 
-
+   - :ref:`solace_get_cert_authorities_module`
 
 
 
 Parameters
 ----------
-
-cert_content (optional)
-  The certificate.
-
-  | **type**: str
 
 host (optional)
   Hostname of Solace Broker.
@@ -92,7 +96,7 @@ host (optional)
   | **default**: localhost
 
 name (required)
-  The name of the Certificate Authority. Maps to 'certAuthorityName' in the API.
+  The name of the Certificate Authority. Maps to 'certAuthorityName' in the Sempv2 API.
 
   | **type**: str
 
@@ -112,11 +116,38 @@ secure_connection (optional)
   If true, use https rather than http.
 
   | **type**: bool
+  | **default**: False
+
+sempv2_version (optional)
+  The SEMP V2 API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
+
+  Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'.
+
+  | **type**: str
+  | **aliases**: semp_version
 
 settings (optional)
   JSON dictionary of additional configuration, see Reference documentation.
 
   | **type**: dict
+
+solace_cloud_api_token (optional)
+  The API Token.
+
+  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
+  | **type**: str
+
+solace_cloud_service_id (optional)
+  The service id in Solace Cloud.
+
+  Click on the service in Solace Cloud - the service id is in the URL.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
+  | **type**: str
 
 state (optional)
   Target state.
@@ -154,10 +185,29 @@ response
 
   | **returned**: success
   | **type**: dict
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
   | **sample**:
 
   .. code-block:: json
 
-     "{}"
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
 
 

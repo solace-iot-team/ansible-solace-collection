@@ -2,10 +2,10 @@
 
 .. _solace_gather_facts_module:
 
-solace_gather_facts -- Retrieve facts from the Solace event broker and set 'ansible_facts.solace'.
-==================================================================================================
+solace_gather_facts -- gather broker facts
+==========================================
 
-Retrieves facts from the Solace event broker and set 'ansible_facts.solace'. Call at the beginning of the playbook so all subsequent tasks can use '{{ ansible_facts.solace.<path-to-fact> }}' or :ref:`solace_get_facts <solace_get_facts_module>` module. Supports Solace Cloud and brokers. Retrieves: service/broker info, about info, virtual router name, messaging endpoints, etc.
+Retrieve facts from the Solace broker and set 'ansible_facts.solace'. Call at the beginning of the playbook so all subsequent tasks can use '{{ ansible_facts.solace.<path-to-fact> }}' or :ref:`solace_get_facts <solace_get_facts_module>` module. Supports Solace Cloud and standalone brokers. Retrieves: service/broker info, about info, virtual router name, messaging endpoints, etc.
 
 
 
@@ -17,34 +17,30 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   -
-     name: "Get Information about the broker / service"
-     hosts: "{{ brokers }}"
-     gather_facts: no
-     any_errors_fatal: true
-     collections:
-       - solace.pubsub_plus
-     module_defaults:
-       solace_gather_facts:
-         host: "{{ sempv2_host }}"
-         port: "{{ sempv2_port }}"
-         secure_connection: "{{ sempv2_is_secure_connection }}"
-         username: "{{ sempv2_username }}"
-         password: "{{ sempv2_password }}"
-         timeout: "{{ sempv2_timeout }}"
-         solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
-         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+   hosts: all
+   gather_facts: no
+   any_errors_fatal: true
+   collections:
+   - solace.pubsub_plus
+   module_defaults:
+     solace_gather_facts:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+   tasks:
+   - name: Gather Solace Facts
+     solace_gather_facts:
 
-     tasks:
-       - name: Gather Solace Facts
-         solace_gather_facts:
-
-       - name: "Save hostvars to ./hostvars.json"
-         copy:
-           content: "{{ hostvars | to_nice_json }}"
-           dest: ./hostvars.json
-         delegate_to: localhost
-
+   - name: "Save hostvars to ./hostvars.json"
+     copy:
+       content: "{{ hostvars | to_nice_json }}"
+       dest: ./hostvars.json
+     delegate_to: localhost
 
 
 
@@ -52,16 +48,12 @@ Notes
 -----
 
 .. note::
-   In order to access other hosts' (other than the current 'inventory_host') facts, you must not use the 'serial' strategy for the playbook.
-
-   Reference about: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about.
-
-   Reference broker: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/all/getBroker.
-
-   Reference Solace Cloud: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm - Get Service / Connections Details.
-
-   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
-
+   - In order to access other hosts' (other than the current 'inventory_host') facts, you must not use the 'serial' strategy for the playbook.
+   - Module Sempv2 Config - about: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about
+   - Module Sempv2 Config - broker: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/all/getBroker
+   - Module Solace Cloud Api - get service: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
 
 
 See Also
@@ -70,6 +62,7 @@ See Also
 .. seealso::
 
    - :ref:`solace_get_facts_module`
+   - :ref:`solace_cloud_account_gather_facts_module`
 
 
 
@@ -98,6 +91,15 @@ secure_connection (optional)
   If true, use https rather than http.
 
   | **type**: bool
+  | **default**: False
+
+sempv2_version (optional)
+  The SEMP V2 API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
+
+  Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'.
+
+  | **type**: str
+  | **aliases**: semp_version
 
 solace_cloud_api_token (optional)
   The API Token.
@@ -141,8 +143,8 @@ x_broker (optional)
 Return Values
 -------------
 
-ansible_facts.solace
-  The facts as returned from the APIs.
+ansible_facts
+  The facts as returned by the APIs. Element: 'solace'.
 
   | **returned**: success
   | **type**: dict
@@ -153,7 +155,6 @@ ansible_facts.solace
      {
      "ansible_facts": {
        "solace": {
-         "Server": "Solace_VMR/9.6.0.27",
          "about": {
            "api": {
              "platform": "VMR",
@@ -170,9 +171,35 @@ ansible_facts.solace
            }
          },
          "isSolaceCloud": false,
-         "service_facts": null
+         "service_facts": {
+           "info": "various service/broker info"
+         }
        }
      }
    }
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
 
 

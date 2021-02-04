@@ -1,4 +1,7 @@
-solace_broker_service - Manage a Broker Service
+
+.. _solace_broker_service_role:
+
+solace_broker_service - manage a broker service
 ===============================================
 
 Manage a Broker Service running in Docker.
@@ -16,7 +19,7 @@ Example playbooks
 This playbook will:
   - download the latest Solace PubSub+ standard edition image from docker hub
   - start the docker container
-  - wait until the broker service is up and running
+  - wait until the broker service is up and running, including a test if message spool is availabe (by creating/deleting a queue)
   - create the inventory file in the ``.tmp`` directory
   - uses the default ```definition`` values for ``docker-compose``
 

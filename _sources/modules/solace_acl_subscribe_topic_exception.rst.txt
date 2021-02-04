@@ -9,12 +9,6 @@ Configure a subscribe topic exception object for an ACL Profile.
 
 Allows addition and removal of a subscribe topic exception object for an ACL Profile.
 
-Supported versions: [ <=2.13, >=2.14 ].
-
-Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeTopicException.
-
-Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeException.
-
 
 
 
@@ -30,60 +24,41 @@ Examples
    collections:
    - solace.pubsub_plus
    module_defaults:
-       solace_gather_facts:
-           host: "{{ sempv2_host }}"
-           port: "{{ sempv2_port }}"
-           secure_connection: "{{ sempv2_is_secure_connection }}"
-           username: "{{ sempv2_username }}"
-           password: "{{ sempv2_password }}"
-           timeout: "{{ sempv2_timeout }}"
-           solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
-           solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-       solace_acl_profile:
-           host: "{{ sempv2_host }}"
-           port: "{{ sempv2_port }}"
-           secure_connection: "{{ sempv2_is_secure_connection }}"
-           username: "{{ sempv2_username }}"
-           password: "{{ sempv2_password }}"
-           timeout: "{{ sempv2_timeout }}"
-           msg_vpn: "{{ vpn }}"
-       solace_acl_subscribe_topic_exception:
-           host: "{{ sempv2_host }}"
-           port: "{{ sempv2_port }}"
-           secure_connection: "{{ sempv2_is_secure_connection }}"
-           username: "{{ sempv2_username }}"
-           password: "{{ sempv2_password }}"
-           timeout: "{{ sempv2_timeout }}"
-           msg_vpn: "{{ vpn }}"
+     solace_acl_profile:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       msg_vpn: "{{ vpn }}"
+     solace_acl_subscribe_topic_exception:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       msg_vpn: "{{ vpn }}"
    tasks:
-     - name: "Gather Solace Facts"
-       solace_gather_facts:
-     - set_fact:
-           semp_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
-
      - name: Create ACL Profile
        solace_acl_profile:
-           name: "test_ansible_solace"
-           settings:
-             clientConnectDefaultAction: "disallow"
-             publishTopicDefaultAction: "disallow"
-             subscribeTopicDefaultAction: "disallow"
-           state: present
+         name: foo
+         settings:
+           subscribeTopicDefaultAction: "disallow"
+         state: present
 
      - name: Add Subscribe Topic Exceptions to ACL Profile
        solace_acl_subscribe_topic_exception:
-           semp_version: "{{ semp_version }}"
-           acl_profile_name: "test_ansible_solace"
-           name: "test/ansible/solace"
-           state: present
+         acl_profile_name: foo
+         name: "test/ansible/solace"
+         state: present
 
      - name: Delete Subscribe Topic Exceptions from ACL Profile
        solace_acl_subscribe_topic_exception:
-           semp_version: "{{ semp_version }}"
-           acl_profile_name: "test_ansible_solace"
-           name: "test/ansible/solace"
-           state: absent
-
+         acl_profile_name: foo
+         name: "test/ansible/solace"
+         state: absent
 
 
 
@@ -91,8 +66,10 @@ Notes
 -----
 
 .. note::
-   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
-
+   - Module Sempv2 Config (>=2.14): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeTopicException
+   - Module Sempv2 Config (<=2.13): https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileSubscribeException
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
 
 
 See Also
@@ -124,7 +101,7 @@ msg_vpn (required)
   | **type**: str
 
 name (required)
-  The subscribe topic exception.
+  The name (topic) of the subscribe topic exception. Maps to 'subscribeTopicException' in the SEMP v2 API.
 
   | **type**: str
 
@@ -144,11 +121,15 @@ secure_connection (optional)
   If true, use https rather than http.
 
   | **type**: bool
+  | **default**: False
 
-semp_version (required)
-  The Semp API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
+sempv2_version (optional)
+  The SEMP V2 API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
+
+  Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'.
 
   | **type**: str
+  | **aliases**: semp_version
 
 settings (optional)
   JSON dictionary of additional configuration, see Reference documentation.
@@ -173,6 +154,7 @@ topic_syntax (optional)
 
   | **type**: str
   | **default**: smf
+  | **choices**: smf, mqtt
 
 username (optional)
   Administrator username for Solace Broker.
@@ -206,6 +188,30 @@ response
      "msgVpnName": "default",
      "subscribeTopicException": "test/ansible/solace",
      "subscribeTopicExceptionSyntax": "smf"
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
    }
 
 

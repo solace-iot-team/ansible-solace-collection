@@ -39,27 +39,21 @@ Examples
        timeout: "{{ sempv2_timeout }}"
        msg_vpn: "{{ vpn }}"
    tasks:
-     - name: create mqtt session
-       solace_mqtt_session:
-           name: foo
-           state: present
+   - name: create mqtt session
+     solace_mqtt_session:
+       name: foo
+       state: present
 
-     - name: "Get MQTT Magic Queues"
-       solace_get_magic_queues:
-           where_name: "#mqtt/*"
-       register: result
+   - name: get magic queue
+     solace_get_magic_queues:
+       where_name: "#mqtt/*"
+     register: result
 
-     - set_fact:
-           magic_queues: "{{ result.result_list }}"
-
-     - name: "Check: All magic Queues are ON/ON"
-       fail:
-           msg: "Magic queue: ingress or egress is 'Down' for magic_queue: {{ magic_queue.name }} "
-       when: magic_queue.info['ingress-config-status'] == "Down" or magic_queue.info['egress-config-status'] == "Down"
-       loop: "{{ magic_queues }}"
-       loop_control:
-           loop_var: magic_queue
-
+   - name: print result
+     debug:
+       msg:
+       - "{{ result.result_list }}"
+       - "{{ result.result_list_count }}"
 
 
 
@@ -67,14 +61,18 @@ Notes
 -----
 
 .. note::
-   Uses SEMP v1.
-
-   Reference: https://docs.solace.com/Configuring-and-Managing/Monitoring-Guaranteed-Messaging.htm#Viewing.
-
-   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
+   - Module Sempv1: https://docs.solace.com/Configuring-and-Managing/Monitoring-Guaranteed-Messaging.htm#Viewing - show queue
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
 
 
+See Also
+--------
 
+.. seealso::
+
+   - :ref:`solace_mqtt_session_module`
+   - :ref:`solace_rdp_queue_binding_module`
 
 
 
@@ -108,6 +106,15 @@ secure_connection (optional)
   If true, use https rather than http.
 
   | **type**: bool
+  | **default**: False
+
+sempv2_version (optional)
+  The SEMP V2 API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
+
+  Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'.
+
+  | **type**: str
+  | **aliases**: semp_version
 
 timeout (optional)
   Connection timeout in seconds for the http request.
@@ -124,7 +131,7 @@ username (optional)
 where_name (required)
   Query for queue name. Maps to <name> in the API.
 
-  Examples: #mqtt/*, #rdp/* 
+  Examples: ``#mqtt/*``, ``#rdp/*`` 
 
   | **type**: str
 
@@ -140,19 +147,8 @@ x_broker (optional)
 Return Values
 -------------
 
-rc
-  return code. on success: rc=0, on failure: rc=1
-
-  | **returned**: always
-  | **type**: int
-  | **sample**:
-
-  .. code-block:: json
-
-     "{}"
-
 result_list
-  The list of objects found containing requested fields.
+  The list of objects found containing requested fields. Payload depends on API called.
 
   | **returned**: success
   | **type**: list
@@ -176,7 +172,7 @@ result_list
          "topic-subscription-count": "3",
          "type": "Primary"
        },
-       "name": "#mqtt/ansible_solace_test_mqtt__1__/180"
+       "name": "#mqtt/foo/180"
      }
    ]
 
@@ -185,10 +181,29 @@ result_list_count
 
   | **returned**: success
   | **type**: int
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
   | **sample**:
 
   .. code-block:: json
 
-     "{}"
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
 
 

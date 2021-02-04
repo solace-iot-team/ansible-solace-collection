@@ -7,6 +7,9 @@ solace_bridge -- bridge
 
 Configure a Bridge object. Allows addition, removal and update of a Bridge Object in an idempotent manner.
 
+Before configuring a Bridge object, consider deleting it first. This ensures that the set-up starts completely fresh. For example, adding a new remote vpn to a bridge will not result in any existing remote vpns to be deleted. This could mean that invalid remote vpns are 'hanging around', causing the bridge to be not operational.
+
+
 
 
 
@@ -31,28 +34,33 @@ Examples
        timeout: "{{ sempv2_timeout }}"
        msg_vpn: "{{ vpn }}"
    tasks:
-     - name: add
-       solace_bridge:
-         name: foo
-         virtual_router: auto
-         settings:
-           enabled: false
-           remoteAuthenticationBasicClientUsername: default
-           remoteAuthenticationBasicPassword: password
-           remoteAuthenticationScheme: basic
+   - name: delete the bridge first  - starting fresh
+     solace_bridge:
+       name: foo
+       state: absent
 
-     - name: update
-       solace_bridge:
-         name: foo
-         virtual_router: auto
-         settings:
-           enabled: true
+   - name: add
+     solace_bridge:
+       name: foo
+       bridge_virtual_router: auto
+       settings:
+         enabled: false
+         remoteAuthenticationBasicClientUsername: default
+         remoteAuthenticationBasicPassword: password
+         remoteAuthenticationScheme: basic
 
-     - name: remove
-       solace_bridge:
-         name: foo
-         virtual_router: auto
-         state: absent
+   - name: update
+     solace_bridge:
+       name: foo
+       bridge_virtual_router: auto
+       settings:
+         enabled: true
+
+   - name: remove
+     solace_bridge:
+       name: foo
+       bridge_virtual_router: auto
+       state: absent
 
 
 
@@ -60,17 +68,30 @@ Notes
 -----
 
 .. note::
-   Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge.
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
 
-   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
 
+See Also
+--------
 
+.. seealso::
 
+   - :ref:`solace_get_bridges_module`
 
 
 
 Parameters
 ----------
+
+bridge_virtual_router (optional)
+  The virtual router. Maps to 'bridgeVirtualRouter' in the API.
+
+  | **type**: str
+  | **default**: auto
+  | **choices**: primary, backup, auto
+  | **aliases**: virtual_router
 
 host (optional)
   Hostname of Solace Broker.
@@ -104,6 +125,15 @@ secure_connection (optional)
   If true, use https rather than http.
 
   | **type**: bool
+  | **default**: False
+
+sempv2_version (optional)
+  The SEMP V2 API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
+
+  Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'.
+
+  | **type**: str
+  | **aliases**: semp_version
 
 settings (optional)
   JSON dictionary of additional configuration, see Reference documentation.
@@ -129,13 +159,6 @@ username (optional)
   | **type**: str
   | **default**: admin
 
-virtual_router (optional)
-  The virtual router.
-
-  | **type**: str
-  | **default**: auto
-  | **choices**: primary, backup, auto
-
 x_broker (optional)
   Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
 
@@ -153,10 +176,29 @@ response
 
   | **returned**: success
   | **type**: dict
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
   | **sample**:
 
   .. code-block:: json
 
-     "{}"
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
 
 

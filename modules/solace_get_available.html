@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>solace_get_available – Check if broker/service is reachable and responsive. &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  <title>solace_get_available – check if broker is available &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
   
 
   
@@ -17,7 +17,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -37,8 +40,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="solace_cloud_account_gather_facts – Facts from all services in Solace Cloud Account." href="solace_cloud_account_gather_facts.html" />
-    <link rel="prev" title="solace_get_facts – get facts from solace_gather_facts" href="solace_get_facts.html" /> 
+    <link rel="next" title="solace_cloud_account_gather_facts – gather account services facts" href="solace_cloud_account_gather_facts.html" />
+    <link rel="prev" title="solace_get_facts – get facts from ansible_facts.solace" href="solace_get_facts.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -52,7 +55,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Solace PubSub+ Ansible Collection 
+            <a href="../index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
           
 
           
@@ -91,30 +94,59 @@
 </ul>
 <p class="caption"><span class="caption-text">Guides</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts of Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics.html">The Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inventory-files.html">Best Practices for Ansible-Solace Inventory Files</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Modules &amp; Roles</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../facts_and_general_modules.html#facts-general-module-reference">Facts &amp; General Module Reference</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="solace_gather_facts.html">solace_gather_facts – Retrieve facts from the Solace event broker and set ‘ansible_facts.solace’.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_facts.html">solace_get_facts – get facts from <span class="xref std std-ref">solace_gather_facts</span></a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_available – Check if broker/service is reachable and responsive.</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration Modules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../solace_get_modules.html">Solace Get Object List Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../solace_get_modules.html#module-reference">Module Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="solace_get_acl_profiles.html">solace_get_acl_profiles – get list of acl profiles</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_available – check if broker is available</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="solace_cloud_account_gather_facts.html">solace_cloud_account_gather_facts – Facts from all services in Solace Cloud Account.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_facts.html">solace_cloud_get_facts – access solace facts from <span class="xref std std-ref">solace_cloud_account_gather_facts</span></a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_bridge_remote_vpns.html">solace_get_bridge_remote_vpns – get list of remote vpns of a bridge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_bridges.html">solace_get_bridges – get list of bridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_cert_authorities.html">solace_get_cert_authorities – get list of cert authorities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_client_profiles.html">solace_get_client_profiles – get list of client profiles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_client_usernames.html">solace_get_client_usernames – get list of client usernames</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_bridges.html">solace_get_dmr_bridges – get list of dmr bridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_cluster_link_remote_addresses.html">solace_get_dmr_cluster_link_remote_addresses – get list of remote addresses on a dmr cluster link</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_cluster_link_trusted_cns.html">solace_get_dmr_cluster_link_trusted_cns – get list of trusted common names on a dmr cluster link</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_cluster_links.html">solace_get_dmr_cluster_links – get list of links on a dmr cluster</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_clusters.html">solace_get_dmr_clusters – get list of dmr clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_facts.html">solace_get_facts – get facts from ansible_facts.solace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_magic_queues.html">solace_get_magic_queues – get ‘magic’ queues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_session_subscriptions.html">solace_get_mqtt_session_subscriptions – get list of mqtt session subscriptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_sessions.html">solace_get_mqtt_sessions – get list of mqtt sessions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_queue_subscriptions.html">solace_get_queue_subscriptions – get list of subscriptions on a queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_queues.html">solace_get_queues – get list of queues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_queue_bindings.html">solace_get_rdp_queue_bindings – get list of rdp queue bindings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_rest_consumer_trusted_cns.html">solace_get_rdp_rest_consumer_trusted_cns – get list of rdp rest consumer trusted common names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_rest_consumers.html">solace_get_rdp_rest_consumers – get list of rdp rest consumers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_rdps.html">solace_get_rdps – get list of rdps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_topic_endpoints.html">solace_get_topic_endpoints – get list of topic endpoints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_vpn_clients.html">solace_get_vpn_clients – get list of vpn clients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_vpns.html">solace_get_vpns – get list of vpns</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_available – check if broker is available</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_facts.html">solace_get_facts – get facts from ansible_facts.solace</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../solace_monitor_modules.html">Solace Monitor Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../roles.html">Roles</a></li>
 </ul>
 
@@ -158,6 +190,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -166,12 +200,12 @@
         
           <li><a href="../facts_and_general_modules.html">Fact &amp; General Modules</a> &raquo;</li>
         
-      <li>solace_get_available – Check if broker/service is reachable and responsive.</li>
+      <li>solace_get_available – check if broker is available</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             
               <!-- User defined GitHub URL -->
               <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_available.py" class="fa fa-github"> Edit on GitHub</a>
@@ -188,33 +222,29 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="solace-get-available-check-if-broker-service-is-reachable-and-responsive">
-<span id="solace-get-available-module"></span><h1>solace_get_available – Check if broker/service is reachable and responsive.<a class="headerlink" href="#solace-get-available-check-if-broker-service-is-reachable-and-responsive" title="Permalink to this headline">¶</a></h1>
-<p>Check if broker/service is reachable and responsive. Calls “GET /about” and sets “is_available=True/False”.</p>
+  <div class="section" id="solace-get-available-check-if-broker-is-available">
+<span id="solace-get-available-module"></span><h1>solace_get_available – check if broker is available<a class="headerlink" href="#solace-get-available-check-if-broker-is-available" title="Permalink to this headline">¶</a></h1>
+<p>Check if broker/service is reachable and responsive. Calls “GET /about”.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Check/wait</span><span class="nv"> </span><span class="s">until</span><span class="nv"> </span><span class="s">brokers</span><span class="nv"> </span><span class="s">available&quot;</span>
-  <span class="nt">hosts</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">brokers</span> <span class="cp">}}</span><span class="s">&quot;</span>
-  <span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
-  <span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-  <span class="nt">module_defaults</span><span class="p">:</span>
-    <span class="nt">solace_get_available</span><span class="p">:</span>
-      <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
-
-  <span class="nt">tasks</span><span class="p">:</span>
-
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Pause</span><span class="nv"> </span><span class="s">Until</span><span class="nv"> </span><span class="s">Broker/Service</span><span class="nv"> </span><span class="s">available&quot;</span>
-      <span class="nt">solace_get_available</span><span class="p">:</span>
-      <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">_result</span>
-      <span class="nt">until</span><span class="p">:</span> <span class="s">&quot;_result.is_available&quot;</span>
-      <span class="nt">retries</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">25</span> <span class="c1"># 25 * 5 seconds</span>
-      <span class="nt">delay</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span> <span class="c1"># Every 5 seconds</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
+<span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
+<span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">module_defaults</span><span class="p">:</span>
+  <span class="nt">solace_get_available</span><span class="p">:</span>
+    <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="nt">tasks</span><span class="p">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Pause</span><span class="nv"> </span><span class="s">Until</span><span class="nv"> </span><span class="s">Broker/Service</span><span class="nv"> </span><span class="s">available&quot;</span>
+  <span class="nt">solace_get_available</span><span class="p">:</span>
+  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">_result</span>
+  <span class="nt">until</span><span class="p">:</span> <span class="s">&quot;_result.is_available&quot;</span>
+  <span class="nt">retries</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">25</span> <span class="c1"># 25 * 5 seconds</span>
+  <span class="nt">delay</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span> <span class="c1"># Every 5 seconds</span>
 </pre></div>
 </div>
 </div>
@@ -222,7 +252,11 @@
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a>.</p>
+<ul class="simple">
+<li><p>Module Sempv2 Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about/getAbout">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about/getAbout</a></p></li>
+<li><p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a></p></li>
+<li><p>Sempv2 Monitor Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/</a></p></li>
+</ul>
 </div>
 </div>
 <div class="section" id="parameters">
@@ -249,6 +283,14 @@
 <dt>secure_connection (optional)</dt><dd><p>If true, use https rather than http.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
+</div>
+</dd>
+<dt>sempv2_version (optional)</dt><dd><p>The SEMP V2 API version of the broker. See <a class="reference internal" href="solace_get_facts.html#solace-get-facts-module"><span class="std std-ref">solace_get_facts</span></a> for info on how to retrieve the version from the broker.</p>
+<p>Note: If the module requires it and not provided, the module will fetch it using the SEMP call ‘about/api’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>aliases</strong>: semp_version</div>
 </div>
 </dd>
 <dt>timeout (optional)</dt><dd><p>Connection timeout in seconds for the http request.</p>
@@ -277,19 +319,28 @@
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: bool</div>
-<div class="line"><strong>sample</strong>:</div>
-</div>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;{}&quot;</span>
-</pre></div>
 </div>
 </dd>
-<dt>msg</dt><dd><p>The response from the HTTP call or error description.</p>
+<dt>msg</dt><dd><p>The response from the HTTP call in case of error.</p>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: error</div>
-<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+</dd>
+<dt>rc</dt><dd><p>Return code. rc=0 on success, rc=1 on error.</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;{}&quot;</span>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;rc&quot;</span><span class="p">:</span> <span class="mi">1</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;success&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;rc&quot;</span><span class="p">:</span> <span class="mi">0</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </dd>
@@ -302,25 +353,18 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="solace_cloud_account_gather_facts.html" class="btn btn-neutral float-right" title="solace_cloud_account_gather_facts – Facts from all services in Solace Cloud Account." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="solace_get_facts.html" class="btn btn-neutral float-left" title="solace_get_facts – get facts from solace_gather_facts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="solace_cloud_account_gather_facts.html" class="btn btn-neutral float-right" title="solace_cloud_account_gather_facts – gather account services facts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="solace_get_facts.html" class="btn btn-neutral float-left" title="solace_get_facts – get facts from ansible_facts.solace" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;
+        &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 29 Dec 2020 at 11:26.
+        Last updated on 04 Feb 2021 at 14:29.
       </span>
 
     </p>
@@ -328,14 +372,13 @@
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

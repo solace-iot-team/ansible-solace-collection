@@ -2,11 +2,10 @@
 
 .. _solace_get_available_module:
 
-solace_get_available -- Check if broker/service is reachable and responsive.
-============================================================================
+solace_get_available -- check if broker is available
+====================================================
 
-Check if broker/service is reachable and responsive. Calls "GET /about" and sets "is_available=True/False".
-
+Check if broker/service is reachable and responsive. Calls "GET /about".
 
 
 
@@ -17,28 +16,24 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   -
-     name: "Check/wait until brokers available"
-     hosts: "{{ brokers }}"
-     gather_facts: no
-     any_errors_fatal: true
-     module_defaults:
-       solace_get_available:
-         host: "{{ sempv2_host }}"
-         port: "{{ sempv2_port }}"
-         secure_connection: "{{ sempv2_is_secure_connection }}"
-         username: "{{ sempv2_username }}"
-         password: "{{ sempv2_password }}"
-         timeout: "{{ sempv2_timeout }}"
-
-     tasks:
-
-       - name: "Pause Until Broker/Service available"
-         solace_get_available:
-         register: _result
-         until: "_result.is_available"
-         retries: 25 # 25 * 5 seconds
-         delay: 5 # Every 5 seconds
+   hosts: all
+   gather_facts: no
+   any_errors_fatal: true
+   module_defaults:
+     solace_get_available:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+   tasks:
+   - name: "Pause Until Broker/Service available"
+     solace_get_available:
+     register: _result
+     until: "_result.is_available"
+     retries: 25 # 25 * 5 seconds
+     delay: 5 # Every 5 seconds
 
 
 
@@ -46,8 +41,9 @@ Notes
 -----
 
 .. note::
-   Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/.
-
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about/getAbout
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
 
 
 
@@ -78,6 +74,15 @@ secure_connection (optional)
   If true, use https rather than http.
 
   | **type**: bool
+  | **default**: False
+
+sempv2_version (optional)
+  The SEMP V2 API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
+
+  Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'.
+
+  | **type**: str
+  | **aliases**: semp_version
 
 timeout (optional)
   Connection timeout in seconds for the http request.
@@ -108,21 +113,29 @@ is_available
 
   | **returned**: always
   | **type**: bool
-  | **sample**:
-
-  .. code-block:: json
-
-     "{}"
 
 msg
-  The response from the HTTP call or error description.
+  The response from the HTTP call in case of error.
 
   | **returned**: error
-  | **type**: str
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
   | **sample**:
 
   .. code-block:: json
 
-     "{}"
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
 
 
