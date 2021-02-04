@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
   schedule:
-    # - cron: '0 1 * * THU'
-    - cron: '0 1 * * *'
+    # - cron: '0 5 * * THU'
+    - cron: '0 5 * * *'
   pull_request:
     branches:
       - main

@@ -45,7 +45,7 @@ options:
     - wait_timeout_minutes > 0 ==> waits, polls every 30 seconds until service request completed.
     type: int
     required: false
-    default: 20
+    default: 30
   settings:
     description:
     - Additional settings for state=present. See Reference documentation output of M(solace_cloud_get_service) for details.
@@ -287,7 +287,7 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
 def run_module():
     module_args = dict(
         name=dict(type='str', required=False, default=None),
-        wait_timeout_minutes=dict(type='int', required=False, default=20)
+        wait_timeout_minutes=dict(type='int', required=False, default=30)
     )
     arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud()
     arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service_id())

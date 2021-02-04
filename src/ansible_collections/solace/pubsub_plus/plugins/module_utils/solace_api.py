@@ -473,6 +473,7 @@ class SolaceCloudApi(SolaceApi):
         max_retries = (timeout_minutes * 60) // delay
 
         while not is_completed and not is_failed and try_count < max_retries:
+            logging.debug("try number: %d", try_count + 1)
             resp = self.get_service(config, service_id)
             if not resp:
                 # edge case: service deleted before creation completed
@@ -490,7 +491,7 @@ class SolaceCloudApi(SolaceApi):
             )
         if not is_completed:
             r = dict(
-                msg=f"create service not completed, state={resp['creationState']}",
+                msg=f"create service not completed, timeout(mins)={timeout_minutes}, creationState={resp['creationState']}",
                 response=resp
             )
             raise SolaceApiError(r)
