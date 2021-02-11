@@ -16,7 +16,7 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
     solace_get_cert_authorities:
       host: "{{ sempv2_host }}"
@@ -25,7 +25,7 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
   pre_tasks:
   - include_vars:

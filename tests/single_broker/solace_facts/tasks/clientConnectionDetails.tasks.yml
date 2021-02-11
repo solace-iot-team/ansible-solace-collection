@@ -1,0 +1,51 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- name: "clientConnectionDetails:solace_get_facts:get_vpnClientConnectionDetails:no vpn"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    hostvars_inventory_hostname: "{{ inventory_hostname }}"
+    get_functions:
+      - get_vpnClientConnectionDetails
+  register: result
+
+- name: "clientConnectionDetails:solace_get_facts:get_vpnClientConnectionDetails"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    hostvars_inventory_hostname: "{{ inventory_hostname }}"
+    msg_vpn: "{{ vpn }}"
+    get_functions:
+      - get_vpnClientConnectionDetails
+  register: result
+- name: "clientConnectionDetails:save to file:vpnClientConnectionDetails"
+  copy:
+    content: "{{ result.facts | to_nice_yaml }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.vpnClientConnectionDetails.yml"
+  delegate_to: localhost
+- name: "clientConnectionDetails:save to file:vpnClientConnectionDetails"
+  copy:
+    content: "{{ result.facts | to_nice_json }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.vpnClientConnectionDetails.json"
+  delegate_to: localhost
+- name: "clientConnectionDetails:print result.facts:vpnClientConnectionDetails"
+  debug:
+    msg:
+      - "result.facts="
+      - "{{ result.facts }}"
+- assert:
+    that:
+      - result.facts.vpnClientConnectionDetails is defined
+      - result.facts.vpnClientConnectionDetails.msgVpn is defined
+      - result.facts.vpnClientConnectionDetails.msgVpn == "{{ vpn }}"
+      - result.facts.vpnClientConnectionDetails.brokerMgmtType is defined
+      - result.facts.vpnClientConnectionDetails.AMQP is defined
+      - result.facts.vpnClientConnectionDetails.JMS is defined
+      - result.facts.vpnClientConnectionDetails.MQTT is defined
+      - result.facts.vpnClientConnectionDetails.REST is defined
+      - result.facts.vpnClientConnectionDetails.SMF is defined
+      - result.facts.vpnClientConnectionDetails.trustStore is defined
+
+###
+# The End.

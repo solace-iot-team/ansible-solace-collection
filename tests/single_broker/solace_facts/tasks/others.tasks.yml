@@ -1,0 +1,196 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- name: "others:solace_get_facts:get_serviceVirtualRouterName"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    hostvars_inventory_hostname: "{{ inventory_hostname }}"
+    msg_vpn: "{{ vpn }}"
+    get_functions:
+      - get_serviceVirtualRouterName
+  register: result
+- name: "others:save to file:serviceVirtualRouterName"
+  copy:
+    content: "{{ result.facts | to_nice_yaml }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.serviceVirtualRouterName.yml"
+  delegate_to: localhost
+- name: "others:save to file:serviceVirtualRouterName"
+  copy:
+    content: "{{ result.facts | to_nice_json }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.serviceVirtualRouterName.json"
+  delegate_to: localhost
+- name: "others:print results.facts:serviceVirtualRouterName"
+  debug:
+    msg:
+      - "result.facts="
+      - "{{ result.facts }}"
+- assert:
+    that:
+      - result.facts.serviceVirtualRouterName is defined
+
+
+- name: "others:solace_get_facts:get_serviceTrustStoreDetails"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    hostvars_inventory_hostname: "{{ inventory_hostname }}"
+    msg_vpn: "{{ vpn }}"
+    get_functions:
+      - get_serviceTrustStoreDetails
+  register: result
+- name: "others:save to file:serviceTrustStoreDetails"
+  copy:
+    content: "{{ result.facts | to_nice_yaml }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.serviceTrustStoreDetails.yml"
+  delegate_to: localhost
+- name: "others:save to file:serviceTrustStoreDetails"
+  copy:
+    content: "{{ result.facts | to_nice_json }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.serviceTrustStoreDetails.json"
+  delegate_to: localhost
+- name: "others:print results.facts:serviceTrustStoreDetails"
+  debug:
+    msg:
+      - "result.facts="
+      - "{{ result.facts }}"
+- assert:
+    that:
+      - result.facts.serviceTrustStoreDetails is defined
+      - result.facts.serviceTrustStoreDetails.enabled is defined
+      - "{{ True if broker_type!='solace_cloud' else (result.facts.serviceTrustStoreDetails.uri is defined) }}"
+
+
+- name: "others:solace_get_facts:get_vpnBridgeRemoteMsgVpnLocations"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    hostvars_inventory_hostname: "{{ inventory_hostname }}"
+    msg_vpn: "{{ vpn }}"
+    get_functions:
+      - get_vpnBridgeRemoteMsgVpnLocations
+  register: result
+- name: "others:save to file:vpnBridgeRemoteMsgVpnLocations"
+  copy:
+    content: "{{ result.facts | to_nice_yaml }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.vpnBridgeRemoteMsgVpnLocations.yml"
+  delegate_to: localhost
+- name: "others:save to file:vpnBridgeRemoteMsgVpnLocations"
+  copy:
+    content: "{{ result.facts | to_nice_json }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.vpnBridgeRemoteMsgVpnLocations.json"
+  delegate_to: localhost
+- name: "others:print results.facts:vpnBridgeRemoteMsgVpnLocations"
+  debug:
+    msg:
+      - "result.facts="
+      - "{{ result.facts }}"
+- assert:
+    that:
+      - result.facts.vpnBridgeRemoteMsgVpnLocations is defined
+      - result.facts.vpnBridgeRemoteMsgVpnLocations.enabled is defined
+      - result.facts.vpnBridgeRemoteMsgVpnLocations.compressed is defined
+      - result.facts.vpnBridgeRemoteMsgVpnLocations.plain is defined
+      - result.facts.vpnBridgeRemoteMsgVpnLocations.secured is defined
+
+
+- name: "others:solace_get_facts:get_serviceDmrClusterConnectionDetails"
+  block:
+    - name: "others:solace_get_facts:get_serviceDmrClusterConnectionDetails"
+      solace_get_facts:
+        hostvars: "{{ hostvars }}"
+        hostvars_inventory_hostname: "{{ inventory_hostname }}"
+        msg_vpn: "{{ vpn }}"
+        get_functions:
+          - get_serviceDmrClusterConnectionDetails
+      register: result
+    - name: "others:save to file:serviceDmrClusterConnectionDetails"
+      copy:
+        content: "{{ result.facts | to_nice_yaml }}"
+        dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.serviceDmrClusterConnectionDetails.yml"
+      delegate_to: localhost
+    - name: "others:save to file:serviceDmrClusterConnectionDetails"
+      copy:
+        content: "{{ result.facts | to_nice_json }}"
+        dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.serviceDmrClusterConnectionDetails.json"
+      delegate_to: localhost
+    - name: "others:print results.facts:serviceDmrClusterConnectionDetails"
+      debug:
+        msg:
+          - "result.facts="
+          - "{{ result.facts }}"
+    - assert:
+        that:
+          - result.facts.serviceDmrClusterConnectionDetails is defined
+          - result.facts.serviceDmrClusterConnectionDetails.clusterName is defined
+          - result.facts.serviceDmrClusterConnectionDetails.password is defined
+          - result.facts.serviceDmrClusterConnectionDetails.remoteAddress is defined
+          - result.facts.serviceDmrClusterConnectionDetails.primaryRouterName is defined
+  when: broker_type == 'solace_cloud'
+
+
+- name: "others:solace_get_facts:get_vpnAttributes"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    hostvars_inventory_hostname: "{{ inventory_hostname }}"
+    msg_vpn: "{{ vpn }}"
+    get_functions:
+      - get_vpnAttributes
+  register: result
+- name: "others:save to file:vpnAttributes"
+  copy:
+    content: "{{ result.facts | to_nice_yaml }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.vpnAttributes.yml"
+  delegate_to: localhost
+- name: "others:save to file:vpnAttributes"
+  copy:
+    content: "{{ result.facts | to_nice_json }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.vpnAttributes.json"
+  delegate_to: localhost
+- name: "others:print results.facts:vpnAttributes"
+  debug:
+    msg:
+      - "result.facts="
+      - "{{ result.facts }}"
+- assert:
+    that:
+      - result.facts.vpnAttributes is defined
+      - result.facts.vpnAttributes.msgVpn is defined
+
+
+- name: "others:solace_get_facts:get all"
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    hostvars_inventory_hostname: "{{ inventory_hostname }}"
+    msg_vpn: "{{ vpn }}"
+    get_functions:
+      - get_vpnClientConnectionDetails
+      - get_vpnAttributes
+      - get_vpnBridgeRemoteMsgVpnLocations
+      - get_serviceTrustStoreDetails
+      - get_serviceVirtualRouterName
+  register: result
+- name: "others:save to file:all"
+  copy:
+    content: "{{ result.facts | to_nice_yaml }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.all.yml"
+  delegate_to: localhost
+- name: "others:save to file:all"
+  copy:
+    content: "{{ result.facts | to_nice_json }}"
+    dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.all.json"
+  delegate_to: localhost
+- name: "others:print results.facts:all"
+  debug:
+    msg:
+      - "result.facts="
+      - "{{ result.facts }}"
+- assert:
+    that:
+      - result.facts.serviceVirtualRouterName is defined
+      - result.facts.serviceTrustStoreDetails is defined
+      - result.facts.vpnBridgeRemoteMsgVpnLocations is defined
+      - result.facts.vpnClientConnectionDetails is defined
+      - result.facts.vpnAttributes is defined
+
+###
+# The End.

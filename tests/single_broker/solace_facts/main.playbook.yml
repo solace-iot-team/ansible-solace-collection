@@ -16,7 +16,7 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
     solace_vpn:
       host: "{{ sempv2_host }}"
@@ -26,59 +26,41 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
   tasks:
-    - name: "main: Check vars"
-      set_fact:
-        working_dir: "{{ WORKING_DIR }}"
-        vpn_1: default
-        vpn_2: asc_test_vpn
+  - name: "main: Check vars"
+    set_fact:
+      working_dir: "{{ WORKING_DIR }}"
+      vpn_1: default
+      vpn_2: asc_test_vpn
 
-    - name: "main: gather facts"
-      solace_gather_facts:
-    - set_fact:
-        is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud}}"
+  - name: "main: ensure working_dir exists"
+    file:
+      path: "{{ working_dir }}"
+      state: directory
+    delegate_to: localhost
 
-    - name: "main: Save 'ansible_facts.solace' to File"
-      copy:
-        content: "{{ ansible_facts.solace | to_nice_json }}"
-        dest: "{{ working_dir }}/facts.one-vpn.{{ inventory_hostname }}.json"
-      delegate_to: localhost
+  - name: "main: gather facts"
+    solace_gather_facts:
+  - set_fact:
+      is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud}}"
 
-    - name: "main: solace_get_facts(no vpn)"
-      solace_get_facts:
-        hostvars: "{{ hostvars }}"
-        host: "{{ inventory_hostname }}"
-        field_funcs:
-          - get_serviceSmfPlainTextListenPort
-          - get_serviceSmfPlainTextListenPort
-          - get_serviceSmfCompressionListenPort
-          - get_serviceSmfTlsListenPort
-          - get_virtualRouterName
-          - get_serviceSMFMessagingEndpoints
-          - get_bridge_remoteMsgVpnLocations
-          - get_allClientConnectionDetails
-      register: result
-    - debug:
-        msg:
-          - "facts:"
-          - "{{ result.facts }}"
-    - assert:
-        that:
-          - result.facts.serviceSmfPlainTextListenPort is defined
-          - result.facts.serviceSmfCompressionListenPort is defined
-          - result.facts.serviceSmfTlsListenPort is defined
-          - result.facts.virtualRouterName is defined
-          - result.facts.serviceMessagingEndpoints is defined
-          - result.facts.bridge_remoteMsgVpnLocations is defined
-          - result.facts.clientConnectionDetails is defined
+  - name: "main: Save 'ansible_facts.solace' to yaml"
+    copy:
+      content: "{{ ansible_facts.solace | to_nice_yaml }}"
+      dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.raw.yml"
+    delegate_to: localhost
 
-    - name: "main: include local tasks"
-      include_tasks: ./tasks/local.tasks.yml
-      when: not is_solace_cloud
+  - name: "main: Save 'ansible_facts.solace' to json"
+    copy:
+      content: "{{ ansible_facts.solace | to_nice_json }}"
+      dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.raw.json"
+    delegate_to: localhost
 
-    - name: "main: include solace cloud tasks"
-      include_tasks: ./tasks/solace_cloud.tasks.yml
-      when: is_solace_cloud
 
+  - name: "main: include clientConnectionDetails tasks"
+    include_tasks: ./tasks/clientConnectionDetails.tasks.yml
+
+  - name: "main: include others tasks"
+    include_tasks: ./tasks/others.tasks.yml
 
 ###
 # The End.

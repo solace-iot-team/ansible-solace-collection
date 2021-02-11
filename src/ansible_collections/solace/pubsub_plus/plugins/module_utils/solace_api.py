@@ -52,6 +52,9 @@ class SolaceApi(object):
     def make_patch_request(self, config: SolaceTaskConfig, path_array: list, json=None):
         return self.make_request(config, requests.patch, path_array, json)
 
+    def make_put_request(self, config: SolaceTaskConfig, path_array: list, json=None):
+        return self.make_request(config, requests.put, path_array, json)
+
     def handle_response(self, resp):
         if resp.status_code != 200:
             self.handle_bad_response(resp)
@@ -157,6 +160,7 @@ class SolaceSempV2Api(SolaceApi):
 
     API_BASE_SEMPV2_CONFIG = "/SEMP/v2/config"
     API_BASE_SEMPV2_MONITOR = "/SEMP/v2/monitor"
+    API_BASE_SEMPV2_ACTION = "/SEMP/v2/action"
 
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
@@ -249,9 +253,33 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
         self.query = query
         while hasNextPage:
             body = self.make_get_request(config, path_array)
+            data_list = []
+            # monitor api may have collections as well
+            collections_list = []
             if "data" in body.keys():
                 data_list = body['data']
-                result_list.extend(data_list)
+            if "collections" in body.keys():
+                collections_list = body['collections']
+            # merge collections & data into result_list. assuming same index and same length.
+            for i, data in enumerate(data_list):
+                result_element = dict(
+                    data=data
+                )
+                if len(collections_list) > 0:
+                    result_element.update(dict(collections=collections_list[i]))
+
+                result_list.append(result_element)
+
+            # # merge collections into data list. assuming same index and same length.
+            # for i, collection in enumerate(collections_list):
+            #     result_element = dict(
+            #         data=data_list[i],
+            #         collections=collection
+            #     )
+            #     result_list.append(result_element)
+            #     # data_list[i].update(collection)
+
+            # result_list.extend(data_list)
             # cursor seems to have a bug ==> test first if any data returned
             if len(data_list) == 0:
                 hasNextPage = False

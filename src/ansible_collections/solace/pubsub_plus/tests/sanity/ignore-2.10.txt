@@ -11,6 +11,7 @@ plugins/doc_fragments/solace.py pep8:E501
 plugins/module_utils/solace_api.py compile-2.7!skip
 plugins/modules/solace_gather_facts.py compile-2.7!skip
 plugins/modules/solace_get_facts.py compile-2.7!skip
+plugins/modules/solace_get_facts.py pep8:E501
 plugins/modules/solace_cloud_service.py compile-2.7!skip
 plugins/modules/solace_cloud_get_service.py compile-2.7!skip
 plugins/modules/solace_cloud_get_facts.py compile-2.7!skip
@@ -89,3 +90,4 @@ plugins/modules/solace_get_rdp_rest_consumers.py pep8:E501
 plugins/modules/solace_get_available.py compile-2.7!skip
 plugins/modules/solace_acl_subscribe_share_name_exception.py pep8:E501
 plugins/modules/solace_dmr_cluster_link_remote_address.py pep8:E501
+plugins/modules/solace_replay_log.py compile-2.7!skip

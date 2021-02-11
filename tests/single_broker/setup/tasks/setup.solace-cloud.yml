@@ -12,6 +12,14 @@
       - WORKING_DIR is defined
     fail_msg: "one or more variables not defined"
 
+# don't enable, takes too long in devel
+# - name: "Ensure Solace Cloud Service does not exist"
+#   solace_cloud_service:
+#     api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+#     name: "{{ sc_service.name }}"
+#     state: absent
+#   register: result
+
 - name: "Create Solace Cloud Service"
   solace_cloud_service:
     api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
@@ -28,18 +36,6 @@
 - set_fact:
     sc_service_id: "{{ result.response.serviceId }}"
     sc_service_info: "{{ result.response }}"
-
-# - name: "Wait for Service Provisioning to Complete"
-#   solace_cloud_get_service:
-#     api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
-#     service_id: "{{ sc_service_id }}"
-#   register: result
-#   until: "result.rc != 0 or result.response.creationState == 'completed'"
-#   retries: 40
-#   delay: 60
-#
-# - set_fact:
-#     sc_service_info: "{{ result.response }}"
 
 - name: "Get Solace Cloud Service Inventory"
   solace_cloud_get_facts:

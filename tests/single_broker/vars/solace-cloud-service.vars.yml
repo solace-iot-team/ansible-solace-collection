@@ -2,8 +2,8 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 ---
-  name: asc_test
-  msgVpnName: asc_test
+  name: asc_test_120
+  msgVpnName: asc_test_120
   # datacenterId: "aws-eu-west-2a"
   datacenterId: "aws-ca-central-1a"
   serviceTypeId: "enterprise"
@@ -13,16 +13,16 @@
       serviceSmfPlainTextListenPort: 55555
       serviceSmfCompressedListenPort: 55003
       serviceSmfTlsListenPort: 55443
-      serviceAmqpPlainTextListenPort: 0
-      serviceAmqpTlsListenPort: 0
-      serviceMqttPlainTextListenPort: 0
-      serviceMqttTlsListenPort: 0
-      serviceMqttTlsWebSocketListenPort: 0
-      serviceMqttWebSocketListenPort: 0
-      serviceRestIncomingPlainTextListenPort: 0
-      serviceRestIncomingTlsListenPort: 0
-      serviceWebPlainTextListenPort: 0
-      serviceWebTlsListenPort: 0
+      serviceAmqpPlainTextListenPort: 5672
+      serviceAmqpTlsListenPort: 5671
+      serviceMqttPlainTextListenPort: 1883
+      serviceMqttTlsListenPort: 8883
+      serviceMqttTlsWebSocketListenPort: 8443
+      serviceMqttWebSocketListenPort: 8000
+      serviceRestIncomingPlainTextListenPort: 9000
+      serviceRestIncomingTlsListenPort: 9443
+      serviceWebPlainTextListenPort: 80
+      serviceWebTlsListenPort: 443
 
 ###
 # The End.

@@ -106,5 +106,6 @@ Module Reference
    modules/solace_mqtt_session*
    modules/solace_queue*
    modules/solace_rdp*
+   modules/solace_replay*
    modules/solace_topic_endpoint*
    modules/solace_vpn

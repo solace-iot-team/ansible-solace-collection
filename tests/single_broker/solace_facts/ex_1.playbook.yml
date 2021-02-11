@@ -16,7 +16,7 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 
   tasks:
@@ -26,10 +26,10 @@
     - name: "Ex_1: wrong vpn"
       solace_get_facts:
         hostvars: "{{ hostvars }}"
-        host: "{{ inventory_hostname }}"
+        hostvars_inventory_hostname: "{{ inventory_hostname }}"
         msg_vpn: "does_not_exist"
-        field_funcs:
-          - get_allClientConnectionDetails
+        get_functions:
+          - get_vpnClientConnectionDetails
       register: result
       ignore_errors: yes
     - assert:
@@ -40,23 +40,22 @@
     - name: "Ex_1: unknown field func"
       solace_get_facts:
         hostvars: "{{ hostvars }}"
-        host: "{{ inventory_hostname }}"
-        field_funcs:
+        hostvars_inventory_hostname: "{{ inventory_hostname }}"
+        msg_vpn: "{{ vpn }}"
+        get_functions:
           - unknown_field_func
       register: result
       ignore_errors: yes
     - assert:
         that:
           - result.rc == 1
-          - "'arg \\'field_funcs=unknown_field_func\\': unknown, valid field functions are:' in result.msg[1]"
-          - "'get_serviceSmfPlainTextListenPort' in result.msg[1]"
-          - "'get_serviceSmfCompressionListenPort' in result.msg[1]"
-          - "'get_serviceSmfTlsListenPort' in result.msg[1]"
-          - "'get_virtualRouterName' in result.msg[1]"
-          - "'get_serviceSMFMessagingEndpoints' in result.msg[1]"
-          - "'get_bridge_remoteMsgVpnLocations' in result.msg[1]"
-          - "'get_allClientConnectionDetails' in result.msg[1]"
-
+          - "'arg \\'unknown get_function=unknown_field_func\\': valid get functions are' in result.msg[1]"
+          - "'get_vpnClientConnectionDetails' in result.msg[1]"
+          - "'get_serviceTrustStoreDetails' in result.msg[1]"
+          - "'get_serviceVirtualRouterName' in result.msg[1]"
+          - "'get_vpnBridgeRemoteMsgVpnLocations' in result.msg[1]"
+          - "'get_serviceDmrClusterConnectionDetails' in result.msg[1]"
+          - "'get_vpnAttributes' in result.msg[1]"
 
 
 ###

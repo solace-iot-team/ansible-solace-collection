@@ -12,18 +12,20 @@
 - name: "delete.ext-link.tasks: solace_get_facts: get_dmrClusterConnectionDetails & get_msgVpnAttributes"
   solace_get_facts:
     hostvars: "{{ hostvars }}"
-    host: "{{ remote_host_name }}"
-    field_funcs:
-      - get_dmrClusterConnectionDetails
-      - get_msgVpnAttributes
+    hostvars_inventory_hostname: "{{ remote_host_name }}"
+    get_functions:
+      - get_serviceDmrClusterConnectionDetails
+      - get_vpnAttributes
   register: result
-  no_log: true
 
 - set_fact:
-    remote_address: "{{ result.facts.dmrClusterConnectionDetails.remoteAddress }}"
-    remote_password: "{{ result.facts.dmrClusterConnectionDetails.password }}"
-    remote_node_name: "{{ result.facts.dmrClusterConnectionDetails.primaryRouterName }}"
-    remote_msg_vpn_name: "{{ result.facts.msgVpnAttributes.vpnName }}"
+    result_facts: "{{ result.facts }}"
+
+- set_fact:
+    remote_address: "{{ result.facts.serviceDmrClusterConnectionDetails.remoteAddress }}"
+    remote_password: "{{ result.facts.serviceDmrClusterConnectionDetails.password }}"
+    remote_node_name: "{{ result.facts.serviceDmrClusterConnectionDetails.primaryRouterName }}"
+    remote_msg_vpn_name: "{{ result.facts.vpnAttributes.msgVpn }}"
 
 - name: "delete.ext-link.tasks: solace_dmr_cluster_link: disable"
   solace_dmr_cluster_link:

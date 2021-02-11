@@ -1,0 +1,246 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_replay"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_replay_log:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_replay_logs:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_queue:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_queue_subscription:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_queues:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_queue_start_replay:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_queue_cancel_replay:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  # pre_tasks:
+  # - include_vars:
+  #     file: "queues.vars.yml"
+  #     name: target_list
+  vars:
+    replay_log_name: foo
+    topic: "hello/world"
+    queue: "asc_replay_test"
+  tasks:
+
+    DO NOT DELETE REPLAY LOG IN SOLACE CLOUD
+
+  - name: "main: check vars"
+    set_fact:
+      working_dir: "{{ WORKING_DIR }}"
+
+  - name: "main: ensure working_dir exists"
+    file:
+      path: "{{ working_dir }}"
+      state: directory
+    delegate_to: localhost
+
+  - name: "main: solace_replay_log: delete"
+    solace_replay_log:
+      name: "{{ replay_log_name }}"
+      state: absent
+
+  - name: "get: solace_get_replay_logs:config:all"
+    solace_get_replay_logs:
+    register: result
+  - assert:
+      that:
+        - result.rc==0
+        - result.result_list==[]
+        - result.result_list_count==0
+
+  - name: "main: solace_get_replay_logs:monitor:all - 1"
+    solace_get_replay_logs:
+      api: monitor
+    register: result
+  - assert:
+      that:
+        - result.rc==0
+        - result.result_list==[]
+        - result.result_list_count==0
+
+  # - name: "main: solace_replay_log:create"
+  #   solace_replay_log:
+  #     name: "{{ replay_log_name }}"
+  #     state: present
+  #
+  # - name: "main: solace_replay_log:update"
+  #   solace_replay_log:
+  #     name: "{{ replay_log_name }}"
+  #     settings:
+  #       egressEnabled: true
+  #       ingressEnabled: true
+  #       maxSpoolUsage: 1
+  #     state: present
+
+  # - name: "main: solace_get_replay_logs:config:all"
+  #   solace_get_replay_logs:
+  #   register: result
+  # - assert:
+  #     that:
+  #       - result.rc==0
+  #       - result.result_list_count==1
+  #
+  # - name: "main: solace_get_replay_logs:monitor:all - 2"
+  #   solace_get_replay_logs:
+  #     api: monitor
+  #   register: result
+  # - assert:
+  #     that:
+  #       - result.rc==0
+  #       - result.result_list_count==1
+  #       - result.result_list[0].collections.msgs.count==0
+  # - set_fact:
+  #     before_spool_usage: "{{ result.result_list[0].data.msgSpoolUsage }}"
+
+  - name: "main: call tasks: send 10 messages"
+    include_tasks: ./tasks/send-messages.tasks.yml
+
+  - name: "main: solace_get_replay_logs:monitor:all - 3"
+    solace_get_replay_logs:
+      api: monitor
+    register: result
+  - assert:
+      that:
+        - result.rc==0
+        - result.result_list_count==1
+  - set_fact:
+      after_spool_usage: "{{ result.result_list[0].data.msgSpoolUsage }}"
+      msg_count: "{{ result.result_list[0].collections.msgs.count }}"
+  - assert:
+      that:
+        - before_spool_usage < after_spool_usage
+        - msg_count|int==10
+
+  - name: "main: delete queue"
+    solace_queue:
+      name: "{{ queue }}"
+      state: absent
+
+  - name: "main: create queue"
+    solace_queue:
+      name: "{{ queue }}"
+      settings:
+        egressEnabled: true
+        ingressEnabled: true
+      state: present
+
+  - name: "main: add subscription"
+    solace_queue_subscription:
+      name: "{{ topic }}"
+      queue_name: "{{ queue }}"
+      state: present
+
+  # replay all messages
+  - name: "main: solace_queue_start_replay"
+    solace_queue_start_replay:
+      queue_name: "{{ queue }}"
+      settings:
+        fromTime: 123
+
+  - name: "get: solace_get_queues(monitor)"
+    solace_get_queues:
+      api: monitor
+      query_params:
+        where:
+          - "queueName=={{ queue }}"
+        select:
+          - msgs
+          - replay*
+          # - replayFailureCount
+          # - replayStartCount
+          # - replayState
+          # - replaySuccessCount
+          # - replayedAckedMsgCount
+          # - replayedTxMsgCount
+    register: result
+  - assert:
+      that:
+        - result.rc==0
+        - result.result_list_count==1
+  - set_fact:
+      msg_count: "{{ result.result_list[0].collections.msgs.count }}"
+  - assert:
+      that:
+        - msg_count|int==10
+
+  - name: "main: solace_queue_cancel_replay"
+    solace_queue_cancel_replay:
+      queue_name: "{{ queue }}"
+      settings:
+        forceComplete: false
+
+  - name: "main: solace_queue: absent"
+    solace_queue:
+      name: "{{ queue }}"
+      state: absent
+
+  - name: "main: solace_replay_log: absent"
+    solace_replay_log:
+      name: foo
+      state: absent
+
+
+###
+# The End.

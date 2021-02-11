@@ -1,0 +1,68 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- name: "send-messages: solace_gather_facts"
+  solace_gather_facts:
+  register: result
+
+- name: "send-messages: solace_get_facts: get_allClientConnectionDetails"
+  solace_get_facts:
+   hostvars: "{{ hostvars }}"
+   host: "{{ inventory_hostname }}"
+   # TODO: I need the vpn to figure out the connection details and ports
+   # msg_vpn: "{{ vpn }}"
+   field_funcs:
+     - get_allClientConnectionDetails
+  register: result
+
+- name: "send-messages: save client connection details to file"
+  copy:
+    content: "{{ result.facts.clientConnectionDetails | to_nice_json }}"
+    dest: "{{ working_dir }}/clientConnectionDetails.{{ broker_type }}.{{ vpn }}.json"
+  delegate_to: localhost
+
+- meta: end_play
+
+- set_fact:
+    is_rest_incoming_enabled: "{{ ansible_facts.solace.service['rest-incoming-admin-state'] == 'Enabled' }}"
+  when: broker_type == 'local'
+
+- assert:
+    that: is_rest_incoming_enabled
+
+- name: "send-messages: solace_get_facts: get_allClientConnectionDetails"
+  solace_get_facts:
+   hostvars: "{{ hostvars }}"
+   host: "{{ inventory_hostname }}"
+   # TODO: I need the vpn to figure out the connection details and ports
+   # msg_vpn: "{{ vpn }}"
+   field_funcs:
+     - get_allClientConnectionDetails
+  register: result
+
+- set_fact:
+    rest_port: "{{ result.facts.clientConnectionDetails.REST.serviceRestIncomingPlainTextListenPort }}"
+    rest_host: "{{ sempv2_host if broker_type == 'local' else 'what-is-the-host-for-solace-cloud?' }}"
+    rest_user: "{{ sempv2_username if broker_type == 'local' else 'solace-cloud-rest-user?' }}"
+    rest_pwd: "{{ sempv2_password if broker_type == 'local' else 'solace-cloud-rest-password?' }}"
+
+- name: "send-messages: send REST message"
+  uri:
+    url: "http://{{ rest_host }}:{{ rest_port }}/TOPIC/{{ topic }}"
+    user: "{{ rest_user }}"
+    password: "{{ rest_pwd }}"
+    method: POST
+    headers:
+      Solace-delivery-mode: Persistent
+    body_format: json
+    body:
+      msg_num: "{{ item }}"
+      hello: world
+    force_basic_auth: yes
+    status_code: 200
+  with_sequence: start=1 end=10
+
+###
+# The End.

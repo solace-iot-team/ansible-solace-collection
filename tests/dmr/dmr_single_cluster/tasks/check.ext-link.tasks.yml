@@ -9,22 +9,24 @@
       - dmr_cluster_name is defined
     fail_msg: "one or more variables not defined"
 
-- name: "setup.ext-link.tasks: solace_get_facts: get_dmrClusterConnectionDetails & get_msgVpnAttributes"
+- name: "check.ext-link.tasks: solace_get_facts: get_dmrClusterConnectionDetails & get_msgVpnAttributes"
   solace_get_facts:
     hostvars: "{{ hostvars }}"
-    host: "{{ remote_host_name }}"
-    field_funcs:
-      - get_dmrClusterConnectionDetails
-      - get_msgVpnAttributes
+    hostvars_inventory_hostname: "{{ remote_host_name }}"
+    get_functions:
+      - get_serviceDmrClusterConnectionDetails
+      - get_vpnAttributes
   register: result
-  no_log: true
 
 - set_fact:
-    remote_address: "{{ result.facts.dmrClusterConnectionDetails.remoteAddress }}"
-    remote_node_name: "{{ result.facts.dmrClusterConnectionDetails.primaryRouterName }}"
-    remote_msg_vpn_name: "{{ result.facts.msgVpnAttributes.vpnName }}"
+    result_facts: "{{ result.facts }}"
 
-- name: "setup.ext-link.tasks: solace_get_dmr_cluster_links: monitor - check if up"
+- set_fact:
+    remote_address: "{{ result.facts.serviceDmrClusterConnectionDetails.remoteAddress }}"
+    remote_node_name: "{{ result.facts.serviceDmrClusterConnectionDetails.primaryRouterName }}"
+    remote_msg_vpn_name: "{{ result.facts.vpnAttributes.msgVpn }}"
+
+- name: "check.ext-link.tasks: solace_get_dmr_cluster_links: monitor - check if up"
   solace_get_dmr_cluster_links:
     api: monitor
     dmr_cluster_name: "{{ dmr_cluster_name }}"
@@ -33,11 +35,11 @@
         - "remoteNodeName=={{ remote_node_name }}"
   register: result
   until:
-    - result.result_list[0].up
+    - result.result_list[0].data.up
   retries: 10
   delay: 10
 
-- name: "setup.ext-link.tasks: solace_get_dmr_cluster_link_remote_addresses: config"
+- name: "check.ext-link.tasks: solace_get_dmr_cluster_link_remote_addresses: config"
   solace_get_dmr_cluster_link_remote_addresses:
     dmr_cluster_name: "{{ dmr_cluster_name }}"
     remote_node_name: "{{ remote_node_name }}"
@@ -47,9 +49,9 @@
       - result.rc == 0
       - result.result_list | length == 1
       - result.result_list_count == 1
-      - result.result_list[0].remoteAddress == "{{ remote_address }}"
+      - result.result_list[0].data.remoteAddress == "{{ remote_address }}"
 
-- name: "setup.ext-link.tasks: solace_get_dmr_cluster_link_trusted_cns: config"
+- name: "check.ext-link.tasks: solace_get_dmr_cluster_link_trusted_cns: config"
   solace_get_dmr_cluster_link_trusted_cns:
     dmr_cluster_name: "{{ dmr_cluster_name }}"
     remote_node_name: "{{ remote_node_name }}"
@@ -59,9 +61,9 @@
       - result.rc == 0
       - result.result_list | length == 1
       - result.result_list_count == 1
-      - result.result_list[0].tlsTrustedCommonName == "{{ dmr_cluster_link_trusted_cn }}"
+      - result.result_list[0].data.tlsTrustedCommonName == "{{ dmr_cluster_link_trusted_cn }}"
 
-- name: "setup.ext-link.tasks: solace_get_dmr_bridges: monitor"
+- name: "check.ext-link.tasks: solace_get_dmr_bridges: monitor"
   solace_get_dmr_bridges:
     api: monitor
     query_params:
@@ -74,7 +76,7 @@
       - result.rc == 0
       - result.result_list | length == 1
       - result.result_list_count == 1
-      - result.result_list[0].up
+      - result.result_list[0].data.up
 
 ###
 # The End.

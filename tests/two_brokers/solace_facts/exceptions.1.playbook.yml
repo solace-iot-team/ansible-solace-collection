@@ -24,7 +24,8 @@
     - name: "Get Host Service Ports: local"
       solace_get_facts:
         hostvars: "{{ hostvars }}"
-        host: local_broker
+        hostvars_inventory_hostname: local_broker
+        msg_vpn: "{{ vpn }}"
       register: result
       ignore_errors: yes
     - assert:

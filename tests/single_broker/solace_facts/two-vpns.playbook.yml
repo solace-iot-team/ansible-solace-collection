@@ -1,0 +1,179 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Main: solace_facts"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_vpn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+  vars:
+      vpn_1: default
+      vpn_2: solace_facts
+  tasks:
+
+  - name: "end play if not local broker"
+    meta: end_play
+    when: broker_type != 'local'
+
+  - name: "check vars"
+    set_fact:
+      working_dir: "{{ WORKING_DIR }}"
+
+  - name: "ensure working_dir exists"
+    file:
+      path: "{{ working_dir }}"
+      state: directory
+    delegate_to: localhost
+
+  - name: "delete vpn2"
+    solace_vpn:
+      name: "{{ vpn_2 }}"
+      state: absent
+
+  - name: "create vpn2"
+    solace_vpn:
+      name: "{{ vpn_2 }}"
+      settings:
+        enabled: true
+        authenticationBasicType: "none"
+        maxMsgSpoolUsage: 100
+        serviceMqttPlainTextEnabled: true
+        serviceMqttMaxConnectionCount: 10
+        serviceMqttPlainTextListenPort: 1884
+      state: present
+
+  - name: "solace_gather_facts"
+    solace_gather_facts:
+  - name: "save 'ansible_facts.solace' to yaml"
+    copy:
+      content: "{{ ansible_facts.solace | to_nice_yaml }}"
+      dest: "{{ working_dir }}/facts.{{ broker_type }}.two-vpns.raw.yml"
+    delegate_to: localhost
+  - name: "save 'ansible_facts.solace' to json"
+    copy:
+      content: "{{ ansible_facts.solace | to_nice_json }}"
+      dest: "{{ working_dir }}/facts.{{ broker_type }}.two-vpns.raw.json"
+    delegate_to: localhost
+
+  - name: "solace_get_facts:get_vpnClientConnectionDetails:vpn_1"
+    solace_get_facts:
+      hostvars: "{{ hostvars }}"
+      hostvars_inventory_hostname: "{{ inventory_hostname }}"
+      msg_vpn: "{{ vpn_1 }}"
+      get_functions:
+        - get_vpnClientConnectionDetails
+    register: result
+  - name: "save to file:vpnClientConnectionDetails:vpn_1"
+    copy:
+      content: "{{ result.facts | to_nice_yaml }}"
+      dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn_1 }}.vpnClientConnectionDetails.yml"
+    delegate_to: localhost
+  - name: "save to file:vpnClientConnectionDetails:vpn_1"
+    copy:
+      content: "{{ result.facts | to_nice_json }}"
+      dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn_1 }}.vpnClientConnectionDetails.json"
+    delegate_to: localhost
+  - name: "print result.facts"
+    debug:
+      msg:
+        - "result.facts="
+        - "{{ result.facts }}"
+  - assert:
+      that:
+        - result.facts.vpnClientConnectionDetails is defined
+        - result.facts.vpnClientConnectionDetails.msgVpn is defined
+        - result.facts.vpnClientConnectionDetails.msgVpn == "{{ vpn_1 }}"
+        - result.facts.vpnClientConnectionDetails.brokerMgmtType is defined
+        - result.facts.vpnClientConnectionDetails.AMQP is defined
+        - result.facts.vpnClientConnectionDetails.JMS is defined
+        - result.facts.vpnClientConnectionDetails.MQTT is defined
+        - result.facts.vpnClientConnectionDetails.REST is defined
+        - result.facts.vpnClientConnectionDetails.SMF is defined
+        - result.facts.vpnClientConnectionDetails.trustStore is defined
+
+  - name: "solace_get_facts:get_vpnClientConnectionDetails:vpn_2"
+    solace_get_facts:
+      hostvars: "{{ hostvars }}"
+      hostvars_inventory_hostname: "{{ inventory_hostname }}"
+      msg_vpn: "{{ vpn_2 }}"
+      get_functions:
+        - get_vpnClientConnectionDetails
+    register: result
+  - name: "save to file:vpnClientConnectionDetails:vpn_2"
+    copy:
+      content: "{{ result.facts | to_nice_yaml }}"
+      dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn_2 }}.vpnClientConnectionDetails.yml"
+    delegate_to: localhost
+  - name: "save to file:vpnClientConnectionDetails:vpn_1"
+    copy:
+      content: "{{ result.facts | to_nice_json }}"
+      dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn_2 }}.vpnClientConnectionDetails.json"
+    delegate_to: localhost
+  - name: "print result.facts"
+    debug:
+      msg:
+        - "result.facts="
+        - "{{ result.facts }}"
+  - assert:
+      that:
+        - result.facts.vpnClientConnectionDetails is defined
+        - result.facts.vpnClientConnectionDetails.msgVpn is defined
+        - result.facts.vpnClientConnectionDetails.msgVpn == "{{ vpn_2 }}"
+        - result.facts.vpnClientConnectionDetails.brokerMgmtType is defined
+        - result.facts.vpnClientConnectionDetails.AMQP is defined
+        - result.facts.vpnClientConnectionDetails.JMS is defined
+        - result.facts.vpnClientConnectionDetails.MQTT is defined
+        - result.facts.vpnClientConnectionDetails.REST is defined
+        - result.facts.vpnClientConnectionDetails.SMF is defined
+        - result.facts.vpnClientConnectionDetails.trustStore is defined
+
+  - name: "solace_get_facts:get_vpnClientConnectionDetails:no_vpn"
+    solace_get_facts:
+      hostvars: "{{ hostvars }}"
+      hostvars_inventory_hostname: "{{ inventory_hostname }}"
+      get_functions:
+        - get_vpnClientConnectionDetails
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.rc == 1
+        - "'arg \\'msg_vpn=None\\': required for get_function=get_vpnClientConnectionDetails' in result.msg|string"
+
+  - name: "solace_get_facts:get_service*:no_vpn"
+    solace_get_facts:
+      hostvars: "{{ hostvars }}"
+      hostvars_inventory_hostname: "{{ inventory_hostname }}"
+      get_functions:
+        - get_serviceTrustStoreDetails
+        - get_serviceVirtualRouterName
+    register: result
+
+  - name: "delete vpn2"
+    solace_vpn:
+      name: "{{ vpn_2 }}"
+      state: absent
+
+
+
+###
+# The End.

@@ -74,9 +74,9 @@
             - "clientProfileName==test_ansible_solace"
       register: result
     - set_fact:
-          client_profile: "{{ result.result_list[0] }}"
+          client_profile: "{{ result.result_list[0].data }}"
 
-    - name: "update: Solace Cloud: Assert that Updates worked"
+    - name: "update: assert that updates worked"
       assert:
         that:
           - not client_profile.allowGuaranteedMsgSendEnabled
