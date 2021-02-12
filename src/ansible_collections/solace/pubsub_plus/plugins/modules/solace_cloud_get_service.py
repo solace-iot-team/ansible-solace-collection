@@ -86,6 +86,7 @@ import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceCloudGetTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceCloudApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudConfig, SolaceTaskSolaceCloudServiceConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -97,11 +98,20 @@ class SolaceCloudGetServiceTask(SolaceCloudGetTask):
     def do_task(self):
         service_id = self.get_module().params['solace_cloud_service_id']
         service = self.get_solace_cloud_api().get_service(self.get_config(), service_id)
+        if not service:
+            raise SolaceError(f"solace_cloud_service_id={service_id} not found")
+
         result = self.create_result()
         result.update(dict(
             service=service
         ))
-        return None, result
+        msg = None
+        if not service:
+            msg=f"solace cloud service id={service_id} not found"
+            result.update(dict(
+                rc=1
+            ))
+        return msg, result
 
 
 def run_module():

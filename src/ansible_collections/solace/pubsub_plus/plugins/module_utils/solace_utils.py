@@ -73,6 +73,23 @@ class SolaceUtils(object):
         return d
 
     @staticmethod
+    def deep_dict_convert_strs_to_types(d: dict):
+        for k, i in d.items():
+            t = type(i)
+            if t == str:
+                if i.lower() in ['true', 'yes']:
+                    d[k] = True
+                elif i.lower() in ['false', 'no']:
+                    d[k] = False   
+                elif re.search(r'^[0-9]+$', i):
+                    d[k] = int(i)
+                elif re.search(r'^[0-9]+\.[0-9]$', i):
+                    d[k] = float(i)
+            elif t == dict:
+                d[k] = SolaceUtils.deep_dict_convert_strs_to_types(i)
+        return d
+
+    @staticmethod
     def deep_dict_diff(new: dict, old: dict, changes: dict = dict()):
         for k in new.keys():
             if not isinstance(new[k], dict):

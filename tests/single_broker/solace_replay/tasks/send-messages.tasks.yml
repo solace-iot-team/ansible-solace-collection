@@ -3,50 +3,52 @@
 
 ---
 
+- name: "ensure var topic is defined"
+  assert:
+    that:
+      - topic is defined
+
 - name: "send-messages: solace_gather_facts"
   solace_gather_facts:
   register: result
 
-- name: "send-messages: solace_get_facts: get_allClientConnectionDetails"
+- name: "send-messages: solace_get_facts: get_vpnClientConnectionDetails"
   solace_get_facts:
    hostvars: "{{ hostvars }}"
-   host: "{{ inventory_hostname }}"
-   # TODO: I need the vpn to figure out the connection details and ports
-   # msg_vpn: "{{ vpn }}"
-   field_funcs:
-     - get_allClientConnectionDetails
+   hostvars_inventory_hostname: "{{ inventory_hostname }}"
+   get_functions:
+     - get_vpnClientConnectionDetails
   register: result
+- set_fact:
+      client_connection_details: "{{ result.facts.vpnClientConnectionDetails }}"
 
 - name: "send-messages: save client connection details to file"
   copy:
-    content: "{{ result.facts.clientConnectionDetails | to_nice_json }}"
+    content: "{{ client_connection_details | to_nice_json }}"
     dest: "{{ working_dir }}/clientConnectionDetails.{{ broker_type }}.{{ vpn }}.json"
   delegate_to: localhost
 
-- meta: end_play
-
 - set_fact:
-    is_rest_incoming_enabled: "{{ ansible_facts.solace.service['rest-incoming-admin-state'] == 'Enabled' }}"
-  when: broker_type == 'local'
-
+    is_rest_incoming_enabled: "{{  client_connection_details.REST.enabled and client_connection_details.REST.plain.enabled }}"
 - assert:
     that: is_rest_incoming_enabled
 
-- name: "send-messages: solace_get_facts: get_allClientConnectionDetails"
-  solace_get_facts:
-   hostvars: "{{ hostvars }}"
-   host: "{{ inventory_hostname }}"
-   # TODO: I need the vpn to figure out the connection details and ports
-   # msg_vpn: "{{ vpn }}"
-   field_funcs:
-     - get_allClientConnectionDetails
-  register: result
-
 - set_fact:
-    rest_port: "{{ result.facts.clientConnectionDetails.REST.serviceRestIncomingPlainTextListenPort }}"
-    rest_host: "{{ sempv2_host if broker_type == 'local' else 'what-is-the-host-for-solace-cloud?' }}"
-    rest_user: "{{ sempv2_username if broker_type == 'local' else 'solace-cloud-rest-user?' }}"
-    rest_pwd: "{{ sempv2_password if broker_type == 'local' else 'solace-cloud-rest-password?' }}"
+    rest_port: "{{ client_connection_details.REST.plain.uri_components.port }}"
+
+- name: "set REST connection details local broker"
+  set_fact:
+    rest_host: "{{ sempv2_host }}"
+    rest_user: "{{ sempv2_username }}"
+    rest_pwd: "{{ sempv2_password }}"
+  when: client_connection_details.brokerMgmtType == 'self_hosted'
+
+- name: "set REST connection details solace-cloud broker"
+  set_fact:
+    rest_host: "{{ client_connection_details.REST.plain.uri_components.host }}"
+    rest_user: "{{ client_connection_details.REST.authentication.username }}"
+    rest_pwd: "{{ client_connection_details.REST.authentication.password }}"
+  when: client_connection_details.brokerMgmtType == 'solace_cloud'
 
 - name: "send-messages: send REST message"
   uri:

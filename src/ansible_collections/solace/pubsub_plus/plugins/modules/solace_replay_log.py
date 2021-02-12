@@ -17,6 +17,7 @@ module: solace_replay_log
 short_description: replay log
 description:
 - "Configure a Replay Log object on a Message Vpn. Allows addition, removal and configuration of Replay Log objects in an idempotent manner."
+- "Solace Cloud currently does not support creating, deleting, updating Replay Log objects. Module will throw an exception."
 notes:
 - "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/replayLog"
 options:
@@ -30,6 +31,7 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.settings
 - solace.pubsub_plus.solace.state
+- solace.pubsub_plus.solace.broker_config_solace_cloud
 seealso:
 - module: solace_get_replay_logs
 author:
@@ -52,6 +54,8 @@ module_defaults:
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
+    solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+    solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 tasks:
 - name: add replay log
   solace_replay:
@@ -97,6 +101,8 @@ import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -117,7 +123,12 @@ class SolaceReplayLogTask(SolaceBrokerCRUDTask):
         path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'replayLogs', replay_log_name]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
+    def _create_func_solace_cloud(self, vpn_name, replay_log_name, settings=None):
+        raise SolaceError("creating replayLog in Solace Cloud not supported")
+
     def create_func(self, vpn_name, replay_log_name, settings=None):
+        if self.get_config().is_solace_cloud():
+            return self._create_func_solace_cloud(vpn_name, replay_log_name, settings)
         # POST /msgVpns/{msgVpnName}/replayLogs
         data = {
             'msgVpnName': vpn_name,
@@ -129,10 +140,17 @@ class SolaceReplayLogTask(SolaceBrokerCRUDTask):
 
     def update_func(self, vpn_name, replay_log_name, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/replayLogs/{replayLogName}
+        # solace cloud complains about using the exact types
+        converted_settings = SolaceUtils.deep_dict_convert_strs_to_types(settings)
         path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'replayLogs', replay_log_name]
-        return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
+        return self.sempv2_api.make_patch_request(self.get_config(), path_array, converted_settings)
+
+    def _delete_func_solace_cloud(self, vpn_name, replay_log_name):
+        raise SolaceError("deleting replayLog in Solace Cloud not supported")
 
     def delete_func(self, vpn_name, replay_log_name):
+        if self.get_config().is_solace_cloud():
+            return self._delete_func_solace_cloud(vpn_name, replay_log_name)
         # DELETE /msgVpns/{msgVpnName}/replayLogs/{replayLogName}
         path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'replayLogs', replay_log_name]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
@@ -143,6 +161,7 @@ def run_module():
         name=dict(type='str', required=True, aliases=['replay_log_name'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_solace_cloud())
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_crud())
     arg_spec.update(module_args)

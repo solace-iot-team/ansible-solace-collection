@@ -161,6 +161,7 @@ class SolaceSempV2Api(SolaceApi):
     API_BASE_SEMPV2_CONFIG = "/SEMP/v2/config"
     API_BASE_SEMPV2_MONITOR = "/SEMP/v2/monitor"
     API_BASE_SEMPV2_ACTION = "/SEMP/v2/action"
+    API_BASE_SEMPV2_PRIVATE_ACTION = "/SEMP/v2/__private_action__"
 
     def __init__(self, module: AnsibleModule):
         super().__init__(module)

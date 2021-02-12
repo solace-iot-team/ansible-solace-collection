@@ -14,6 +14,9 @@ DOCUMENTATION = '''
 ---
 module: solace_get_facts
 short_description: get facts for a broker/vpn
+
+TODO: copy a sample for solace cloud AND self-hosted
+
 description:
 - Provides convenience functions to access solace facts retrieved from broker service using M(solace_gather_facts) from 'ansible_facts.solace'.
 notes:
