@@ -91,7 +91,7 @@
         hostvars_inventory_hostname: "{{ inventory_hostname }}"
         msg_vpn: "{{ vpn }}"
         get_functions:
-          - get_allClientConnectionDetails
+          - get_vpnClientConnectionDetails
       register: result
       # no_log: true
 
