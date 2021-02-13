@@ -160,6 +160,7 @@ class SolaceSempV2Api(SolaceApi):
 
     API_BASE_SEMPV2_CONFIG = "/SEMP/v2/config"
     API_BASE_SEMPV2_MONITOR = "/SEMP/v2/monitor"
+    API_BASE_SEMPV2_PRIVATE_MONITOR = "/SEMP/v2/__private_monitor__"
     API_BASE_SEMPV2_ACTION = "/SEMP/v2/action"
     API_BASE_SEMPV2_PRIVATE_ACTION = "/SEMP/v2/__private_action__"
 
@@ -226,7 +227,15 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
             return resp.json()
         return dict()
 
-    def get_objects(self, config: SolaceTaskBrokerConfig, api: str, path_array: list, query_params: dict = None) -> list:
+    def get_monitor_api_base(self) -> str:
+        return SolaceSempV2Api.API_BASE_SEMPV2_MONITOR
+
+    def get_objects(self, 
+                    config: SolaceTaskBrokerConfig, 
+                    api: str, 
+                    path_array: list, 
+                    query_params: dict = None, 
+                    get_monitor_api_base_func=get_monitor_api_base) -> list:
         query = ""
         if self.is_supports_paging:
             query = "count=100"
@@ -247,7 +256,7 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
 
         api_base = self.API_BASE_SEMPV2_CONFIG
         if api == 'monitor':
-            api_base = self.API_BASE_SEMPV2_MONITOR
+            api_base = get_monitor_api_base_func()
         path_array = [api_base] + path_array
         result_list = []
         hasNextPage = True
@@ -270,17 +279,6 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
                     result_element.update(dict(collections=collections_list[i]))
 
                 result_list.append(result_element)
-
-            # # merge collections into data list. assuming same index and same length.
-            # for i, collection in enumerate(collections_list):
-            #     result_element = dict(
-            #         data=data_list[i],
-            #         collections=collection
-            #     )
-            #     result_list.append(result_element)
-            #     # data_list[i].update(collection)
-
-            # result_list.extend(data_list)
             # cursor seems to have a bug ==> test first if any data returned
             if len(data_list) == 0:
                 hasNextPage = False

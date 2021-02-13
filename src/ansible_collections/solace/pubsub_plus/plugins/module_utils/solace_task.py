@@ -262,6 +262,9 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
     def get_sempv2_get_paging_api(self) -> SolaceSempV2Api:
         return self.sempv2_get_paging_api
 
+    def get_monitor_api_base(self) -> str:
+        return SolaceSempV2Api.API_BASE_SEMPV2_MONITOR
+
     def get_path_array(self, params: dict) -> list:
         raise SolaceInternalErrorAbstractMethod()
 
@@ -269,7 +272,7 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
         params = self.get_config().get_params()
         api = params['api']
         query_params = params['query_params']
-        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, self.get_path_array(params), query_params)
+        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, self.get_path_array(params), query_params, self.get_monitor_api_base)
         result = self.create_result_with_list(objects)
         return None, result
 
