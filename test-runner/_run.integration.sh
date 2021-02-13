@@ -174,8 +174,7 @@ ansibleSolaceTestTargetGroup="dmr"
   mkdir -p $LOG_DIR
 
   export SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE=$solaceCloudAccountInventoryFile
-  # test only
-  # export TEARDOWN_SOLACE_CLOUD=False
+  export TEARDOWN_SOLACE_CLOUD=True
 
   runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
   $runScript
