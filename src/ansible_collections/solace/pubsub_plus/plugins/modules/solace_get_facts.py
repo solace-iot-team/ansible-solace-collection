@@ -14,9 +14,6 @@ DOCUMENTATION = '''
 ---
 module: solace_get_facts
 short_description: get facts for a broker/vpn
-
-TODO: copy a sample for solace cloud AND self-hosted
-
 description:
 - Provides convenience functions to access solace facts retrieved from broker service using M(solace_gather_facts) from 'ansible_facts.solace'.
 notes:
@@ -155,156 +152,282 @@ facts:
     returned: success
     elements: dict
     sample:
-        vpnBridgeRemoteMsgVpnLocations:
-            compressed: mr1oqbbo5py0k5.messaging.solace.cloud:55003
-            enabled: true
-            plain: mr1oqbbo5py0k5.messaging.solace.cloud:55555
-            secured: mr1oqbbo5py0k5.messaging.solace.cloud:55443
-        serviceDmrClusterConnectionDetails:
-            clusterName: cluster-aws-ca-central-1a-1oqbbo5py0k5
-            password: a442o651ukpdnrpp4anvpl6s4o
-            primaryRouterName: pri-aws-ca-central-1a-1oqbbo5py0k5
-            remoteAddress: mr1oqbbo5py0k5.messaging.solace.cloud
-        serviceTrustStoreDetails:
-            enabled: true
-            uri: https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/root/DigiCert_Global_Root_CA.pem
-        serviceVirtualRouterName: pri-aws-ca-central-1a-1oqbbo5py0k5
-        vpnAttributes:
-            msgVpn: asc_test_120
-        vpnClientConnectionDetails:
-            AMQP:
-                authentication:
-                    password: jmqjg4eotp6ae5ul4ci75oogoa
-                    username: solace-cloud-client
-                compressed:
-                    enabled: false
-                    uri: null
-                    uri_components: null
-                enabled: true
-                plain:
-                    enabled: true
-                    uri: amqp://mr1oqbbo5py0k5.messaging.solace.cloud:5672
-                    uri_components:
-                        host: mr1oqbbo5py0k5.messaging.solace.cloud
-                        port: 5672
-                        protocol: amqp
-                secured:
-                    enabled: true
-                    uri: amqps://mr1oqbbo5py0k5.messaging.solace.cloud:5671
-                    uri_components:
-                        host: mr1oqbbo5py0k5.messaging.solace.cloud
-                        port: 5671
-                        protocol: amqps
-                ws_plain: null
-                ws_secured: null
-            JMS:
-                authentication:
-                    password: jmqjg4eotp6ae5ul4ci75oogoa
-                    username: solace-cloud-client
-                compressed:
-                    enabled: false
-                    uri: null
-                    uri_components: null
-                enabled: true
-                plain:
-                    enabled: true
-                    uri: smf://mr1oqbbo5py0k5.messaging.solace.cloud:55555
-                    uri_components:
-                        host: mr1oqbbo5py0k5.messaging.solace.cloud
-                        port: 55555
-                        protocol: smf
-                secured:
-                    enabled: true
-                    uri: smfs://mr1oqbbo5py0k5.messaging.solace.cloud:55443
-                    uri_components:
-                        host: mr1oqbbo5py0k5.messaging.solace.cloud
-                        port: 55443
-                        protocol: smfs
-                ws_plain: null
-                ws_secured: null
-            MQTT:
-                authentication:
-                    password: jmqjg4eotp6ae5ul4ci75oogoa
-                    username: solace-cloud-client
-                compressed:
-                    enabled: false
-                    uri: null
-                    uri_components: null
-                enabled: true
-                plain:
-                    enabled: true
-                    uri: tcp://mr1oqbbo5py0k5.messaging.solace.cloud:1883
-                    uri_components:
-                        host: mr1oqbbo5py0k5.messaging.solace.cloud
-                        port: 1883
-                        protocol: tcp
-                secured:
-                    enabled: true
-                    uri: ssl://mr1oqbbo5py0k5.messaging.solace.cloud:8883
-                    uri_components:
-                        host: mr1oqbbo5py0k5.messaging.solace.cloud
-                        port: 8883
-                        protocol: ssl
-                ws_plain: null
-                ws_secured: null
-            REST:
-                authentication:
-                    password: jmqjg4eotp6ae5ul4ci75oogoa
-                    username: solace-cloud-client
-                compressed:
-                    enabled: false
-                    uri: null
-                    uri_components: null
-                enabled: true
-                plain:
-                    enabled: true
-                    uri: http://mr1oqbbo5py0k5.messaging.solace.cloud:9000
-                    uri_components:
-                        host: mr1oqbbo5py0k5.messaging.solace.cloud
-                        port: 9000
-                        protocol: http
-                secured:
-                    enabled: true
-                    uri: https://mr1oqbbo5py0k5.messaging.solace.cloud:9443
-                    uri_components:
-                        host: mr1oqbbo5py0k5.messaging.solace.cloud
-                        port: 9443
-                        protocol: https
-                ws_plain: null
-                ws_secured: null
-            SMF:
-                authentication:
-                    password: jmqjg4eotp6ae5ul4ci75oogoa
-                    username: solace-cloud-client
-                compressed:
-                    enabled: true
-                    uri: tcp://mr1oqbbo5py0k5.messaging.solace.cloud:55003
-                    uri_components:
-                        host: mr1oqbbo5py0k5.messaging.solace.cloud
-                        port: 55003
-                        protocol: tcp
-                enabled: true
-                plain:
-                    enabled: true
-                    uri: tcp://mr1oqbbo5py0k5.messaging.solace.cloud:55555
-                    uri_components:
-                        host: mr1oqbbo5py0k5.messaging.solace.cloud
-                        port: 55555
-                        protocol: tcp
-                secured:
-                    enabled: true
-                    uri: tcps://mr1oqbbo5py0k5.messaging.solace.cloud:55443
-                    uri_components:
-                        host: mr1oqbbo5py0k5.messaging.solace.cloud
-                        port: 55443
-                        protocol: tcps
-                ws_plain: null
-                ws_secured: null
-            brokerMgmtType: solace_cloud
-            msgVpn: asc_test_120
-            trustStore:
+        solace_cloud:
+            serviceDmrClusterConnectionDetails:
+                clusterName: cluster-aws-ca-central-1a-1oqbbo5q53bt
+                password: ia48anu4ru6qhmopopmrgacs9v
+                primaryRouterName: pri-aws-ca-central-1a-1oqbbo5q53bt
+                remoteAddress: mr1oqbbo5q53bt.messaging.solace.cloud
+            serviceTrustStoreDetails:
                 enabled: true
                 uri: https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/root/DigiCert_Global_Root_CA.pem
+            serviceVirtualRouterName: pri-aws-ca-central-1a-1oqbbo5q53bt
+            vpnAttributes:
+                msgVpn: asc_test_120
+            vpnBridgeRemoteMsgVpnLocations:
+                compressed: mr1oqbbo5q53bt.messaging.solace.cloud:55003
+                enabled: true
+                plain: mr1oqbbo5q53bt.messaging.solace.cloud:55555
+                secured: mr1oqbbo5q53bt.messaging.solace.cloud:55443
+            vpnClientConnectionDetails:
+                AMQP:
+                    authentication:
+                        password: m35lqpr8h5hgtbknq1e1lvdj5d
+                        username: solace-cloud-client
+                    compressed:
+                        enabled: false
+                        uri: null
+                        uri_components: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: amqp://mr1oqbbo5q53bt.messaging.solace.cloud:5672
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 5672
+                            protocol: amqp
+                    secured:
+                        enabled: true
+                        uri: amqps://mr1oqbbo5q53bt.messaging.solace.cloud:5671
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 5671
+                            protocol: amqps
+                    ws_plain: null
+                    ws_secured: null
+                JMS:
+                    authentication:
+                        password: m35lqpr8h5hgtbknq1e1lvdj5d
+                        username: solace-cloud-client
+                    compressed:
+                        enabled: false
+                        uri: null
+                        uri_components: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: smf://mr1oqbbo5q53bt.messaging.solace.cloud:55555
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 55555
+                            protocol: smf
+                    secured:
+                        enabled: true
+                        uri: smfs://mr1oqbbo5q53bt.messaging.solace.cloud:55443
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 55443
+                            protocol: smfs
+                    ws_plain: null
+                    ws_secured: null
+                MQTT:
+                    authentication:
+                        password: m35lqpr8h5hgtbknq1e1lvdj5d
+                        username: solace-cloud-client
+                    compressed:
+                        enabled: false
+                        uri: null
+                        uri_components: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: tcp://mr1oqbbo5q53bt.messaging.solace.cloud:1883
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 1883
+                            protocol: tcp
+                    secured:
+                        enabled: true
+                        uri: ssl://mr1oqbbo5q53bt.messaging.solace.cloud:8883
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 8883
+                            protocol: ssl
+                    ws_plain: null
+                    ws_secured: null
+                REST:
+                    authentication:
+                        password: m35lqpr8h5hgtbknq1e1lvdj5d
+                        username: solace-cloud-client
+                    compressed:
+                        enabled: false
+                        uri: null
+                        uri_components: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: http://mr1oqbbo5q53bt.messaging.solace.cloud:9000
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 9000
+                            protocol: http
+                    secured:
+                        enabled: true
+                        uri: https://mr1oqbbo5q53bt.messaging.solace.cloud:9443
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 9443
+                            protocol: https
+                    ws_plain: null
+                    ws_secured: null
+                SMF:
+                    authentication:
+                        password: m35lqpr8h5hgtbknq1e1lvdj5d
+                        username: solace-cloud-client
+                    compressed:
+                        enabled: true
+                        uri: tcp://mr1oqbbo5q53bt.messaging.solace.cloud:55003
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 55003
+                            protocol: tcp
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: tcp://mr1oqbbo5q53bt.messaging.solace.cloud:55555
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 55555
+                            protocol: tcp
+                    secured:
+                        enabled: true
+                        uri: tcps://mr1oqbbo5q53bt.messaging.solace.cloud:55443
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 55443
+                            protocol: tcps
+                    ws_plain: null
+                    ws_secured: null
+                brokerMgmtType: solace_cloud
+                msgVpn: asc_test_120
+                trustStore:
+                    enabled: true
+                    uri: https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/root/DigiCert_Global_Root_CA.pem
+        self_hosted:
+            serviceDmrClusterConnectionDetails:
+                note:
+                - feature currently not supported
+                - extract dmr cluster connection details for broker-type=self_hosted
+                - pls raise a new feature request if required
+            serviceTrustStoreDetails:
+                enabled: false
+            serviceVirtualRouterName: 4a140514b2a1
+            vpnAttributes:
+                msgVpn: default
+            vpnBridgeRemoteMsgVpnLocations:
+                compressed: v:4a140514b2a1
+                enabled: true
+                plain: v:4a140514b2a1
+                secured: v:4a140514b2a1
+            vpnClientConnectionDetails:
+                AMQP:
+                    authentication: null
+                    compressed: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 5672
+                    secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 5671
+                    ws_plain: null
+                    ws_secured: null
+                JMS:
+                    authentication: null
+                    compressed:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55003
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55555
+                    secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55443
+                    ws_plain: null
+                    ws_secured: null
+                MQTT:
+                    authentication: null
+                    compressed: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 1883
+                    secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 8883
+                    ws_plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 8000
+                    ws_secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 8443
+                REST:
+                    authentication: null
+                    compressed: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 9000
+                    secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 9443
+                    ws_plain: null
+                    ws_secured: null
+                SMF:
+                    authentication: null
+                    compressed:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55003
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55555
+                    secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55443
+                    ws_plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: '8008'
+                    ws_secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 1443
+                brokerMgmtType: self_hosted
+                msgVpn: default
+                trustStore:
+                    enabled: false
 msg:
     description: The response from the HTTP call in case of error.
     type: dict

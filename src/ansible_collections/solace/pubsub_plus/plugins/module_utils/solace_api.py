@@ -230,11 +230,11 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
     def get_monitor_api_base(self) -> str:
         return SolaceSempV2Api.API_BASE_SEMPV2_MONITOR
 
-    def get_objects(self, 
-                    config: SolaceTaskBrokerConfig, 
-                    api: str, 
-                    path_array: list, 
-                    query_params: dict = None, 
+    def get_objects(self,
+                    config: SolaceTaskBrokerConfig,
+                    api: str,
+                    path_array: list,
+                    query_params: dict = None,
                     get_monitor_api_base_func=get_monitor_api_base) -> list:
         query = ""
         if self.is_supports_paging:

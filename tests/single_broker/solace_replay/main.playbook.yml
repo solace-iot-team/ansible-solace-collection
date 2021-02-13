@@ -165,7 +165,7 @@
     solace_replay_log_trim_logged_msgs:
       name: "{{ replay_log_name }}"
       settings:
-        olderThanTime: "{{ ansible_date_time.epoch }}"
+        olderThanTime: "{{ ansible_date_time.epoch }}"    
 
   - name: "main: solace_get_replay_logs:monitor:all - 1"
     solace_get_replay_logs:

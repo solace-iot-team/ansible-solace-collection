@@ -1,5 +1,37 @@
 # Release Notes
 
+## Version: 1.2.0
+Addition of modules to manage replay of messages.
+
+_**Note: this release contains minor breaking changes.**_
+
+#### New Modules
+  * config:
+    - [solace_replay_log](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_replay_log.html)
+  * action:
+    - [solace_replay_log_trim_logged_msgs](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_replay_log_trim_logged_msgs.html)
+    - [solace_queue_start_replay](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_queue_start_replay.html)
+    - [solace_queue_cancel_replay](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_queue_cancel_replay.html)
+  * get list
+    - [solace_get_replay_logs](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_replay_logs.html)
+
+#### Updated Modules
+  * facts:
+    - [solace_get_facts](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_facts.html)
+      - standardized the output for Solace Cloud and self-hosted brokers
+  * get list:
+    - all get object list modules
+      - config & monitor apis:
+          - contains new dictionary: data {}
+      - monitor api:
+        - contains additional dictionary: collections {}
+
+#### Known Issues
+
+  * Api calls fail on response 504: Bad Gateway
+  * module: solace_get_available - does not check if spool is available for self-hosted brokers
+  * ansible checkmode not implemented
+
 ## Version: 1.1.0
 Refactor framework to streamline module interfaces and development.
 

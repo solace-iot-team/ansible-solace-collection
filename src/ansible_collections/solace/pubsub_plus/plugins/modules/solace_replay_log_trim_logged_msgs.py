@@ -12,68 +12,56 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: solace_queue_start_replay
-TODO: write me
-
-document olderThanTime default setting
-
-short_description: queue
+module: solace_replay_log_trim_logged_msgs
+short_description: trim msgs on replay log
 description:
-- "Configure a Queue object on a Message Vpn. Allows addition, removal and configuration of Queue objects in an idempotent manner."
+- "Trim logged messages on a Replay Log object."
 notes:
-- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue"
+- "Module Sempv2 Action: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/replayLog/doMsgVpnReplayLogTrimLoggedMsgs"
 options:
   name:
-    description: Name of the queue. Maps to 'queueName' in the API.
+    description: Name of the replay log. Maps to 'replayLogName' in the API.
     required: true
     type: str
-    aliases: [queue, queue_name]
+    aliases: [replay_log_name]
+  settings:
+    description: JSON dictionary of additional configuration, see Reference documentation.
+    required: false
+    type: dict
+    suboptions:
+        olderThanTime:
+            description:
+            - See Reference documentation.
+            - "B(default): the current time."
+            type: int
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
-- solace.pubsub_plus.solace.settings
-- solace.pubsub_plus.solace.state
 seealso:
-- module: solace_get_queues
+- module: solace_replay_log
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
-
-TODO: using time right now for olderThanTime
-
 hosts: all
 gather_facts: no
 any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-  solace_queue:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
+    solace_replay_log_trim_logged_msgs:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
 tasks:
-- name: add queue
-  solace_queue:
-    name: bar
-    state: present
-
-- name: update queue
-  solace_queue:
-    name: bar
-    setttings:
-      egressEnabled: false
-    state: present
-
-- name: remove queue
-  solace_queue:
-    name: bar
-    state: absent
+  - name: trim all logged messages
+    solace_replay_log_trim_logged_msgs:
+      name: "{{ replay_log_name }}"
 '''
 
 RETURN = '''

@@ -107,7 +107,7 @@ class SolaceCloudGetServiceTask(SolaceCloudGetTask):
         ))
         msg = None
         if not service:
-            msg=f"solace cloud service id={service_id} not found"
+            msg = f"solace cloud service id={service_id} not found"
             result.update(dict(
                 rc=1
             ))

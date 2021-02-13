@@ -84,7 +84,7 @@ class ProtocolConnectionDetails(object):
         self.ws_secured = connectionDetails
 
     def set_compressed(self, connectionDetails: SingleConnectionDetails):
-        self.compressed = connectionDetails    
+        self.compressed = connectionDetails
 
     def get(self) -> dict:
         return {
@@ -154,13 +154,13 @@ class SolaceBrokerFacts(object):
         raise SolaceInternalErrorAbstractMethod()
 
     def get_dmr_cluster_connection_details(self) -> dict:
-        return self._extract_formatted_dmr_cluster_connection_details()    
+        return self._extract_formatted_dmr_cluster_connection_details()
 
     def _extract_formatted_msg_vpn_attributes(self) -> dict:
         raise SolaceInternalErrorAbstractMethod()
 
     def get_msg_vpn_attributes(self) -> dict:
-        return self._extract_formatted_msg_vpn_attributes()    
+        return self._extract_formatted_msg_vpn_attributes()
 
     def _extract_formatted_trust_store_details(self) -> dict:
         raise SolaceInternalErrorAbstractMethod()
@@ -222,7 +222,7 @@ class SolaceCloudBrokerFacts(SolaceBrokerFacts):
     def __init__(self, input_dict: dict, vpn: str):
         super().__init__(input_dict, vpn)
         self.messaging_protocols = None
-    
+
     def _get_broker_mgmt_type(self) -> str:
         return "solace_cloud"
 
@@ -338,13 +338,13 @@ class SolaceCloudBrokerFacts(SolaceBrokerFacts):
 
     def _extract_formatted_amqp_client_connection_details(self) -> dict:
         return self._extract_formatted_protocol_client_connection_details(protocol="AMQP", plain="AMQP", secured="Secured AMQP", compressed=None)
-    
+
     def _extract_formatted_jms_client_connection_details(self) -> dict:
         return self._extract_formatted_protocol_client_connection_details(protocol="JMS", plain="JMS", secured="Secured JMS", compressed=None)
 
     def _extract_formatted_mqtt_client_connection_details(self) -> dict:
         return self._extract_formatted_protocol_client_connection_details(protocol="MQTT", plain="MQTT", secured="Secured MQTT", compressed=None)
-    
+
     def _extract_formatted_rest_client_connection_details(self) -> dict:
         return self._extract_formatted_protocol_client_connection_details(protocol="REST", plain="REST", secured="Secured REST", compressed=None)
 
@@ -388,7 +388,15 @@ class SolaceSelfHostedBrokerFacts(SolaceBrokerFacts):
         return formatted_res
 
     def _extract_formatted_dmr_cluster_connection_details(self) -> dict:
-        raise SolaceFeatureNotSupportedError(f'extract dmr cluster connection details for broker-type={self._get_broker_mgmt_type()}')
+        formatted_res = {
+            "note": [
+                "feature currently not supported",
+                f"extract dmr cluster connection details for broker-type={self._get_broker_mgmt_type()}",
+                "pls raise a new feature request if required"
+            ]
+        }
+        return formatted_res
+        # raise SolaceFeatureNotSupportedError(f'extract dmr cluster connection details for broker-type={self._get_broker_mgmt_type()}')
 
     def _extract_formatted_virtual_router_name(self) -> dict:
         return SolaceBrokerFacts.get_field(self.input_dict, "virtualRouterName")
@@ -442,7 +450,7 @@ class SolaceSelfHostedBrokerFacts(SolaceBrokerFacts):
         res.set_ws_plain(res_ws_plain)
         res.set_ws_secured(res_ws_secured)
         return res.get()
-    
+
     def _extract_formatted_rest_client_connection_details(self) -> dict:
         vpn_dict = self.input_dict['vpns'][self.msg_vpn]
         is_enabled = vpn_dict['serviceRestIncomingPlainTextEnabled'] or vpn_dict['serviceRestIncomingTlsEnabled']
@@ -465,10 +473,10 @@ class SolaceSelfHostedBrokerFacts(SolaceBrokerFacts):
         vpn_dict = self.input_dict['vpns'][self.msg_vpn]
         service_dict = self.input_dict['service']['service']
         smf_service_dict = self.get_nested_dict(service_dict, 'name', 'SMF')
-        web_service_dict = self.get_nested_dict(service_dict, 'name', 'WEB')  
+        web_service_dict = self.get_nested_dict(service_dict, 'name', 'WEB')
         is_compression_enabled = smf_service_dict['compression-listen-port-operational-status'] == "Up"
         is_ws_enabled = vpn_dict['serviceWebPlainTextEnabled'] or vpn_dict['serviceWebTlsEnabled']
-        is_enabled = vpn_dict['serviceSmfPlainTextEnabled'] or vpn_dict['serviceSmfTlsEnabled'] or vpn_dict['serviceWebPlainTextEnabled'] or vpn_dict['serviceWebTlsEnabled'] 
+        is_enabled = vpn_dict['serviceSmfPlainTextEnabled'] or vpn_dict['serviceSmfTlsEnabled'] or vpn_dict['serviceWebPlainTextEnabled'] or vpn_dict['serviceWebTlsEnabled']
         is_enabled = is_enabled or is_compression_enabled or is_ws_enabled
         res = ProtocolConnectionDetails()
         if not is_enabled:

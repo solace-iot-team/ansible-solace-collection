@@ -80,7 +80,7 @@ class SolaceUtils(object):
                 if i.lower() in ['true', 'yes']:
                     d[k] = True
                 elif i.lower() in ['false', 'no']:
-                    d[k] = False   
+                    d[k] = False
                 elif re.search(r'^[0-9]+$', i):
                     d[k] = int(i)
                 elif re.search(r'^[0-9]+\.[0-9]$', i):
