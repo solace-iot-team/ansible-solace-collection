@@ -17,7 +17,7 @@ module: solace_replay_log
 short_description: replay log
 description:
 - "Configure a Replay Log object on a Message Vpn. Allows addition, removal and configuration of Replay Log objects in an idempotent manner."
-- "Solace Cloud currently does not support creating, deleting, updating Replay Log objects. Module will throw an exception."
+- "Note: Solace Cloud currently does not support creating, deleting, updating Replay Log objects. Module will return an error."
 notes:
 - "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/replayLog"
 options:
@@ -34,6 +34,7 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker_config_solace_cloud
 seealso:
 - module: solace_get_replay_logs
+- module: solace_replay_log_trim_logged_msgs
 author:
 - Mike O'Brien (@mikeo)
 - Ricardo Gomez-Ulmke (@rjgu)

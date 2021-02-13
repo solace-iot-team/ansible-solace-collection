@@ -31,6 +31,9 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.state
 seealso:
 - module: solace_get_queues
+- module: solace_queue_subscription
+- module: solace_queue_start_replay
+- module: solace_queue_cancel_replay
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
