@@ -87,7 +87,7 @@
   vars:
     replay_log_name: replaylog-asc-test-replay
     topic_1: "hello/world"
-    # topic_2: "no/subscription/for/this/topic"
+    topic_2: "no/subscription/for/this/topic"
     queue: "asc_replay_test"
   tasks:
 
@@ -188,10 +188,10 @@
     vars:
       topic: "{{ topic_1 }}"
 
-  # - name: "main: call tasks: send 10 messages"
-  #   include_tasks: ./tasks/send-messages.tasks.yml
-  #   vars:
-  #     topic: "{{ topic_2 }}"
+  - name: "main: call tasks: send 10 messages"
+    include_tasks: ./tasks/send-messages.tasks.yml
+    vars:
+      topic: "{{ topic_2 }}"
 
   - name: "main: solace_get_replay_logs:monitor:all - 3"
     solace_get_replay_logs:
@@ -207,8 +207,8 @@
   - assert:
       that:
         - before_spool_usage < after_spool_usage
-        - msg_count|int==10
-        # - msg_count|int==20
+        # - msg_count|int==10
+        - msg_count|int==20
 
   - name: "main: create queue"
     solace_queue:
@@ -237,19 +237,21 @@
       query_params:
         where:
           - "queueName=={{ queue }}"
-        select:
-          - msgs
-          - replay*
+        # select:
+        #   - msgs
+        #   - replay*
     register: result
   - assert:
       that:
         - result.rc==0
         - result.result_list_count==1
   - set_fact:
-      msg_count: "{{ result.result_list[0].collections.msgs.count }}"
+      # msg_count: "{{ result.result_list[0].collections.msgs.count }}"
+      current_spooled_msg_count: "{{ result.result_list[0].data.currentSpooledMsgCount }}"
   - assert:
       that:
-        - msg_count|int==10
+        # - msg_count|int==10
+        - current_spooled_msg_count|int==10
 
   - name: "main: solace_queue_cancel_replay"
     solace_queue_cancel_replay:
