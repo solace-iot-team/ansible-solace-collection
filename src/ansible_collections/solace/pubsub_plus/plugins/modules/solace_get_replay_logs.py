@@ -36,18 +36,47 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
+    solace_replay_log:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_get_replay_logs:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+tasks:
+- name: create or update replay log
+  solace_replay_log:
+    name: foo
+    settings:
+      egressEnabled: true
+      ingressEnabled: true
+      maxSpoolUsage: 1
+    state: present
 
-TODO
+- name: get list config
+  solace_get_replay_logs:
+  register: result
+
+- name: print result
+  debug:
+    msg:
+    - "{{ result.result_list }}"
+    - "{{ result.result_list_count }}"
 
 - name: get list monitor
-  solace_get_queues:
+  solace_get_replay_logs:
     api: monitor
-    query_params:
-      where:
-      - "queueName==foo*"
-      select:
-      - "queueName"
-      - "eventMsgSpoolUsageThreshold"
   register: result
 
 - name: print result
