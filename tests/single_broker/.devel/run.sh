@@ -34,17 +34,17 @@ export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
   export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.8.0.12"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.7.0.29"
-  export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.6.0.46"
+  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.6.0.46"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.3.1.28"
   export BROKER_TYPE="local"
   export LOCAL_BROKER_INVENTORY_FILE="$projectHome/test-runner/files/local.broker.inventory.yml"
   export BROKER_DOCKER_COMPOSE_FILE="$projectHome/test-runner/files/PubSubStandard_singleNode.yml"
   export INVENTORY_FILE=$LOCAL_BROKER_INVENTORY_FILE
 
-# # solace cloud broker
-#   export BROKER_TYPE="solace_cloud"
-#   export INVENTORY_FILE="$projectHome/test-runner/files/solace-cloud-account.inventory.yml"
-#   export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
+# solace cloud broker
+  export BROKER_TYPE="solace_cloud"
+  export INVENTORY_FILE="$projectHome/test-runner/files/solace-cloud-account.inventory.yml"
+  export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
 
 export CLEAN_WORKING_DIR=False
 
