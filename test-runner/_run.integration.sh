@@ -24,11 +24,12 @@ testsBaseDir="$PROJECT_HOME/tests"
 localBrokerInventoryFile="$PROJECT_HOME/test-runner/files/local.broker.inventory.yml"
 localBrokerDockerComposeFile="$PROJECT_HOME/test-runner/files/PubSubStandard_singleNode.yml"
 solaceCloudAccountInventoryFile="$PROJECT_HOME/test-runner/files/solace-cloud-account.inventory.yml"
+# removed from testing
+# "solace/solace-pubsub-standard:9.3.1.28"
+# "solace/solace-pubsub-standard:9.5.0.30"
+# "solace/solace-pubsub-standard:9.7.0.29"
 brokerDockerImages=(
-  # "solace/solace-pubsub-standard:9.3.1.28"
-  # "solace/solace-pubsub-standard:9.5.0.30"
   "solace/solace-pubsub-standard:9.6.0.46"
-  "solace/solace-pubsub-standard:9.7.0.29"
   "solace/solace-pubsub-standard:9.8.0.12"
   "solace/solace-pubsub-standard:latest"
 )

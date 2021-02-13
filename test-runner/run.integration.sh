@@ -38,6 +38,27 @@ $scriptDir/_run.integration.sh
 code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - $scriptLogName"; FAILED=1; fi
 
 ##############################################################################################################################
+# Check for warnings
+
+# 2021-02-13 12:17:06,587 - WARNING - root - solace_api - log_http_roundtrip(): this is a warning
+# shopt -s globstar
+# filePattern="$LOG_DIR/**/*ansible-solace*.*"
+filePattern="$LOG_DIR"
+warnings=$(grep -n -r -e " - WARNING - " $filePattern )
+
+if [[ -z "$warnings" ]]; then
+  echo ">>> FINISHED:NO_WARNINGS - $scriptLogName"
+  touch "$LOG_DIR/$scriptLogName.NO_WARNINGS.out"
+else
+  echo ">>> FINISHED:WITH_WARNINGS";
+  if [ ! -z "$warnings" ]; then
+    while IFS= read line; do
+      echo $line >> "$LOG_DIR/$scriptLogName.WARNINGS.out"
+    done < <(printf '%s\n' "$warnings")
+  fi
+fi
+
+##############################################################################################################################
 # Check for errors
 
 filePattern="$LOG_DIR"
@@ -55,6 +76,7 @@ else
   fi
   exit 1
 fi
+
 
 ###
 # The End.
