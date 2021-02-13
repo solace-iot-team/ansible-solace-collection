@@ -117,6 +117,7 @@ msg:
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetPagingTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -125,8 +126,12 @@ class SolaceGetQueuesTask(SolaceBrokerGetPagingTask):
     def __init__(self, module):
         super().__init__(module)
 
+    def get_monitor_api_base(self) -> str:
+        return SolaceSempV2Api.API_BASE_SEMPV2_PRIVATE_MONITOR
+
     def get_path_array(self, params: dict) -> list:
         # GET /msgVpns/{msgVpnName}/queues
+        # __private_monitor__
         return ['msgVpns', params['msg_vpn'], 'queues']
 
 
