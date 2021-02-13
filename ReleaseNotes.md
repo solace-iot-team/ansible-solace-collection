@@ -19,7 +19,9 @@ _**Note: this release contains minor breaking changes.**_
   * facts:
     - [solace_get_facts](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_facts.html)
       - standardized the output for Solace Cloud and self-hosted brokers
+      - _note: breaking change: may require minor adjustment of playbooks evaluating response._
   * get list:
+    - _note: breaking change: requires minor adjustment of playbooks evaluating response._
     - all get object list modules
       - config & monitor apis:
           - contains new dictionary: data {}
