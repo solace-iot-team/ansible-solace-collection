@@ -106,7 +106,8 @@ ansibleSolaceTestTargetGroup="single_broker"
   export BROKER_TYPE="solace_cloud"
   export INVENTORY_FILE=$solaceCloudAccountInventoryFile
   export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
-  export TEARDOWN_SOLACE_CLOUD=False # keep it for next test
+  # export TEARDOWN_SOLACE_CLOUD=False # keep it for next test
+  export TEARDOWN_SOLACE_CLOUD=True
 
   echo "##############################################################################################################"
   echo "# test target group: $ansibleSolaceTestTargetGroup(solace_cloud)"

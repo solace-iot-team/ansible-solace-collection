@@ -2,8 +2,8 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 ---
-  name: asc_test_120
-  msgVpnName: asc_test_120
+  name: asct_single_broker
+  msgVpnName: asct_single_broker
   # datacenterId: "aws-eu-west-2a"
   datacenterId: "aws-ca-central-1a"
   serviceTypeId: "enterprise"

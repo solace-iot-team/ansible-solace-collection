@@ -3,8 +3,8 @@
 
 ---
   solace_cloud_services:
-    - name: asc_test_1
-      msgVpnName: asc_test_1
+    - name: asct_solace_cloud
+      msgVpnName: asct_solace_cloud
       # datacenterId: "aws-eu-west-2a"
       datacenterId: "aws-ca-central-1a"
       serviceTypeId: "enterprise"
