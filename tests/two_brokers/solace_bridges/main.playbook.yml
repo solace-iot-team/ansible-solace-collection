@@ -95,7 +95,7 @@
       file: "bridges.topology.yml"
       name: bridges_topology
   vars:
-      bridge_name: "ansible-solace__test_bridge"
+      bridge_name: "asct_test_bridge"
 
   tasks:
 
