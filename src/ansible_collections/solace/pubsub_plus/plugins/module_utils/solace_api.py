@@ -472,13 +472,13 @@ class SolaceCloudApi(SolaceApi):
         if wait_timeout_minutes > 0:
             res = self.wait_for_service_create_completion(config, wait_timeout_minutes, resp['serviceId'])
             if "failed" in res:
-                logging.warn(f"solace cloud service creation failed, try number: {try_count}")
+                logging.warn("solace cloud service creation failed, try number: %d", try_count)
                 if try_count < 3:
-                    logging.warn(f"solace cloud service in failed state - deleting service_id={_service_id} ...")
+                    logging.warn("solace cloud service in failed state - deleting service_id=%s ...", _service_id)
                     _resp = self.delete_service(config, _service_id)
                     logging.warn("creating solace cloud service again ...")
                     _resp = self.create_service(config, wait_timeout_minutes, data, try_count + 1)
-                    logging.warn(f"new service_id={_resp['serviceId']}")
+                    logging.warn("new service_id=%s", _resp['serviceId'])
                     return self.wait_for_service_create_completion(config, wait_timeout_minutes, _resp['serviceId'])
                 else:
                     r = dict(
