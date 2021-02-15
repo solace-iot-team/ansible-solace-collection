@@ -2,11 +2,15 @@
 
 ```
 ├── doc_fragments
+│   ├── __pycache__
+│   │   └── solace.cpython-36.pyc
+│   ├── old_solace.py
 │   └── solace.py
 ├── module_utils
 │   ├── __init__.py
 │   ├── solace_api.py
 │   ├── solace_error.py
+│   ├── solace_facts.py
 │   ├── solace_sys.py
 │   ├── solace_task.py
 │   ├── solace_task_config.py
@@ -57,17 +61,22 @@
     ├── solace_get_rdp_rest_consumer_trusted_cns.py
     ├── solace_get_rdp_rest_consumers.py
     ├── solace_get_rdps.py
+    ├── solace_get_replay_logs.py
     ├── solace_get_topic_endpoints.py
     ├── solace_get_vpn_clients.py
     ├── solace_get_vpns.py
     ├── solace_mqtt_session.py
     ├── solace_mqtt_session_subscription.py
     ├── solace_queue.py
+    ├── solace_queue_cancel_replay.py
+    ├── solace_queue_start_replay.py
     ├── solace_queue_subscription.py
     ├── solace_rdp.py
     ├── solace_rdp_queue_binding.py
     ├── solace_rdp_rest_consumer.py
     ├── solace_rdp_rest_consumer_trusted_cn.py
+    ├── solace_replay_log.py
+    ├── solace_replay_log_trim_logged_msgs.py
     ├── solace_topic_endpoint.py
     └── solace_vpn.py
 ```
