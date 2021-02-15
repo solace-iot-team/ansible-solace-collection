@@ -1,5 +1,5 @@
-Solace Configuration Modules
-============================
+Solace Configuration & Action Modules
+=====================================
 
 Configuration modules mostly use the Solace Sempv2 Config Api. Some modules also use the Solace Cloud Api where required,
 so the same module can be used for both, standalone brokers and Solace Cloud services.
@@ -65,7 +65,8 @@ Idempotency
 -----------
 The configuration modules update/add/delete Broker objects in an idempotent manner.
 
-They all support the `state=[present, absent]` argument.
+They argument `state=[present, absent]` determines the desired outcome of the module.
+The module's behavior is as follows:
 
 **state='present'**:
 
@@ -106,5 +107,6 @@ Module Reference
    modules/solace_mqtt_session*
    modules/solace_queue*
    modules/solace_rdp*
+   modules/solace_replay*
    modules/solace_topic_endpoint*
    modules/solace_vpn

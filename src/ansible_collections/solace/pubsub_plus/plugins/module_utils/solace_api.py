@@ -52,6 +52,9 @@ class SolaceApi(object):
     def make_patch_request(self, config: SolaceTaskConfig, path_array: list, json=None):
         return self.make_request(config, requests.patch, path_array, json)
 
+    def make_put_request(self, config: SolaceTaskConfig, path_array: list, json=None):
+        return self.make_request(config, requests.put, path_array, json)
+
     def handle_response(self, resp):
         if resp.status_code != 200:
             self.handle_bad_response(resp)
@@ -157,6 +160,9 @@ class SolaceSempV2Api(SolaceApi):
 
     API_BASE_SEMPV2_CONFIG = "/SEMP/v2/config"
     API_BASE_SEMPV2_MONITOR = "/SEMP/v2/monitor"
+    API_BASE_SEMPV2_PRIVATE_MONITOR = "/SEMP/v2/__private_monitor__"
+    API_BASE_SEMPV2_ACTION = "/SEMP/v2/action"
+    API_BASE_SEMPV2_PRIVATE_ACTION = "/SEMP/v2/__private_action__"
 
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
@@ -221,7 +227,15 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
             return resp.json()
         return dict()
 
-    def get_objects(self, config: SolaceTaskBrokerConfig, api: str, path_array: list, query_params: dict = None) -> list:
+    def get_monitor_api_base(self) -> str:
+        return SolaceSempV2Api.API_BASE_SEMPV2_MONITOR
+
+    def get_objects(self,
+                    config: SolaceTaskBrokerConfig,
+                    api: str,
+                    path_array: list,
+                    query_params: dict = None,
+                    get_monitor_api_base_func=get_monitor_api_base) -> list:
         query = ""
         if self.is_supports_paging:
             query = "count=100"
@@ -242,16 +256,29 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
 
         api_base = self.API_BASE_SEMPV2_CONFIG
         if api == 'monitor':
-            api_base = self.API_BASE_SEMPV2_MONITOR
+            api_base = get_monitor_api_base_func()
         path_array = [api_base] + path_array
         result_list = []
         hasNextPage = True
         self.query = query
         while hasNextPage:
             body = self.make_get_request(config, path_array)
+            data_list = []
+            # monitor api may have collections as well
+            collections_list = []
             if "data" in body.keys():
                 data_list = body['data']
-                result_list.extend(data_list)
+            if "collections" in body.keys():
+                collections_list = body['collections']
+            # merge collections & data into result_list. assuming same index and same length.
+            for i, data in enumerate(data_list):
+                result_element = dict(
+                    data=data
+                )
+                if len(collections_list) > 0:
+                    result_element.update(dict(collections=collections_list[i]))
+
+                result_list.append(result_element)
             # cursor seems to have a bug ==> test first if any data returned
             if len(data_list) == 0:
                 hasNextPage = False
@@ -445,14 +472,13 @@ class SolaceCloudApi(SolaceApi):
         if wait_timeout_minutes > 0:
             res = self.wait_for_service_create_completion(config, wait_timeout_minutes, resp['serviceId'])
             if "failed" in res:
-                # import logging
-                # logging.debug("***** SERVICE CREATION FAILED HANDLING STARTING ******")
+                logging.warn("solace cloud service creation failed, try number: %d", try_count)
                 if try_count < 3:
-                    # logging.debug(f"solace cloud service in failed state - deleting service_id={_service_id} ...")
+                    logging.warn("solace cloud service in failed state - deleting service_id=%s ...", _service_id)
                     _resp = self.delete_service(config, _service_id)
-                    # logging.debug("creating solace cloud service again ...")
+                    logging.warn("creating solace cloud service again ...")
                     _resp = self.create_service(config, wait_timeout_minutes, data, try_count + 1)
-                    # logging.debug(f"new service_id={_resp['serviceId']}")
+                    logging.warn("new service_id=%s", _resp['serviceId'])
                     return self.wait_for_service_create_completion(config, wait_timeout_minutes, _resp['serviceId'])
                 else:
                     r = dict(

@@ -67,9 +67,9 @@
     - assert:
         that:
           - result.result_list_count == 3
-          - result.result_list[0].enabled == True and result.result_list[0].guaranteedEndpointPermissionOverrideEnabled == True
-          - result.result_list[1].enabled == True and result.result_list[1].guaranteedEndpointPermissionOverrideEnabled == True
-          - result.result_list[2].enabled == True and result.result_list[2].guaranteedEndpointPermissionOverrideEnabled == True
+          - result.result_list[0].data.enabled == True and result.result_list[0].data.guaranteedEndpointPermissionOverrideEnabled == True
+          - result.result_list[1].data.enabled == True and result.result_list[1].data.guaranteedEndpointPermissionOverrideEnabled == True
+          - result.result_list[2].data.enabled == True and result.result_list[2].data.guaranteedEndpointPermissionOverrideEnabled == True
 
     - name: "main: solace_client_username: remove all - end"
       solace_client_username:

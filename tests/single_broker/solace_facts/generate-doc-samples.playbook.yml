@@ -1,0 +1,70 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Main: solace_facts"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+  vars:
+    generated_doc_sample_solace_cloud_file: "GENERATED_DOC_SAMPLE.SOLACE_CLOUD.yml"
+    generated_doc_sample_local_file: "GENERATED_DOC_SAMPLE.LOCAL.yml"
+  tasks:
+  - name: check vars
+    set_fact:
+      working_dir: "{{ WORKING_DIR }}"
+
+  - name: ensure working dir exists
+    file:
+      path: "{{ working_dir }}"
+      state: directory
+    delegate_to: localhost
+
+  - name: gather_facts
+    solace_gather_facts:
+  - set_fact:
+      is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud}}"
+
+  - name: solace_get_facts
+    solace_get_facts:
+      hostvars: "{{ hostvars }}"
+      hostvars_inventory_hostname: "{{ inventory_hostname }}"
+      msg_vpn: "{{ vpn }}"
+      get_functions:
+        - get_serviceDmrClusterConnectionDetails
+        - get_serviceTrustStoreDetails
+        - get_serviceVirtualRouterName
+        - get_vpnAttributes
+        - get_vpnBridgeRemoteMsgVpnLocations
+        - get_vpnClientConnectionDetails          
+    register: result
+
+  - set_fact:
+        generated_doc_sample_file: "{{ generated_doc_sample_solace_cloud_file }}"
+    when: is_solace_cloud
+
+  - set_fact:
+        generated_doc_sample_file: "{{ generated_doc_sample_local_file }}"
+    when: not is_solace_cloud
+
+  - name: save
+    copy:
+      content: "{{ result.facts | to_nice_yaml }}"
+      dest: "{{ working_dir }}/{{ generated_doc_sample_file }}"
+    delegate_to: localhost
+
+
+###
+# The End.

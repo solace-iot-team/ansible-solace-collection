@@ -15,6 +15,12 @@
 
 - name: First Run
   block:
+    - name: "Ensure Solace Cloud Service does not exist"
+      solace_cloud_service:
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+        name: "{{ sc_service.name }}"
+        state: absent
+
     - name: "Create Solace Cloud Service - No waiting"
       solace_cloud_service:
         api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"

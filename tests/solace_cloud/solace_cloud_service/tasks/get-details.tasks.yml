@@ -22,29 +22,6 @@
         dest: "{{ working_dir }}/facts.solace_cloud_service.{{ sc_service.name }}.details.json"
       delegate_to: localhost
 
-    - name: "Get Semp Management Endpoints for: {{ sc_service.name }}"
-      solace_cloud_get_facts:
-        from_dict: "{{ sc_service_details }}"
-        field_funcs:
-          - get_doesNotExist
-      register: _r
-      ignore_errors: yes
-    - assert:
-        that: _r.rc == 1 and 'field_funcs=get_doesNotExist' in _r.msg[1]
-
-    - name: "Get Semp Management Endpoints for: {{ sc_service.name }}"
-      solace_cloud_get_facts:
-        from_dict: "{{ sc_service_details }}"
-        field_funcs:
-          - get_serviceSEMPManagementEndpoints
-      register: semp_enpoints_facts
-
-    - name: "Save Solace Cloud Service SEMP Management Endpoints to File"
-      copy:
-        content: "{{ semp_enpoints_facts | to_nice_json }}"
-        dest: "{{ working_dir }}/facts.solace_cloud_service.{{ sc_service.name }}.semp.json"
-      delegate_to: localhost
-
     - name: "Get Host Inventory for: {{ sc_service.name }}"
       solace_cloud_get_facts:
         from_dict: "{{ sc_service_details }}"
@@ -66,14 +43,24 @@
         dest: "{{ working_dir }}/inventory.{{ sc_service.name }}.json"
       delegate_to: localhost
 
+    - name: "Save Solace Cloud Service inventory to File"
+      copy:
+        content: "{{ inv_results.facts.formattedHostInventory | to_nice_yaml }}"
+        dest: "{{ working_dir }}/inventory.{{ sc_service.name }}.yml"
+      delegate_to: localhost
+
+    - set_fact:
+        inventory_facts: "{{ inv_results.facts.formattedHostInventory.all.hosts[sc_service.name] }}"
+
     - name: "Set Fact: Solace Service SEMP for {{ sc_service.name }}"
       set_fact:
-        sempv2_host: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.host }}"
-        sempv2_port: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.port }}"
-        sempv2_is_secure_connection: True
-        sempv2_username: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.username }}"
-        sempv2_password: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.password }}"
-        sempv2_timeout: 60
+        sempv2_host: "{{ inventory_facts.sempv2_host }}"
+        sempv2_port: "{{ inventory_facts.sempv2_port }}"
+        sempv2_is_secure_connection: "{{ inventory_facts.sempv2_is_secure_connection }}"
+        sempv2_username: "{{ inventory_facts.sempv2_username }}"
+        sempv2_password: "{{ inventory_facts.sempv2_password }}"
+        sempv2_timeout: "{{ inventory_facts.sempv2_timeout }}"
+        vpn: "{{ inventory_facts.vpn }}"
 
     - name: "Gather Solace Facts from Service"
       solace_gather_facts:
@@ -101,9 +88,10 @@
     - name: "Get Facts: all client connection details"
       solace_get_facts:
         hostvars: "{{ hostvars }}"
-        host: "{{ inventory_hostname }}"
-        field_funcs:
-          - get_allClientConnectionDetails
+        hostvars_inventory_hostname: "{{ inventory_hostname }}"
+        msg_vpn: "{{ vpn }}"
+        get_functions:
+          - get_vpnClientConnectionDetails
       register: result
       # no_log: true
 

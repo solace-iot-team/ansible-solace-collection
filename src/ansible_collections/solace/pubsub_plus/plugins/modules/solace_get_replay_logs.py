@@ -12,19 +12,19 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: solace_get_queues
-short_description: get list of queues
+module: solace_get_replay_logs
+short_description: get list of replay logs
 description:
-- "Get a list of Queue objects."
+- "Get a list of Replay Log objects."
 notes:
-- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/getMsgVpnQueues"
-- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/queue/getMsgVpnQueues"
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/replayLog/getMsgVpnReplayLogs"
+- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/replayLog/getMsgVpnReplayLogs"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
 seealso:
-- module: solace_queue
+- module: solace_replay_log
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -36,33 +36,36 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-  solace_queue:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
-  solace_get_queues:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
+    solace_replay_log:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_get_replay_logs:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
 tasks:
-- name: create queue
-  solace_queue:
+- name: create or update replay log
+  solace_replay_log:
     name: foo
+    settings:
+      egressEnabled: true
+      ingressEnabled: true
+      maxSpoolUsage: 1
     state: present
 
 - name: get list config
-  solace_get_queues:
-    query_params:
-      where:
-      - "queueName==foo*"
+  solace_get_replay_logs:
   register: result
 
 - name: print result
@@ -72,14 +75,8 @@ tasks:
     - "{{ result.result_list_count }}"
 
 - name: get list monitor
-  solace_get_queues:
+  solace_get_replay_logs:
     api: monitor
-    query_params:
-      where:
-      - "queueName==foo*"
-      select:
-      - "queueName"
-      - "eventMsgSpoolUsageThreshold"
   register: result
 
 - name: print result
@@ -117,22 +114,17 @@ msg:
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetPagingTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceGetQueuesTask(SolaceBrokerGetPagingTask):
+class SolaceGetReplayLogsTask(SolaceBrokerGetPagingTask):
 
     def __init__(self, module):
         super().__init__(module)
 
-    def get_monitor_api_base(self) -> str:
-        return SolaceSempV2Api.API_BASE_SEMPV2_PRIVATE_MONITOR
-
     def get_path_array(self, params: dict) -> list:
-        # GET /msgVpns/{msgVpnName}/queues
-        # __private_monitor__
-        return ['msgVpns', params['msg_vpn'], 'queues']
+        # GET /msgVpns/{msgVpnName}/replayLogs
+        return ['msgVpns', params['msg_vpn'], 'replayLogs']
 
 
 def run_module():
@@ -148,7 +140,7 @@ def run_module():
         supports_check_mode=True
     )
 
-    solace_task = SolaceGetQueuesTask(module)
+    solace_task = SolaceGetReplayLogsTask(module)
     solace_task.execute()
 
 

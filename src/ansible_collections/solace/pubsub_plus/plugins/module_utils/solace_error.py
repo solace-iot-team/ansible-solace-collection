@@ -38,6 +38,11 @@ class SolaceParamsValidationError(Exception):
         super().__init__(f"arg '{param}={value}': {msg}")
 
 
+class SolaceFeatureNotSupportedError(Exception):
+    def __init__(self, feature):
+        super().__init__(f"feature: '{feature}")
+
+
 class SolaceError(Exception):
     def __init__(self, message, result_update: dict = None):
         self.message = message

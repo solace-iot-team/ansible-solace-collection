@@ -95,7 +95,7 @@
       file: "bridges.topology.yml"
       name: bridges_topology
   vars:
-      bridge_name: "ansible-solace__test_bridge"
+      bridge_name: "asct_test_bridge"
 
   tasks:
 
@@ -154,18 +154,23 @@
           remoteAuthenticationScheme: basic
         state: present
 
+    - set_fact:
+        remote_inventory_hostname: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_host }}"
+        remote_vpn: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+
     - name: "main: check the Remote Host Settings for the Bridge"
       debug:
         msg:
-          - "remote_host: {{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_host }}"
-          - "remote_vpn: {{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+          - "remote_host: {{ remote_inventory_hostname }}"
+          - "remote_vpn: {{ remote_vpn }}"
 
     - name: "main: solace_get_facts: get_bridge_remoteMsgVpnLocations"
       solace_get_facts:
         hostvars: "{{ hostvars }}"
-        host: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_host }}"
-        field_funcs:
-          - get_bridge_remoteMsgVpnLocations
+        hostvars_inventory_hostname: "{{ remote_inventory_hostname }}"
+        msg_vpn: "{{ remote_vpn }}"
+        get_functions:
+          - get_vpnBridgeRemoteMsgVpnLocations
       register: remote_host_bridge
 
     - name: "main: Print Remote Host Bridge Facts"
@@ -176,11 +181,11 @@
 
     - name: "main: solace_bridge_remote_vpn: add"
       solace_bridge_remote_vpn:
-        name: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+        name: "{{ remote_vpn }}"
         bridge_name: "{{ bridge_name }}"
         bridge_virtual_router: auto
         # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
-        remote_vpn_location: "{{ remote_host_bridge.facts.bridge_remoteMsgVpnLocations.plain }}"
+        remote_vpn_location: "{{ remote_host_bridge.facts.vpnBridgeRemoteMsgVpnLocations.plain }}"
         settings:
           enabled: false
           tlsEnabled: false
@@ -189,21 +194,21 @@
 
     - name: "main: solace_bridge_remote_vpn: queueBinding"
       solace_bridge_remote_vpn:
-        name: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+        name: "{{ remote_vpn }}"
         bridge_name: "{{ bridge_name }}"
         # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
-        remote_vpn_location: "{{ remote_host_bridge.facts.bridge_remoteMsgVpnLocations.plain }}"
+        remote_vpn_location: "{{ remote_host_bridge.facts.vpnBridgeRemoteMsgVpnLocations.plain }}"
         settings:
           queueBinding: "{{ bridge_name }}"
         state: present
 
     - name: "main: solace_bridge_remote_vpn: enable"
       solace_bridge_remote_vpn:
-        name: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+        name: "{{ remote_vpn }}"
         bridge_name: "{{ bridge_name }}"
         bridge_virtual_router: auto
         # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
-        remote_vpn_location: "{{ remote_host_bridge.facts.bridge_remoteMsgVpnLocations.plain }}"
+        remote_vpn_location: "{{ remote_host_bridge.facts.vpnBridgeRemoteMsgVpnLocations.plain }}"
         settings:
           enabled: true
         state: present
@@ -245,7 +250,7 @@
         api: monitor
         query_params:
           where:
-            - "remoteMsgVpnName=={{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+            - "remoteMsgVpnName=={{ remote_vpn }}"
           select:
             - bridgeName
             - remoteMsgVpnLocation
@@ -256,7 +261,7 @@
             - tlsEnabled
       register: result
       until:
-        - result.result_list[0].up == True
+        - result.result_list[0].data.up == True
       retries: 3
       delay: 5
     - assert:
@@ -267,8 +272,8 @@
     - name: "main: assert bridge remote vpn is up"
       assert:
         that:
-          - result.result_list[0].up == True
-        fail_msg: "lastConnectionFailureReason={{ result.result_list[0].lastConnectionFailureReason }}"
+          - result.result_list[0].data.up == True
+        fail_msg: "lastConnectionFailureReason={{ result.result_list[0].data.lastConnectionFailureReason }}"
 
     - name: "main: solace_get_bridges: until bridge is up"
       solace_get_bridges:
@@ -282,8 +287,8 @@
             - outboundState
       register: bridge_list
       until:
-        - bridge_list.result_list[0].inboundState == 'ready-in-sync'
-        - bridge_list.result_list[0].outboundState == 'ready'
+        - bridge_list.result_list[0].data.inboundState == 'ready-in-sync'
+        - bridge_list.result_list[0].data.outboundState == 'ready'
       retries: 3
       delay: 2
 
@@ -297,8 +302,8 @@
     - name: "main: assert bridge is up"
       assert:
         that:
-          - bridge_list.result_list[0].inboundState == 'ready-in-sync'
-          - bridge_list.result_list[0].outboundState == 'ready'
+          - bridge_list.result_list[0].data.inboundState == 'ready-in-sync'
+          - bridge_list.result_list[0].data.outboundState == 'ready'
 
   # Remove all the objects created
 
@@ -316,20 +321,20 @@
 
     - name: "main: solace_bridge_remote_vpn: remove queueBinding"
       solace_bridge_remote_vpn:
-        name: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+        name: "{{ remote_vpn }}"
         bridge_name: "{{ bridge_name }}"
         # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
-        remote_vpn_location: "{{ remote_host_bridge.facts.bridge_remoteMsgVpnLocations.plain }}"
+        remote_vpn_location: "{{ remote_host_bridge.facts.vpnBridgeRemoteMsgVpnLocations.plain }}"
         settings:
           queueBinding: ""
         state: present
 
     - name: "main: solace_bridge_remote_vpn: remove vpn"
       solace_bridge_remote_vpn:
-        name: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+        name: "{{ remote_vpn }}"
         bridge_name: "{{ bridge_name }}"
         # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
-        remote_vpn_location: "{{ remote_host_bridge.facts.bridge_remoteMsgVpnLocations.plain }}"
+        remote_vpn_location: "{{ remote_host_bridge.facts.vpnBridgeRemoteMsgVpnLocations.plain }}"
         state: absent
 
     - name: "main: solace_bridge: remove"

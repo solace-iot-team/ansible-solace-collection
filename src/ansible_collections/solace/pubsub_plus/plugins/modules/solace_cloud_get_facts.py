@@ -15,23 +15,14 @@ DOCUMENTATION = '''
 module: solace_cloud_get_facts
 short_description: get Solace Cloud service facts
 description:
-- Convenience functions to access Solace Cloud service facts gathered with M(solace_cloud_get_service).
+- Convenience functions to access Solace Cloud service facts gathered with M(solace_cloud_get_service) and returned by M(solace_cloud_service).
 options:
   from_dict:
-    description: The JSON object (dict) which holds the service facts.
+    description: >
+      The JSON object (dict) which holds the service facts.
+      Could be the result of M(solace_cloud_get_service) or M(solace_cloud_service) (state=present).
     required: True
     type: dict
-  field_funcs:
-    description: List of pre-built field functions that retrieve values from the 'from_dict'.
-    required: false
-    type: list
-    default: []
-    elements: str
-    suboptions:
-      get_serviceSEMPManagementEndpoints:
-        description: Retrieves the SEMP management endpoint.
-        type: str
-        required: no
   get_formattedHostInventory:
     description: >
         Get the facts formatted as a JSON host inventory.
@@ -53,6 +44,9 @@ options:
         required: true
 seealso:
 - module: solace_cloud_get_service
+- module: solace_cloud_service
+- module: solace_gather_facts
+- module: solace_get_facts
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -66,62 +60,37 @@ collections:
 tasks:
   - set_fact:
       api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
-      service_id: "the-service-id"
 
-  - name: "Get Service"
-    solace_cloud_get_service:
+  - name: get a list of all services in the account
+    solace_cloud_get_services:
       api_token: "{{ api_token }}"
-      service_id: "{{ service_id }}"
     register: result
 
-  - name: "Set Fact: Solace Service Details"
+  - name: save first service in list
     set_fact:
-      sc_service_details: "{{ result.response }}"
+      sc_service: "{{ result.result_list[0] }}"
 
-  - name: "Get Semp Management Endpoints"
-    solace_cloud_get_facts:
-      from_dict: "{{ sc_service_details }}"
-      field_funcs:
-        - get_serviceSEMPManagementEndpoints
-      register: semp_enpoints_facts
+  - name: get all details for first service in list
+    solace_cloud_get_service:
+      api_token: "{{ api_token }}"
+      service_id: "{{ sc_service.serviceId }}"
+    register: result
 
-  - name: "Save Solace Cloud Service SEMP Management Endpoints to File"
+  - name: save service details
+    set_fact:
+      sc_service_details: "{{ result.service }}"
+
+  - name: save details to file
     copy:
-      content: "{{ semp_enpoints_facts | to_nice_json }}"
-      dest: "./tmp/facts.solace_cloud_service.semp.json"
+      content: "{{ sc_service_details | to_nice_json }}"
+      dest: "./solace_cloud_service.{{ sc_service.name }}.details.json"
     delegate_to: localhost
 
-  - name: "Set Fact: Solace Service SEMP"
-    set_fact:
-      sempv2_host: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.host }}"
-      sempv2_port: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.port }}"
-      sempv2_is_secure_connection: True
-      sempv2_username: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.username }}"
-      sempv2_password: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.password }}"
-      sempv2_timeout: 60
-
-  - name: "Gather Solace Facts from Service"
-    solace_gather_facts:
-      host: "{{ sempv2_host }}"
-      port: "{{ sempv2_port }}"
-      secure_connection: "{{ sempv2_is_secure_connection }}"
-      username: "{{ sempv2_username }}"
-      password: "{{ sempv2_password }}"
-      timeout: "{{ sempv2_timeout }}"
-      solace_cloud_api_token: "{{ api_token }}"
-      solace_cloud_service_id: "{{ serviceId }}"
-
-  - name: "Save Solace Cloud Service Facts to File"
-    copy:
-      content: "{{ ansible_facts.solace | to_nice_json }}"
-      dest: "./tmp/solace_facts.solace_cloud_service.json"
-    delegate_to: localhost
-
-  - name: "Get Host Inventory"
+  - name: get host inventory for service
     solace_cloud_get_facts:
       from_dict: "{{ sc_service_details }}"
       get_formattedHostInventory:
-        host_entry: "{{ sc_service_name }}"
+        host_entry: "{{ sc_service.name }}"
         api_token: "{{ api_token }}"
         meta:
           service_name: "{{ sc_service_details.name }}"
@@ -130,12 +99,56 @@ tasks:
           serviceTypeId: "{{ sc_service_details.serviceTypeId}}"
           serviceClassId: "{{ sc_service_details.serviceClassId }}"
           serviceClassDisplayedAttributes: "{{ sc_service_details.serviceClassDisplayedAttributes }}"
-    register: inv_results
+    register: result
 
-  - name: "Save Solace Cloud Service inventory to File"
+  - name: save new service inventory to file
     copy:
-      content: "{{ inv_results.facts.formattedHostInventory | to_nice_json }}"
-      dest: "./tmp/inventory.{{ sc_service_name }}.json"
+      content: "{{ result.facts.formattedHostInventory | to_nice_yaml }}"
+      dest: "./inventory.{{ sc_service.name }}.yml"
+    delegate_to: localhost
+
+  - name: extract the service facts
+    set_fact:
+      inventory_facts: "{{ result.facts.formattedHostInventory.all.hosts[sc_service.name] }}"
+
+  - name: set semp connection facts
+    set_fact:
+      sempv2_host: "{{ inventory_facts.sempv2_host }}"
+      sempv2_port: "{{ inventory_facts.sempv2_port }}"
+      sempv2_is_secure_connection: "{{ inventory_facts.sempv2_is_secure_connection }}"
+      sempv2_username: "{{ inventory_facts.sempv2_username }}"
+      sempv2_password: "{{ inventory_facts.sempv2_password }}"
+      sempv2_timeout: "{{ inventory_facts.sempv2_timeout }}"
+      vpn: "{{ inventory_facts.vpn }}"
+
+  - name: gather facts for service
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ api_token }}"
+      solace_cloud_service_id: "{{ sc_service.serviceId }}"
+
+  - name: retrieve all client connection details
+    solace_get_facts:
+      hostvars: "{{ hostvars }}"
+      hostvars_inventory_hostname: "{{ inventory_hostname }}"
+      msg_vpn: "{{ vpn }}"
+      get_functions:
+        - get_allClientConnectionDetails
+    register: result
+
+  - name: save connection details
+    set_fact:
+      client_connection_details: "{{ result.facts }}"
+
+  - name: save connection details to file
+    copy:
+      content: "{{ client_connection_details | to_nice_json }}"
+      dest: "./facts.solace_cloud_service.{{ sc_service.name }}.client_connection_details.json"
     delegate_to: localhost
 '''
 
@@ -157,22 +170,46 @@ facts:
     description: The facts retrieved from the input.
     type: dict
     returned: success
+    sample:
+      get_formattedHostInventory:
+        all:
+            hosts:
+                asc_test_1:
+                    ansible_connection: local
+                    broker_type: solace_cloud
+                    meta:
+                        datacenterId: aws-ca-central-1a
+                        serviceClassDisplayedAttributes:
+                            Clients: '250'
+                            High Availability: HA Group
+                            Message Broker Tenancy: Dedicated
+                            Network Speed: 450 Mbps
+                            Network Usage: 50 GB per month
+                            Queues: '250'
+                            Storage: 25 GB
+                        serviceClassId: enterprise-250-nano
+                        serviceTypeId: enterprise
+                        service_id: 1n34cqfh9i7x
+                        service_name: asc_test_1
+                    sempv2_host: mr1n34cqfh9i8x.messaging.solace.cloud
+                    sempv2_is_secure_connection: true
+                    sempv2_password: hihqxxx92sa3bc2sphtp3nl
+                    sempv2_port: 943
+                    sempv2_timeout: '60'
+                    sempv2_username: asc_test_1-admin
+                    solace_cloud_service_id: 1n34cqfh9i7x
+                    virtual_router: primary
+                    vpn: asc_test_1
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceReadFactsTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_facts import SolaceCloudBrokerFacts
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError, SolaceParamsValidationError
 from ansible.module_utils.basic import AnsibleModule
-from urllib.parse import urlparse
-import json
-from json.decoder import JSONDecodeError
 
 
 class SolaceCloudGetFactsTask(SolaceReadFactsTask):
-
-    FIELD_FUNCS = [
-        "get_serviceSEMPManagementEndpoints"
-    ]
 
     def __init__(self, module):
         super().__init__(module)
@@ -184,13 +221,7 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
         if not isinstance(from_dict, dict):
             raise SolaceParamsValidationError("from_dict", type(from_dict), "invalid type, must be a dict")
 
-        # check state of service
-        service_state = self.get_field(from_dict, 'creationState')
-        if service_state != 'completed':
-            raise SolaceParamsValidationError("service creationState", service_state, "is not 'completed'")
-
-        has_get_funcs = self.validate_param_field_funcs(self.FIELD_FUNCS, params['field_funcs'])
-
+        has_get_funcs = False
         param_get_formattedHostInventory = params.get('get_formattedHostInventory', None)
         if param_get_formattedHostInventory:
             has_get_funcs = True
@@ -202,16 +233,18 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
         self.validate_params()
         params = self.get_module().params
         search_dict = params['from_dict']
-        field_funcs = params['field_funcs']
-        facts = dict()
-        if field_funcs and len(field_funcs) > 0:
-            for field_func in field_funcs:
-                field, value = self.call_dynamic_func(field_func, search_dict)
-                facts[field] = value
+        solaceCloudServiceFacts = SolaceCloudBrokerFacts(search_dict, None)
 
+        # check state of service
+        service_state = solaceCloudServiceFacts.get_field(search_dict, 'creationState')
+        if service_state != 'completed':
+            raise SolaceParamsValidationError("service creationState", service_state, "is not 'completed'")
+
+        facts = dict()
         param_get_formattedHostInventory = params['get_formattedHostInventory']
         if param_get_formattedHostInventory:
-            field, value = self.get_formattedHostInventory(search_dict,
+            field, value = self.get_formattedHostInventory(solaceCloudServiceFacts,
+                                                           search_dict,
                                                            param_get_formattedHostInventory['host_entry'],
                                                            param_get_formattedHostInventory['api_token'],
                                                            param_get_formattedHostInventory['meta'])
@@ -221,24 +254,34 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
         result['facts'] = facts
         return None, result
 
-    def get_formattedHostInventory(self, search_dict: dict, host_entry: str, api_token: str = None, meta: dict = None):
-        _eps_field, eps_val = self.get_serviceSEMPManagementEndpoints(search_dict)
+    def get_formattedHostInventory(self,
+                                   solace_cloud_service_facts: SolaceCloudBrokerFacts,
+                                   search_dict: dict,
+                                   host_entry: str,
+                                   api_token: str = None,
+                                   meta: dict = None):
         inv = dict(
             all=dict()
         )
         hosts = dict()
+
+        secured_semp_details = solace_cloud_service_facts.get_semp_client_connection_details()
+        msg_vpn_attributes = solace_cloud_service_facts.get_msg_vpn_attributes()
+        # import logging, json
+        # logging.debug(f"secured_semp_details=\n{secured_semp_details}")
+        # logging.debug(f"msg_vpn_attributes=\n{msg_vpn_attributes}")
         hosts[host_entry] = {
             'meta': meta,
             'ansible_connection': 'local',
             'broker_type': 'solace_cloud',
             'solace_cloud_service_id': search_dict['serviceId'],
-            'sempv2_host': eps_val['SEMP']['SecuredSEMP']['uriComponents']['host'],
-            "sempv2_port": eps_val['SEMP']['SecuredSEMP']['uriComponents']['port'],
+            'sempv2_host': secured_semp_details['secured']['uri_components']['host'],
+            "sempv2_port": secured_semp_details['secured']['uri_components']['port'],
             "sempv2_is_secure_connection": True,
-            "sempv2_username": eps_val['SEMP']['username'],
-            "sempv2_password": eps_val['SEMP']['password'],
+            "sempv2_username": secured_semp_details['authentication']['username'],
+            "sempv2_password": secured_semp_details['authentication']['password'],
             "sempv2_timeout": "60",
-            "vpn": self.get_vpn(search_dict),
+            "vpn": msg_vpn_attributes['msgVpn'],
             "virtual_router": "primary"
         }
         if api_token:
@@ -247,79 +290,10 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
         inv['all']['hosts'] = hosts
         return 'formattedHostInventory', inv
 
-    def get_serviceSEMPManagementEndpoints(self, search_dict: dict):
-        eps = dict(
-            SEMP=dict(
-                SecuredSEMP=dict()
-            )
-        )
-        mgmt_protocols_dict = self.get_field(search_dict, 'managementProtocols')
-        if mgmt_protocols_dict is None:
-            raise SolaceError("Could not find 'managementProtocols' in 'from_dict'.")
-        semp_dict = self.get_nested_dict(mgmt_protocols_dict, field="name", value='SEMP')
-        if semp_dict is None:
-            raise SolaceError("Could not find 'name=SEMP' in 'managementProtocols' in 'from_dict'.")
-        sec_semp_end_point_dict = self.get_protocol_endpoint(semp_dict, field='name', value='Secured SEMP Config')
-        sec_semp_uri = self.get_protocol_endpoint_uri(sec_semp_end_point_dict)
-        t = urlparse(sec_semp_uri)
-        sec_semp_protocol = t.scheme
-        sec_semp_host = t.hostname
-        sec_semp_port = t.port
-        # put the dict together
-        sec_semp = dict()
-        sec_semp_ucs = dict()
-        sec_semp_ucs['protocol'] = sec_semp_protocol
-        sec_semp_ucs['host'] = sec_semp_host
-        sec_semp_ucs['port'] = sec_semp_port
-        sec_semp['uriComponents'] = sec_semp_ucs
-        sec_semp['uri'] = sec_semp_uri
-        eps['SEMP']['SecuredSEMP'] = sec_semp
-        eps['SEMP']['username'] = semp_dict['username']
-        eps['SEMP']['password'] = semp_dict['password']
-        return 'serviceManagementEndpoints', eps
-
-    def get_vpn(self, search_dict: dict) -> str:
-        vpn_attributes = search_dict.get('msgVpnAttributes', None)
-        if not vpn_attributes:
-            raise SolaceError(f"Could not find 'msgVpnAttributes' in dict:{search_dict}.")
-        vpn_name = vpn_attributes.get('vpnName', None)
-        if not vpn_name:
-            raise SolaceError(f"Could not find 'vpnName' in dict:{search_dict}.")
-        return vpn_name
-
-    def get_protocol_endpoint(self, search_dict: dict, field: str, value: str):
-        element = 'endPoints'
-        if element not in search_dict:
-            raise SolaceError(f"Could not find '{element}' in dict:{search_dict}.")
-        end_points = search_dict[element]
-        if len(end_points) == 0:
-            raise SolaceError(f"Empty list:'{element}' in dict:{search_dict}.")
-        end_point_dict = self.get_nested_dict(end_points, field, value)
-        if end_point_dict is None:
-            raise SolaceError(f"Could not find end point with '{field}={value}'.")
-        return end_point_dict
-
-    def get_protocol_endpoint_uri(self, search_dict: dict):
-        element = 'uris'
-        if element not in search_dict:
-            errs = [
-                f"Could not find '{element}' in end point:",
-                f"{json.dumps(search_dict)}"
-            ]
-            raise SolaceError(errs)
-        if len(search_dict['uris']) != 1:
-            errs = [
-                f"'{element}' list contains != 1 elements in end point:",
-                f"{json.dumps(search_dict)}"
-            ]
-            raise SolaceError(errs)
-        return search_dict['uris'][0]
-
 
 def run_module():
     module_args = dict(
         from_dict=dict(type='dict', required=True),
-        field_funcs=dict(type='list', required=False, elements='str'),
         get_formattedHostInventory=dict(type='dict',
                                         required=False,
                                         default=None,

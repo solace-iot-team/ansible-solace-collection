@@ -24,11 +24,12 @@ testsBaseDir="$PROJECT_HOME/tests"
 localBrokerInventoryFile="$PROJECT_HOME/test-runner/files/local.broker.inventory.yml"
 localBrokerDockerComposeFile="$PROJECT_HOME/test-runner/files/PubSubStandard_singleNode.yml"
 solaceCloudAccountInventoryFile="$PROJECT_HOME/test-runner/files/solace-cloud-account.inventory.yml"
+# removed from testing
+# "solace/solace-pubsub-standard:9.3.1.28"
+# "solace/solace-pubsub-standard:9.5.0.30"
+# "solace/solace-pubsub-standard:9.7.0.29"
 brokerDockerImages=(
-  # "solace/solace-pubsub-standard:9.3.1.28"
-  # "solace/solace-pubsub-standard:9.5.0.30"
-  "solace/solace-pubsub-standard:9.6.0.38"
-  "solace/solace-pubsub-standard:9.7.0.29"
+  "solace/solace-pubsub-standard:9.6.0.46"
   "solace/solace-pubsub-standard:9.8.0.12"
   "solace/solace-pubsub-standard:latest"
 )
@@ -105,7 +106,8 @@ ansibleSolaceTestTargetGroup="single_broker"
   export BROKER_TYPE="solace_cloud"
   export INVENTORY_FILE=$solaceCloudAccountInventoryFile
   export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
-  export TEARDOWN_SOLACE_CLOUD=False # keep it for next test
+  # export TEARDOWN_SOLACE_CLOUD=False # keep it for next test
+  export TEARDOWN_SOLACE_CLOUD=True
 
   echo "##############################################################################################################"
   echo "# test target group: $ansibleSolaceTestTargetGroup(solace_cloud)"
@@ -156,8 +158,7 @@ ansibleSolaceTestTargetGroup="solace_cloud"
   mkdir -p $LOG_DIR
 
   export SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE=$solaceCloudAccountInventoryFile
-  # test only
-  # export TEARDOWN_SOLACE_CLOUD=False
+  export TEARDOWN_SOLACE_CLOUD=True
 
   runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
   $runScript
@@ -174,8 +175,7 @@ ansibleSolaceTestTargetGroup="dmr"
   mkdir -p $LOG_DIR
 
   export SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE=$solaceCloudAccountInventoryFile
-  # test only
-  # export TEARDOWN_SOLACE_CLOUD=False
+  export TEARDOWN_SOLACE_CLOUD=True
 
   runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
   $runScript

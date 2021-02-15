@@ -9,6 +9,10 @@
   any_errors_fatal: true
   collections:
     - solace.pubsub_plus
+  pre_tasks:
+  - include_vars:
+      file: "solace-cloud-service.vars.yml"
+      name: sc_services
   tasks:
     - name: "Check vars"
       set_fact:
@@ -20,7 +24,7 @@
     - name: "ex_2: update service"
       solace_cloud_service:
         api_token: "{{ api_token }}"
-        name: asc_test_1
+        name: "{{ sc_services.solace_cloud_services[1].name }}"
         settings:
           msgVpnName: change_me
           datacenterId: "aws-ca-central-1a"
@@ -30,12 +34,17 @@
       register: result
       ignore_errors: yes
     - assert:
-        that: result.rc == 1 and 'Solace Cloud Service \'name=asc_test_1\' already exists' in result.msg | string and result.delta.msgVpnName == 'change_me'
+        that:
+          - result.rc==1
+          - "'Solace Cloud Service' in result.msg|string"
+          - "'{{ sc_services.solace_cloud_services[1].name }}' in result.msg|string"
+          - "'already exists' in result.msg|string"
+          - result.delta.msgVpnName == 'change_me'
 
     - name: "ex_2: Delete by service_id & name - service_id takes precedence"
       solace_cloud_service:
         api_token: "{{ api_token }}"
-        name: asc_test_1
+        name: "{{ sc_services.solace_cloud_services[1].name }}"
         service_id: "xxxxx"
         state: absent
       register: result

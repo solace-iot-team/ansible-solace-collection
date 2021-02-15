@@ -1,0 +1,65 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "generate solace cloud inventory for existing service"
+  hosts: localhost
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  tasks:
+  - name: "Check vars"
+    assert:
+      that:
+        - SOLACE_CLOUD_API_TOKEN is defined
+        - WORKING_DIR is defined
+        - SOLACE_CLOUD_SERVICE_ID is defined
+        - GENERATED_INVENTORY_FILE_NAME is defined
+      fail_msg: "one or more variables not defined"
+
+  - name: "ensure WORKING_DIR exists"
+    file:
+      path: "{{ WORKING_DIR }}"
+      state: directory
+    delegate_to: localhost
+
+  - name: "solace_cloud_get_service"
+    solace_cloud_get_service:
+      api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+      service_id: "{{ SOLACE_CLOUD_SERVICE_ID }}"
+    register: result
+  - set_fact:
+      sc_service: "{{ result.service }}"
+
+  # - name: "save solace_cloud_get_service to json"
+  #   copy:
+  #     content: "{{ sc_service | to_nice_json }}"
+  #     dest: "{{ WORKING_DIR }}/solace_cloud_broker.service.json"
+  #   changed_when: false
+  #   delegate_to: localhost
+
+
+  - name: "Get Solace Cloud Service Inventory"
+    solace_cloud_get_facts:
+      from_dict: "{{ sc_service }}"
+      get_formattedHostInventory:
+        host_entry: "{{ sc_service.name }}"
+        meta:
+          service_name: "{{ sc_service.name }}"
+          sc_service_id: "{{ sc_service.serviceId }}"
+          datacenterId: "{{ sc_service.datacenterId }}"
+          serviceTypeId: "{{ sc_service.serviceTypeId}}"
+          serviceClassId: "{{ sc_service.serviceClassId }}"
+          serviceClassDisplayedAttributes: "{{ sc_service.serviceClassDisplayedAttributes }}"
+    register: result
+
+  - name: "Save Solace Cloud Service Inventory to File"
+    copy:
+      content: "{{ result.facts.formattedHostInventory | to_nice_yaml }}"
+      dest: "{{ WORKING_DIR }}/{{ GENERATED_INVENTORY_FILE_NAME }}"
+    changed_when: false
+    delegate_to: localhost
+
+###
+# The End.

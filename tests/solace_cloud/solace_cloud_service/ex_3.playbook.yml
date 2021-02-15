@@ -83,7 +83,10 @@
       register: result
       ignore_errors: yes
     - assert:
-        that: result.rc == 1 and 'already exists' in result.msg | string and result.delta.msgVpnName == 'asc_test_1-update'
+        that:
+          - result.rc==1
+          - "'already exists' in result.msg|string"
+          - "result.delta.msgVpnName == '{{ sc_service.msgVpnName}}-update'"
 
     - name: "ex_3: Update Ports"
       solace_cloud_service:

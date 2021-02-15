@@ -6,7 +6,7 @@ __metaclass__ = type
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError, SolaceError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudServiceConfig, SolaceTaskSolaceCloudConfig
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceApi, SolaceSempV2Api, SolaceCloudApi, SolaceSempV2PagingGetApi
 from ansible.module_utils.basic import AnsibleModule
@@ -77,6 +77,10 @@ class SolaceTask(object):
             msg = ["module arg validation failed", str(e)]
             result = self.create_result(rc=1, changed=False)
             self.module.exit_json(msg=msg, **result)
+        except SolaceFeatureNotSupportedError as e:
+            msg = ["Feature currently not supported. Pls raise an new feature request if required.", str(e)]
+            result = self.create_result(rc=1, changed=False)
+            self.module.exit_json(msg=msg, **result)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
             # logging.debug("Request Error: %s", str(e))
             result = self.create_result(rc=1, changed=self.changed)
@@ -93,12 +97,12 @@ class SolaceReadFactsTask(SolaceTask):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
 
-    def validate_param_field_funcs(self, valid_field_funcs: list, param_field_funcs: list) -> bool:
-        if param_field_funcs and len(param_field_funcs) > 0:
-            for field_func in param_field_funcs:
-                exists = (True if field_func in valid_field_funcs else False)
+    def validate_param_get_functions(self, valid_get_funcs: list, param_get_funcs: list) -> bool:
+        if param_get_funcs and len(param_get_funcs) > 0:
+            for get_func in param_get_funcs:
+                exists = (True if get_func in valid_get_funcs else False)
                 if not exists:
-                    raise SolaceParamsValidationError("field_funcs", field_func, f"unknown, valid field functions are: {valid_field_funcs}.")
+                    raise SolaceParamsValidationError("unknown get_function", get_func, f"valid get functions are: {valid_get_funcs}")
             return True
         return False
 
@@ -108,35 +112,17 @@ class SolaceReadFactsTask(SolaceTask):
         except AttributeError as e:
             raise SolaceInternalError(f"function '{func_name}' not found") from e
 
-    def get_field(self, search_object, field: str):
-        if isinstance(search_object, dict):
-            if field in search_object:
-                return search_object[field]
-            for key in search_object:
-                item = self.get_field(search_object[key], field)
-                if item:
-                    return item
-        elif isinstance(search_object, list):
-            for element in search_object:
-                item = self.get_field(element, field)
-                if item:
-                    return item
-        return None
 
-    def get_nested_dict(self, search_object, field: str, value: str):
-        if isinstance(search_object, dict):
-            if field in search_object and search_object[field] == value:
-                return search_object
-            for key in search_object:
-                item = self.get_nested_dict(search_object[key], field, value)
-                if item:
-                    return item
-        elif isinstance(search_object, list):
-            for element in search_object:
-                item = self.get_nested_dict(element, field, value)
-                if item:
-                    return item
-        return None
+class SolaceBrokerActionTask(SolaceTask):
+    def __init__(self, module: AnsibleModule):
+        super().__init__(module)
+        self.config = SolaceTaskBrokerConfig(module)
+
+    def get_config(self) -> SolaceTaskBrokerConfig:
+        return self.config
+
+    def get_args(self) -> list:
+        raise SolaceInternalErrorAbstractMethod()
 
 
 class SolaceCRUDTask(SolaceTask):
@@ -276,6 +262,9 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
     def get_sempv2_get_paging_api(self) -> SolaceSempV2Api:
         return self.sempv2_get_paging_api
 
+    def get_monitor_api_base(self) -> str:
+        return SolaceSempV2Api.API_BASE_SEMPV2_MONITOR
+
     def get_path_array(self, params: dict) -> list:
         raise SolaceInternalErrorAbstractMethod()
 
@@ -283,7 +272,7 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
         params = self.get_config().get_params()
         api = params['api']
         query_params = params['query_params']
-        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, self.get_path_array(params), query_params)
+        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, self.get_path_array(params), query_params, self.get_monitor_api_base)
         result = self.create_result_with_list(objects)
         return None, result
 

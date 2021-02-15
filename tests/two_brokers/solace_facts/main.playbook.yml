@@ -48,73 +48,71 @@
       debug:
         msg: "msg vpns={{ ansible_facts.solace.about.user.msgVpns }}"
 
-    - name: "Get Host SMF Messaging Endpoints Facts: local"
+    - name: "others:solace_get_facts:get all"
       solace_get_facts:
         hostvars: "{{ hostvars }}"
-        host: "{{ inventory_hostname }}"
-        field_funcs:
-          - get_serviceSMFMessagingEndpoints
-      register: local_smf_enpoints_facts
-      when: broker_type == "local"
-
-    - name: "Get Host SMF Messaging Endpoints Facts: solace_cloud"
-      solace_get_facts:
-        hostvars: "{{ hostvars }}"
-        host: "{{ inventory_hostname }}"
-        field_funcs:
-          - get_serviceSMFMessagingEndpoints
-      register: solace_cloud_smf_enpoints_facts
-      when: broker_type == "solace_cloud"
-
-    - name: "Get Host Service Facts: local"
-      solace_get_facts:
-        hostvars: "{{ hostvars }}"
-        host: "{{ inventory_hostname }}"
-        field_funcs:
-          - get_serviceSmfPlainTextListenPort
-          - get_serviceSmfCompressionListenPort
-          - get_serviceSmfTlsListenPort
-          - get_virtualRouterName
-      register: local_service_facts
-      when: broker_type == "local"
-
-    - name: "Get Host Service Facts: solace_cloud"
-      solace_get_facts:
-        hostvars: "{{ hostvars }}"
-        host: "{{ inventory_hostname }}"
-        field_funcs:
-          - get_serviceSmfPlainTextListenPort
-          - get_serviceSmfCompressionListenPort
-          - get_serviceSmfTlsListenPort
-          - get_virtualRouterName
-      register: solace_cloud_service_facts
-      when: broker_type == "solace_cloud"
-
-    - name: "Show Host Service Facts"
+        hostvars_inventory_hostname: "{{ inventory_hostname }}"
+        msg_vpn: "{{ vpn }}"
+        get_functions:
+          - get_vpnClientConnectionDetails
+          - get_serviceTrustStoreDetails
+          - get_serviceVirtualRouterName
+          - get_vpnBridgeRemoteMsgVpnLocations
+          - get_vpnAttributes
+      register: result
+    - name: "others:save to file:all"
+      copy:
+        content: "{{ result.facts | to_nice_yaml }}"
+        dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.all.yml"
+      delegate_to: localhost
+    - name: "others:save to file:all"
+      copy:
+        content: "{{ result.facts | to_nice_json }}"
+        dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.all.json"
+      delegate_to: localhost
+    - name: "others:print results.facts:all"
       debug:
         msg:
-          - "local_service_facts:"
-          - "{{ local_service_facts }}"
-          - "{{ local_smf_enpoints_facts }}"
-          - "solace_cloud_service_facts:"
-          - "{{ solace_cloud_service_facts }}"
-          - "{{ solace_cloud_smf_enpoints_facts }}"
+          - "result.facts="
+          - "{{ result.facts }}"
+    - assert:
+        that:
+          - result.facts.serviceVirtualRouterName is defined
+          - result.facts.serviceTrustStoreDetails is defined
+          - result.facts.vpnBridgeRemoteMsgVpnLocations is defined
+          - result.facts.vpnClientConnectionDetails is defined
+          - result.facts.vpnAttributes is defined
 
-    - name: "Get Host Bridge Facts: local"
-      solace_get_facts:
-        hostvars: "{{ hostvars }}"
-        host: local_broker
-        field_funcs:
-          - get_bridge_remoteMsgVpnLocations
-      register: local_bridge
 
-    - name: "Get Host Bridge Facts: {{sc_service.name}}"
-      solace_get_facts:
-        hostvars: "{{ hostvars }}"
-        host: ansible_solace_test_broker
-        field_funcs:
-          - get_bridge_remoteMsgVpnLocations
-      register: solace_cloud_bridge
+    - name: "solace_get_facts:get_dmrClusterConnectionDetails"
+      block:
+        - name: "solace_get_facts:get_dmrClusterConnectionDetails"
+          solace_get_facts:
+            hostvars: "{{ hostvars }}"
+            hostvars_inventory_hostname: "{{ inventory_hostname }}"
+            msg_vpn: "{{ vpn }}"
+            get_functions:
+              - get_serviceDmrClusterConnectionDetails
+          register: result
+        - name: "save to file:all"
+          copy:
+            content: "{{ result.facts | to_nice_yaml }}"
+            dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.dmrClusterConnectionDetails.yml"
+          delegate_to: localhost
+        - name: "save to file:all"
+          copy:
+            content: "{{ result.facts | to_nice_json }}"
+            dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.dmrClusterConnectionDetails.json"
+          delegate_to: localhost
+        - name: "print results.facts:dmrClusterConnectionDetails"
+          debug:
+            msg:
+              - "result.facts="
+              - "{{ result.facts }}"
+        - assert:
+            that:
+              - result.facts.serviceDmrClusterConnectionDetails is defined
+      when: broker_type == 'solace_cloud'
 
 ###
 # The End.

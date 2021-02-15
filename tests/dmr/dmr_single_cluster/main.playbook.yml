@@ -118,17 +118,18 @@
     - name: "main: solace_gather_facts"
       solace_gather_facts:
 
-    - name: "main: solace_get_facts: get_dmrClusterConnectionDetails"
+    - name: "main: solace_get_facts: get_serviceDmrClusterConnectionDetails"
       solace_get_facts:
         hostvars: "{{ hostvars }}"
-        host: "{{ inventory_hostname }}"
-        field_funcs:
-          - get_dmrClusterConnectionDetails
+        hostvars_inventory_hostname: "{{ inventory_hostname }}"
+        msg_vpn: "{{ vpn }}"
+        get_functions:
+          - get_serviceDmrClusterConnectionDetails
       register: result
     - set_fact:
-        dmr_cluster_connection_details: "{{ result.facts.dmrClusterConnectionDetails }}"
+        dmr_cluster_connection_details: "{{ result.facts.serviceDmrClusterConnectionDetails }}"
     - set_fact:
-        dmr_cluster_name: "{{ dmr_cluster_connection_details.name }}"
+        dmr_cluster_name: "{{ dmr_cluster_connection_details.clusterName }}"
         dmr_cluster_password: "{{ dmr_cluster_connection_details.password }}"
 
     - name: "main: save dmr_cluster_connection_details for {{ inventory_hostname }}"
@@ -186,7 +187,7 @@
 
     - name: "main: solace_dmr_cluster_link: delete all"
       solace_dmr_cluster_link:
-        remote_node_name: "{{ item.remoteNodeName }}"
+        remote_node_name: "{{ item.data.remoteNodeName }}"
         dmr_cluster_name: "{{ dmr_cluster_name }}"
         state: absent
       loop: "{{ result.result_list }}"
@@ -246,7 +247,7 @@
           - result.rc == 0
           - result.result_list | length == 1
           - result.result_list_count == 1
-          - result.result_list[0].up
+          - result.result_list[0].data.up
 
     - name: "main: call delete ext-link tasks"
       include_tasks: ./tasks/delete.ext-link.tasks.yml

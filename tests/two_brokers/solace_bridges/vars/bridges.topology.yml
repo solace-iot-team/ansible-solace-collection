@@ -1,17 +1,18 @@
 ---
   bridges:
-    ansible-solace__test_bridge:
+    asct_test_bridge:
       # Notes:
       # - the hosts and remote_hosts
       #   must be the same name as in the main inventory
       # - bridges always come in pairs and reference each other
       local_broker:
-        remote_host: ansible_solace_test_broker
-        remote_vpn: as_test_broker
-      ansible_solace_test_broker:
+        remote_host: asct_two_brokers
+        remote_vpn: asct_two_brokers
+      asct_two_brokers:
         remote_host: local_broker
         remote_vpn: default
 
+    # unused
     another_bridge:
       host_3:
         remote_host: host_4

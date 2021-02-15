@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
@@ -13,70 +13,73 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_facts
-short_description: get facts from ansible_facts.solace
+short_description: get facts for a broker/vpn
 description:
 - Provides convenience functions to access solace facts retrieved from broker service using M(solace_gather_facts) from 'ansible_facts.solace'.
 notes:
 - In order to access other hosts' facts (other than the current 'inventory_host'), you must not use the 'serial' strategy for the playbook.
 options:
   hostvars:
-    description: The playbook's 'hostvars'.
+    description:
+    - "The playbook's 'hostvars'. Contains all facts for all hosts / brokers."
+    - "Always set to: 'hostvars: \\"{{ hostvars }}\\""
     required: True
     type: dict
-  host:
-    description: The playbook host to retrieve the facts from.
+  hostvars_inventory_hostname:
+    description: The 'inventory_hostname', i.e. the playbook's host, to retrieve the facts from as available in 'hostvars'.
     required: True
     type: str
   msg_vpn:
-    description: The message vpn.
+    description:
+    - The message vpn of the broker to retrieve the facts from.
+    - Only required for certain 'get_functions' if more than 1 Vpn exists.
+    - Can be omitted if only 1 Vpn exists.
     required: False
     type: str
-  field_funcs:
-    description: List of pre-built field functions that retrieve values from hostvars.
+  get_functions:
+    description: List of pre-built functions that retrieve data for the 'hostvars_inventory_hostname'/'msg_vpn' data in 'hostvars'.
     required: False
     type: list
     default: []
     elements: str
     suboptions:
-        get_serviceSmfPlainTextListenPort:
-            description: Retrieve the smf plain listen port
+        get_vpnClientConnectionDetails:
+            description:
+            - Retrieve all enabled client connection details for the various protocols for the service/broker.
+            - Requires 'msg_vpn' parameter if more than 1 Vpn exists.
             type: str
             required: no
-        get_serviceSmfCompressionListenPort:
-            description: Retrieve the smf compressed listen port
-            type: str
-            required: no
-        get_serviceSmfTlsListenPort:
-            description: Retrieve the smf tls listen port
-            type: str
-            required: no
-        get_virtualRouterName:
-            description: Retrieve the virtual router name
-            type: str
-            required: no
-        get_serviceSMFMessagingEndpoints:
-            description: Retrieve the all smf messaging endpoints
-            type: str
-            required: no
-        get_bridge_remoteMsgVpnLocations:
+        get_vpnBridgeRemoteMsgVpnLocations:
             description:
             - "Retrieve enabled remote message vpn locations (plain, secured, compressed) for the service/broker."
+            - Requires 'msg_vpn' parameter if more than 1 Vpn exists.
             - "For Solace Cloud: {hostname}:{port}."
             - "For broker: v:{virtualRouterName}."
             type: str
             required: no
-        get_allClientConnectionDetails:
+        get_vpnAttributes:
             description:
-            - "Retrieve all enabled client connection details for the various protocols for the service/broker."
+            - Retrieve attributes of the message Vpn.
+            - Requires 'msg_vpn' parameter if more than 1 Vpn exists.
             type: str
             required: no
-        get_dmrClusterConnectionDetails:
+        get_serviceTrustStoreDetails:
+            description: Retrieve the URI for to download client certificates if enabled.
+            type: str
+            required: no
+        get_serviceVirtualRouterName:
+            description: Retrieve the virtual router name.
+            type: str
+            required: no
+        get_serviceDmrClusterConnectionDetails:
             description:
-            - "Retrieve all DMR cluster connection details for the service/broker."
+            - Retrieve DMR cluster connection details for the service/broker.
+            - "Note: Currently only supports Solace Cloud services."
             type: str
             required: no
 seealso:
 - module: solace_gather_facts
+- module: solace_cloud_get_facts
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -95,30 +98,51 @@ module_defaults:
     username: "{{ sempv2_username }}"
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
-    solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+    solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
     solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-
 tasks:
 - name: Gather Solace Facts
   solace_gather_facts:
 
-- name: "Get Host SMF Messaging Endpoints Facts: solace-cloud-1"
+- name: get_vpnClientConnectionDetails
   solace_get_facts:
-    hostvars: "{{ hostvars }}"
-    # solace-cloud-1 is a host in the inventory
-    host: solace-cloud-1
-    field_funcs:
-    - get_serviceSMFMessagingEndpoints
-    - get_serviceSmfPlainTextListenPort
-    - get_serviceSmfCompressionListenPort
-    - get_serviceSmfTlsListenPort
-    - get_virtualRouterName
-  register: results
+    hostvars: "{{ hostvars }}" # always use this setting
+    hostvars_inventory_hostname: "{{ inventory_hostname }}"
+    msg_vpn: "{{ vpn }}"
+    get_functions:
+      - get_vpnClientConnectionDetails
+  register: result
 
-- name: print results
+- name: save to yaml file
+  copy:
+    content: "{{ result.facts | to_nice_yaml }}"
+    dest: "./vpnClientConnectionDetails.yml"
+  delegate_to: localhost
+
+- name: print
   debug:
     msg:
-    - "{{ results.facts }}"
+      - "result.facts="
+      - "{{ result.facts }}"
+
+- name: get other facts
+  solace_get_facts:
+    hostvars: "{{ hostvars }}"
+    hostvars_inventory_hostname: "{{ inventory_hostname }}"
+    msg_vpn: "{{ vpn }}"
+    get_functions:
+      - get_vpnBridgeRemoteMsgVpnLocations
+      - get_vpnAttributes
+      - get_serviceTrustStoreDetails
+      - get_serviceVirtualRouterName
+      - get_serviceDmrClusterConnectionDetails
+  register: result
+
+- name: print
+  debug:
+    msg:
+      - "result.facts="
+      - "{{ result.facts }}"
 '''
 
 RETURN = '''
@@ -128,11 +152,282 @@ facts:
     returned: success
     elements: dict
     sample:
-        facts:
-            serviceSmfCompressionListenPort: 55003
-            serviceSmfPlainTextListenPort: 55555
-            serviceSmfTlsListenPort: 55443
-            virtualRouterName: "single-aws-eu-west-6e-4ftdf"
+        solace_cloud:
+            serviceDmrClusterConnectionDetails:
+                clusterName: cluster-aws-ca-central-1a-1oqbbo5q53bt
+                password: ia48anu4ru6qhmopopmrgacs9v
+                primaryRouterName: pri-aws-ca-central-1a-1oqbbo5q53bt
+                remoteAddress: mr1oqbbo5q53bt.messaging.solace.cloud
+            serviceTrustStoreDetails:
+                enabled: true
+                uri: https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/root/DigiCert_Global_Root_CA.pem
+            serviceVirtualRouterName: pri-aws-ca-central-1a-1oqbbo5q53bt
+            vpnAttributes:
+                msgVpn: asc_test_120
+            vpnBridgeRemoteMsgVpnLocations:
+                compressed: mr1oqbbo5q53bt.messaging.solace.cloud:55003
+                enabled: true
+                plain: mr1oqbbo5q53bt.messaging.solace.cloud:55555
+                secured: mr1oqbbo5q53bt.messaging.solace.cloud:55443
+            vpnClientConnectionDetails:
+                AMQP:
+                    authentication:
+                        password: m35lqpr8h5hgtbknq1e1lvdj5d
+                        username: solace-cloud-client
+                    compressed:
+                        enabled: false
+                        uri: null
+                        uri_components: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: amqp://mr1oqbbo5q53bt.messaging.solace.cloud:5672
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 5672
+                            protocol: amqp
+                    secured:
+                        enabled: true
+                        uri: amqps://mr1oqbbo5q53bt.messaging.solace.cloud:5671
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 5671
+                            protocol: amqps
+                    ws_plain: null
+                    ws_secured: null
+                JMS:
+                    authentication:
+                        password: m35lqpr8h5hgtbknq1e1lvdj5d
+                        username: solace-cloud-client
+                    compressed:
+                        enabled: false
+                        uri: null
+                        uri_components: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: smf://mr1oqbbo5q53bt.messaging.solace.cloud:55555
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 55555
+                            protocol: smf
+                    secured:
+                        enabled: true
+                        uri: smfs://mr1oqbbo5q53bt.messaging.solace.cloud:55443
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 55443
+                            protocol: smfs
+                    ws_plain: null
+                    ws_secured: null
+                MQTT:
+                    authentication:
+                        password: m35lqpr8h5hgtbknq1e1lvdj5d
+                        username: solace-cloud-client
+                    compressed:
+                        enabled: false
+                        uri: null
+                        uri_components: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: tcp://mr1oqbbo5q53bt.messaging.solace.cloud:1883
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 1883
+                            protocol: tcp
+                    secured:
+                        enabled: true
+                        uri: ssl://mr1oqbbo5q53bt.messaging.solace.cloud:8883
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 8883
+                            protocol: ssl
+                    ws_plain: null
+                    ws_secured: null
+                REST:
+                    authentication:
+                        password: m35lqpr8h5hgtbknq1e1lvdj5d
+                        username: solace-cloud-client
+                    compressed:
+                        enabled: false
+                        uri: null
+                        uri_components: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: http://mr1oqbbo5q53bt.messaging.solace.cloud:9000
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 9000
+                            protocol: http
+                    secured:
+                        enabled: true
+                        uri: https://mr1oqbbo5q53bt.messaging.solace.cloud:9443
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 9443
+                            protocol: https
+                    ws_plain: null
+                    ws_secured: null
+                SMF:
+                    authentication:
+                        password: m35lqpr8h5hgtbknq1e1lvdj5d
+                        username: solace-cloud-client
+                    compressed:
+                        enabled: true
+                        uri: tcp://mr1oqbbo5q53bt.messaging.solace.cloud:55003
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 55003
+                            protocol: tcp
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: tcp://mr1oqbbo5q53bt.messaging.solace.cloud:55555
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 55555
+                            protocol: tcp
+                    secured:
+                        enabled: true
+                        uri: tcps://mr1oqbbo5q53bt.messaging.solace.cloud:55443
+                        uri_components:
+                            host: mr1oqbbo5q53bt.messaging.solace.cloud
+                            port: 55443
+                            protocol: tcps
+                    ws_plain: null
+                    ws_secured: null
+                brokerMgmtType: solace_cloud
+                msgVpn: asc_test_120
+                trustStore:
+                    enabled: true
+                    uri: https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/root/DigiCert_Global_Root_CA.pem
+        self_hosted:
+            serviceDmrClusterConnectionDetails:
+                note:
+                - feature currently not supported
+                - extract dmr cluster connection details for broker-type=self_hosted
+                - pls raise a new feature request if required
+            serviceTrustStoreDetails:
+                enabled: false
+            serviceVirtualRouterName: 4a140514b2a1
+            vpnAttributes:
+                msgVpn: default
+            vpnBridgeRemoteMsgVpnLocations:
+                compressed: v:4a140514b2a1
+                enabled: true
+                plain: v:4a140514b2a1
+                secured: v:4a140514b2a1
+            vpnClientConnectionDetails:
+                AMQP:
+                    authentication: null
+                    compressed: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 5672
+                    secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 5671
+                    ws_plain: null
+                    ws_secured: null
+                JMS:
+                    authentication: null
+                    compressed:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55003
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55555
+                    secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55443
+                    ws_plain: null
+                    ws_secured: null
+                MQTT:
+                    authentication: null
+                    compressed: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 1883
+                    secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 8883
+                    ws_plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 8000
+                    ws_secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 8443
+                REST:
+                    authentication: null
+                    compressed: null
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 9000
+                    secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 9443
+                    ws_plain: null
+                    ws_secured: null
+                SMF:
+                    authentication: null
+                    compressed:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55003
+                    enabled: true
+                    plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55555
+                    secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 55443
+                    ws_plain:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: '8008'
+                    ws_secured:
+                        enabled: true
+                        uri: null
+                        uri_components:
+                            port: 1443
+                brokerMgmtType: self_hosted
+                msgVpn: default
+                trustStore:
+                    enabled: false
 msg:
     description: The response from the HTTP call in case of error.
     type: dict
@@ -150,70 +445,80 @@ rc:
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceReadFactsTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_facts import SolaceBrokerFacts, SolaceCloudBrokerFacts, SolaceSelfHostedBrokerFacts
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError, SolaceInternalError
 from ansible.module_utils.basic import AnsibleModule
-from urllib.parse import urlparse
-import json
-from json.decoder import JSONDecodeError
 
 
 class SolaceGetFactsTask(SolaceReadFactsTask):
 
-    FIELD_FUNCS = [
-        "get_serviceSmfPlainTextListenPort",
-        "get_serviceSmfCompressionListenPort",
-        "get_serviceSmfTlsListenPort",
-        "get_virtualRouterName",
-        "get_serviceSMFMessagingEndpoints",
-        "get_bridge_remoteMsgVpnLocations",
-        "get_allClientConnectionDetails",
-        "get_dmrClusterConnectionDetails",
-        "get_msgVpnAttributes"
+    GET_FUNCTIONS = [
+        "get_vpnClientConnectionDetails",
+        "get_vpnAttributes",
+        "get_vpnBridgeRemoteMsgVpnLocations",
+        "get_serviceTrustStoreDetails",
+        "get_serviceVirtualRouterName",
+        "get_serviceDmrClusterConnectionDetails"
+    ]
+    REQUIRES_VPN = [
+        "get_vpnClientConnectionDetails",
+        "get_vpnAttributes",
+        "get_vpnBridgeRemoteMsgVpnLocations"
     ]
 
     def __init__(self, module):
         super().__init__(module)
+        self.vpn_name = None
 
     def validate_params(self):
         params = self.get_module().params
         hostvars = params['hostvars']
-        host = params['host']
+        hostvars_inventory_hostname = params['hostvars_inventory_hostname']
+        param_get_functions = params['get_functions']
         # check hostvars
-        if host not in hostvars:
-            raise SolaceParamsValidationError("hostvars, host", host, f"cannot find host={host} in hostvars - cross check spelling with inventory file")
-        if 'ansible_facts' not in hostvars[host]:
-            raise SolaceParamsValidationError(f"hostvars[{host}]", hostvars[host], "cannot find 'ansible_facts'")
-        if 'solace' not in hostvars[host]['ansible_facts']:
-            raise SolaceParamsValidationError(f"hostvars[{host}]['ansible_facts']", hostvars[host]['ansible_facts'], "cannot find 'solace'")
-        # field funcs
-        has_get_funcs = self.validate_param_field_funcs(self.FIELD_FUNCS, params['field_funcs'])
+        if hostvars_inventory_hostname not in hostvars:
+            raise SolaceParamsValidationError("hostvars, hostvars_inventory_hostname", hostvars_inventory_hostname, f"cannot find host={hostvars_inventory_hostname} in hostvars - cross check spelling with inventory file")
+        if 'ansible_facts' not in hostvars[hostvars_inventory_hostname]:
+            raise SolaceParamsValidationError(f"hostvars[{hostvars_inventory_hostname}]", hostvars[hostvars_inventory_hostname], "cannot find 'ansible_facts'")
+        if 'solace' not in hostvars[hostvars_inventory_hostname]['ansible_facts']:
+            raise SolaceParamsValidationError(f"hostvars[{hostvars_inventory_hostname}]['ansible_facts']", hostvars[hostvars_inventory_hostname]['ansible_facts'], "cannot find 'solace'")
+        # get funcs
+        has_get_funcs = self.validate_param_get_functions(self.GET_FUNCTIONS, param_get_functions)
         if not has_get_funcs:
-            raise SolaceParamsValidationError("field_funcs", params['field_funcs'], "no get functions found - specify at least one")
+            raise SolaceParamsValidationError("get_functions", param_get_functions, "empty. specify at least one")
         # check vpn exists
-        search_dict = hostvars[host]['ansible_facts']['solace']
-        vpn_name = params['msg_vpn']
+        search_dict = hostvars[hostvars_inventory_hostname]['ansible_facts']['solace']
         vpns = self.get_vpns(search_dict)
-        if not vpn_name:
-            if len(vpns) == 1:
-                self.get_module().params['msg_vpn'] = vpns[0]
-            else:
-                raise SolaceParamsValidationError("msg_vpn", params['msg_vpn'], f"select one of {vpns}")
-        if not self.get_module().params['msg_vpn'] in vpns:
+        vpn_name = params['msg_vpn']
+        if not vpn_name and len(vpns) == 1:
+            vpn_name = vpns[0]
+        # check for wrong vpn
+        if vpn_name and vpn_name not in vpns:
             raise SolaceParamsValidationError("msg_vpn", params['msg_vpn'], f"vpn does not exist - select one of {vpns}")
+        self.vpn_name = vpn_name
+        get_functions = params['get_functions']
+        if get_functions and len(get_functions) > 0:
+            for get_func in get_functions:
+                if get_func in self.REQUIRES_VPN and not self.vpn_name:
+                    raise SolaceParamsValidationError("msg_vpn", params['msg_vpn'], f"required for get_function={get_func}. vpns found: {vpns}")
 
     def do_task(self):
         self.validate_params()
         params = self.get_module().params
         hostvars = params['hostvars']
-        host = params['host']
-        vpn_name = params['msg_vpn']
-        search_dict = hostvars[host]['ansible_facts']['solace']
-        field_funcs = params['field_funcs']
+        hostvars_inventory_hostname = params['hostvars_inventory_hostname']
+        search_dict = hostvars[hostvars_inventory_hostname]['ansible_facts']['solace']
+        get_functions = params['get_functions']
         facts = dict()
 
-        if field_funcs and len(field_funcs) > 0:
-            for field_func in field_funcs:
-                field, value = self.call_dynamic_func(field_func, search_dict, vpn_name)
+        if search_dict['isSolaceCloud']:
+            solaceBrokerFacts = SolaceCloudBrokerFacts(search_dict, self.vpn_name)
+        else:
+            solaceBrokerFacts = SolaceSelfHostedBrokerFacts(search_dict, self.vpn_name)
+
+        if get_functions and len(get_functions) > 0:
+            for get_func in get_functions:
+                field, value = self.call_dynamic_func(get_func, solaceBrokerFacts)
                 facts[field] = value
 
         result = self.create_result(rc=0, changed=False)
@@ -223,294 +528,31 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
     def get_vpns(self, search_dict: dict) -> list:
         return list(search_dict['vpns'].keys())
 
-    def get_broker_service_dict(self, search_dict: dict, field: str, value: str, strict=True):
-        service_dict = self.get_nested_dict(search_dict, field, value)
-        if service_dict is None:
-            if strict:
-                raise SolaceInternalError(f"Could not find '{field}={value}' in search_dict in broker service ansible_facts.")
-            else:
-                service_dict = dict(enabled=False)
-        return service_dict
+    def get_vpnClientConnectionDetails(self, solace_broker_facts: SolaceBrokerFacts):
+        return 'vpnClientConnectionDetails', solace_broker_facts.get_all_client_connection_details()
 
-    def get_sc_messaging_protocol_endpoint(self, search_dict: dict, field: str, value: str):
-        end_points = self.get_field(search_dict, "endPoints")
-        end_point_dict = self.get_nested_dict(end_points, field, value)
-        return end_point_dict
+    def get_vpnAttributes(self, solace_broker_facts: SolaceBrokerFacts):
+        return 'vpnAttributes', solace_broker_facts.get_msg_vpn_attributes()
 
-    def get_sc_messaging_protocols(self, search_dict: dict):
-        mps = self.get_field(search_dict, "messagingProtocols")
-        if not mps:
-            raise SolaceInternalError("Could not find 'messagingProtocols' in 'ansible_facts.solace'. API may have changed.")
-        return mps
+    def get_vpnBridgeRemoteMsgVpnLocations(self, solace_broker_facts: SolaceBrokerFacts):
+        return 'vpnBridgeRemoteMsgVpnLocations', solace_broker_facts.get_bridge_remote_msg_vpn_locations()
 
-    def get_sc_messaging_protocol_dict(self, search_dict: dict, protocol: str):
-        protocol_dict = self.get_nested_dict(search_dict, field="name", value=protocol)
-        if not protocol_dict:
-            protocol_dict = dict(
-                enabled=False
-            )
-        else:
-            protocol_dict['enabled'] = True
-        return protocol_dict
+    def get_serviceTrustStoreDetails(self, solace_broker_facts: SolaceBrokerFacts):
+        return 'serviceTrustStoreDetails', solace_broker_facts.get_trust_store_details()
 
-    def get_allClientConnectionDetails(self, search_dict: dict, vpn: str):
-        ccds = dict()
-        if search_dict['isSolaceCloud']:
-            messaging_protocols = self.get_sc_messaging_protocols(search_dict)
+    def get_serviceVirtualRouterName(self, solace_broker_facts: SolaceBrokerFacts):
+        return 'serviceVirtualRouterName', solace_broker_facts.get_virtual_router_name()
 
-            smf_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'SMF')
-            mqtt_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'MQTT')
-            amqp_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'AMQP')
-            rest_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'REST')
-            jms_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'JMS')
-            web_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'Web Messaging')
-
-            vpn_attributes = self.get_field(search_dict, "msgVpnAttributes")
-            if not vpn_attributes:
-                raise SolaceInternalError("Could not find 'msgVpnAttributes' in 'ansible_facts.solace'. API may have changed.")
-            trust_store_uri = vpn_attributes['truststoreUri']
-        else:
-            vpn_dict = search_dict['vpns'][vpn]
-            _smf_dict = self.get_broker_service_dict(search_dict, field="name", value='SMF', strict=False)
-            smf_dict = dict(
-                serviceSmfMaxConnectionCount=vpn_dict['serviceSmfMaxConnectionCount'],
-                serviceSmfPlainTextEnabled=vpn_dict['serviceSmfPlainTextEnabled'],
-                serviceSmfTlsEnabled=vpn_dict['serviceSmfTlsEnabled'],
-                serviceSmfCompressionEnabled=int(_smf_dict['compression-listen-port']) > 0,
-                serviceSmfPlainTextListenPort=int(_smf_dict['listen-port']),
-                serviceSmfCompressionListenPort=int(_smf_dict['compression-listen-port']),
-                serviceSmfTlsListenPort=int(_smf_dict['ssl']['listen-port'])
-            )
-            # mqtt_dict = self.get_broker_service_dict(search_dict, field="name", value='MQTT', strict=False)
-            mqtt_dict = dict(
-                serviceMqttMaxConnectionCount=vpn_dict['serviceMqttMaxConnectionCount'],
-                serviceMqttPlainTextEnabled=vpn_dict['serviceMqttPlainTextEnabled'],
-                serviceMqttPlainTextListenPort=vpn_dict['serviceMqttPlainTextListenPort'],
-                serviceMqttTlsEnabled=vpn_dict['serviceMqttTlsEnabled'],
-                serviceMqttTlsListenPort=vpn_dict['serviceMqttTlsListenPort'],
-                serviceMqttTlsWebSocketEnabled=vpn_dict['serviceMqttTlsWebSocketEnabled'],
-                serviceMqttTlsWebSocketListenPort=vpn_dict['serviceMqttTlsWebSocketListenPort'],
-                serviceMqttWebSocketEnabled=vpn_dict['serviceMqttWebSocketEnabled'],
-                serviceMqttWebSocketListenPort=vpn_dict['serviceMqttWebSocketListenPort']
-            )
-            # amqp_dict = self.get_broker_service_dict(search_dict, field="name", value='AMQP', strict=False)
-            amqp_dict = dict(
-                serviceAmqpMaxConnectionCount=vpn_dict['serviceAmqpMaxConnectionCount'],
-                serviceAmqpPlainTextEnabled=vpn_dict['serviceAmqpPlainTextEnabled'],
-                serviceAmqpPlainTextListenPort=vpn_dict['serviceAmqpPlainTextListenPort'],
-                serviceAmqpTlsEnabled=vpn_dict['serviceAmqpTlsEnabled'],
-                serviceAmqpTlsListenPort=vpn_dict['serviceAmqpTlsListenPort']
-            )
-            # rest_dict = self.get_broker_service_dict(search_dict, field="name", value='REST', strict=False)
-            rest_dict = dict(
-                serviceRestIncomingMaxConnectionCount=vpn_dict['serviceRestIncomingMaxConnectionCount'],
-                serviceRestIncomingPlainTextEnabled=vpn_dict['serviceRestIncomingPlainTextEnabled'],
-                serviceRestIncomingPlainTextListenPort=vpn_dict['serviceRestIncomingPlainTextListenPort'],
-                serviceRestIncomingTlsEnabled=vpn_dict['serviceRestIncomingTlsEnabled'],
-                serviceRestIncomingTlsListenPort=vpn_dict['serviceRestIncomingTlsListenPort'],
-                serviceRestMode=vpn_dict['serviceRestMode'],
-                serviceRestOutgoingMaxConnectionCount=vpn_dict['serviceRestOutgoingMaxConnectionCount']
-            )
-            jms_dict = None
-            web_dict = self.get_broker_service_dict(search_dict, field="name", value='WEB', strict=False)
-            trust_store_uri = None
-
-        ccds['SMF'] = smf_dict
-        ccds['MQTT'] = mqtt_dict
-        ccds['AMQP'] = amqp_dict
-        ccds['REST'] = rest_dict
-        ccds['JMS'] = jms_dict
-        ccds['WebMessaging'] = web_dict
-        if trust_store_uri:
-            ccds['TrustStore'] = dict(uri=trust_store_uri)
-        return 'clientConnectionDetails', ccds
-
-    def get_bridge_remoteMsgVpnLocations(self, search_dict: dict, vpn: str = None):
-        locs = dict(
-            plain=None,
-            compressed=None,
-            secured=None
-        )
-        if search_dict['isSolaceCloud']:
-            _f, smf_end_point_dict = self.get_serviceSMFMessagingEndpoints(search_dict)
-            if smf_end_point_dict['SMF']['SMF']['uriComponents']['host']:
-                locs['plain'] = (str(smf_end_point_dict['SMF']['SMF']['uriComponents']['host'])
-                                 + ":" + str(smf_end_point_dict['SMF']['SMF']['uriComponents']['port']))
-            else:
-                locs['plain'] = None
-            if smf_end_point_dict['SMF']['CompressedSMF']['uriComponents']['host']:
-                locs['compressed'] = (str(smf_end_point_dict['SMF']['CompressedSMF']['uriComponents']['host'])
-                                      + ":" + str(smf_end_point_dict['SMF']['CompressedSMF']['uriComponents']['port']))
-            else:
-                locs['compressed'] = None
-            if smf_end_point_dict['SMF']['SecuredSMF']['uriComponents']['host']:
-                locs['secured'] = (str(smf_end_point_dict['SMF']['SecuredSMF']['uriComponents']['host'])
-                                   + ":" + str(smf_end_point_dict['SMF']['SecuredSMF']['uriComponents']['port']))
-            else:
-                locs['secured'] = None
-        else:
-            _f, virtual_router = self.get_virtualRouterName(search_dict, vpn)
-            loc = "v:" + virtual_router
-            locs['plain'] = loc
-            locs['compressed'] = loc
-            locs['secured'] = loc
-
-        return 'bridge_remoteMsgVpnLocations', locs
-
-    def get_serviceSMFMessagingEndpoints(self, search_dict: dict, vpn: str = None):
-        eps = dict(
-            SMF=dict(
-                SMF=dict(),
-                SecuredSMF=dict(),
-                CompressedSMF=dict()
-            )
-        )
-        smf_protocol = None
-        smf_host = None
-        smf_port = None
-        smf_uri = None
-
-        sec_smf_protocol = None
-        sec_smf_host = None
-        sec_smf_port = None
-        sec_smf_uri = None
-
-        cmp_smf_protocol = None
-        cmp_smf_host = None
-        cmp_smf_port = None
-        cmp_smf_uri = None
-
-        if search_dict['isSolaceCloud']:
-            messaging_protocols = self.get_sc_messaging_protocols(search_dict)
-            smf_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'SMF')
-            # if endPoint is not enabled, API omits it
-            end_points = self.get_field(smf_dict, "endPoints")
-            smf_end_point_dict = self.get_nested_dict(end_points, field='name', value='SMF')
-            if smf_end_point_dict:
-                smf_uri = smf_end_point_dict['uris'][0]
-                t = urlparse(smf_uri)
-                smf_protocol = t.scheme
-                smf_host = t.hostname
-            sec_smf_end_point_dict = self.get_nested_dict(end_points, field='name', value='Secured SMF')
-            if sec_smf_end_point_dict:
-                sec_smf_uri = sec_smf_end_point_dict['uris'][0]
-                t = urlparse(sec_smf_uri)
-                sec_smf_protocol = t.scheme
-                sec_smf_host = t.hostname
-            cmp_smf_end_point_dict = self.get_nested_dict(end_points, field='name', value='Compressed SMF')
-            if cmp_smf_end_point_dict:
-                cmp_smf_uri = cmp_smf_end_point_dict['uris'][0]
-                t = urlparse(cmp_smf_uri)
-                cmp_smf_protocol = t.scheme
-                cmp_smf_host = t.hostname
-
-        _f, smf_port = self.get_serviceSmfPlainTextListenPort(search_dict, vpn)
-        _f, sec_smf_port = self.get_serviceSmfTlsListenPort(search_dict, vpn)
-        _f, cmp_smf_port = self.get_serviceSmfCompressionListenPort(search_dict, vpn)
-        # put the dict together
-        # smf
-        smf = dict()
-        smf_ucs = dict()
-        smf_ucs['protocol'] = smf_protocol
-        smf_ucs['host'] = smf_host
-        smf_ucs['port'] = smf_port
-        smf['uriComponents'] = smf_ucs
-        smf['uri'] = smf_uri
-        eps['SMF']['SMF'] = smf
-        # secured smf
-        sec_smf = dict()
-        sec_smf_ucs = dict()
-        sec_smf_ucs['protocol'] = sec_smf_protocol
-        sec_smf_ucs['host'] = sec_smf_host
-        sec_smf_ucs['port'] = sec_smf_port
-        sec_smf['uriComponents'] = sec_smf_ucs
-        sec_smf['uri'] = sec_smf_uri
-        eps['SMF']['SecuredSMF'] = sec_smf
-        # compressed smf
-        cmp_smf = dict()
-        cmp_smf_ucs = dict()
-        cmp_smf_ucs['protocol'] = cmp_smf_protocol
-        cmp_smf_ucs['host'] = cmp_smf_host
-        cmp_smf_ucs['port'] = cmp_smf_port
-        cmp_smf['uriComponents'] = cmp_smf_ucs
-        cmp_smf['uri'] = cmp_smf_uri
-        eps['SMF']['CompressedSMF'] = cmp_smf
-        return 'serviceMessagingEndpoints', eps
-
-    def get_serviceSmfPlainTextListenPort(self, search_dict: dict, vpn: str):
-        if search_dict['isSolaceCloud']:
-            messaging_protocols = self.get_sc_messaging_protocols(search_dict)
-            smf_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'SMF')
-            end_point_dict = self.get_sc_messaging_protocol_endpoint(smf_dict, field='name', value='SMF')
-            if end_point_dict:
-                uri = end_point_dict['uris'][0]
-                value = urlparse(uri).port
-            else:
-                value = None
-        else:
-            smf_dict = self.get_broker_service_dict(search_dict, field="name", value="SMF")
-            value = smf_dict['listen-port']
-        return 'serviceSmfPlainTextListenPort', value
-
-    def get_serviceSmfCompressionListenPort(self, search_dict: dict, vpn: str):
-        if search_dict['isSolaceCloud']:
-            messaging_protocols = self.get_sc_messaging_protocols(search_dict)
-            smf_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'SMF')
-            end_point_dict = self.get_sc_messaging_protocol_endpoint(smf_dict, field='name', value='Compressed SMF')
-            if end_point_dict:
-                uri = end_point_dict['uris'][0]
-                value = urlparse(uri).port
-            else:
-                value = None
-        else:
-            smf_dict = self.get_broker_service_dict(search_dict, field="name", value="SMF")
-            value = smf_dict['compression-listen-port']
-        return 'serviceSmfCompressionListenPort', value
-
-    def get_serviceSmfTlsListenPort(self, search_dict: dict, vpn: str):
-        if search_dict['isSolaceCloud']:
-            messaging_protocols = self.get_sc_messaging_protocols(search_dict)
-            smf_dict = self.get_sc_messaging_protocol_dict(messaging_protocols, 'SMF')
-            end_point_dict = self.get_sc_messaging_protocol_endpoint(smf_dict, field='name', value='Secured SMF')
-            if end_point_dict:
-                uri = end_point_dict['uris'][0]
-                value = urlparse(uri).port
-            else:
-                value = None
-        else:
-            smf_dict = self.get_broker_service_dict(search_dict, field="name", value="SMF")
-            value = smf_dict['ssl']['listen-port']
-        return 'serviceSmfTlsListenPort', value
-
-    def get_virtualRouterName(self, search_dict: dict, vpn: str):
-        if search_dict['isSolaceCloud']:
-            value = self.get_field(search_dict, 'primaryRouterName')
-        else:
-            value = self.get_field(search_dict, 'virtualRouterName')
-        return 'virtualRouterName', value
-
-    def get_dmrClusterConnectionDetails(self, search_dict: dict, vpn: str):
-        if search_dict['isSolaceCloud']:
-            value = self.get_field(search_dict, 'cluster')
-        else:
-            raise SolaceInternalError('standalone broker not supported, only solace cloud.')
-        return 'dmrClusterConnectionDetails', value
-
-    def get_msgVpnAttributes(self, search_dict: dict, vpn: str):
-        if search_dict['isSolaceCloud']:
-            value = self.get_field(search_dict, 'msgVpnAttributes')
-        else:
-            raise SolaceInternalError('standalone broker not supported, only solace cloud.')
-        return 'msgVpnAttributes', value
+    def get_serviceDmrClusterConnectionDetails(self, solace_broker_facts: SolaceBrokerFacts):
+        return 'serviceDmrClusterConnectionDetails', solace_broker_facts.get_dmr_cluster_connection_details()
 
 
 def run_module():
     module_args = dict(
         hostvars=dict(type='dict', required=True),
-        host=dict(type='str', required=True),
-        field_funcs=dict(type='list', required=False, default=[], elements='str'),
-        # fields=dict(type='list', required=False, default=[], elements='str'),
-        msg_vpn=dict(type='str', required=False, default=None)
+        hostvars_inventory_hostname=dict(type='str', required=True),
+        get_functions=dict(type='list', required=False, default=[], elements='str'),
+        msg_vpn=dict(type='str', required=False)
     )
     arg_spec = dict()
     arg_spec.update(module_args)
