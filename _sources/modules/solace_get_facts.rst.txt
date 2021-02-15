@@ -2,8 +2,8 @@
 
 .. _solace_get_facts_module:
 
-solace_get_facts -- get facts from ansible_facts.solace
-=======================================================
+solace_get_facts -- get facts for a broker/vpn
+==============================================
 
 Provides convenience functions to access solace facts retrieved from broker service using :ref:`solace_gather_facts <solace_gather_facts_module>` from 'ansible_facts.solace'.
 
@@ -29,30 +29,51 @@ Examples
        username: "{{ sempv2_username }}"
        password: "{{ sempv2_password }}"
        timeout: "{{ sempv2_timeout }}"
-       solace_cloud_api_token: "{{ solace_cloud_api_token | default(omit) }}"
+       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
        solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-
    tasks:
    - name: Gather Solace Facts
      solace_gather_facts:
 
-   - name: "Get Host SMF Messaging Endpoints Facts: solace-cloud-1"
+   - name: get_vpnClientConnectionDetails
      solace_get_facts:
-       hostvars: "{{ hostvars }}"
-       # solace-cloud-1 is a host in the inventory
-       host: solace-cloud-1
-       field_funcs:
-       - get_serviceSMFMessagingEndpoints
-       - get_serviceSmfPlainTextListenPort
-       - get_serviceSmfCompressionListenPort
-       - get_serviceSmfTlsListenPort
-       - get_virtualRouterName
-     register: results
+       hostvars: "{{ hostvars }}" # always use this setting
+       hostvars_inventory_hostname: "{{ inventory_hostname }}"
+       msg_vpn: "{{ vpn }}"
+       get_functions:
+         - get_vpnClientConnectionDetails
+     register: result
 
-   - name: print results
+   - name: save to yaml file
+     copy:
+       content: "{{ result.facts | to_nice_yaml }}"
+       dest: "./vpnClientConnectionDetails.yml"
+     delegate_to: localhost
+
+   - name: print
      debug:
        msg:
-       - "{{ results.facts }}"
+         - "result.facts="
+         - "{{ result.facts }}"
+
+   - name: get other facts
+     solace_get_facts:
+       hostvars: "{{ hostvars }}"
+       hostvars_inventory_hostname: "{{ inventory_hostname }}"
+       msg_vpn: "{{ vpn }}"
+       get_functions:
+         - get_vpnBridgeRemoteMsgVpnLocations
+         - get_vpnAttributes
+         - get_serviceTrustStoreDetails
+         - get_serviceVirtualRouterName
+         - get_serviceDmrClusterConnectionDetails
+     register: result
+
+   - name: print
+     debug:
+       msg:
+         - "result.facts="
+         - "{{ result.facts }}"
 
 
 
@@ -69,25 +90,47 @@ See Also
 .. seealso::
 
    - :ref:`solace_gather_facts_module`
+   - :ref:`solace_cloud_get_facts_module`
 
 
 
 Parameters
 ----------
 
-field_funcs (optional)
-  List of pre-built field functions that retrieve values from hostvars.
+get_functions (optional)
+  List of pre-built functions that retrieve data for the 'hostvars_inventory_hostname'/'msg_vpn' data in 'hostvars'.
 
   | **type**: list
   | **default**: []
 
-  get_allClientConnectionDetails (optional)
-    Retrieve all enabled client connection details for the various protocols for the service/broker.
+  get_serviceDmrClusterConnectionDetails (optional)
+    Retrieve DMR cluster connection details for the service/broker.
+
+    Note: Currently only supports Solace Cloud services.
 
     | **type**: str
 
-  get_bridge_remoteMsgVpnLocations (optional)
+  get_serviceTrustStoreDetails (optional)
+    Retrieve the URI for to download client certificates if enabled.
+
+    | **type**: str
+
+  get_serviceVirtualRouterName (optional)
+    Retrieve the virtual router name.
+
+    | **type**: str
+
+  get_vpnAttributes (optional)
+    Retrieve attributes of the message Vpn.
+
+    Requires 'msg_vpn' parameter if more than 1 Vpn exists.
+
+    | **type**: str
+
+  get_vpnBridgeRemoteMsgVpnLocations (optional)
     Retrieve enabled remote message vpn locations (plain, secured, compressed) for the service/broker.
+
+    Requires 'msg_vpn' parameter if more than 1 Vpn exists.
 
     For Solace Cloud: {hostname}:{port}.
 
@@ -95,49 +138,32 @@ field_funcs (optional)
 
     | **type**: str
 
-  get_dmrClusterConnectionDetails (optional)
-    Retrieve all DMR cluster connection details for the service/broker.
+  get_vpnClientConnectionDetails (optional)
+    Retrieve all enabled client connection details for the various protocols for the service/broker.
+
+    Requires 'msg_vpn' parameter if more than 1 Vpn exists.
 
     | **type**: str
 
-  get_serviceSmfCompressionListenPort (optional)
-    Retrieve the smf compressed listen port
-
-    | **type**: str
-
-  get_serviceSMFMessagingEndpoints (optional)
-    Retrieve the all smf messaging endpoints
-
-    | **type**: str
-
-  get_serviceSmfPlainTextListenPort (optional)
-    Retrieve the smf plain listen port
-
-    | **type**: str
-
-  get_serviceSmfTlsListenPort (optional)
-    Retrieve the smf tls listen port
-
-    | **type**: str
-
-  get_virtualRouterName (optional)
-    Retrieve the virtual router name
-
-    | **type**: str
-
-
-host (required)
-  The playbook host to retrieve the facts from.
-
-  | **type**: str
 
 hostvars (required)
-  The playbook's 'hostvars'.
+  The playbook's 'hostvars'. Contains all facts for all hosts / brokers.
+
+  Always set to: 'hostvars: "{{ hostvars }}"
 
   | **type**: dict
 
+hostvars_inventory_hostname (required)
+  The 'inventory_hostname', i.e. the playbook's host, to retrieve the facts from as available in 'hostvars'.
+
+  | **type**: str
+
 msg_vpn (optional)
-  The message vpn.
+  The message vpn of the broker to retrieve the facts from.
+
+  Only required for certain 'get_functions' if more than 1 Vpn exists.
+
+  Can be omitted if only 1 Vpn exists.
 
   | **type**: str
 
@@ -158,11 +184,369 @@ facts
   .. code-block:: json
 
      {
-     "facts": {
-       "serviceSmfCompressionListenPort": 55003,
-       "serviceSmfPlainTextListenPort": 55555,
-       "serviceSmfTlsListenPort": 55443,
-       "virtualRouterName": "single-aws-eu-west-6e-4ftdf"
+     "self_hosted": {
+       "serviceDmrClusterConnectionDetails": {
+         "note": [
+           "feature currently not supported",
+           "extract dmr cluster connection details for broker-type=self_hosted",
+           "pls raise a new feature request if required"
+         ]
+       },
+       "serviceTrustStoreDetails": {
+         "enabled": false
+       },
+       "serviceVirtualRouterName": "4a140514b2a1",
+       "vpnAttributes": {
+         "msgVpn": "default"
+       },
+       "vpnBridgeRemoteMsgVpnLocations": {
+         "compressed": "v:4a140514b2a1",
+         "enabled": true,
+         "plain": "v:4a140514b2a1",
+         "secured": "v:4a140514b2a1"
+       },
+       "vpnClientConnectionDetails": {
+         "AMQP": {
+           "authentication": null,
+           "compressed": null,
+           "enabled": true,
+           "plain": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 5672
+             }
+           },
+           "secured": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 5671
+             }
+           },
+           "ws_plain": null,
+           "ws_secured": null
+         },
+         "JMS": {
+           "authentication": null,
+           "compressed": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 55003
+             }
+           },
+           "enabled": true,
+           "plain": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 55555
+             }
+           },
+           "secured": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 55443
+             }
+           },
+           "ws_plain": null,
+           "ws_secured": null
+         },
+         "MQTT": {
+           "authentication": null,
+           "compressed": null,
+           "enabled": true,
+           "plain": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 1883
+             }
+           },
+           "secured": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 8883
+             }
+           },
+           "ws_plain": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 8000
+             }
+           },
+           "ws_secured": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 8443
+             }
+           }
+         },
+         "REST": {
+           "authentication": null,
+           "compressed": null,
+           "enabled": true,
+           "plain": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 9000
+             }
+           },
+           "secured": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 9443
+             }
+           },
+           "ws_plain": null,
+           "ws_secured": null
+         },
+         "SMF": {
+           "authentication": null,
+           "compressed": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 55003
+             }
+           },
+           "enabled": true,
+           "plain": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 55555
+             }
+           },
+           "secured": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 55443
+             }
+           },
+           "ws_plain": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": "8008"
+             }
+           },
+           "ws_secured": {
+             "enabled": true,
+             "uri": null,
+             "uri_components": {
+               "port": 1443
+             }
+           }
+         },
+         "brokerMgmtType": "self_hosted",
+         "msgVpn": "default",
+         "trustStore": {
+           "enabled": false
+         }
+       }
+     },
+     "solace_cloud": {
+       "serviceDmrClusterConnectionDetails": {
+         "clusterName": "cluster-aws-ca-central-1a-1oqbbo5q53bt",
+         "password": "ia48anu4ru6qhmopopmrgacs9v",
+         "primaryRouterName": "pri-aws-ca-central-1a-1oqbbo5q53bt",
+         "remoteAddress": "mr1oqbbo5q53bt.messaging.solace.cloud"
+       },
+       "serviceTrustStoreDetails": {
+         "enabled": true,
+         "uri": "https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/root/DigiCert_Global_Root_CA.pem"
+       },
+       "serviceVirtualRouterName": "pri-aws-ca-central-1a-1oqbbo5q53bt",
+       "vpnAttributes": {
+         "msgVpn": "asc_test_120"
+       },
+       "vpnBridgeRemoteMsgVpnLocations": {
+         "compressed": "mr1oqbbo5q53bt.messaging.solace.cloud:55003",
+         "enabled": true,
+         "plain": "mr1oqbbo5q53bt.messaging.solace.cloud:55555",
+         "secured": "mr1oqbbo5q53bt.messaging.solace.cloud:55443"
+       },
+       "vpnClientConnectionDetails": {
+         "AMQP": {
+           "authentication": {
+             "password": "m35lqpr8h5hgtbknq1e1lvdj5d",
+             "username": "solace-cloud-client"
+           },
+           "compressed": {
+             "enabled": false,
+             "uri": null,
+             "uri_components": null
+           },
+           "enabled": true,
+           "plain": {
+             "enabled": true,
+             "uri": "amqp://mr1oqbbo5q53bt.messaging.solace.cloud:5672",
+             "uri_components": {
+               "host": "mr1oqbbo5q53bt.messaging.solace.cloud",
+               "port": 5672,
+               "protocol": "amqp"
+             }
+           },
+           "secured": {
+             "enabled": true,
+             "uri": "amqps://mr1oqbbo5q53bt.messaging.solace.cloud:5671",
+             "uri_components": {
+               "host": "mr1oqbbo5q53bt.messaging.solace.cloud",
+               "port": 5671,
+               "protocol": "amqps"
+             }
+           },
+           "ws_plain": null,
+           "ws_secured": null
+         },
+         "JMS": {
+           "authentication": {
+             "password": "m35lqpr8h5hgtbknq1e1lvdj5d",
+             "username": "solace-cloud-client"
+           },
+           "compressed": {
+             "enabled": false,
+             "uri": null,
+             "uri_components": null
+           },
+           "enabled": true,
+           "plain": {
+             "enabled": true,
+             "uri": "smf://mr1oqbbo5q53bt.messaging.solace.cloud:55555",
+             "uri_components": {
+               "host": "mr1oqbbo5q53bt.messaging.solace.cloud",
+               "port": 55555,
+               "protocol": "smf"
+             }
+           },
+           "secured": {
+             "enabled": true,
+             "uri": "smfs://mr1oqbbo5q53bt.messaging.solace.cloud:55443",
+             "uri_components": {
+               "host": "mr1oqbbo5q53bt.messaging.solace.cloud",
+               "port": 55443,
+               "protocol": "smfs"
+             }
+           },
+           "ws_plain": null,
+           "ws_secured": null
+         },
+         "MQTT": {
+           "authentication": {
+             "password": "m35lqpr8h5hgtbknq1e1lvdj5d",
+             "username": "solace-cloud-client"
+           },
+           "compressed": {
+             "enabled": false,
+             "uri": null,
+             "uri_components": null
+           },
+           "enabled": true,
+           "plain": {
+             "enabled": true,
+             "uri": "tcp://mr1oqbbo5q53bt.messaging.solace.cloud:1883",
+             "uri_components": {
+               "host": "mr1oqbbo5q53bt.messaging.solace.cloud",
+               "port": 1883,
+               "protocol": "tcp"
+             }
+           },
+           "secured": {
+             "enabled": true,
+             "uri": "ssl://mr1oqbbo5q53bt.messaging.solace.cloud:8883",
+             "uri_components": {
+               "host": "mr1oqbbo5q53bt.messaging.solace.cloud",
+               "port": 8883,
+               "protocol": "ssl"
+             }
+           },
+           "ws_plain": null,
+           "ws_secured": null
+         },
+         "REST": {
+           "authentication": {
+             "password": "m35lqpr8h5hgtbknq1e1lvdj5d",
+             "username": "solace-cloud-client"
+           },
+           "compressed": {
+             "enabled": false,
+             "uri": null,
+             "uri_components": null
+           },
+           "enabled": true,
+           "plain": {
+             "enabled": true,
+             "uri": "http://mr1oqbbo5q53bt.messaging.solace.cloud:9000",
+             "uri_components": {
+               "host": "mr1oqbbo5q53bt.messaging.solace.cloud",
+               "port": 9000,
+               "protocol": "http"
+             }
+           },
+           "secured": {
+             "enabled": true,
+             "uri": "https://mr1oqbbo5q53bt.messaging.solace.cloud:9443",
+             "uri_components": {
+               "host": "mr1oqbbo5q53bt.messaging.solace.cloud",
+               "port": 9443,
+               "protocol": "https"
+             }
+           },
+           "ws_plain": null,
+           "ws_secured": null
+         },
+         "SMF": {
+           "authentication": {
+             "password": "m35lqpr8h5hgtbknq1e1lvdj5d",
+             "username": "solace-cloud-client"
+           },
+           "compressed": {
+             "enabled": true,
+             "uri": "tcp://mr1oqbbo5q53bt.messaging.solace.cloud:55003",
+             "uri_components": {
+               "host": "mr1oqbbo5q53bt.messaging.solace.cloud",
+               "port": 55003,
+               "protocol": "tcp"
+             }
+           },
+           "enabled": true,
+           "plain": {
+             "enabled": true,
+             "uri": "tcp://mr1oqbbo5q53bt.messaging.solace.cloud:55555",
+             "uri_components": {
+               "host": "mr1oqbbo5q53bt.messaging.solace.cloud",
+               "port": 55555,
+               "protocol": "tcp"
+             }
+           },
+           "secured": {
+             "enabled": true,
+             "uri": "tcps://mr1oqbbo5q53bt.messaging.solace.cloud:55443",
+             "uri_components": {
+               "host": "mr1oqbbo5q53bt.messaging.solace.cloud",
+               "port": 55443,
+               "protocol": "tcps"
+             }
+           },
+           "ws_plain": null,
+           "ws_secured": null
+         },
+         "brokerMgmtType": "solace_cloud",
+         "msgVpn": "asc_test_120",
+         "trustStore": {
+           "enabled": true,
+           "uri": "https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/root/DigiCert_Global_Root_CA.pem"
+         }
+       }
      }
    }
 

@@ -103,7 +103,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#example-usage">Example Usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-reference">Module Reference</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_gather_facts.html">solace_gather_facts – gather broker facts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="modules/solace_get_facts.html">solace_get_facts – get facts from ansible_facts.solace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_get_facts.html">solace_get_facts – get facts for a broker/vpn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_available.html">solace_get_available – check if broker is available</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_account_gather_facts.html">solace_cloud_account_gather_facts – gather account services facts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_get_facts.html">solace_cloud_get_facts – get Solace Cloud service facts</a></li>
@@ -112,7 +112,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="solace_cloud_modules.html">Solace Cloud Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="solace_config_modules.html">Solace Configuration Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solace_config_modules.html">Solace Configuration &amp; Action Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="solace_get_modules.html">Solace Get Object List Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="roles.html">Roles</a></li>
 </ul>
@@ -202,7 +202,7 @@ each host in the inventory BEFORE the <cite>solace_bridge_remote_vpn</cite> is c
 </pre></div>
 </div>
 <p>This tells Ansible to execute each task for all hosts BEFORE moving onto the next task.</p>
-<p>An additional convenience module allows you to retrieve certain facts from Ansible’s <cite>hostvars</cite>: <a class="reference internal" href="modules/solace_get_facts.html#solace-get-facts-module"><span class="std std-ref">solace_get_facts – get facts from ansible_facts.solace</span></a>.</p>
+<p>An additional convenience module allows you to retrieve certain facts from Ansible’s <cite>hostvars</cite>: <a class="reference internal" href="modules/solace_get_facts.html#solace-get-facts-module"><span class="std std-ref">solace_get_facts – get facts for a broker/vpn</span></a>.</p>
 <p>It implements a few functions to directly collect a set of facts without the need to understand the JSON structure.
 For example, to get the connection details of a newly created Solace Cloud service use the following in your playbook:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Gather</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Facts&quot;</span>
@@ -231,7 +231,7 @@ For example, to get the connection details of a newly created Solace Cloud servi
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_gather_facts.html">solace_gather_facts – gather broker facts</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/solace_get_facts.html">solace_get_facts – get facts from ansible_facts.solace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_get_facts.html">solace_get_facts – get facts for a broker/vpn</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_available.html">solace_get_available – check if broker is available</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_account_gather_facts.html">solace_cloud_account_gather_facts – gather account services facts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_get_facts.html">solace_cloud_get_facts – get Solace Cloud service facts</a></li>
@@ -256,7 +256,7 @@ For example, to get the connection details of a newly created Solace Cloud servi
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 04 Feb 2021 at 14:29.
+        Last updated on 15 Feb 2021 at 19:34.
       </span>
 
     </p>

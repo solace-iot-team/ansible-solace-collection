@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Solace Configuration Modules &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  <title>Solace Configuration &amp; Action Modules &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
   
 
   
@@ -101,7 +101,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="facts_and_general_modules.html">Fact &amp; General Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="solace_cloud_modules.html">Solace Cloud Modules</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Solace Configuration Modules</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Solace Configuration &amp; Action Modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#configuration-settings-for-modules">Configuration Settings for Modules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#example-usage">Example Usage</a></li>
 </ul>
@@ -128,11 +128,15 @@
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_mqtt_session.html">solace_mqtt_session – mqtt session</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_mqtt_session_subscription.html">solace_mqtt_session_subscription – subscription for mqtt session</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_queue.html">solace_queue – queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_queue_cancel_replay.html">solace_queue_cancel_replay – cancel replay on queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_queue_start_replay.html">solace_queue_start_replay – start replay on queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_queue_subscription.html">solace_queue_subscription – subscription on a queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_rdp.html">solace_rdp – rest delivery point</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_rdp_queue_binding.html">solace_rdp_queue_binding – queue bindining on rdp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_rdp_rest_consumer.html">solace_rdp_rest_consumer – rest consumer on rdp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_rdp_rest_consumer_trusted_cn.html">solace_rdp_rest_consumer_trusted_cn – trusted common name on rdp rest consumer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_replay_log.html">solace_replay_log – replay log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_replay_log_trim_logged_msgs.html">solace_replay_log_trim_logged_msgs – trim msgs on replay log</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_topic_endpoint.html">solace_topic_endpoint – topic endpoint</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_vpn.html">solace_vpn – vpn</a></li>
 </ul>
@@ -189,7 +193,7 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Solace Configuration Modules</li>
+      <li>Solace Configuration &amp; Action Modules</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -208,8 +212,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="solace-configuration-modules">
-<h1>Solace Configuration Modules<a class="headerlink" href="#solace-configuration-modules" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="solace-configuration-action-modules">
+<h1>Solace Configuration &amp; Action Modules<a class="headerlink" href="#solace-configuration-action-modules" title="Permalink to this headline">¶</a></h1>
 <p>Configuration modules mostly use the Solace Sempv2 Config Api. Some modules also use the Solace Cloud Api where required,
 so the same module can be used for both, standalone brokers and Solace Cloud services.</p>
 <ul class="simple">
@@ -267,7 +271,8 @@ is based on the Sempv2 Config Api: <a class="reference external" href="https://d
 <div class="section" id="idempotency">
 <h2>Idempotency<a class="headerlink" href="#idempotency" title="Permalink to this headline">¶</a></h2>
 <p>The configuration modules update/add/delete Broker objects in an idempotent manner.</p>
-<p>They all support the <cite>state=[present, absent]</cite> argument.</p>
+<p>They argument <cite>state=[present, absent]</cite> determines the desired outcome of the module.
+The module’s behavior is as follows:</p>
 <p><strong>state=’present’</strong>:</p>
 <ul class="simple">
 <li><p>get the current object from the broker</p></li>
@@ -322,11 +327,15 @@ is based on the Sempv2 Config Api: <a class="reference external" href="https://d
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_mqtt_session.html">solace_mqtt_session – mqtt session</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_mqtt_session_subscription.html">solace_mqtt_session_subscription – subscription for mqtt session</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_queue.html">solace_queue – queue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_queue_cancel_replay.html">solace_queue_cancel_replay – cancel replay on queue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_queue_start_replay.html">solace_queue_start_replay – start replay on queue</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_queue_subscription.html">solace_queue_subscription – subscription on a queue</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_rdp.html">solace_rdp – rest delivery point</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_rdp_queue_binding.html">solace_rdp_queue_binding – queue bindining on rdp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_rdp_rest_consumer.html">solace_rdp_rest_consumer – rest consumer on rdp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_rdp_rest_consumer_trusted_cn.html">solace_rdp_rest_consumer_trusted_cn – trusted common name on rdp rest consumer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_replay_log.html">solace_replay_log – replay log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_replay_log_trim_logged_msgs.html">solace_replay_log_trim_logged_msgs – trim msgs on replay log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_topic_endpoint.html">solace_topic_endpoint – topic endpoint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_vpn.html">solace_vpn – vpn</a></li>
 </ul>
@@ -350,7 +359,7 @@ is based on the Sempv2 Config Api: <a class="reference external" href="https://d
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 04 Feb 2021 at 14:29.
+        Last updated on 15 Feb 2021 at 19:34.
       </span>
 
     </p>

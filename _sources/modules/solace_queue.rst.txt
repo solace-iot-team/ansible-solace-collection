@@ -57,6 +57,7 @@ Notes
    - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue
    - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
    - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
+   - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
 
 
 See Also
@@ -65,6 +66,9 @@ See Also
 .. seealso::
 
    - :ref:`solace_get_queues_module`
+   - :ref:`solace_queue_subscription_module`
+   - :ref:`solace_queue_start_replay_module`
+   - :ref:`solace_queue_cancel_replay_module`
 
 
 

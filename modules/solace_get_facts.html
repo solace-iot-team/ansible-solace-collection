@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>solace_get_facts – get facts from ansible_facts.solace &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  <title>solace_get_facts – get facts for a broker/vpn &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
   
 
   
@@ -101,7 +101,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../solace_get_modules.html">Solace Get Object List Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../solace_get_modules.html#module-reference">Module Reference</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="solace_get_acl_profiles.html">solace_get_acl_profiles – get list of acl profiles</a></li>
@@ -116,7 +116,7 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_cluster_link_trusted_cns.html">solace_get_dmr_cluster_link_trusted_cns – get list of trusted common names on a dmr cluster link</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_cluster_links.html">solace_get_dmr_cluster_links – get list of links on a dmr cluster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_clusters.html">solace_get_dmr_clusters – get list of dmr clusters</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_facts – get facts from ansible_facts.solace</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_facts – get facts for a broker/vpn</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
@@ -133,11 +133,12 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_rest_consumer_trusted_cns.html">solace_get_rdp_rest_consumer_trusted_cns – get list of rdp rest consumer trusted common names</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_rest_consumers.html">solace_get_rdp_rest_consumers – get list of rdp rest consumers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdps.html">solace_get_rdps – get list of rdps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_replay_logs.html">solace_get_replay_logs – get list of replay logs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_topic_endpoints.html">solace_get_topic_endpoints – get list of topic endpoints</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_vpn_clients.html">solace_get_vpn_clients – get list of vpn clients</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_vpns.html">solace_get_vpns – get list of vpns</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_available.html">solace_get_available – check if broker is available</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_facts – get facts from ansible_facts.solace</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_facts – get facts for a broker/vpn</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
@@ -202,7 +203,7 @@
         
           <li><a href="../facts_and_general_modules.html">Fact &amp; General Modules</a> &raquo;</li>
         
-      <li>solace_get_facts – get facts from ansible_facts.solace</li>
+      <li>solace_get_facts – get facts for a broker/vpn</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -224,8 +225,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="solace-get-facts-get-facts-from-ansible-facts-solace">
-<span id="solace-get-facts-module"></span><h1>solace_get_facts – get facts from ansible_facts.solace<a class="headerlink" href="#solace-get-facts-get-facts-from-ansible-facts-solace" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="solace-get-facts-get-facts-for-a-broker-vpn">
+<span id="solace-get-facts-module"></span><h1>solace_get_facts – get facts for a broker/vpn<a class="headerlink" href="#solace-get-facts-get-facts-for-a-broker-vpn" title="Permalink to this headline">¶</a></h1>
 <p>Provides convenience functions to access solace facts retrieved from broker service using <a class="reference internal" href="solace_gather_facts.html#solace-gather-facts-module"><span class="std std-ref">solace_gather_facts</span></a> from ‘ansible_facts.solace’.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
@@ -242,30 +243,51 @@
     <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">solace_cloud_api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">solace_cloud_api_token</span> <span class="o">|</span> <span class="nf">default</span><span class="o">(</span><span class="nv">omit</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">solace_cloud_api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">SOLACE_CLOUD_API_TOKEN</span> <span class="k">if</span> <span class="nv">broker_type</span><span class="o">==</span><span class="s1">&#39;solace_cloud&#39;</span> <span class="k">else</span> <span class="nv">omit</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">solace_cloud_service_id</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">solace_cloud_service_id</span> <span class="o">|</span> <span class="nf">default</span><span class="o">(</span><span class="nv">omit</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
-
 <span class="nt">tasks</span><span class="p">:</span>
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Gather Solace Facts</span>
   <span class="nt">solace_gather_facts</span><span class="p">:</span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Get</span><span class="nv"> </span><span class="s">Host</span><span class="nv"> </span><span class="s">SMF</span><span class="nv"> </span><span class="s">Messaging</span><span class="nv"> </span><span class="s">Endpoints</span><span class="nv"> </span><span class="s">Facts:</span><span class="nv"> </span><span class="s">solace-cloud-1&quot;</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get_vpnClientConnectionDetails</span>
   <span class="nt">solace_get_facts</span><span class="p">:</span>
-    <span class="nt">hostvars</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">hostvars</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="c1"># solace-cloud-1 is a host in the inventory</span>
-    <span class="nt">host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace-cloud-1</span>
-    <span class="nt">field_funcs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSMFMessagingEndpoints</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSmfPlainTextListenPort</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSmfCompressionListenPort</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSmfTlsListenPort</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_virtualRouterName</span>
-  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">results</span>
+    <span class="nt">hostvars</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">hostvars</span> <span class="cp">}}</span><span class="s">&quot;</span> <span class="c1"># always use this setting</span>
+    <span class="nt">hostvars_inventory_hostname</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_hostname</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">get_functions</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_vpnClientConnectionDetails</span>
+  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">print results</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">save to yaml file</span>
+  <span class="nt">copy</span><span class="p">:</span>
+    <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.facts</span> <span class="o">|</span> <span class="nf">to_nice_yaml</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./vpnClientConnectionDetails.yml&quot;</span>
+  <span class="nt">delegate_to</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">print</span>
   <span class="nt">debug</span><span class="p">:</span>
     <span class="nt">msg</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">results.facts</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;result.facts=&quot;</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.facts</span> <span class="cp">}}</span><span class="s">&quot;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get other facts</span>
+  <span class="nt">solace_get_facts</span><span class="p">:</span>
+    <span class="nt">hostvars</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">hostvars</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">hostvars_inventory_hostname</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_hostname</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">get_functions</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_vpnBridgeRemoteMsgVpnLocations</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_vpnAttributes</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceTrustStoreDetails</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceVirtualRouterName</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceDmrClusterConnectionDetails</span>
+  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">print</span>
+  <span class="nt">debug</span><span class="p">:</span>
+    <span class="nt">msg</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;result.facts=&quot;</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.facts</span> <span class="cp">}}</span><span class="s">&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -284,73 +306,71 @@
 <p class="admonition-title">See also</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="solace_gather_facts.html#solace-gather-facts-module"><span class="std std-ref">solace_gather_facts – gather broker facts</span></a></p></li>
+<li><p><a class="reference internal" href="solace_cloud_get_facts.html#solace-cloud-get-facts-module"><span class="std std-ref">solace_cloud_get_facts – get Solace Cloud service facts</span></a></p></li>
 </ul>
 </div>
 </div>
 <div class="section" id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
-<dt>field_funcs (optional)</dt><dd><p>List of pre-built field functions that retrieve values from hostvars.</p>
+<dt>get_functions (optional)</dt><dd><p>List of pre-built functions that retrieve data for the ‘hostvars_inventory_hostname’/’msg_vpn’ data in ‘hostvars’.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>default</strong>: []</div>
 </div>
 <dl>
-<dt>get_allClientConnectionDetails (optional)</dt><dd><p>Retrieve all enabled client connection details for the various protocols for the service/broker.</p>
+<dt>get_serviceDmrClusterConnectionDetails (optional)</dt><dd><p>Retrieve DMR cluster connection details for the service/broker.</p>
+<p>Note: Currently only supports Solace Cloud services.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: str</div>
 </div>
 </dd>
-<dt>get_bridge_remoteMsgVpnLocations (optional)</dt><dd><p>Retrieve enabled remote message vpn locations (plain, secured, compressed) for the service/broker.</p>
+<dt>get_serviceTrustStoreDetails (optional)</dt><dd><p>Retrieve the URI for to download client certificates if enabled.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>get_serviceVirtualRouterName (optional)</dt><dd><p>Retrieve the virtual router name.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>get_vpnAttributes (optional)</dt><dd><p>Retrieve attributes of the message Vpn.</p>
+<p>Requires ‘msg_vpn’ parameter if more than 1 Vpn exists.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>get_vpnBridgeRemoteMsgVpnLocations (optional)</dt><dd><p>Retrieve enabled remote message vpn locations (plain, secured, compressed) for the service/broker.</p>
+<p>Requires ‘msg_vpn’ parameter if more than 1 Vpn exists.</p>
 <p>For Solace Cloud: {hostname}:{port}.</p>
 <p>For broker: v:{virtualRouterName}.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: str</div>
 </div>
 </dd>
-<dt>get_dmrClusterConnectionDetails (optional)</dt><dd><p>Retrieve all DMR cluster connection details for the service/broker.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>get_serviceSmfCompressionListenPort (optional)</dt><dd><p>Retrieve the smf compressed listen port</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>get_serviceSMFMessagingEndpoints (optional)</dt><dd><p>Retrieve the all smf messaging endpoints</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>get_serviceSmfPlainTextListenPort (optional)</dt><dd><p>Retrieve the smf plain listen port</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>get_serviceSmfTlsListenPort (optional)</dt><dd><p>Retrieve the smf tls listen port</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>get_virtualRouterName (optional)</dt><dd><p>Retrieve the virtual router name</p>
+<dt>get_vpnClientConnectionDetails (optional)</dt><dd><p>Retrieve all enabled client connection details for the various protocols for the service/broker.</p>
+<p>Requires ‘msg_vpn’ parameter if more than 1 Vpn exists.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: str</div>
 </div>
 </dd>
 </dl>
 </dd>
-<dt>host (required)</dt><dd><p>The playbook host to retrieve the facts from.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>hostvars (required)</dt><dd><p>The playbook’s ‘hostvars’.</p>
+<dt>hostvars (required)</dt><dd><p>The playbook’s ‘hostvars’. Contains all facts for all hosts / brokers.</p>
+<p>Always set to: ‘hostvars: “{{ hostvars }}”</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: dict</div>
 </div>
 </dd>
-<dt>msg_vpn (optional)</dt><dd><p>The message vpn.</p>
+<dt>hostvars_inventory_hostname (required)</dt><dd><p>The ‘inventory_hostname’, i.e. the playbook’s host, to retrieve the facts from as available in ‘hostvars’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>msg_vpn (optional)</dt><dd><p>The message vpn of the broker to retrieve the facts from.</p>
+<p>Only required for certain ‘get_functions’ if more than 1 Vpn exists.</p>
+<p>Can be omitted if only 1 Vpn exists.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: str</div>
 </div>
@@ -367,11 +387,369 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
-  <span class="nt">&quot;facts&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;serviceSmfCompressionListenPort&quot;</span><span class="p">:</span> <span class="mi">55003</span><span class="p">,</span>
-    <span class="nt">&quot;serviceSmfPlainTextListenPort&quot;</span><span class="p">:</span> <span class="mi">55555</span><span class="p">,</span>
-    <span class="nt">&quot;serviceSmfTlsListenPort&quot;</span><span class="p">:</span> <span class="mi">55443</span><span class="p">,</span>
-    <span class="nt">&quot;virtualRouterName&quot;</span><span class="p">:</span> <span class="s2">&quot;single-aws-eu-west-6e-4ftdf&quot;</span>
+  <span class="nt">&quot;self_hosted&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;serviceDmrClusterConnectionDetails&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;note&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;feature currently not supported&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;extract dmr cluster connection details for broker-type=self_hosted&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pls raise a new feature request if required&quot;</span>
+      <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;serviceTrustStoreDetails&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">false</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;serviceVirtualRouterName&quot;</span><span class="p">:</span> <span class="s2">&quot;4a140514b2a1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;vpnAttributes&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;msgVpn&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;vpnBridgeRemoteMsgVpnLocations&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="s2">&quot;v:4a140514b2a1&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="s2">&quot;v:4a140514b2a1&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="s2">&quot;v:4a140514b2a1&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;vpnClientConnectionDetails&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;AMQP&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;authentication&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">5672</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">5671</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_plain&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;ws_secured&quot;</span><span class="p">:</span> <span class="kc">null</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;JMS&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;authentication&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">55003</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">55555</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">55443</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_plain&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;ws_secured&quot;</span><span class="p">:</span> <span class="kc">null</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;MQTT&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;authentication&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">1883</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">8883</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">8000</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">8443</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;REST&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;authentication&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">9000</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">9443</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_plain&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;ws_secured&quot;</span><span class="p">:</span> <span class="kc">null</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;SMF&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;authentication&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">55003</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">55555</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">55443</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="s2">&quot;8008&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">1443</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;brokerMgmtType&quot;</span><span class="p">:</span> <span class="s2">&quot;self_hosted&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;msgVpn&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;trustStore&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">false</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;solace_cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;serviceDmrClusterConnectionDetails&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;clusterName&quot;</span><span class="p">:</span> <span class="s2">&quot;cluster-aws-ca-central-1a-1oqbbo5q53bt&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;ia48anu4ru6qhmopopmrgacs9v&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;primaryRouterName&quot;</span><span class="p">:</span> <span class="s2">&quot;pri-aws-ca-central-1a-1oqbbo5q53bt&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;remoteAddress&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;serviceTrustStoreDetails&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/root/DigiCert_Global_Root_CA.pem&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;serviceVirtualRouterName&quot;</span><span class="p">:</span> <span class="s2">&quot;pri-aws-ca-central-1a-1oqbbo5q53bt&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;vpnAttributes&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;msgVpn&quot;</span><span class="p">:</span> <span class="s2">&quot;asc_test_120&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;vpnBridgeRemoteMsgVpnLocations&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud:55003&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud:55555&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud:55443&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;vpnClientConnectionDetails&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;AMQP&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;authentication&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;m35lqpr8h5hgtbknq1e1lvdj5d&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;solace-cloud-client&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="kc">null</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;amqp://mr1oqbbo5q53bt.messaging.solace.cloud:5672&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">5672</span><span class="p">,</span>
+            <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;amqp&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;amqps://mr1oqbbo5q53bt.messaging.solace.cloud:5671&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">5671</span><span class="p">,</span>
+            <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;amqps&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_plain&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;ws_secured&quot;</span><span class="p">:</span> <span class="kc">null</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;JMS&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;authentication&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;m35lqpr8h5hgtbknq1e1lvdj5d&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;solace-cloud-client&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="kc">null</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;smf://mr1oqbbo5q53bt.messaging.solace.cloud:55555&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">55555</span><span class="p">,</span>
+            <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;smf&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;smfs://mr1oqbbo5q53bt.messaging.solace.cloud:55443&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">55443</span><span class="p">,</span>
+            <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;smfs&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_plain&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;ws_secured&quot;</span><span class="p">:</span> <span class="kc">null</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;MQTT&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;authentication&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;m35lqpr8h5hgtbknq1e1lvdj5d&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;solace-cloud-client&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="kc">null</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;tcp://mr1oqbbo5q53bt.messaging.solace.cloud:1883&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">1883</span><span class="p">,</span>
+            <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;tcp&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;ssl://mr1oqbbo5q53bt.messaging.solace.cloud:8883&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">8883</span><span class="p">,</span>
+            <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;ssl&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_plain&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;ws_secured&quot;</span><span class="p">:</span> <span class="kc">null</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;REST&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;authentication&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;m35lqpr8h5hgtbknq1e1lvdj5d&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;solace-cloud-client&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="kc">null</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;http://mr1oqbbo5q53bt.messaging.solace.cloud:9000&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">9000</span><span class="p">,</span>
+            <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;http&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;https://mr1oqbbo5q53bt.messaging.solace.cloud:9443&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">9443</span><span class="p">,</span>
+            <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;https&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_plain&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;ws_secured&quot;</span><span class="p">:</span> <span class="kc">null</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;SMF&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;authentication&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;m35lqpr8h5hgtbknq1e1lvdj5d&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;solace-cloud-client&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;compressed&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;tcp://mr1oqbbo5q53bt.messaging.solace.cloud:55003&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">55003</span><span class="p">,</span>
+            <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;tcp&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;plain&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;tcp://mr1oqbbo5q53bt.messaging.solace.cloud:55555&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">55555</span><span class="p">,</span>
+            <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;tcp&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;secured&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;tcps://mr1oqbbo5q53bt.messaging.solace.cloud:55443&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;uri_components&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1oqbbo5q53bt.messaging.solace.cloud&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="mi">55443</span><span class="p">,</span>
+            <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;tcps&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;ws_plain&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nt">&quot;ws_secured&quot;</span><span class="p">:</span> <span class="kc">null</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;brokerMgmtType&quot;</span><span class="p">:</span> <span class="s2">&quot;solace_cloud&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;msgVpn&quot;</span><span class="p">:</span> <span class="s2">&quot;asc_test_120&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;trustStore&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nt">&quot;uri&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/root/DigiCert_Global_Root_CA.pem&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -420,7 +798,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 04 Feb 2021 at 14:29.
+        Last updated on 15 Feb 2021 at 19:34.
       </span>
 
     </p>

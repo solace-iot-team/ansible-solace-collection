@@ -34,14 +34,18 @@ The collection is available on `Ansible Galaxy`_.
   solace_get_modules
   roles
 
-Repos
------
+Repos & Links
+-------------
 
 - `Ansible Solace Collection`_
 - `Ansible Solace Tutorials and Projects`_
+- `Release Notes`_
 
 .. _Ansible Solace Collection:
   https://github.com/solace-iot-team/ansible-solace-collection
 
 .. _Ansible Solace Tutorials and Projects:
   https://github.com/solace-iot-team/ansible-solace
+
+.. _Release Notes:
+  https://github.com/solace-iot-team/ansible-solace-collection/blob/main/ReleaseNotes.md

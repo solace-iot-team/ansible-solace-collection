@@ -75,6 +75,7 @@ Notes
    - Uses deprecated SempV2 API. Since 2.19, broker supports 'clientCertAuthority' & 'domainCertAuthority' instead. Raise an issue if these are required.
    - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
    - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
+   - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
 
 
 See Also

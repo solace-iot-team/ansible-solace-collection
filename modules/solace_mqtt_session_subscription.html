@@ -101,7 +101,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration Modules</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../solace_config_modules.html#configuration-settings-for-modules">Configuration Settings for Modules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../solace_config_modules.html#idempotency">Idempotency</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../solace_config_modules.html#module-reference">Module Reference</a><ul class="current">
@@ -132,11 +132,15 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="solace_queue.html">solace_queue – queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_queue_cancel_replay.html">solace_queue_cancel_replay – cancel replay on queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_queue_start_replay.html">solace_queue_start_replay – start replay on queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_queue_subscription.html">solace_queue_subscription – subscription on a queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp.html">solace_rdp – rest delivery point</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_queue_binding.html">solace_rdp_queue_binding – queue bindining on rdp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer.html">solace_rdp_rest_consumer – rest consumer on rdp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer_trusted_cn.html">solace_rdp_rest_consumer_trusted_cn – trusted common name on rdp rest consumer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_replay_log.html">solace_replay_log – replay log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_replay_log_trim_logged_msgs.html">solace_replay_log_trim_logged_msgs – trim msgs on replay log</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_topic_endpoint.html">solace_topic_endpoint – topic endpoint</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_vpn.html">solace_vpn – vpn</a></li>
 </ul>
@@ -195,7 +199,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../solace_config_modules.html">Solace Configuration Modules</a> &raquo;</li>
+          <li><a href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a> &raquo;</li>
         
       <li>solace_mqtt_session_subscription – subscription for mqtt session</li>
     
@@ -282,6 +286,7 @@
 <li><p>Module Sempv2 Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/mqttSession/createMsgVpnMqttSessionSubscription">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/mqttSession/createMsgVpnMqttSessionSubscription</a></p></li>
 <li><p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a></p></li>
 <li><p>Sempv2 Monitor Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/</a></p></li>
+<li><p>Sempv2 Action Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/</a></p></li>
 </ul>
 </div>
 </div>
@@ -436,7 +441,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 04 Feb 2021 at 14:29.
+        Last updated on 15 Feb 2021 at 19:34.
       </span>
 
     </p>

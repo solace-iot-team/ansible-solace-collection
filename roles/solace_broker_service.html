@@ -100,7 +100,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../solace_get_modules.html">Solace Get Object List Modules</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../roles.html">Roles</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">solace_broker_service - manage a broker service</a><ul>
@@ -325,29 +325,29 @@
       <span class="c1">#container.  This may result in port collisions on commonly used</span>
       <span class="c1">#ports that will cause failure of the container to start.</span>
         <span class="c1">#Web transport</span>
-        <span class="c1">#- &#39;80:80&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&#39;80:80&#39;</span>
         <span class="c1">#Web transport over TLS</span>
-        <span class="c1">#- &#39;443:443&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&#39;443:443&#39;</span>
         <span class="c1">#SEMP over TLS</span>
-        <span class="c1">#- &#39;1943:1943&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&#39;1943:1943&#39;</span>
         <span class="c1">#MQTT Default VPN</span>
         <span class="p p-Indicator">-</span> <span class="s">&#39;1883:1883&#39;</span>
         <span class="c1">#AMQP Default VPN over TLS</span>
-        <span class="c1">#- &#39;5671:5671&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&#39;5671:5671&#39;</span>
         <span class="c1">#AMQP Default VPN</span>
-        <span class="c1">#- &#39;5672:5672&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&#39;5672:5672&#39;</span>
         <span class="c1">#MQTT Default VPN over WebSockets</span>
-        <span class="c1">#- &#39;8000:8000&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&#39;8000:8000&#39;</span>
         <span class="c1">#MQTT Default VPN over WebSockets / TLS</span>
-        <span class="c1">#- &#39;8443:8443&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&#39;8443:8443&#39;</span>
         <span class="c1">#MQTT Default VPN over TLS</span>
-        <span class="c1">#- &#39;8883:8883&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&#39;8883:8883&#39;</span>
         <span class="c1">#SEMP / PubSub+ Manager</span>
         <span class="p p-Indicator">-</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_port</span><span class="nv"> </span><span class="s">}}:{{</span><span class="nv"> </span><span class="s">sempv2_port</span><span class="nv"> </span><span class="s">}}&quot;</span>
         <span class="c1">#REST Default VPN</span>
-        <span class="c1">#- &#39;9000:9000&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&#39;9000:9000&#39;</span>
         <span class="c1">#REST Default VPN over TLS</span>
-        <span class="c1">#- &#39;9443:9443&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&#39;9443:9443&#39;</span>
         <span class="c1">#SMF</span>
         <span class="p p-Indicator">-</span> <span class="s">&#39;55555:55555&#39;</span>
         <span class="c1">#SMF Compressed</span>
@@ -379,7 +379,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 04 Feb 2021 at 14:29.
+        Last updated on 15 Feb 2021 at 19:34.
       </span>
 
     </p>

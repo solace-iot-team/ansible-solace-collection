@@ -101,7 +101,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../solace_get_modules.html">Solace Get Object List Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../solace_get_modules.html#module-reference">Module Reference</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="solace_get_acl_profiles.html">solace_get_acl_profiles – get list of acl profiles</a></li>
@@ -123,7 +123,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_facts.html">solace_get_facts – get facts from ansible_facts.solace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_facts.html">solace_get_facts – get facts for a broker/vpn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_magic_queues.html">solace_get_magic_queues – get ‘magic’ queues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_session_subscriptions.html">solace_get_mqtt_session_subscriptions – get list of mqtt session subscriptions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_sessions.html">solace_get_mqtt_sessions – get list of mqtt sessions</a></li>
@@ -133,11 +133,12 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_rest_consumer_trusted_cns.html">solace_get_rdp_rest_consumer_trusted_cns – get list of rdp rest consumer trusted common names</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_rest_consumers.html">solace_get_rdp_rest_consumers – get list of rdp rest consumers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdps.html">solace_get_rdps – get list of rdps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_replay_logs.html">solace_get_replay_logs – get list of replay logs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_topic_endpoints.html">solace_get_topic_endpoints – get list of topic endpoints</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_vpn_clients.html">solace_get_vpn_clients – get list of vpn clients</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_vpns.html">solace_get_vpns – get list of vpns</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_available.html">solace_get_available – check if broker is available</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_facts.html">solace_get_facts – get facts from ansible_facts.solace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_facts.html">solace_get_facts – get facts for a broker/vpn</a></li>
 </ul>
 </li>
 </ul>
@@ -275,6 +276,7 @@
 <li><p>Module Sempv2 Monitor: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/getDmrClusters">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrCluster/getDmrClusters</a></p></li>
 <li><p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a></p></li>
 <li><p>Sempv2 Monitor Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/</a></p></li>
+<li><p>Sempv2 Action Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/</a></p></li>
 </ul>
 </div>
 </div>
@@ -426,7 +428,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 04 Feb 2021 at 14:29.
+        Last updated on 15 Feb 2021 at 19:34.
       </span>
 
     </p>

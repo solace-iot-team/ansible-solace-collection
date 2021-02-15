@@ -54,6 +54,7 @@ Notes
    - Module Solace Cloud Api - get service: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm
    - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
    - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
+   - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
 
 
 See Also

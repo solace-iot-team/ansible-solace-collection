@@ -117,7 +117,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../solace_get_modules.html">Solace Get Object List Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../roles.html">Roles</a></li>
 </ul>
@@ -196,7 +196,7 @@
             
   <div class="section" id="solace-cloud-get-facts-get-solace-cloud-service-facts">
 <span id="solace-cloud-get-facts-module"></span><h1>solace_cloud_get_facts – get Solace Cloud service facts<a class="headerlink" href="#solace-cloud-get-facts-get-solace-cloud-service-facts" title="Permalink to this headline">¶</a></h1>
-<p>Convenience functions to access Solace Cloud service facts gathered with <a class="reference internal" href="solace_cloud_get_service.html#solace-cloud-get-service-module"><span class="std std-ref">solace_cloud_get_service</span></a>.</p>
+<p>Convenience functions to access Solace Cloud service facts gathered with <a class="reference internal" href="solace_cloud_get_service.html#solace-cloud-get-service-module"><span class="std std-ref">solace_cloud_get_service</span></a> and returned by <a class="reference internal" href="solace_cloud_service.html#solace-cloud-service-module"><span class="std std-ref">solace_cloud_service</span></a>.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
@@ -207,62 +207,37 @@
 <span class="nt">tasks</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="nt">set_fact</span><span class="p">:</span>
       <span class="nt">api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">SOLACE_CLOUD_API_TOKEN</span> <span class="k">if</span> <span class="nv">broker_type</span><span class="o">==</span><span class="s1">&#39;solace_cloud&#39;</span> <span class="k">else</span> <span class="nv">omit</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">service_id</span><span class="p">:</span> <span class="s">&quot;the-service-id&quot;</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Get</span><span class="nv"> </span><span class="s">Service&quot;</span>
-    <span class="nt">solace_cloud_get_service</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get a list of all services in the account</span>
+    <span class="nt">solace_cloud_get_services</span><span class="p">:</span>
       <span class="nt">api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">api_token</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">service_id</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_id</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Set</span><span class="nv"> </span><span class="s">Fact:</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Service</span><span class="nv"> </span><span class="s">Details&quot;</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">save first service in list</span>
     <span class="nt">set_fact</span><span class="p">:</span>
-      <span class="nt">sc_service_details</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.response</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">sc_service</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span><span class="o">[</span><span class="m">0</span><span class="o">]</span> <span class="cp">}}</span><span class="s">&quot;</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Get</span><span class="nv"> </span><span class="s">Semp</span><span class="nv"> </span><span class="s">Management</span><span class="nv"> </span><span class="s">Endpoints&quot;</span>
-    <span class="nt">solace_cloud_get_facts</span><span class="p">:</span>
-      <span class="nt">from_dict</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service_details</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">field_funcs</span><span class="p">:</span>
-        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_serviceSEMPManagementEndpoints</span>
-      <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">semp_enpoints_facts</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get all details for first service in list</span>
+    <span class="nt">solace_cloud_get_service</span><span class="p">:</span>
+      <span class="nt">api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">api_token</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">service_id</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service.serviceId</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Save</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Cloud</span><span class="nv"> </span><span class="s">Service</span><span class="nv"> </span><span class="s">SEMP</span><span class="nv"> </span><span class="s">Management</span><span class="nv"> </span><span class="s">Endpoints</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">File&quot;</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">save service details</span>
+    <span class="nt">set_fact</span><span class="p">:</span>
+      <span class="nt">sc_service_details</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.service</span> <span class="cp">}}</span><span class="s">&quot;</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">save details to file</span>
     <span class="nt">copy</span><span class="p">:</span>
-      <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">semp_enpoints_facts</span> <span class="o">|</span> <span class="nf">to_nice_json</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./tmp/facts.solace_cloud_service.semp.json&quot;</span>
+      <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service_details</span> <span class="o">|</span> <span class="nf">to_nice_json</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./solace_cloud_service.</span><span class="cp">{{</span> <span class="nv">sc_service.name</span> <span class="cp">}}</span><span class="s">.details.json&quot;</span>
     <span class="nt">delegate_to</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Set</span><span class="nv"> </span><span class="s">Fact:</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Service</span><span class="nv"> </span><span class="s">SEMP&quot;</span>
-    <span class="nt">set_fact</span><span class="p">:</span>
-      <span class="nt">sempv2_host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.host</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">sempv2_port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.port</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">sempv2_is_secure_connection</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-      <span class="nt">sempv2_username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.username</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">sempv2_password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.password</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">sempv2_timeout</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">60</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Gather</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Facts</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">Service&quot;</span>
-    <span class="nt">solace_gather_facts</span><span class="p">:</span>
-      <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">solace_cloud_api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">api_token</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">solace_cloud_service_id</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">serviceId</span> <span class="cp">}}</span><span class="s">&quot;</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Save</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Cloud</span><span class="nv"> </span><span class="s">Service</span><span class="nv"> </span><span class="s">Facts</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">File&quot;</span>
-    <span class="nt">copy</span><span class="p">:</span>
-      <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ansible_facts.solace</span> <span class="o">|</span> <span class="nf">to_nice_json</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./tmp/solace_facts.solace_cloud_service.json&quot;</span>
-    <span class="nt">delegate_to</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Get</span><span class="nv"> </span><span class="s">Host</span><span class="nv"> </span><span class="s">Inventory&quot;</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get host inventory for service</span>
     <span class="nt">solace_cloud_get_facts</span><span class="p">:</span>
       <span class="nt">from_dict</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service_details</span> <span class="cp">}}</span><span class="s">&quot;</span>
       <span class="nt">get_formattedHostInventory</span><span class="p">:</span>
-        <span class="nt">host_entry</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service_name</span> <span class="cp">}}</span><span class="s">&quot;</span>
+        <span class="nt">host_entry</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service.name</span> <span class="cp">}}</span><span class="s">&quot;</span>
         <span class="nt">api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">api_token</span> <span class="cp">}}</span><span class="s">&quot;</span>
         <span class="nt">meta</span><span class="p">:</span>
           <span class="nt">service_name</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service_details.name</span> <span class="cp">}}</span><span class="s">&quot;</span>
@@ -271,12 +246,56 @@
           <span class="nt">serviceTypeId</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service_details.serviceTypeId</span><span class="cp">}}</span><span class="s">&quot;</span>
           <span class="nt">serviceClassId</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service_details.serviceClassId</span> <span class="cp">}}</span><span class="s">&quot;</span>
           <span class="nt">serviceClassDisplayedAttributes</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service_details.serviceClassDisplayedAttributes</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inv_results</span>
+    <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Save</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Cloud</span><span class="nv"> </span><span class="s">Service</span><span class="nv"> </span><span class="s">inventory</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">File&quot;</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">save new service inventory to file</span>
     <span class="nt">copy</span><span class="p">:</span>
-      <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inv_results.facts.formattedHostInventory</span> <span class="o">|</span> <span class="nf">to_nice_json</span> <span class="cp">}}</span><span class="s">&quot;</span>
-      <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./tmp/inventory.</span><span class="cp">{{</span> <span class="nv">sc_service_name</span> <span class="cp">}}</span><span class="s">.json&quot;</span>
+      <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.facts.formattedHostInventory</span> <span class="o">|</span> <span class="nf">to_nice_yaml</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./inventory.</span><span class="cp">{{</span> <span class="nv">sc_service.name</span> <span class="cp">}}</span><span class="s">.yml&quot;</span>
+    <span class="nt">delegate_to</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">extract the service facts</span>
+    <span class="nt">set_fact</span><span class="p">:</span>
+      <span class="nt">inventory_facts</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.facts.formattedHostInventory.all.hosts</span><span class="o">[</span><span class="nv">sc_service.name</span><span class="o">]</span> <span class="cp">}}</span><span class="s">&quot;</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set semp connection facts</span>
+    <span class="nt">set_fact</span><span class="p">:</span>
+      <span class="nt">sempv2_host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_facts.sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">sempv2_port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_facts.sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">sempv2_is_secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_facts.sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">sempv2_username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_facts.sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">sempv2_password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_facts.sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">sempv2_timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_facts.sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_facts.vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">gather facts for service</span>
+    <span class="nt">solace_gather_facts</span><span class="p">:</span>
+      <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">solace_cloud_api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">api_token</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">solace_cloud_service_id</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sc_service.serviceId</span> <span class="cp">}}</span><span class="s">&quot;</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">retrieve all client connection details</span>
+    <span class="nt">solace_get_facts</span><span class="p">:</span>
+      <span class="nt">hostvars</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">hostvars</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">hostvars_inventory_hostname</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">inventory_hostname</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">get_functions</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_allClientConnectionDetails</span>
+    <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">save connection details</span>
+    <span class="nt">set_fact</span><span class="p">:</span>
+      <span class="nt">client_connection_details</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.facts</span> <span class="cp">}}</span><span class="s">&quot;</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">save connection details to file</span>
+    <span class="nt">copy</span><span class="p">:</span>
+      <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">client_connection_details</span> <span class="o">|</span> <span class="nf">to_nice_json</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./facts.solace_cloud_service.</span><span class="cp">{{</span> <span class="nv">sc_service.name</span> <span class="cp">}}</span><span class="s">.client_connection_details.json&quot;</span>
     <span class="nt">delegate_to</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
 </pre></div>
 </div>
@@ -287,26 +306,16 @@
 <p class="admonition-title">See also</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="solace_cloud_get_service.html#solace-cloud-get-service-module"><span class="std std-ref">solace_cloud_get_service – get Solace Cloud service details</span></a></p></li>
+<li><p><a class="reference internal" href="solace_cloud_service.html#solace-cloud-service-module"><span class="std std-ref">solace_cloud_service – manage Solace Cloud services</span></a></p></li>
+<li><p><a class="reference internal" href="solace_gather_facts.html#solace-gather-facts-module"><span class="std std-ref">solace_gather_facts – gather broker facts</span></a></p></li>
+<li><p><a class="reference internal" href="solace_get_facts.html#solace-get-facts-module"><span class="std std-ref">solace_get_facts – get facts for a broker/vpn</span></a></p></li>
 </ul>
 </div>
 </div>
 <div class="section" id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
-<dt>field_funcs (optional)</dt><dd><p>List of pre-built field functions that retrieve values from the ‘from_dict’.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: list</div>
-<div class="line"><strong>default</strong>: []</div>
-</div>
-<dl>
-<dt>get_serviceSEMPManagementEndpoints (optional)</dt><dd><p>Retrieves the SEMP management endpoint.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-</dl>
-</dd>
-<dt>from_dict (required)</dt><dd><p>The JSON object (dict) which holds the service facts.</p>
+<dt>from_dict (required)</dt><dd><p>The JSON object (dict) which holds the service facts. Could be the result of <a class="reference internal" href="solace_cloud_get_service.html#solace-cloud-get-service-module"><span class="std std-ref">solace_cloud_get_service</span></a> or <a class="reference internal" href="solace_cloud_service.html#solace-cloud-service-module"><span class="std std-ref">solace_cloud_service</span></a> (state=present).</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: dict</div>
 </div>
@@ -365,6 +374,46 @@
 <div class="line-block">
 <div class="line"><strong>returned</strong>: success</div>
 <div class="line"><strong>type</strong>: dict</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
+  <span class="nt">&quot;get_formattedHostInventory&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;all&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;hosts&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;asc_test_1&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;ansible_connection&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;broker_type&quot;</span><span class="p">:</span> <span class="s2">&quot;solace_cloud&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;datacenterId&quot;</span><span class="p">:</span> <span class="s2">&quot;aws-ca-central-1a&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;serviceClassDisplayedAttributes&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;Clients&quot;</span><span class="p">:</span> <span class="s2">&quot;250&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;High Availability&quot;</span><span class="p">:</span> <span class="s2">&quot;HA Group&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;Message Broker Tenancy&quot;</span><span class="p">:</span> <span class="s2">&quot;Dedicated&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;Network Speed&quot;</span><span class="p">:</span> <span class="s2">&quot;450 Mbps&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;Network Usage&quot;</span><span class="p">:</span> <span class="s2">&quot;50 GB per month&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;Queues&quot;</span><span class="p">:</span> <span class="s2">&quot;250&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;Storage&quot;</span><span class="p">:</span> <span class="s2">&quot;25 GB&quot;</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;serviceClassId&quot;</span><span class="p">:</span> <span class="s2">&quot;enterprise-250-nano&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;serviceTypeId&quot;</span><span class="p">:</span> <span class="s2">&quot;enterprise&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;service_id&quot;</span><span class="p">:</span> <span class="s2">&quot;1n34cqfh9i7x&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;service_name&quot;</span><span class="p">:</span> <span class="s2">&quot;asc_test_1&quot;</span>
+          <span class="p">},</span>
+          <span class="nt">&quot;sempv2_host&quot;</span><span class="p">:</span> <span class="s2">&quot;mr1n34cqfh9i8x.messaging.solace.cloud&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;sempv2_is_secure_connection&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;sempv2_password&quot;</span><span class="p">:</span> <span class="s2">&quot;hihqxxx92sa3bc2sphtp3nl&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;sempv2_port&quot;</span><span class="p">:</span> <span class="mi">943</span><span class="p">,</span>
+          <span class="nt">&quot;sempv2_timeout&quot;</span><span class="p">:</span> <span class="s2">&quot;60&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;sempv2_username&quot;</span><span class="p">:</span> <span class="s2">&quot;asc_test_1-admin&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;solace_cloud_service_id&quot;</span><span class="p">:</span> <span class="s2">&quot;1n34cqfh9i7x&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;virtual_router&quot;</span><span class="p">:</span> <span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;vpn&quot;</span><span class="p">:</span> <span class="s2">&quot;asc_test_1&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 </div>
 </dd>
 </dl>
@@ -387,7 +436,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 04 Feb 2021 at 14:29.
+        Last updated on 15 Feb 2021 at 19:34.
       </span>
 
     </p>

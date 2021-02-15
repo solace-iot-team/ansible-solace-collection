@@ -5,7 +5,7 @@
 solace_cloud_get_facts -- get Solace Cloud service facts
 ========================================================
 
-Convenience functions to access Solace Cloud service facts gathered with :ref:`solace_cloud_get_service <solace_cloud_get_service_module>`.
+Convenience functions to access Solace Cloud service facts gathered with :ref:`solace_cloud_get_service <solace_cloud_get_service_module>` and returned by :ref:`solace_cloud_service <solace_cloud_service_module>`.
 
 
 
@@ -24,62 +24,37 @@ Examples
    tasks:
      - set_fact:
          api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
-         service_id: "the-service-id"
 
-     - name: "Get Service"
-       solace_cloud_get_service:
+     - name: get a list of all services in the account
+       solace_cloud_get_services:
          api_token: "{{ api_token }}"
-         service_id: "{{ service_id }}"
        register: result
 
-     - name: "Set Fact: Solace Service Details"
+     - name: save first service in list
        set_fact:
-         sc_service_details: "{{ result.response }}"
+         sc_service: "{{ result.result_list[0] }}"
 
-     - name: "Get Semp Management Endpoints"
-       solace_cloud_get_facts:
-         from_dict: "{{ sc_service_details }}"
-         field_funcs:
-           - get_serviceSEMPManagementEndpoints
-         register: semp_enpoints_facts
+     - name: get all details for first service in list
+       solace_cloud_get_service:
+         api_token: "{{ api_token }}"
+         service_id: "{{ sc_service.serviceId }}"
+       register: result
 
-     - name: "Save Solace Cloud Service SEMP Management Endpoints to File"
+     - name: save service details
+       set_fact:
+         sc_service_details: "{{ result.service }}"
+
+     - name: save details to file
        copy:
-         content: "{{ semp_enpoints_facts | to_nice_json }}"
-         dest: "./tmp/facts.solace_cloud_service.semp.json"
+         content: "{{ sc_service_details | to_nice_json }}"
+         dest: "./solace_cloud_service.{{ sc_service.name }}.details.json"
        delegate_to: localhost
 
-     - name: "Set Fact: Solace Service SEMP"
-       set_fact:
-         sempv2_host: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.host }}"
-         sempv2_port: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.SecuredSEMP.uriComponents.port }}"
-         sempv2_is_secure_connection: True
-         sempv2_username: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.username }}"
-         sempv2_password: "{{ semp_enpoints_facts.facts.serviceManagementEndpoints.SEMP.password }}"
-         sempv2_timeout: 60
-
-     - name: "Gather Solace Facts from Service"
-       solace_gather_facts:
-         host: "{{ sempv2_host }}"
-         port: "{{ sempv2_port }}"
-         secure_connection: "{{ sempv2_is_secure_connection }}"
-         username: "{{ sempv2_username }}"
-         password: "{{ sempv2_password }}"
-         timeout: "{{ sempv2_timeout }}"
-         solace_cloud_api_token: "{{ api_token }}"
-         solace_cloud_service_id: "{{ serviceId }}"
-
-     - name: "Save Solace Cloud Service Facts to File"
-       copy:
-         content: "{{ ansible_facts.solace | to_nice_json }}"
-         dest: "./tmp/solace_facts.solace_cloud_service.json"
-       delegate_to: localhost
-
-     - name: "Get Host Inventory"
+     - name: get host inventory for service
        solace_cloud_get_facts:
          from_dict: "{{ sc_service_details }}"
          get_formattedHostInventory:
-           host_entry: "{{ sc_service_name }}"
+           host_entry: "{{ sc_service.name }}"
            api_token: "{{ api_token }}"
            meta:
              service_name: "{{ sc_service_details.name }}"
@@ -88,12 +63,56 @@ Examples
              serviceTypeId: "{{ sc_service_details.serviceTypeId}}"
              serviceClassId: "{{ sc_service_details.serviceClassId }}"
              serviceClassDisplayedAttributes: "{{ sc_service_details.serviceClassDisplayedAttributes }}"
-       register: inv_results
+       register: result
 
-     - name: "Save Solace Cloud Service inventory to File"
+     - name: save new service inventory to file
        copy:
-         content: "{{ inv_results.facts.formattedHostInventory | to_nice_json }}"
-         dest: "./tmp/inventory.{{ sc_service_name }}.json"
+         content: "{{ result.facts.formattedHostInventory | to_nice_yaml }}"
+         dest: "./inventory.{{ sc_service.name }}.yml"
+       delegate_to: localhost
+
+     - name: extract the service facts
+       set_fact:
+         inventory_facts: "{{ result.facts.formattedHostInventory.all.hosts[sc_service.name] }}"
+
+     - name: set semp connection facts
+       set_fact:
+         sempv2_host: "{{ inventory_facts.sempv2_host }}"
+         sempv2_port: "{{ inventory_facts.sempv2_port }}"
+         sempv2_is_secure_connection: "{{ inventory_facts.sempv2_is_secure_connection }}"
+         sempv2_username: "{{ inventory_facts.sempv2_username }}"
+         sempv2_password: "{{ inventory_facts.sempv2_password }}"
+         sempv2_timeout: "{{ inventory_facts.sempv2_timeout }}"
+         vpn: "{{ inventory_facts.vpn }}"
+
+     - name: gather facts for service
+       solace_gather_facts:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         solace_cloud_api_token: "{{ api_token }}"
+         solace_cloud_service_id: "{{ sc_service.serviceId }}"
+
+     - name: retrieve all client connection details
+       solace_get_facts:
+         hostvars: "{{ hostvars }}"
+         hostvars_inventory_hostname: "{{ inventory_hostname }}"
+         msg_vpn: "{{ vpn }}"
+         get_functions:
+           - get_allClientConnectionDetails
+       register: result
+
+     - name: save connection details
+       set_fact:
+         client_connection_details: "{{ result.facts }}"
+
+     - name: save connection details to file
+       copy:
+         content: "{{ client_connection_details | to_nice_json }}"
+         dest: "./facts.solace_cloud_service.{{ sc_service.name }}.client_connection_details.json"
        delegate_to: localhost
 
 
@@ -106,26 +125,18 @@ See Also
 .. seealso::
 
    - :ref:`solace_cloud_get_service_module`
+   - :ref:`solace_cloud_service_module`
+   - :ref:`solace_gather_facts_module`
+   - :ref:`solace_get_facts_module`
 
 
 
 Parameters
 ----------
 
-field_funcs (optional)
-  List of pre-built field functions that retrieve values from the 'from_dict'.
-
-  | **type**: list
-  | **default**: []
-
-  get_serviceSEMPManagementEndpoints (optional)
-    Retrieves the SEMP management endpoint.
-
-    | **type**: str
-
-
 from_dict (required)
-  The JSON object (dict) which holds the service facts.
+  The JSON object (dict) which holds the service facts. Could be the result of :ref:`solace_cloud_get_service <solace_cloud_get_service_module>` or :ref:`solace_cloud_service <solace_cloud_service_module>` (state=present).
+
 
   | **type**: dict
 
@@ -187,5 +198,46 @@ facts
 
   | **returned**: success
   | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "get_formattedHostInventory": {
+       "all": {
+         "hosts": {
+           "asc_test_1": {
+             "ansible_connection": "local",
+             "broker_type": "solace_cloud",
+             "meta": {
+               "datacenterId": "aws-ca-central-1a",
+               "serviceClassDisplayedAttributes": {
+                 "Clients": "250",
+                 "High Availability": "HA Group",
+                 "Message Broker Tenancy": "Dedicated",
+                 "Network Speed": "450 Mbps",
+                 "Network Usage": "50 GB per month",
+                 "Queues": "250",
+                 "Storage": "25 GB"
+               },
+               "serviceClassId": "enterprise-250-nano",
+               "serviceTypeId": "enterprise",
+               "service_id": "1n34cqfh9i7x",
+               "service_name": "asc_test_1"
+             },
+             "sempv2_host": "mr1n34cqfh9i8x.messaging.solace.cloud",
+             "sempv2_is_secure_connection": true,
+             "sempv2_password": "hihqxxx92sa3bc2sphtp3nl",
+             "sempv2_port": 943,
+             "sempv2_timeout": "60",
+             "sempv2_username": "asc_test_1-admin",
+             "solace_cloud_service_id": "1n34cqfh9i7x",
+             "virtual_router": "primary",
+             "vpn": "asc_test_1"
+           }
+         }
+       }
+     }
+   }
 
 
