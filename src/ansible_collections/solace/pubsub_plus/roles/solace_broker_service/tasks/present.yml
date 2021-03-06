@@ -4,6 +4,7 @@
 - set_fact:
     broker_url: "{{ 'https' if sempv2_is_secure_connection else 'http' }}://{{ sempv2_host }}:{{ sempv2_port }}"
   when: service_type == 'docker_single_node'
+  delegate_to: localhost
 
 - name: "Wait for Broker Up"
   uri:
@@ -15,11 +16,13 @@
   retries: 20
   delay: 5
   when: service_type == 'docker_single_node'
+  delegate_to: localhost
 
 - assert:
     that: result.status == 200
     fail_msg: "cannot reach broker on {{ broker_url }}"
   when: service_type == 'docker_single_node'
+  delegate_to: localhost
 
 # check if spool is fully activated, using create a queue as test
 - name: "Check if message spool is available"
@@ -37,11 +40,13 @@
   retries: 20
   delay: 5
   when: service_type == 'docker_single_node'
+  delegate_to: localhost
 
 - assert:
     that: result.rc == 0
     fail_msg: "failed to create queue: {{ result.msg }}"
   when: service_type == 'docker_single_node'
+  delegate_to: localhost
 
 - name: "clean up queue"
   solace.pubsub_plus.solace_queue:
@@ -54,11 +59,13 @@
     name: test_message_spool
     state: absent
   when: service_type == 'docker_single_node'
+  delegate_to: localhost
 
 - name: create inventory
   set_fact:
     inventory: "{{ lookup('template', 'docker_single_node.j2') | from_json}}"
   when: service_type == 'docker_single_node'
+  delegate_to: localhost
 
 - name: "Write Generated Inventory"
   copy:
