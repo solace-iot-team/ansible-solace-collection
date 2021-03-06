@@ -82,7 +82,7 @@ echo " >>> Test ssh to vm ..."
     ((tries++))
     ssh_test=$(ssh "$vmAdminUsr@$vmPublicIpAddress" "bash --version")
     code=$?
-    echo "ssh_test=$ssh_test"
+    echo "tries=$tries, ssh_test=$ssh_test"
     if [[ $code != 0 ]]; then echo "code=$code && tries=$tries, sleep 1m"; sleep 1m; fi
   done
   if [[ $code != 0 || -z "$ssh_test" ]]; then echo " >>> ERROR: ssh into vm"; exit 1; fi
