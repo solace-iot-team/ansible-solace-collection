@@ -5,6 +5,9 @@ name: integration tests
 on:
   # for testing
   workflow_dispatch:
+  push:
+    branches:
+      mtn-120
 
   schedule:
     # - cron: '0 5 * * THU'
@@ -33,6 +36,12 @@ jobs:
         # ansible-version: [ 'ansible>=2.9.11,<2.10.0' ]
 
     steps:
+
+      - name: ls ~/.ssh
+        run: |
+          # mkdir -p ~/.ssh
+          ls -la ~/.ssh
+          exit 1
 
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
@@ -111,7 +120,7 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{secrets.AZURE_CREDENTIALS}}
-          
+
       - name: Run Tests
         run: |
           export ANSIBLE_PYTHON_INTERPRETER=$(python -c "import sys; print(sys.executable)")
