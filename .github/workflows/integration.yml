@@ -34,15 +34,7 @@ jobs:
         ansible-version: [ 'ansible>=2.10.3' ]
         # ansible-version: [ 'ansible>=2.9.11,<2.10.0', 'ansible>=2.10.3' ]
         # ansible-version: [ 'ansible>=2.9.11,<2.10.0' ]
-
     steps:
-
-      - name: ls ~/.ssh
-        run: |
-          mkdir -p ~/.ssh
-          ls -la ~/.ssh
-          exit 1
-
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
         run: |

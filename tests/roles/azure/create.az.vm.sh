@@ -61,6 +61,8 @@ echo " >>> Creating azure vm ..."
     > $outputInfoFile
   if [[ $? != 0 ]]; then echo " >>> ERROR: creating azure vm"; exit 1; fi
   cat $outputInfoFile | jq .
+  cat ~/.ssh/id_rsa.pub
+  exit 1
 echo " >>> Success."
 
 echo " >>> Opening semp port on azure vm ..."
