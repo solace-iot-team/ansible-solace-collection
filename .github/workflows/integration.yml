@@ -22,7 +22,7 @@ env:
 jobs:
   integration_test:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       max-parallel: 1
       matrix:
@@ -106,6 +106,12 @@ jobs:
           ls -la
           ansible-galaxy collection list -vvv solace.pubsub_plus
 
+      - name: Azure Login
+        # https://github.com/marketplace/actions/azure-login
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+          
       - name: Run Tests
         run: |
           export ANSIBLE_PYTHON_INTERPRETER=$(python -c "import sys; print(sys.executable)")
