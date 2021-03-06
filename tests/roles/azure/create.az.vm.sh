@@ -61,7 +61,7 @@ echo " >>> Creating azure vm ..."
     > $outputInfoFile
   if [[ $? != 0 ]]; then echo " >>> ERROR: creating azure vm"; exit 1; fi
   cat $outputInfoFile | jq .
-  cat ~/.ssh/id_rsa.pub
+  cat ~/.ssh/id_rsa.pub; if [[ $? != 0 ]]; then echo " >>> ERROR: vm pub key"; exit 1; fi
   exit 1
 echo " >>> Success."
 
