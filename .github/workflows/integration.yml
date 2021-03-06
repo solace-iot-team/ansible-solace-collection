@@ -5,9 +5,9 @@ name: integration tests
 on:
   # for testing
   workflow_dispatch:
-  push:
-    branches:
-      mtn-120
+  # push:
+  #   branches:
+  #     mtn-120
 
   schedule:
     # - cron: '0 5 * * THU'
