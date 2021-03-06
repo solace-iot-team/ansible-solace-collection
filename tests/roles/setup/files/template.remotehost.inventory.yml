@@ -1,0 +1,11 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+---
+all:
+  hosts:
+    remotehost:
+      ansible_host: "public-ip-address"
+      ansible_user: "admin-user"
+      ansible_become: true
+      ansible_python_interpreter: "/usr/bin/python"
+      semp_port: 8080
