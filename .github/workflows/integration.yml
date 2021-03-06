@@ -39,7 +39,7 @@ jobs:
 
       - name: ls ~/.ssh
         run: |
-          # mkdir -p ~/.ssh
+          mkdir -p ~/.ssh
           ls -la ~/.ssh
           exit 1
 
