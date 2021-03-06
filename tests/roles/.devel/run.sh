@@ -12,6 +12,7 @@ export PROJECT_HOME=$projectHome
 
 
 ansibleSolaceTests=(
+  "teardown"
   "setup"
   "solace_broker_service"
   "teardown"

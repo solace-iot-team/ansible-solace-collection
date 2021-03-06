@@ -64,6 +64,8 @@ echo " >>> Creating azure vm ..."
   ls -la ~/.ssh/id_rsa*
   cat ~/.ssh/id_rsa; if [[ $? != 0 ]]; then echo " >>> ERROR: vm private key"; exit 1; fi
   cat ~/.ssh/id_rsa.pub; if [[ $? != 0 ]]; then echo " >>> ERROR: vm pub key"; exit 1; fi
+  ssh_test=$(ssh "$vmAdminUsr@$vmPublicIpAddress" "bash --version")
+  echo "ssh_test=$ssh_test"
   exit 1
 echo " >>> Success."
 
