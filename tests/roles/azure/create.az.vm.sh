@@ -63,10 +63,10 @@ echo " >>> Creating azure vm ..."
   cat $outputInfoFile | jq .
   ls -la ~/.ssh/id_rsa*
   cat ~/.ssh/id_rsa; if [[ $? != 0 ]]; then echo " >>> ERROR: vm private key"; exit 1; fi
-  cat ~/.ssh/id_rsa.pub; echo; if [[ $? != 0 ]]; then echo " >>> ERROR: vm pub key"; exit 1; fi
+  cat ~/.ssh/id_rsa.pub; echo ""; if [[ $? != 0 ]]; then echo " >>> ERROR: vm pub key"; exit 1; fi
   vmPublicIpAddress=$(cat $outputInfoFile | jq -r '.publicIpAddress')
   ssh_test=$(ssh "$vmAdminUsr@$vmPublicIpAddress" "bash --version")
-  if [[ $? != 0 ]]; then echo " >>> ERROR: ssh into vm"; exit 1; fi
+  if [[ $? != 0 || -z "$ssh_test" ]]; then echo " >>> ERROR: ssh into vm"; exit 1; fi
   echo "ssh_test=$ssh_test"
   exit 1
 echo " >>> Success."
