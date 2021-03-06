@@ -88,8 +88,6 @@ echo " >>> Test ssh to vm ..."
   if [[ $code != 0 || -z "$ssh_test" ]]; then echo " >>> ERROR: ssh into vm"; exit 1; fi
 echo " >>> Success."
 
-exit 1
-
 echo " >>> Calling Bootstrap vm ..."
   vmPublicIpAddress=$(cat $outputInfoFile | jq -r '.publicIpAddress')
   export vmPublicIpAddress
