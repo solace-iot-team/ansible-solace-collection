@@ -2,7 +2,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "main: broker_service"
+  name: "create: broker_service"
   hosts: all
   gather_facts: no
   any_errors_fatal: true
@@ -10,10 +10,12 @@
   - include_vars:
       file: "env.vars.yml"
       name: env
+  vars:
+    broker_project_name: test_roles_local_broker_service_single_node
   tasks:
     - name: "Check vars"
       set_fact:
-        genenrated_inventory_file: "{{ WORKING_DIR }}/{{ env.broker_inventory_file_name }}"
+        genenrated_inventory_file: "{{ WORKING_DIR }}/{{ env.local_broker_inventory_file_name }}"
 
     - name: "Broker Service Delete"
       include_role:
@@ -21,7 +23,7 @@
       vars:
         service_type: docker_single_node
         state: absent
-        project_name: test_roles_broker_service_single_node
+        project_name: "{{ broker_project_name }}"
         generated_inventory_file: "{{ genenrated_inventory_file }}"
 
     - name: "Broker Service Setup"
@@ -30,18 +32,9 @@
       vars:
         service_type: docker_single_node
         state: present
-        project_name: test_roles_broker_service_single_node
+        project_name: "{{ broker_project_name }}"
         container_name: "pubSubStandardSingleNode"
         image: "{{ BROKER_DOCKER_IMAGE }}"
-        generated_inventory_file: "{{ genenrated_inventory_file }}"
-
-    - name: "Broker Service Delete"
-      include_role:
-        name: solace.pubsub_plus.solace_broker_service
-      vars:
-        service_type: docker_single_node
-        state: absent
-        project_name: test_roles_broker_service_single_node
         generated_inventory_file: "{{ genenrated_inventory_file }}"
 
 
