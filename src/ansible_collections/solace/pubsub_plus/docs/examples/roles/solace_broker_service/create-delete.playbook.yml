@@ -1,0 +1,25 @@
+-
+  name: broker service
+  hosts: all
+  tasks:
+    - name: standup broker service
+      include_role:
+        name: solace.pubsub_plus.solace_broker_service
+      vars:
+        service_type: docker_single_node
+        state: present
+        project_name: broker_service_single_node
+        container_name: "pubSubStandardSingleNode"
+        image: "solace/solace-pubsub-standard:latest"
+        generated_inventory_file: "./tmp/{{ inventory_hostname }}.broker.inventory.yml"
+        sempv2_host: "{{ ansible_host }}"
+        sempv2_port: "{{ semp_port }}"
+
+    - name: delete broker service
+      include_role:
+        name: solace.pubsub_plus.solace_broker_service
+      vars:
+        service_type: docker_single_node
+        state: absent
+        project_name: broker_service_single_node
+        generated_inventory_file: "./tmp/{{ inventory_hostname }}.broker.inventory.yml"
