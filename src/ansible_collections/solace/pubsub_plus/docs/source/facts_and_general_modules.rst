@@ -44,16 +44,17 @@ For example, to get the connection details of a newly created Solace Cloud servi
   - name: "Gather Solace Facts"
     solace_gather_facts:
 
-  - name: "Get Facts: all client connection details"
+  - name: get_vpnClientConnectionDetails
     solace_get_facts:
-      hostvars: "{{ hostvars }}"
-      host: "{{ inventory_hostname }}"
-      field_funcs:
-        - get_allClientConnectionDetails
+      hostvars: "{{ hostvars }}" # always use this setting
+      hostvars_inventory_hostname: "{{ inventory_hostname }}"
+      msg_vpn: "{{ vpn }}"
+      get_functions:
+        - get_vpnClientConnectionDetails
     register: result
 
   - set_fact:
-      client_connection_details: "{{ result.facts }}"
+      client_connection_details: "{{ result.facts.vpnClientConnectionDetails }}"
 
   - name: "Save 'client_connection_details' to File"
     copy:

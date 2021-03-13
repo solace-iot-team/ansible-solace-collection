@@ -84,7 +84,6 @@ make --version
   GNU Make 3.81 # <- min version
 ````
 
-
 #### Create the rst file:
 ````bash
 cd src/ansible_collections/solace/pubsub_plus/docs
@@ -99,6 +98,14 @@ make html
 # point browser to
 {your-path}/src/ansible_collections/solace/pubsub_plus/docs/build/html/index.html
 {your-path}/src/ansible_collections/solace/pubsub_plus/docs/build/html/modules/{module}.html
+````
+
+#### Check the links:
+````bash
+cd src/ansible_collections/solace/pubsub_plus/docs
+make linkcheck
+# output in
+{your-path}/src/ansible_collections/solace/pubsub_plus/docs/build/linkcheck/output.txt
 ````
 
 #### Create all project docs:

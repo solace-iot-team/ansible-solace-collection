@@ -4,34 +4,141 @@
 solace_broker_service - manage a broker service
 ===============================================
 
-Manage a Broker Service running in Docker.
+Manage a self-hosted Broker Service running in Docker.
+
+.. note::
+  The role only supports plain http SEMP.
+
+  When using a remote VM:
+    - ensure ansible has access to the public key for the VM
+    - ensure the SEMP port on the VM is open
+
 
 Prerequisites
 -------------
 
-- collections: community.general
-  - docker_compose
+- collection: `docker_compose`_
+
+.. _docker_compose:
+  https://docs.ansible.com/ansible/latest/collections/community/docker/docker_compose_module.html
+
+Usage Examples
+--------------
+
+Start Single Broker on Remote Ubuntu-18 VM
+++++++++++++++++++++++++++++++++++++++++++
+
+**Example ansible controller ssh config:**
+
+Switch off host key checking:
+
+.. code-block:: bash
+
+  mkdir -p ~/.ssh
+  echo "Host *" > ~/.ssh/config
+  echo " StrictHostKeyChecking no" >> ~/.ssh/config
 
 
-Example playbooks
------------------
+**Example Bootstrap for Ubuntu-18:**
+
+.. literalinclude:: ../../examples/roles/solace_broker_service/remotevm/bootstrap.Ubuntu-18.vm.sh
+   :language: bash
+
+**Example Template Inventory File for Remote VM:**
+
+.. literalinclude:: ../../examples/roles/solace_broker_service/remotevm/template.remotehost.inventory.yml
+   :language: yaml
+
+**Example Playbook to Create & Delete a Service:**
+
+.. literalinclude:: ../../examples/roles/solace_broker_service/create-delete.playbook.yml
+   :language: yaml
+
+
+**Run the Playbook:**
 
 This playbook will:
   - download the latest Solace PubSub+ standard edition image from docker hub
   - start the docker container
-  - wait until the broker service is up and running, including a test if message spool is availabe (by creating/deleting a queue)
-  - create the inventory file in the ``.tmp`` directory
-  - uses the default ```definition`` values for ``docker-compose``
+  - wait until the broker service is up and running, including a test if message spool is availabe
+  - generate the inventory file for the new broker service in the ``./tmp`` directory
+  - uses the default ``definition`` values for ``docker-compose``
+  - delete the service again
 
-.. literalinclude:: ../../examples/roles/broker_service.playbook.yml
+.. code-block:: bash
+
+  ansible-playbook \
+                -i {inventory-file} \
+                {playbook-file}
+
+**Example Playbook with default settings and docker compose file:**
+
+.. literalinclude:: ../../examples/roles/solace_broker_service/example-2.playbook.yml
    :language: yaml
 
-This playbook uses a docker-compose file to start the service:
 
-.. literalinclude:: ../../examples/roles/broker_service2.playbook.yml
-   :language: yaml
+Start Single Broker on Local Machine with Default Settings
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-**List of select variables:**
+Use this example to start a broker service in a docker container on your local machine (the ansible controller).
+
+**Inventory File:**
+
+.. code-block:: yaml
+
+  ---
+  all:
+    hosts:
+      localhost:
+        ansible_connection: local
+
+
+Example Generated Broker Service Inventory Files
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+The ``project_name`` variable is used as the host entry.
+
+**Remote VM:**
+
+.. code-block:: yaml
+
+  all:
+    hosts:
+      broker_service_single_node:
+        ansible_connection: local
+        broker_type: local
+        sempv2_host: {the vm public ip address }
+        sempv2_is_secure_connection: 'False'
+        sempv2_password: admin
+        sempv2_port: '8080'
+        sempv2_timeout: '60'
+        sempv2_username: admin
+        virtual_router: primary
+        vpn: default
+
+
+**Localhost:**
+
+.. code-block:: yaml
+
+  all:
+    hosts:
+      broker_service_single_node:
+        ansible_connection: local
+        broker_type: local
+        sempv2_host: localhost
+        sempv2_is_secure_connection: 'False'
+        sempv2_password: admin
+        sempv2_port: '8080'
+        sempv2_timeout: '60'
+        sempv2_username: admin
+        virtual_router: primary
+        vpn: default
+
+
+
+List of select variables
+------------------------
 
 .. list-table::
    :header-rows: 1
@@ -68,7 +175,7 @@ This playbook uses a docker-compose file to start the service:
 
 .. seealso::
 
-  `community.general.docker_compose <https://docs.ansible.com/ansible/latest/collections/community/general/docker_compose_module.html>`_
+  `docker_compose`_
 
 Full list of variables & default values
 ---------------------------------------

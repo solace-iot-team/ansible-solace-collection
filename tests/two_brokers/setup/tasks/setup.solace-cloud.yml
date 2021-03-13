@@ -15,7 +15,7 @@
   solace_cloud_service:
     api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
     name: "{{ sc_service.name }}"
-    wait_timeout_minutes: 10
+    wait_timeout_minutes: 30
     settings:
       msgVpnName: "{{ sc_service.msgVpnName }}"
       datacenterId: "{{ sc_service.datacenterId }}"

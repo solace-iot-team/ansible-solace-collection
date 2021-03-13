@@ -33,7 +33,7 @@
       solace_cloud_service:
         api_token: "{{ sc_api_token }}"
         name: "{{ sc_service_name }}"
-        wait_timeout_minutes: 10
+        wait_timeout_minutes: 30
         settings: "{{ sc_service_settings }}"
         state: present
       register: result

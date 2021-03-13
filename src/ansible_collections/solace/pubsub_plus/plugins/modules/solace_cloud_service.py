@@ -17,6 +17,7 @@ short_description: manage Solace Cloud services
 description:
 - Create & delete Solace Cloud services.
 - "Note that you can't change a service once it has been created. Only option: delete & re-create."
+- "Note that a service name must be unique in the global Solace Cloud namespace. Creating a service using an existing name (regardless in which account) will fail."
 - Creating a service in Solace Cloud is a long-running process. In case creation fails, module will delete the service and try again, up to 3 times.
 - >
     The module operates at a Solace Cloud Account level, therefor, you don't necessarily require an inventory file.

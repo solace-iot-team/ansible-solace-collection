@@ -10,9 +10,13 @@ if [[ ! $projectHome =~ "ansible-solace-collection" ]]; then
 fi
 export PROJECT_HOME=$projectHome
 
+export AZURE_PROJECT_NAME="asct-devel"
 
 ansibleSolaceTests=(
+  # "teardown"
+  "setup"
   "solace_broker_service"
+  "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 

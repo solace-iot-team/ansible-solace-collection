@@ -1,0 +1,43 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "create: broker service on remote vm"
+  hosts: all
+  any_errors_fatal: true
+  pre_tasks:
+  - include_vars:
+      file: "env.vars.yml"
+      name: env
+  vars:
+    broker_project_name: test_roles_remote_broker_service_single_node
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        generated_inventory_file_name: "{{ WORKING_DIR }}/{{ env.remote_broker_inventory_file_name }}"
+
+    - name: "Broker Service Delete"
+      include_role:
+        name: solace.pubsub_plus.solace_broker_service
+      vars:
+        service_type: docker_single_node
+        state: absent
+        project_name: "{{ broker_project_name }}"
+        generated_inventory_file: "{{ generated_inventory_file_name }}"
+
+    - name: "Broker Service Setup"
+      include_role:
+        name: solace.pubsub_plus.solace_broker_service
+      vars:
+        service_type: docker_single_node
+        state: present
+        project_name: "{{ broker_project_name }}"
+        container_name: "pubSubStandardSingleNode"
+        image: "{{ BROKER_DOCKER_IMAGE }}"
+        generated_inventory_file: "{{ generated_inventory_file_name }}"
+        sempv2_host: "{{ ansible_host }}"
+        sempv2_port: "{{ semp_port }}"
+
+
+###
+# The End.

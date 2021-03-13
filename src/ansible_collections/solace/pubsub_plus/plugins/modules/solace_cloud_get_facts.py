@@ -15,7 +15,7 @@ DOCUMENTATION = '''
 module: solace_cloud_get_facts
 short_description: get Solace Cloud service facts
 description:
-- Convenience functions to access Solace Cloud service facts gathered with M(solace_cloud_get_service) and returned by M(solace_cloud_service).
+- Convenience functions to access Solace Cloud service facts gathered with M(solace_cloud_get_service) or returned by M(solace_cloud_service).
 options:
   from_dict:
     description: >

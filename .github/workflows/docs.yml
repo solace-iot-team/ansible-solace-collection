@@ -14,7 +14,7 @@ on:
     - cron: '0 1 * * *'
   pull_request:
     branches:
-      - main    
+      - main
 
 env:
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
@@ -23,9 +23,7 @@ env:
 
 jobs:
   docs:
-
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-18.04
     steps:
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'

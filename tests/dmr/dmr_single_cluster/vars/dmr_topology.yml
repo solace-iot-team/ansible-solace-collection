@@ -1,23 +1,23 @@
 ---
   # a host in the inventory
-  asc_dmr_cluster_1_node_1:
+  asct_dmr_cluster_1_node_1:
     external_links:
       # hosts in the inventory
       remote_host_names:
-        - asc_dmr_cluster_1_node_2
-        - asc_dmr_cluster_1_node_3
-  asc_dmr_cluster_1_node_2:
+        - asct_dmr_cluster_1_node_2
+        - asct_dmr_cluster_1_node_3
+  asct_dmr_cluster_1_node_2:
     external_links:
       # hosts in the inventory
       remote_host_names:
-        - asc_dmr_cluster_1_node_1
-        - asc_dmr_cluster_1_node_3
-  asc_dmr_cluster_1_node_3:
+        - asct_dmr_cluster_1_node_1
+        - asct_dmr_cluster_1_node_3
+  asct_dmr_cluster_1_node_3:
     external_links:
       # hosts in the inventory
       remote_host_names:
-        - asc_dmr_cluster_1_node_1
-        - asc_dmr_cluster_1_node_2
+        - asct_dmr_cluster_1_node_1
+        - asct_dmr_cluster_1_node_2
 
 ###
 # The End.

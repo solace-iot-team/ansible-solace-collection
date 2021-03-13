@@ -16,6 +16,9 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$WORKING_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
   if [ -z "$RUN_FG" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: RUN_FG"; exit 1; fi
   if [ -z "$BROKER_DOCKER_IMAGE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: BROKER_DOCKER_IMAGE"; exit 1; fi
+  if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY" ]; then
+    export AZURE_VM_REMOTE_HOST_INVENTORY="$WORKING_DIR/azure/vm.inventory.json"
+  fi
 
 ##############################################################################################################################
 # Prepare
@@ -26,19 +29,40 @@ source $PROJECT_HOME/.lib/functions.sh
 ##############################################################################################################################
 # Settings
 
-inventory=$(assertFile $scriptLogName "$scriptDir/files/inventory.yml") || exit
+localInventory=$(assertFile $scriptLogName "$scriptDir/files/inventory.yml") || exit
+remoteInventory=$(assertFile $scriptLogName "$AZURE_VM_REMOTE_HOST_INVENTORY") || exit
 
-playbooks=(
-  "$scriptDir/main.playbook.yml"
+remote_playbooks=(
+  "$scriptDir/create.remote.playbook.yml"
+  "$scriptDir/delete.remote.playbook.yml"
+)
+local_playbooks=(
+  "$scriptDir/create.local.playbook.yml"
+  "$scriptDir/delete.local.playbook.yml"
 )
 
+
 ##############################################################################################################################
-# Run
-for playbook in ${playbooks[@]}; do
+# Run Remote
+for playbook in ${remote_playbooks[@]}; do
 
   playbook=$(assertFile $scriptLogName $playbook) || exit
   ansible-playbook \
-                  -i $inventory \
+                  -i $remoteInventory \
+                  $playbook \
+                  --extra-vars "WORKING_DIR=$WORKING_DIR" \
+                  --extra-vars "BROKER_DOCKER_IMAGE=$BROKER_DOCKER_IMAGE"
+  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
+
+done
+
+##############################################################################################################################
+# Run Local
+for playbook in ${local_playbooks[@]}; do
+
+  playbook=$(assertFile $scriptLogName $playbook) || exit
+  ansible-playbook \
+                  -i $localInventory \
                   $playbook \
                   --extra-vars "WORKING_DIR=$WORKING_DIR" \
                   --extra-vars "BROKER_DOCKER_IMAGE=$BROKER_DOCKER_IMAGE"

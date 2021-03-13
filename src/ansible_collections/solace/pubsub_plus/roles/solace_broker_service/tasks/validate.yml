@@ -14,6 +14,7 @@
 - stat:
       path: "{{ generated_inventory_file_dir }}"
   register: generated_inventory_file_dir_stat
+  delegate_to: localhost
 - fail:
     msg: "arg 'generated_inventory_file={{ generated_inventory_file }}' - path='{{ generated_inventory_file_dir }}' does not exist"
   when: not generated_inventory_file_dir_stat.stat.exists or not generated_inventory_file_dir_stat.stat.isdir

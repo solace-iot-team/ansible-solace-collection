@@ -41,7 +41,7 @@ definition:
         #Web transport over TLS
         - '443:443'
         #SEMP over TLS
-        - '1943:1943'
+        # - '1943:1943'
         #MQTT Default VPN
         - '1883:1883'
         #AMQP Default VPN over TLS

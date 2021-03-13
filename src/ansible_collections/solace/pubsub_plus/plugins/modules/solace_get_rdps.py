@@ -59,7 +59,7 @@ tasks:
     state: present
 
 - name: get list config
-  solace_get_rdp_rest_consumers:
+  solace_get_rdps:
     query_params:
       where:
       - "restDeliveryPointName==foo"
@@ -72,7 +72,7 @@ tasks:
     - "{{ result.result_list_count }}"
 
 - name: get list monitor
-  solace_get_rdp_rest_consumers:
+  solace_get_rdps:
     api: monitor
     query_params:
       where:
