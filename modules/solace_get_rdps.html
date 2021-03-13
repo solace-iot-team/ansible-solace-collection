@@ -96,6 +96,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../basics.html">The Basics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../inventory-files.html">Best Practices for Ansible-Solace Inventory Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tips-tricks.html">Tips &amp; Tricks</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Modules &amp; Roles</span></p>
 <ul class="current">
@@ -254,7 +255,7 @@
     <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get list config</span>
-  <span class="nt">solace_get_rdp_rest_consumers</span><span class="p">:</span>
+  <span class="nt">solace_get_rdps</span><span class="p">:</span>
     <span class="nt">query_params</span><span class="p">:</span>
       <span class="nt">where</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="s">&quot;restDeliveryPointName==foo&quot;</span>
@@ -267,7 +268,7 @@
     <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get list monitor</span>
-  <span class="nt">solace_get_rdp_rest_consumers</span><span class="p">:</span>
+  <span class="nt">solace_get_rdps</span><span class="p">:</span>
     <span class="nt">api</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">monitor</span>
     <span class="nt">query_params</span><span class="p">:</span>
       <span class="nt">where</span><span class="p">:</span>
@@ -442,7 +443,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 15 Feb 2021 at 19:34.
+        Last updated on 13 Mar 2021 at 14:23.
       </span>
 
     </p>

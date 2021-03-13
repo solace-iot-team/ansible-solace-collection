@@ -5,7 +5,7 @@
 solace_cloud_get_facts -- get Solace Cloud service facts
 ========================================================
 
-Convenience functions to access Solace Cloud service facts gathered with :ref:`solace_cloud_get_service <solace_cloud_get_service_module>` and returned by :ref:`solace_cloud_service <solace_cloud_service_module>`.
+Convenience functions to access Solace Cloud service facts gathered with :ref:`solace_cloud_get_service <solace_cloud_get_service_module>` or returned by :ref:`solace_cloud_service <solace_cloud_service_module>`.
 
 
 
