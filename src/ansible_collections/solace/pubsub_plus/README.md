@@ -3,6 +3,7 @@
 ![integration tests](https://github.com/solace-iot-team/ansible-solace-collection/workflows/integration%20tests/badge.svg)
 ![ansible-test](https://github.com/solace-iot-team/ansible-solace-collection/workflows/ansible-test/badge.svg)
 ![docs](https://github.com/solace-iot-team/ansible-solace-collection/workflows/docs/badge.svg)
+[![publish release](https://github.com/solace-iot-team/ansible-solace-collection/actions/workflows/publish.yml/badge.svg)](https://github.com/solace-iot-team/ansible-solace-collection/actions/workflows/publish.yml)
 
 Ansible collection to manage and configure [Solace PubSub+ Event Brokers](https://solace.com/products/event-broker/).
 
