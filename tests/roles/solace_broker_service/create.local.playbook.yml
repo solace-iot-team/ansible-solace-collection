@@ -26,7 +26,7 @@
         project_name: "{{ broker_project_name }}"
         generated_inventory_file: "{{ genenrated_inventory_file }}"
 
-    - name: "Broker Service Setup"
+    - name: "Broker Service Setup - HTTP"
       include_role:
         name: solace.pubsub_plus.solace_broker_service
       vars:
@@ -36,7 +36,6 @@
         container_name: "pubSubStandardSingleNode"
         image: "{{ BROKER_DOCKER_IMAGE }}"
         generated_inventory_file: "{{ genenrated_inventory_file }}"
-
 
 ###
 # The End.

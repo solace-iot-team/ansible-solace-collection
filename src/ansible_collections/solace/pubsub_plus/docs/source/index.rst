@@ -4,10 +4,6 @@ Solace PubSub+ Ansible Collection
 
 The collection is available on `Ansible Galaxy`_.
 
-.. _Ansible Galaxy:
-  https://galaxy.ansible.com/solace/pubsub_plus
-
-
 .. toctree::
   :maxdepth: 1
   :caption: Using Solace PubSub+ Ansible Collection
@@ -23,6 +19,7 @@ The collection is available on `Ansible Galaxy`_.
 
   basics
   inventory-files
+  tips-tricks
 
 .. toctree::
   :maxdepth: 1
@@ -41,6 +38,8 @@ Repos & Links
 - `Ansible Solace Tutorials and Projects`_
 - `Release Notes`_
 
+
+
 .. _Ansible Solace Collection:
   https://github.com/solace-iot-team/ansible-solace-collection
 
@@ -49,3 +48,6 @@ Repos & Links
 
 .. _Release Notes:
   https://github.com/solace-iot-team/ansible-solace-collection/blob/main/ReleaseNotes.md
+
+.. _Ansible Galaxy:
+  https://galaxy.ansible.com/solace/pubsub_plus

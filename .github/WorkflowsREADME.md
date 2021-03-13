@@ -6,7 +6,7 @@
 
 
 ````bash
-az ad sp create-for-rbac --name "solace-int-rdp-az-funcs" --sdk-auth
+az ad sp create-for-rbac --name "ansible-solace-collection" --sdk-auth
 
 # make a note of the output, similar to this:
 {

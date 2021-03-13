@@ -18,9 +18,7 @@ env:
 
 jobs:
   publish:
-
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-18.04
     steps:
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
