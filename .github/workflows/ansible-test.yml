@@ -6,9 +6,9 @@ on:
   # # for testing
   # workflow_dispatch:
   # # testing branches
-  push:
-    branches:
-      - mtn-120
+  # push:
+  #   branches:
+  #     - mtn-120
 
   schedule:
     # - cron: '0 1 * * THU'
@@ -48,6 +48,7 @@ jobs:
 
       - name: update packages
         run: |
+          # some release files are missing ...
           # sudo apt-get update
           sudo apt-get install libyaml-dev
           sudo apt-get install shellcheck
