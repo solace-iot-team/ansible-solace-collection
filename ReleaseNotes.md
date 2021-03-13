@@ -1,5 +1,17 @@
 # Release Notes
 
+## Version: 1.2.1
+Maintenance release.
+
+* **roles:**
+  - [solace_broker_service](https://solace-iot-team.github.io/ansible-solace-collection/roles/solace_broker_service.html)
+    - fixed remote vm support
+* **documentation**
+  - [added bridges to tips & tricks](https://solace-iot-team.github.io/ansible-solace-collection/tips-tricks.html)
+* **tests**
+  - dmr: fixed timing issues and host name mismatch
+  - docs: added linkcheck to tests
+
 ## Version: 1.2.0
 Addition of modules to manage replay of messages.
 
