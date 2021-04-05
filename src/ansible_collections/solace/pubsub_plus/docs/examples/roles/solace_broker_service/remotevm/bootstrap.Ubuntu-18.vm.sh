@@ -8,7 +8,7 @@ scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
 # Bootstrap Ubuntu-18 VM with prerequisites to run role solace_broker_service.
 # Note:
 #   ssh requires public key to be available in ~/.ssh/
-# 
+#
 
 
 ############################################################################################################################

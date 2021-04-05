@@ -19,7 +19,8 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$AZURE_PROJECT_NAME" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_PROJECT_NAME"; exit 1; fi
   if [ -z "$AZURE_LOCATION" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_LOCATION"; exit 1; fi
   if [ -z "$AZURE_VM_IMAGE_URN" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_VM_IMAGE_URN"; exit 1; fi
-  if [ -z "$AZURE_VM_SEMP_PORT" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_PORT"; exit 1; fi
+  if [ -z "$AZURE_VM_SEMP_PLAIN_PORT" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_PLAIN_PORT"; exit 1; fi
+  if [ -z "$AZURE_VM_SEMP_SECURE_PORT" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_SECURE_PORT"; exit 1; fi
   if [ -z "$AZURE_VM_ADMIN_USER" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_VM_ADMIN_USER"; exit 1; fi
   if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE"; exit 1; fi
   if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_VM_REMOTE_HOST_INVENTORY"; exit 1; fi
@@ -32,7 +33,8 @@ azLocation="$AZURE_LOCATION"
 vmImageUrn="$AZURE_VM_IMAGE_URN"
 vmName="$AZURE_PROJECT_NAME-vm"
 vmAdminUsr="$AZURE_VM_ADMIN_USER"
-vmSempPort="$AZURE_VM_SEMP_PORT"
+vmSempPlainPort="$AZURE_VM_SEMP_PLAIN_PORT"
+vmSempSecurePort="$AZURE_VM_SEMP_SECURE_PORT"
 
 outputDir="$WORKING_DIR/azure"; mkdir -p $outputDir;
 if [ -z "$CLEAN_WORKING_DIR" ]; then rm -rf $outputDir/*; fi
@@ -66,13 +68,26 @@ echo " >>> Creating azure vm ..."
   cat ~/.ssh/id_rsa.pub; echo ""; if [[ $? != 0 ]]; then echo " >>> ERROR: vm pub key"; exit 1; fi
 echo " >>> Success."
 
-echo " >>> Opening semp port on azure vm ..."
+echo " >>> Opening plain semp port on azure vm ..."
   az vm open-port \
-    --port $vmSempPort \
+    --port $vmSempPlainPort \
+    --priority 101 \
     --resource-group $resourceGroupName \
     --name "$vmName" \
     --verbose
-  if [[ $? != 0 ]]; then echo " >>> ERROR: opening semp port on azure vm"; exit 1; fi
+  if [[ $? != 0 ]]; then echo " >>> ERROR: opening semp plain port $vmSempPlainPort on azure vm"; exit 1; fi
+echo " >>> Success."
+
+# TODO: how does this work?
+
+echo " >>> Opening secure semp port on azure vm ..."
+  az vm open-port \
+    --port $vmSempSecurePort \
+    --priority 100 \
+    --resource-group $resourceGroupName \
+    --name "$vmName" \
+    --verbose
+  if [[ $? != 0 ]]; then echo " >>> ERROR: opening semp secure port $vmSempSecurePort on azure vm"; exit 1; fi
 echo " >>> Success."
 
 echo " >>> Test ssh to vm ..."
@@ -106,10 +121,12 @@ echo " >>> Success."
 echo " >>> Adding info ..."
   vmInfo=$(cat $outputInfoFile | jq .)
   export vmAdminUsr
-  export vmSempPort
+  export vmSempPlainPort
+  export vmSempSecurePort
   export vmPythonPath
   vmInfo=$(echo $vmInfo | jq ".admin_user=env.vmAdminUsr")
-  vmInfo=$(echo $vmInfo | jq ".sempv2_port=env.vmSempPort")
+  vmInfo=$(echo $vmInfo | jq ".semp_plain_port=env.vmSempPlainPort")
+  vmInfo=$(echo $vmInfo | jq ".semp_secure_port=env.vmSempSecurePort")
   vmInfo=$(echo $vmInfo | jq ".python_path=env.vmPythonPath")
   echo $vmInfo | jq . > "$outputInfoFile"
   cat $outputInfoFile | jq .
@@ -120,11 +137,13 @@ echo " >>> Creating inventory file ..."
   export vmPublicIpAddress=$(cat $outputInfoFile | jq -r '.publicIpAddress')
   export vmAdminUsr
   export vmPythonPath
-  export vmSempPort
+  export vmSempPlainPort
+  export vmSempSecurePort
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.ansible_host=env.vmPublicIpAddress")
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.ansible_user=env.vmAdminUsr")
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.ansible_python_interpreter=env.vmPythonPath")
-  inventory=$(echo $inventory | jq ".all.hosts.remotehost.semp_port=env.vmSempPort")
+  inventory=$(echo $inventory | jq ".all.hosts.remotehost.semp_plain_port=env.vmSempPlainPort")
+  inventory=$(echo $inventory | jq ".all.hosts.remotehost.semp_secure_port=env.vmSempSecurePort")
   echo $inventory | jq . > "$outputInventoryFile"
   cat "$outputInventoryFile" | jq .
 echo " >>> Success."

@@ -76,7 +76,6 @@ class SolaceGetAvailableTask(SolaceBrokerGetTask):
 
     def __init__(self, module):
         super().__init__(module)
-        self.sempv2_api = SolaceSempV2Api(module)
 
     def do_task(self):
         resp = self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + ["about"])

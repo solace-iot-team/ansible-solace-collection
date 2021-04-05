@@ -2,20 +2,20 @@
 # role args
 service_type: docker_single_node
 generated_inventory_file: "{{ args.__null__ }}"
-
-# docker_compose args
 state: present
+# docker_compose args
 project_name: "{{ args.__null__ }}"
 container_name: "pubSubStandardSingleNode"
 image: "solace/solace-pubsub-standard:latest"
 restarted: yes
-# generated inventory entries
-sempv2_host: localhost
-sempv2_port: 8080
-sempv2_username: admin
-sempv2_password: admin
-sempv2_is_secure_connection: false
-vpn: default
+generated_inventory:
+  sempv2_host: localhost
+  sempv2_port: 8080
+  sempv2_username: admin
+  sempv2_password: admin
+  sempv2_is_secure_connection: false
+  vpn: default
+  virtual_router: primary
 definition:
   version: '3.3'
   services:
@@ -40,8 +40,6 @@ definition:
         - '80:80'
         #Web transport over TLS
         - '443:443'
-        #SEMP over TLS
-        # - '1943:1943'
         #MQTT Default VPN
         - '1883:1883'
         #AMQP Default VPN over TLS
@@ -54,8 +52,10 @@ definition:
         - '8443:8443'
         #MQTT Default VPN over TLS
         - '8883:8883'
+        #SEMP over TLS
+        # - "1943:1943"
         #SEMP / PubSub+ Manager
-        - "{{ sempv2_port }}:{{ sempv2_port }}"
+        - "{{ sempv2_port }}:8080"
         #REST Default VPN
         - '9000:9000'
         #REST Default VPN over TLS

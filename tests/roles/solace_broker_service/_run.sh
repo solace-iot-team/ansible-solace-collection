@@ -29,18 +29,25 @@ source $PROJECT_HOME/.lib/functions.sh
 ##############################################################################################################################
 # Settings
 
-localInventory=$(assertFile $scriptLogName "$scriptDir/files/inventory.yml") || exit
 remoteInventory=$(assertFile $scriptLogName "$AZURE_VM_REMOTE_HOST_INVENTORY") || exit
-
 remote_playbooks=(
-  "$scriptDir/create.remote.playbook.yml"
-  "$scriptDir/delete.remote.playbook.yml"
-)
-local_playbooks=(
-  "$scriptDir/create.local.playbook.yml"
-  "$scriptDir/delete.local.playbook.yml"
+  # "$scriptDir/create.remote.playbook.yml"
+  # "$scriptDir/delete.remote.playbook.yml"
 )
 
+localInventory=$(assertFile $scriptLogName "$scriptDir/files/inventory.yml") || exit
+local_playbooks=(
+  # "$scriptDir/create.local-plain.playbook.yml"
+  "$scriptDir/create.local-secure.playbook.yml"
+  # "$scriptDir/delete.local.playbook.yml"
+)
+
+sslCertFile="$scriptDir/files/secrets/asc.pem"
+
+# # looks like python requires this?
+# CERT_FILE=$(python -m certifi)
+# export SSL_CERT_FILE=${CERT_FILE}
+# export REQUESTS_CA_BUNDLE=${CERT_FILE}
 
 ##############################################################################################################################
 # Run Remote
@@ -65,7 +72,10 @@ for playbook in ${local_playbooks[@]}; do
                   -i $localInventory \
                   $playbook \
                   --extra-vars "WORKING_DIR=$WORKING_DIR" \
-                  --extra-vars "BROKER_DOCKER_IMAGE=$BROKER_DOCKER_IMAGE"
+                  --extra-vars "BROKER_DOCKER_IMAGE=$BROKER_DOCKER_IMAGE" \
+                  --extra-vars "BROKER_HOST_MOUNT_PATH_DATA=$WORKING_DIR/broker_mount_data" \
+                  --extra-vars "BROKER_HOST_MOUNT_PATH_SECRETS=$WORKING_DIR/broker_mount_secrets" \
+                  --extra-vars "SSL_CERT_FILE=$sslCertFile"
   code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
 done

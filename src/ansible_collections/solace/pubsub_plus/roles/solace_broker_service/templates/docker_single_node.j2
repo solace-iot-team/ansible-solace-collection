@@ -5,14 +5,14 @@
       "{{ project_name}}": {
         "broker_type": "local",
         "ansible_connection": "local",
-        "sempv2_host": "{{ sempv2_host }}",
-        "sempv2_port": "{{ sempv2_port }}",
-        "sempv2_is_secure_connection": "{{ sempv2_is_secure_connection }}",
-        "sempv2_username": "{{ sempv2_username }}",
-        "sempv2_password": "{{ sempv2_password }}",
+        "sempv2_host": "{{ generated_inventory.sempv2_host }}",
+        "sempv2_port": "{{ generated_inventory.sempv2_port }}",
+        "sempv2_is_secure_connection": "{{ generated_inventory.sempv2_is_secure_connection }}",
+        "sempv2_username": "{{ generated_inventory.sempv2_username }}",
+        "sempv2_password": "{{ generated_inventory.sempv2_password }}",
         "sempv2_timeout": "60",
-        "vpn": "default",
-        "virtual_router": "primary"
+        "vpn": "{{ generated_inventory.vpn }}",
+        "virtual_router": "{{ generated_inventory.virtual_router }}"
       }
     }
   }

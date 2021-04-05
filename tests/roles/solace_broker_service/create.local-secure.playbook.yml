@@ -1,0 +1,116 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "create local secure broker service"
+  hosts: all
+  gather_facts: yes
+  any_errors_fatal: true
+  pre_tasks:
+  - include_vars:
+      file: "env.vars.yml"
+      name: env
+  tasks:
+    - name: "Check vars"
+      set_fact:
+        target_inventory_file: "{{ WORKING_DIR }}/{{ env.local_broker_inventory_file_name }}"
+        docker_project_name: "{{ env.docker_project_name }}"
+        host_mount_path_secrets: "{{ BROKER_HOST_MOUNT_PATH_SECRETS }}"
+        host_mount_path_data: "{{ BROKER_HOST_MOUNT_PATH_DATA }}"
+        ssl_cert_file: "{{ SSL_CERT_FILE }}"
+
+    - name: "Create host mount path data"
+      file:
+        path: "{{ host_mount_path_data }}"
+        state: directory
+
+    - name: "Create host mount path secrets"
+      file:
+        path: "{{ host_mount_path_secrets }}"
+        state: directory
+
+    - name: "Copy cert to mount path secrets"
+      copy:
+        src: "{{ ssl_cert_file }}"
+        dest: "{{ host_mount_path_secrets }}"
+
+    - name: "Set Service Vars"
+      set_fact:
+        _container_name: "pubSubStandardSingleNodeHttps"
+        _image: "{{ BROKER_DOCKER_IMAGE }}"
+        _ssl_cert_filename: "{{ SSL_CERT_FILE | basename }}"
+        _generated_inventory:
+          sempv2_host: localhost
+          sempv2_port: 1943
+          sempv2_is_secure_connection: True
+          sempv2_username: admin
+          sempv2_password: admin
+          vpn: default
+          virtual_router: primary
+
+    - name: "Set the Docker Compose Definition"
+      set_fact:
+        docker_compose_definition:
+          version: '3.3'
+          services:
+            primary:
+              container_name: "{{ _container_name }}"
+              image: "{{ _image }}"
+              restart: unless-stopped
+              shm_size: 1g
+              ulimits:
+                core: 2
+                nofile:
+                  soft: 2448
+                  hard: 38048
+              volumes:
+                - "{{ host_mount_path_secrets }}:/run/secrets"
+                - "{{ host_mount_path_data }}/spool/softAdb:/usr/sw/internalSpool/softAdb:Z"
+                - "{{ host_mount_path_data }}/spool:/usr/sw/internalSpool:Z"
+                - "{{ host_mount_path_data }}/jail:/usr/sw/jail:Z"
+                - "{{ host_mount_path_data }}/diagnostics:/var/lib/solace/diags:Z"
+                - "{{ host_mount_path_data }}/adbBackup:/usr/sw/adb:Z"
+                - "{{ host_mount_path_data }}/var:/usr/sw/var:Z"
+              ports:
+                - "{{ _generated_inventory.sempv2_port }}:1943"
+              environment:
+                - "username_admin_globalaccesslevel={{ _generated_inventory.sempv2_username }}"
+                - "username_admin_password={{ _generated_inventory.sempv2_password }}"
+                - system_scaling_maxconnectioncount=100
+                - "tls_servercertificate_filepath=/run/secrets/{{ _ssl_cert_filename }}"
+
+    - name: "Broker Service Delete"
+      include_role:
+        name: solace.pubsub_plus.solace_broker_service
+      vars:
+        service_type: docker_single_node
+        project_name: "{{ docker_project_name }}"
+        generated_inventory_file: "{{ target_inventory_file }}"
+        definition: "{{ docker_compose_definition }}"
+        state: absent
+
+    - name: "Broker Service Setup - HTTPS"
+      include_role:
+        name: solace.pubsub_plus.solace_broker_service
+      vars:
+        service_type: docker_single_node
+        project_name: "{{ docker_project_name }}"
+        container_name: "{{ _container_name}}"
+        image: "{{ _image }}"
+        generated_inventory_file: "{{ target_inventory_file }}"
+        generated_inventory: "{{ _generated_inventory }}"
+        definition: "{{ docker_compose_definition }}"
+        state: present
+
+    - name: "Broker Service Delete"
+      include_role:
+        name: solace.pubsub_plus.solace_broker_service
+      vars:
+        service_type: docker_single_node
+        project_name: "{{ docker_project_name }}"
+        generated_inventory_file: "{{ target_inventory_file }}"
+        definition: "{{ docker_compose_definition }}"
+        state: absent
+
+###
+# The End.

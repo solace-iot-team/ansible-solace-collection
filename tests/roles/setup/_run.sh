@@ -20,7 +20,8 @@ source $PROJECT_HOME/.lib/functions.sh
   # az vm image list --output table
   # az vm image list --offer UbuntuServer --all --output table
   if [ -z "$AZURE_VM_IMAGE_URN" ]; then export AZURE_VM_IMAGE_URN="UbuntuLTS"; fi
-  if [ -z "$AZURE_VM_SEMP_PORT" ]; then export AZURE_VM_SEMP_PORT="8080"; fi
+  if [ -z "$AZURE_VM_SEMP_PLAIN_PORT" ]; then export AZURE_VM_SEMP_PLAIN_PORT="8080"; fi
+  if [ -z "$AZURE_VM_SEMP_SECURE_PORT" ]; then export AZURE_VM_SEMP_SECURE_PORT="1943"; fi
   if [ -z "$AZURE_VM_ADMIN_USER" ]; then export AZURE_VM_ADMIN_USER="$AZURE_PROJECT_NAME-admin"; fi
   if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE" ]; then
     export AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE=$(assertFile $scriptLogName "$scriptDir/files/template.remotehost.inventory.yml") || exit

@@ -1,38 +1,58 @@
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 ---
 - set_fact:
-    broker_url: "{{ 'https' if sempv2_is_secure_connection else 'http' }}://{{ sempv2_host }}:{{ sempv2_port }}"
+    broker_url: "{{ 'https' if generated_inventory.sempv2_is_secure_connection else 'http' }}://{{ generated_inventory.sempv2_host }}:{{ generated_inventory.sempv2_port }}"
   when: service_type == 'docker_single_node'
   delegate_to: localhost
 
-- name: "Wait for Broker Up"
-  uri:
-    url: "{{ broker_url }}"
-    return_content: yes
-    status_code: [200, -1]
-  register: result
-  until: result.status == 200
-  retries: 20
-  delay: 5
-  when: service_type == 'docker_single_node'
+- name: "Try until Broker available"
+  solace_get_available:
+    host: "{{ generated_inventory.sempv2_host }}"
+    port: "{{ generated_inventory.sempv2_port }}"
+    secure_connection: "{{ generated_inventory.sempv2_is_secure_connection }}"
+    username: "{{ generated_inventory.sempv2_username }}"
+    password: "{{ generated_inventory.sempv2_password }}"
+  register: _result
+  until: "_result.rc == 0 and _result.is_available"
+  retries: 25 # 25 * 5 seconds
+  delay: 5 # Every 5 seconds
   delegate_to: localhost
 
 - assert:
-    that: result.status == 200
+    that: _result.rc == 0 and _result.is_available
     fail_msg: "cannot reach broker on {{ broker_url }}"
   when: service_type == 'docker_single_node'
   delegate_to: localhost
 
+
+# - name: "Wait for Broker Up"
+#   uri:
+#     url: "{{ broker_url }}"
+#     return_content: yes
+#     status_code: [200, -1]
+#   register: result
+#   until: result.status == 200
+#   retries: 20
+#   delay: 5
+#   when: service_type == 'docker_single_node'
+#   delegate_to: localhost
+#
+# - assert:
+#     that: result.status == 200
+#     fail_msg: "cannot reach broker on {{ broker_url }}"
+#   when: service_type == 'docker_single_node'
+#   delegate_to: localhost
+#
 # check if spool is fully activated, using create a queue as test
 - name: "Check if message spool is available"
   solace.pubsub_plus.solace_queue:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    msg_vpn: "{{ vpn }}"
+    host: "{{ generated_inventory.sempv2_host }}"
+    port: "{{ generated_inventory.sempv2_port }}"
+    secure_connection: "{{ generated_inventory.sempv2_is_secure_connection }}"
+    username: "{{ generated_inventory.sempv2_username }}"
+    password: "{{ generated_inventory.sempv2_password }}"
+    msg_vpn: "{{ generated_inventory.vpn }}"
     name: test_message_spool
     state: present
   register: result
@@ -50,12 +70,12 @@
 
 - name: "clean up queue"
   solace.pubsub_plus.solace_queue:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    msg_vpn: "{{ vpn }}"
+    host: "{{ generated_inventory.sempv2_host }}"
+    port: "{{ generated_inventory.sempv2_port }}"
+    secure_connection: "{{ generated_inventory.sempv2_is_secure_connection }}"
+    username: "{{ generated_inventory.sempv2_username }}"
+    password: "{{ generated_inventory.sempv2_password }}"
+    msg_vpn: "{{ generated_inventory.vpn }}"
     name: test_message_spool
     state: absent
   when: service_type == 'docker_single_node'
