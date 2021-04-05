@@ -29,7 +29,7 @@ source $PROJECT_HOME/.lib/functions.sh
 ##############################################################################################################################
 # Settings
 
-remoteInventory=$(assertFile $scriptLogName "$AZURE_VM_REMOTE_HOST_INVENTORY") || exit
+# remoteInventory=$(assertFile $scriptLogName "$AZURE_VM_REMOTE_HOST_INVENTORY") || exit
 remote_playbooks=(
   # "$scriptDir/create.remote.playbook.yml"
   # "$scriptDir/delete.remote.playbook.yml"
