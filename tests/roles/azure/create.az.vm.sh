@@ -59,6 +59,7 @@ echo " >>> Creating azure vm ..."
     --image "$vmImageUrn" \
     --admin-username $vmAdminUsr \
     --generate-ssh-keys \
+    --public-ip-address-dns-name $vmName \
     --verbose \
     > $outputInfoFile
   if [[ $? != 0 ]]; then echo " >>> ERROR: creating azure vm"; exit 1; fi
@@ -135,6 +136,7 @@ echo " >>> Success."
 echo " >>> Creating inventory file ..."
   inventory=$(cat $inventoryTemplateFile | yq .)
   export vmPublicIpAddress=$(cat $outputInfoFile | jq -r '.publicIpAddress')
+  export vmFQDNS=$(cat $outputInfoFile | jq -r '.fqdns')
   export vmAdminUsr
   export vmPythonPath
   export vmSempPlainPort
@@ -142,6 +144,7 @@ echo " >>> Creating inventory file ..."
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.ansible_host=env.vmPublicIpAddress")
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.ansible_user=env.vmAdminUsr")
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.ansible_python_interpreter=env.vmPythonPath")
+  inventory=$(echo $inventory | jq ".all.hosts.remotehost.broker_host=env.vmFQDNS")
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.semp_plain_port=env.vmSempPlainPort")
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.semp_secure_port=env.vmSempSecurePort")
   echo $inventory | jq . > "$outputInventoryFile"

@@ -19,6 +19,9 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY" ]; then
     export AZURE_VM_REMOTE_HOST_INVENTORY="$WORKING_DIR/azure/vm.inventory.json"
   fi
+  if [ -z "$SSL_CERT_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SSL_CERT_FILE"; exit 1; fi
+  if [ -z "$REQUESTS_CA_BUNDLE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: REQUESTS_CA_BUNDLE"; exit 1; fi
+
 
 ##############################################################################################################################
 # Prepare
@@ -29,56 +32,30 @@ source $PROJECT_HOME/.lib/functions.sh
 ##############################################################################################################################
 # Settings
 
-# remoteInventory=$(assertFile $scriptLogName "$AZURE_VM_REMOTE_HOST_INVENTORY") || exit
-remote_playbooks=(
-  # "$scriptDir/create.remote.playbook.yml"
-  # "$scriptDir/delete.remote.playbook.yml"
-)
-
-localInventory=$(assertFile $scriptLogName "$scriptDir/files/inventory.yml") || exit
-local_playbooks=(
-  # "$scriptDir/create.local-plain.playbook.yml"
-  "$scriptDir/create.local-secure.playbook.yml"
-  # "$scriptDir/delete.local.playbook.yml"
-)
-
-sslCertFile="$scriptDir/files/secrets/asc.pem"
-
-# # looks like python requires this?
-# CERT_FILE=$(python -m certifi)
-# export SSL_CERT_FILE=${CERT_FILE}
-# export REQUESTS_CA_BUNDLE=${CERT_FILE}
+  remoteInventory=$(assertFile $scriptLogName "$AZURE_VM_REMOTE_HOST_INVENTORY") || exit
+  localInventory=$(assertFile $scriptLogName "$scriptDir/files/inventory.yml") || exit
+  playbooks=(
+    # "$scriptDir/delete.single-node.plain+secure.playbook.yml"
+    "$scriptDir/create.single-node.plain+secure.playbook.yml"
+    # "$scriptDir/delete.single-node.plain+secure.playbook.yml"
+  )
+  sslCertFile="$scriptDir/files/secrets/asc.pem"
 
 ##############################################################################################################################
-# Run Remote
-for playbook in ${remote_playbooks[@]}; do
+# Run
+  for playbook in ${playbooks[@]}; do
 
-  playbook=$(assertFile $scriptLogName $playbook) || exit
-  ansible-playbook \
-                  -i $remoteInventory \
-                  $playbook \
-                  --extra-vars "WORKING_DIR=$WORKING_DIR" \
-                  --extra-vars "BROKER_DOCKER_IMAGE=$BROKER_DOCKER_IMAGE"
-  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
+    playbook=$(assertFile $scriptLogName $playbook) || exit
+    ansible-playbook \
+                    -i $remoteInventory \
+                    -i $localInventory \
+                    $playbook \
+                    --extra-vars "WORKING_DIR=$WORKING_DIR" \
+                    --extra-vars "BROKER_DOCKER_IMAGE=$BROKER_DOCKER_IMAGE" \
+                    --extra-vars "SSL_CERT_FILE=$sslCertFile"
+    code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
-done
-
-##############################################################################################################################
-# Run Local
-for playbook in ${local_playbooks[@]}; do
-
-  playbook=$(assertFile $scriptLogName $playbook) || exit
-  ansible-playbook \
-                  -i $localInventory \
-                  $playbook \
-                  --extra-vars "WORKING_DIR=$WORKING_DIR" \
-                  --extra-vars "BROKER_DOCKER_IMAGE=$BROKER_DOCKER_IMAGE" \
-                  --extra-vars "BROKER_HOST_MOUNT_PATH_DATA=$WORKING_DIR/broker_mount_data" \
-                  --extra-vars "BROKER_HOST_MOUNT_PATH_SECRETS=$WORKING_DIR/broker_mount_secrets" \
-                  --extra-vars "SSL_CERT_FILE=$sslCertFile"
-  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
-
-done
+  done
 
 echo ">>> SUCCESS: $scriptLogName"
 

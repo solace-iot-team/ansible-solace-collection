@@ -5,7 +5,7 @@ generated_inventory_file: "{{ args.__null__ }}"
 state: present
 # docker_compose args
 project_name: "{{ args.__null__ }}"
-container_name: "pubSubStandardSingleNode"
+container_name: "{{ args.__null__ }}"
 image: "solace/solace-pubsub-standard:latest"
 restarted: yes
 generated_inventory:
@@ -55,7 +55,7 @@ definition:
         #SEMP over TLS
         # - "1943:1943"
         #SEMP / PubSub+ Manager
-        - "{{ sempv2_port }}:8080"
+        - "{{ generated_inventory.sempv2_port }}:8080"
         #REST Default VPN
         - '9000:9000'
         #REST Default VPN over TLS
@@ -67,7 +67,7 @@ definition:
         #SMF over TLS
         - '55443:55443'
       environment:
-        - "username_admin_globalaccesslevel={{ sempv2_username }}"
-        - "username_admin_password={{ sempv2_password }}"
+        - "username_admin_globalaccesslevel={{ generated_inventory.sempv2_username }}"
+        - "username_admin_password={{ generated_inventory.sempv2_password }}"
         - system_scaling_maxconnectioncount=100
         #- routername=ansible-solace__test

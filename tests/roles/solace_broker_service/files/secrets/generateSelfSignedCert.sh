@@ -6,9 +6,9 @@ scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
 ##############################################################################################################################
 # Prepare
 
-  privateKeyFile="$scriptDir/secrets/asc.key"
-  certFile="$scriptDir/secrets/asc.crt"
-  pemFile="$scriptDir/secrets/asc.pem"
+  privateKeyFile="$scriptDir/asc.key"
+  certFile="$scriptDir/asc.crt"
+  pemFile="$scriptDir/asc.pem"
   sslConfFile="$scriptDir/ssl.conf"
 
   subjectC="UK"
@@ -37,9 +37,17 @@ echo ">>> Generating self-signed certificate ..."
   cat $privateKeyFile >> $pemFile
   echo "    >>> generated pem file:"
   cat $pemFile
+echo ">>> Success."
 
-  # add new cert to CA bundle
+echo ">>> Add new cert to python CA bundle ..."
   CA_CERT_BUNDLE_FILE=$(python3 -m certifi)
+  originalCACertBundleFile="$CA_CERT_BUNDLE_FILE.original"
+  if [ ! -f "$originalCACertBundleFile" ]; then
+    cp $CA_CERT_BUNDLE_FILE $originalCACertBundleFile
+    if [[ $? != 0 ]]; then echo " >>> ERROR: updating $CA_CERT_BUNDLE_FILE"; exit 1; fi
+  fi
+  # copy original and add to it
+  cp $originalCACertBundleFile $CA_CERT_BUNDLE_FILE
   echo "# Subject: $subject" >> $CA_CERT_BUNDLE_FILE
   if [[ $? != 0 ]]; then echo " >>> ERROR: updating $CA_CERT_BUNDLE_FILE"; exit 1; fi
   cat $certFile >> $CA_CERT_BUNDLE_FILE

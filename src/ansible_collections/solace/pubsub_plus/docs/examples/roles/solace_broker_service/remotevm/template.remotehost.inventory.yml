@@ -8,5 +8,6 @@ all:
       ansible_user: "admin-user"
       ansible_become: true
       ansible_python_interpreter: "/usr/bin/python3"
+      broker_host: "fqdns"
       semp_plain_port: 8080
       semp_secure_port: 1943

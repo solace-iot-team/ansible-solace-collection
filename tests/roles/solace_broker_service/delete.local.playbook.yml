@@ -10,21 +10,33 @@
   - include_vars:
       file: "env.vars.yml"
       name: env
-  vars:
-    broker_project_name: test_roles_local_broker_service_single_node
   tasks:
     - name: "Check vars"
       set_fact:
-        generated_inventory_file_name: "{{ WORKING_DIR }}/{{ env.local_broker_inventory_file_name }}"
+        target_inventory_file: "{{ WORKING_DIR }}/{{ env.local_broker_inventory_file_name }}"
+        docker_project_name: "{{ env.docker_project_name }}"
+        docker_container_name: "{{ env.docker_container_name }}"
+        host_mount_path_secrets: "{{ BROKER_HOST_MOUNT_PATH_SECRETS }}"
+        host_mount_path_data: "{{ BROKER_HOST_MOUNT_PATH_DATA }}"
+        ssl_cert_file: "{{ SSL_CERT_FILE }}"
 
     - name: "Broker Service Delete"
       include_role:
         name: solace.pubsub_plus.solace_broker_service
       vars:
-        service_type: docker_single_node
+        project_name: "{{ docker_project_name }}"
+        container_name: "{{ docker_container_name}}"
+        generated_inventory_file: "{{ target_inventory_file }}"
         state: absent
-        project_name: "{{ broker_project_name }}"
-        generated_inventory_file: "{{ generated_inventory_file_name }}"
+
+    - name: "Clean up mount paths"
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "{{ host_mount_path_data }}"
+        - "{{ host_mount_path_secrets }}"
+
 
 ###
 # The End.

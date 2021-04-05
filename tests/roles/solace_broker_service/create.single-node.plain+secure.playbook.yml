@@ -1,10 +1,9 @@
-# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "create local secure broker service"
+  name: "create: broker service:single-node:plain+secure"
   hosts: all
-  gather_facts: yes
   any_errors_fatal: true
   pre_tasks:
   - include_vars:
@@ -13,27 +12,44 @@
   tasks:
     - name: "Check vars"
       set_fact:
-        target_inventory_file: "{{ WORKING_DIR }}/{{ env.local_broker_inventory_file_name }}"
+        target_inventory_file: "{{ WORKING_DIR }}/{{ broker_host }}.inventory.yml"
         docker_project_name: "{{ env.docker_project_name }}"
         docker_container_name: "{{ env.docker_container_name }}"
-        host_mount_path_secrets: "{{ BROKER_HOST_MOUNT_PATH_SECRETS }}"
-        host_mount_path_data: "{{ BROKER_HOST_MOUNT_PATH_DATA }}"
         ssl_cert_file: "{{ SSL_CERT_FILE }}"
+    - name: "Set mount points for broker_host=localhost"
+      set_fact:
+        host_mount_path_secrets: "{{ WORKING_DIR }}/broker_mount_secrets"
+        host_mount_path_data: "{{ WORKING_DIR }}/broker_mount_data"
+      when: broker_host == 'localhost'
+    - name: "Set mount points for broker_host=localhost"
+      set_fact:
+        host_mount_path_secrets: "/usr/local/broker_mount_secrets"
+        host_mount_path_data: "/usr/local/broker_mount_data"
+      when: broker_host != 'localhost'
 
     - name: "Create host mount path data"
       file:
-        path: "{{ host_mount_path_data }}"
+        path: "{{ item }}"
+        mode: "ugo+w"
         state: directory
+      with_items:
+        - "{{ host_mount_path_data }}/spool/softAdb"
+        - "{{ host_mount_path_data }}/jail"
+        - "{{ host_mount_path_data }}/diagnostics"
+        - "{{ host_mount_path_data }}/adbBackup"
+        - "{{ host_mount_path_data }}/var"
 
     - name: "Create host mount path secrets"
       file:
         path: "{{ host_mount_path_secrets }}"
+        mode: "ugo+w"
         state: directory
 
     - name: "Copy cert to mount path secrets"
       copy:
         src: "{{ ssl_cert_file }}"
         dest: "{{ host_mount_path_secrets }}"
+        mode: "ugo+rwx"
 
     - name: "Set Service Vars"
       set_fact:
@@ -41,7 +57,7 @@
         _image: "{{ BROKER_DOCKER_IMAGE }}"
         _ssl_cert_filename: "{{ SSL_CERT_FILE | basename }}"
         _generated_inventory:
-          sempv2_host: localhost
+          sempv2_host: "{{ broker_host }}"
           sempv2_port: 1943
           sempv2_is_secure_connection: True
           sempv2_username: admin
@@ -74,6 +90,7 @@
                 - "{{ host_mount_path_data }}/var:/usr/sw/var:Z"
               ports:
                 - "{{ _generated_inventory.sempv2_port }}:1943"
+                - "8080:8080"
               environment:
                 - "username_admin_globalaccesslevel={{ _generated_inventory.sempv2_username }}"
                 - "username_admin_password={{ _generated_inventory.sempv2_password }}"
@@ -118,7 +135,6 @@
         generated_inventory: "{{ _generated_inventory }}"
         definition: "{{ updated_docker_compose_definition }}"
         state: present
-
 
 ###
 # The End.
