@@ -41,7 +41,9 @@ echo ">>> Generating self-signed certificate ..."
   # add new cert to CA bundle
   CA_CERT_BUNDLE_FILE=$(python3 -m certifi)
   echo "# Subject: $subject" >> $CA_CERT_BUNDLE_FILE
+  if [[ $? != 0 ]]; then echo " >>> ERROR: updating $CA_CERT_BUNDLE_FILE"; exit 1; fi
   cat $certFile >> $CA_CERT_BUNDLE_FILE
+  if [[ $? != 0 ]]; then echo " >>> ERROR: updating $CA_CERT_BUNDLE_FILE"; exit 1; fi
   cat $CA_CERT_BUNDLE_FILE
 
 echo ">>> Success."
