@@ -39,7 +39,7 @@ echo ">>> Generating self-signed certificate ..."
   cat $pemFile
 
   # add new cert to CA bundle
-  CA_CERT_BUNDLE_FILE=$(python -m certifi)
+  CA_CERT_BUNDLE_FILE=$(python3 -m certifi)
   echo "# Subject: $subject" >> $CA_CERT_BUNDLE_FILE
   cat $certFile >> $CA_CERT_BUNDLE_FILE
   cat $CA_CERT_BUNDLE_FILE
