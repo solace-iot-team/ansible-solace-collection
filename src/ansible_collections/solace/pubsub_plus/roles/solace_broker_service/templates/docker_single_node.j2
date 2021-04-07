@@ -2,7 +2,7 @@
 {
   "all": {
     "hosts": {
-      "{{ project_name}}": {
+      "{{ generated_inventory.inventory_hostname }}": {
         "broker_type": "local",
         "ansible_connection": "local",
         "sempv2_host": "{{ generated_inventory.sempv2_host }}",

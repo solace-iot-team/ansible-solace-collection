@@ -1,93 +1,42 @@
 # Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 ---
-- set_fact:
-    broker_url: "{{ 'https' if generated_inventory.sempv2_is_secure_connection else 'http' }}://{{ generated_inventory.sempv2_host }}:{{ generated_inventory.sempv2_port }}"
-  when: service_type == 'docker_single_node'
-  delegate_to: localhost
-
-- name: "Try until Broker available"
-  solace_get_available:
-    host: "{{ generated_inventory.sempv2_host }}"
-    port: "{{ generated_inventory.sempv2_port }}"
-    secure_connection: "{{ generated_inventory.sempv2_is_secure_connection }}"
-    username: "{{ generated_inventory.sempv2_username }}"
-    password: "{{ generated_inventory.sempv2_password }}"
-  register: _result
-  until: "_result.rc == 0 and _result.is_available"
-  retries: 25 # 25 * 5 seconds
-  delay: 5 # Every 5 seconds
-  delegate_to: localhost
-
-- assert:
-    that: _result.rc == 0 and _result.is_available
-    fail_msg: "cannot reach broker on {{ broker_url }}"
-  when: service_type == 'docker_single_node'
-  delegate_to: localhost
-
-
-# - name: "Wait for Broker Up"
-#   uri:
-#     url: "{{ broker_url }}"
-#     return_content: yes
-#     status_code: [200, -1]
-#   register: result
-#   until: result.status == 200
-#   retries: 20
-#   delay: 5
-#   when: service_type == 'docker_single_node'
-#   delegate_to: localhost
-#
-# - assert:
-#     that: result.status == 200
-#     fail_msg: "cannot reach broker on {{ broker_url }}"
-#   when: service_type == 'docker_single_node'
-#   delegate_to: localhost
-#
-# check if spool is fully activated, using create a queue as test
-- name: "Check if message spool is available"
-  solace.pubsub_plus.solace_queue:
+- name: "Wait until broker service available"
+  solace.pubsub_plus.solace_get_available:
     host: "{{ generated_inventory.sempv2_host }}"
     port: "{{ generated_inventory.sempv2_port }}"
     secure_connection: "{{ generated_inventory.sempv2_is_secure_connection }}"
     username: "{{ generated_inventory.sempv2_username }}"
     password: "{{ generated_inventory.sempv2_password }}"
     msg_vpn: "{{ generated_inventory.vpn }}"
-    name: test_message_spool
-    state: present
-  register: result
-  until: result.rc == 0
-  retries: 20
-  delay: 5
-  when: service_type == 'docker_single_node'
+    # wait_timeout_minutes: 1 # test failure
   delegate_to: localhost
+  register: available_result
 
-- assert:
-    that: result.rc == 0
-    fail_msg: "failed to create queue: {{ result.msg }}"
-  when: service_type == 'docker_single_node'
-  delegate_to: localhost
+- name: "Get docker logs if not available"
+  command:
+    argv:
+      - docker
+      - logs
+      - "{{ container_name }}"
+  when: not available_result.is_available
+  register: docker_logs_result
+- name: "Show docker logs if failed to start solace broker service"
+  debug:
+    msg:
+      - "failed to start solace broker service"
+      - "docker logs {{ container_name}}"
+      - "{{ docker_logs_result.stdout_lines if docker_logs_result.stdout_lines is defined else 'no docker logs available'}}"
+  when: not available_result.is_available
+  failed_when: true
 
-- name: "clean up queue"
-  solace.pubsub_plus.solace_queue:
-    host: "{{ generated_inventory.sempv2_host }}"
-    port: "{{ generated_inventory.sempv2_port }}"
-    secure_connection: "{{ generated_inventory.sempv2_is_secure_connection }}"
-    username: "{{ generated_inventory.sempv2_username }}"
-    password: "{{ generated_inventory.sempv2_password }}"
-    msg_vpn: "{{ generated_inventory.vpn }}"
-    name: test_message_spool
-    state: absent
-  when: service_type == 'docker_single_node'
-  delegate_to: localhost
-
-- name: create inventory
+- name: "Generate inventory"
   set_fact:
     inventory: "{{ lookup('template', 'docker_single_node.j2') | from_json}}"
   when: service_type == 'docker_single_node'
   delegate_to: localhost
 
-- name: "Write Generated Inventory"
+- name: "Save generated inventory"
   copy:
     content: "{{ inventory | to_nice_yaml(indent=2) }}"
     dest: "{{ generated_inventory_file }}"

@@ -9,6 +9,7 @@ container_name: "{{ args.__null__ }}"
 image: "solace/solace-pubsub-standard:latest"
 restarted: yes
 generated_inventory:
+  inventory_hostname: localhost
   sempv2_host: localhost
   sempv2_port: 8080
   sempv2_username: admin

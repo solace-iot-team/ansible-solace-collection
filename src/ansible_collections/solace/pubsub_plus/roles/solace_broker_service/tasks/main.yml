@@ -13,7 +13,8 @@
     definition: "{{ definition }}"
     state: "{{ state }}"
     restarted: "{{ restarted }}"
-    debug: true
+    recreate: always
+    debug: yes
 
 - name: state=present
   include_tasks: present.yml
