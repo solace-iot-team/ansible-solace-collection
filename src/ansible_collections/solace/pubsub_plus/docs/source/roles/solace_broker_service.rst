@@ -4,6 +4,9 @@
 solace_broker_service - manage a broker service
 ===============================================
 
+TODO: re-write
+
+
 Manage a self-hosted Broker Service running in Docker.
 
 .. note::
