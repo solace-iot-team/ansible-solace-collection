@@ -44,6 +44,15 @@ source $PROJECT_HOME/.lib/functions.sh
 
 ##############################################################################################################################
 # Run
+
+  runScript="$scriptDir/files/secrets/generateSelfSignedCert.sh"
+  $runScript
+  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+
+  runScript="$scriptDir/files/secrets/addCert2PythonCABundle.sh"
+  $runScript
+  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+
   for playbook in ${playbooks[@]}; do
 
     playbook=$(assertFile $scriptLogName $playbook) || exit
