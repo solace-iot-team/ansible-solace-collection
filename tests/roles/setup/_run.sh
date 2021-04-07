@@ -37,11 +37,10 @@ source $PROJECT_HOME/.lib/functions.sh
 ##############################################################################################################################
 # Run
 
-runScript="$scriptDir/../azure/create.az.vm.sh"
-$runScript
-code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+  runScript="$scriptDir/../azure/create.az.vm.sh"
+  $runScript
+  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
-echo ">>> SUCCESS: $scriptLogName"
 
 ###
 # The End.
