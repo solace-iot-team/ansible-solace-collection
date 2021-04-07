@@ -65,8 +65,8 @@ echo " >>> Creating azure vm ..."
   if [[ $? != 0 ]]; then echo " >>> ERROR: creating azure vm"; exit 1; fi
   cat $outputInfoFile | jq .
   ls -la ~/.ssh/id_rsa*
-  cat ~/.ssh/id_rsa; if [[ $? != 0 ]]; then echo " >>> ERROR: vm private key"; exit 1; fi
-  cat ~/.ssh/id_rsa.pub; echo ""; if [[ $? != 0 ]]; then echo " >>> ERROR: vm pub key"; exit 1; fi
+  # cat ~/.ssh/id_rsa; if [[ $? != 0 ]]; then echo " >>> ERROR: vm private key"; exit 1; fi
+  # cat ~/.ssh/id_rsa.pub; echo ""; if [[ $? != 0 ]]; then echo " >>> ERROR: vm pub key"; exit 1; fi
 echo " >>> Success."
 
 echo " >>> Opening plain semp port on azure vm ..."
@@ -126,8 +126,8 @@ echo " >>> Adding info ..."
   export vmSempSecurePort
   export vmPythonPath
   vmInfo=$(echo $vmInfo | jq ".admin_user=env.vmAdminUsr")
-  vmInfo=$(echo $vmInfo | jq ".semp_plain_port=env.vmSempPlainPort")
-  vmInfo=$(echo $vmInfo | jq ".semp_secure_port=env.vmSempSecurePort")
+  vmInfo=$(echo $vmInfo | jq ".semp_port_plain=env.vmSempPlainPort")
+  vmInfo=$(echo $vmInfo | jq ".semp_port_secure=env.vmSempSecurePort")
   vmInfo=$(echo $vmInfo | jq ".python_path=env.vmPythonPath")
   echo $vmInfo | jq . > "$outputInfoFile"
   cat $outputInfoFile | jq .
@@ -144,9 +144,9 @@ echo " >>> Creating inventory file ..."
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.ansible_host=env.vmPublicIpAddress")
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.ansible_user=env.vmAdminUsr")
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.ansible_python_interpreter=env.vmPythonPath")
-  inventory=$(echo $inventory | jq ".all.hosts.remotehost.broker_host=env.vmFQDNS")
-  inventory=$(echo $inventory | jq ".all.hosts.remotehost.semp_plain_port=env.vmSempPlainPort")
-  inventory=$(echo $inventory | jq ".all.hosts.remotehost.semp_secure_port=env.vmSempSecurePort")
+  inventory=$(echo $inventory | jq ".all.hosts.remotehost.solace_broker_service.semp_host=env.vmFQDNS")
+  inventory=$(echo $inventory | jq ".all.hosts.remotehost.solace_broker_service.semp_port_plain=env.vmSempPlainPort")
+  inventory=$(echo $inventory | jq ".all.hosts.remotehost.solace_broker_service.semp_port_secure=env.vmSempSecurePort")
   echo $inventory | jq . > "$outputInventoryFile"
   cat "$outputInventoryFile" | jq .
 echo " >>> Success."
