@@ -106,7 +106,7 @@ class SolaceTask(object):
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except (requests.exceptions.SSLError) as e:
             # these paths do not seem to work
-            # logging.debug("ssl verify paths: %s", SolaceUtils.get_ssl_default_verify_paths())       
+            # logging.debug("ssl verify paths: %s", SolaceUtils.get_ssl_default_verify_paths())
             log_msg = [type(e)] + [f"certificate authority (CA) bundle used:{certifi.where()}"]
             self.logException(log_msg, e)
             self.update_result(dict(rc=1, changed=self.changed))
