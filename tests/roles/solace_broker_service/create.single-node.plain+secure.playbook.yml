@@ -4,137 +4,155 @@
 -
   name: "create: broker service:single-node:plain+secure"
   hosts: all
+  gather_facts: yes
   any_errors_fatal: true
   pre_tasks:
   - include_vars:
       file: "env.vars.yml"
       name: env
   tasks:
-    - name: "Check vars"
-      set_fact:
-        target_inventory_file: "{{ WORKING_DIR }}/{{ broker_host }}.inventory.yml"
-        docker_project_name: "{{ env.docker_project_name }}"
-        docker_container_name: "{{ env.docker_container_name }}"
-        ssl_cert_file: "{{ SSL_CERT_FILE }}"
-    - name: "Set mount points for broker_host=localhost"
-      set_fact:
-        host_mount_path_secrets: "{{ WORKING_DIR }}/broker_mount_secrets"
-        host_mount_path_data: "{{ WORKING_DIR }}/broker_mount_data"
-      when: broker_host == 'localhost'
-    - name: "Set mount points for broker_host=localhost"
-      set_fact:
-        host_mount_path_secrets: "/usr/local/broker_mount_secrets"
-        host_mount_path_data: "/usr/local/broker_mount_data"
-      when: broker_host != 'localhost'
+  - name: "Include task: set-facts"
+    include_tasks: ./tasks/set-facts.yml
+  - name: "Check vars"
+    assert:
+      that:
+        - SSL_CERT_FILE is defined
+      fail_msg: "one or more variables not defined"
+  - name: "Set facts"
+    set_fact:
+      ssl_cert_file: "{{ SSL_CERT_FILE }}"
 
-    - name: "Create host mount path data"
-      file:
-        path: "{{ item }}"
-        mode: "ugo+w"
-        state: directory
-      with_items:
-        - "{{ host_mount_path_data }}/spool/softAdb"
-        - "{{ host_mount_path_data }}/jail"
-        - "{{ host_mount_path_data }}/diagnostics"
-        - "{{ host_mount_path_data }}/adbBackup"
-        - "{{ host_mount_path_data }}/var"
+  - name: "Set docker user id"
+    set_fact:
+      docker_os_user: "{{ ansible_user_id if broker_host=='localhost' else env.remote.docker_os_user }}"
+      docker_os_user_id: "{{ ansible_user_id if broker_host=='localhost' else env.remote.docker_os_user_id }}"
 
-    - name: "Create host mount path secrets"
-      file:
-        path: "{{ host_mount_path_secrets }}"
-        mode: "ugo+w"
-        state: directory
+  - name: "Create docker user"
+    user:
+      name: "{{ docker_os_user }}"
+      uid: "{{ docker_os_user_id|int|default(null) }}"
+    register: user_result
 
-    - name: "Copy cert to mount path secrets"
-      copy:
-        src: "{{ ssl_cert_file }}"
-        dest: "{{ host_mount_path_secrets }}"
-        mode: "ugo+rwx"
+  - name: "Set docker user id"
+    set_fact:
+      docker_os_user: "{{ user_result.name }}"
+      docker_os_user_id: "{{ user_result.uid }}"
 
-    - name: "Set Service Vars"
-      set_fact:
-        _container_name: "{{ docker_container_name }}"
-        _image: "{{ BROKER_DOCKER_IMAGE }}"
-        _ssl_cert_filename: "{{ SSL_CERT_FILE | basename }}"
-        _generated_inventory:
-          sempv2_host: "{{ broker_host }}"
-          sempv2_port: 1943
-          sempv2_is_secure_connection: True
-          sempv2_username: admin
-          sempv2_password: admin
-          vpn: default
-          virtual_router: primary
+  - name: "Set Service Vars"
+    set_fact:
+      _container_name: "{{ docker_container_name }}"
+      _image: "{{ BROKER_DOCKER_IMAGE }}"
+      _ssl_cert_filename: "{{ SSL_CERT_FILE | basename }}"
+      _user:  "{{ docker_os_user_id }}"
+      _generated_inventory:
+        inventory_hostname: "{{ ansible_hostname }}"
+        sempv2_host: "{{ broker_host }}"
+        sempv2_port: 1943
+        sempv2_is_secure_connection: True
+        sempv2_username: admin
+        sempv2_password: admin
+        vpn: default
+        virtual_router: primary
 
-    - name: "Set the Docker Compose Definition"
-      set_fact:
-        docker_compose_definition:
-          version: '3.3'
-          services:
-            primary:
-              container_name: "{{ _container_name }}"
-              image: "{{ _image }}"
-              restart: unless-stopped
-              shm_size: 1g
-              ulimits:
-                core: 2
-                nofile:
-                  soft: 2448
-                  hard: 38048
-              volumes:
-                - "{{ host_mount_path_secrets }}:/run/secrets"
-                - "{{ host_mount_path_data }}/spool/softAdb:/usr/sw/internalSpool/softAdb:Z"
-                - "{{ host_mount_path_data }}/spool:/usr/sw/internalSpool:Z"
-                - "{{ host_mount_path_data }}/jail:/usr/sw/jail:Z"
-                - "{{ host_mount_path_data }}/diagnostics:/var/lib/solace/diags:Z"
-                - "{{ host_mount_path_data }}/adbBackup:/usr/sw/adb:Z"
-                - "{{ host_mount_path_data }}/var:/usr/sw/var:Z"
-              ports:
-                - "{{ _generated_inventory.sempv2_port }}:1943"
-                - "8080:8080"
-              environment:
-                - "username_admin_globalaccesslevel={{ _generated_inventory.sempv2_username }}"
-                - "username_admin_password={{ _generated_inventory.sempv2_password }}"
-                - system_scaling_maxconnectioncount=100
-                - "tls_servercertificate_filepath=/run/secrets/{{ _ssl_cert_filename }}"
+  - name: "Create host mount path secrets"
+    file:
+      path: "{{ host_mount_path_secrets }}"
+      owner: "{{ _user }}"
+      state: directory
 
-    - name: "Broker Service Setup - HTTPS"
-      include_role:
-        name: solace.pubsub_plus.solace_broker_service
-      vars:
-        service_type: docker_single_node
-        project_name: "{{ docker_project_name }}"
-        container_name: "{{ _container_name}}"
-        image: "{{ _image }}"
-        generated_inventory_file: "{{ target_inventory_file }}"
-        generated_inventory: "{{ _generated_inventory }}"
-        definition: "{{ docker_compose_definition }}"
-        state: present
+  - name: "Create host mount path data"
+    file:
+      path: "{{ item }}"
+      owner: "{{ _user }}"
+      state: directory
+    with_items:
+      - "{{ host_mount_path_data }}"
+      - "{{ host_mount_path_data }}/spool"
+      - "{{ host_mount_path_data }}/spool/softAdb"
+      - "{{ host_mount_path_data }}/jail"
+      - "{{ host_mount_path_data }}/diagnostics"
+      - "{{ host_mount_path_data }}/adbBackup"
+      - "{{ host_mount_path_data }}/var"
 
-    - name: "Update the Docker Compose Definition"
-      set_fact:
-        update_docker_compose_definition:
-          services:
-            primary:
-              ports:
-                - "{{ _generated_inventory.sempv2_port }}:1943"
-                - "80:80"
-                - "443:443"
-                - "1883:1883"
-    - set_fact:
-        updated_docker_compose_definition: "{{ docker_compose_definition | combine(update_docker_compose_definition, recursive=true) }}"
+  - name: "Copy cert to mount path secrets"
+    copy:
+      src: "{{ ssl_cert_file }}"
+      dest: "{{ host_mount_path_secrets }}"
+      owner: "{{ _user }}"
 
-    - name: "Broker Service Setup - HTTPS"
-      include_role:
-        name: solace.pubsub_plus.solace_broker_service
-      vars:
-        service_type: docker_single_node
-        project_name: "{{ docker_project_name }}"
-        container_name: "{{ _container_name}}"
-        image: "{{ _image }}"
-        generated_inventory_file: "{{ target_inventory_file }}"
-        generated_inventory: "{{ _generated_inventory }}"
-        definition: "{{ updated_docker_compose_definition }}"
-        state: present
+  - name: "Set the Docker Compose Definition"
+    set_fact:
+      docker_compose_definition:
+        version: '3.3'
+        services:
+          primary:
+            container_name: "{{ _container_name }}"
+            image: "{{ _image }}"
+            restart: unless-stopped
+            shm_size: 1g
+            user: "{{ _user }}"
+            ulimits:
+              core: 2
+              nofile:
+                soft: 2448
+                hard: 38048
+            volumes:
+              - "{{ host_mount_path_secrets }}:/run/secrets"
+              - "{{ host_mount_path_data }}/spool/softAdb:/usr/sw/internalSpool/softAdb:Z"
+              - "{{ host_mount_path_data }}/spool:/usr/sw/internalSpool:Z"
+              - "{{ host_mount_path_data }}/jail:/usr/sw/jail:Z"
+              - "{{ host_mount_path_data }}/diagnostics:/var/lib/solace/diags:Z"
+              - "{{ host_mount_path_data }}/adbBackup:/usr/sw/adb:Z"
+              - "{{ host_mount_path_data }}/var:/usr/sw/var:Z"
+            ports:
+              - "{{ _generated_inventory.sempv2_port }}:1943"
+              - "8080:8080"
+            environment:
+              - "username_admin_globalaccesslevel={{ _generated_inventory.sempv2_username }}"
+              - "username_admin_password={{ _generated_inventory.sempv2_password }}"
+              - system_scaling_maxconnectioncount=100
+              - "tls_servercertificate_filepath=/run/secrets/{{ _ssl_cert_filename }}"
+
+  - name: "Broker Service Setup - plain+secure"
+    include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      service_type: docker_single_node
+      project_name: "{{ docker_project_name }}"
+      container_name: "{{ _container_name}}"
+      image: "{{ _image }}"
+      generated_inventory_file: "{{ target_inventory_file }}"
+      generated_inventory: "{{ _generated_inventory }}"
+      definition: "{{ docker_compose_definition }}"
+      state: present
+
+  - meta: end_play
+
+  - name: "Update the Docker Compose Definition"
+    set_fact:
+      update_docker_compose_definition:
+        services:
+          primary:
+            ports:
+              - "{{ _generated_inventory.sempv2_port }}:1943"
+              - "80:80"
+              - "443:443"
+              - "1883:1883"
+  - set_fact:
+      updated_docker_compose_definition: "{{ docker_compose_definition | combine(update_docker_compose_definition, recursive=true) }}"
+
+  - name: "Broker Service Up"
+    include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      service_type: docker_single_node
+      project_name: "{{ docker_project_name }}"
+      container_name: "{{ _container_name}}"
+      image: "{{ _image }}"
+      generated_inventory_file: "{{ target_inventory_file }}"
+      generated_inventory: "{{ _generated_inventory }}"
+      definition: "{{ updated_docker_compose_definition }}"
+      state: present
 
 ###
 # The End.

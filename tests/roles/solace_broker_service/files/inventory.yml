@@ -5,4 +5,7 @@ all:
   hosts:
     localhost:
       ansible_connection: local
-      broker_host: localhost
+      solace_broker_service:
+        semp_host: localhost
+        semp_port_plain: 8080
+        semp_port_secure: 1943

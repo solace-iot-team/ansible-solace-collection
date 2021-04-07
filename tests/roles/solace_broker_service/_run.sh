@@ -22,7 +22,6 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$SSL_CERT_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SSL_CERT_FILE"; exit 1; fi
   if [ -z "$REQUESTS_CA_BUNDLE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: REQUESTS_CA_BUNDLE"; exit 1; fi
 
-
 ##############################################################################################################################
 # Prepare
 
@@ -32,12 +31,14 @@ source $PROJECT_HOME/.lib/functions.sh
 ##############################################################################################################################
 # Settings
 
+  # fix docker image to only one here
+  BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
   remoteInventory=$(assertFile $scriptLogName "$AZURE_VM_REMOTE_HOST_INVENTORY") || exit
   localInventory=$(assertFile $scriptLogName "$scriptDir/files/inventory.yml") || exit
   playbooks=(
-    # "$scriptDir/delete.single-node.plain+secure.playbook.yml"
+    "$scriptDir/delete.single-node.service.playbook.yml"
     "$scriptDir/create.single-node.plain+secure.playbook.yml"
-    # "$scriptDir/delete.single-node.plain+secure.playbook.yml"
+    "$scriptDir/delete.single-node.service.playbook.yml"
   )
   sslCertFile="$scriptDir/files/secrets/asc.pem"
 
@@ -47,8 +48,8 @@ source $PROJECT_HOME/.lib/functions.sh
 
     playbook=$(assertFile $scriptLogName $playbook) || exit
     ansible-playbook \
-                    -i $remoteInventory \
                     -i $localInventory \
+                    -i $remoteInventory \
                     $playbook \
                     --extra-vars "WORKING_DIR=$WORKING_DIR" \
                     --extra-vars "BROKER_DOCKER_IMAGE=$BROKER_DOCKER_IMAGE" \

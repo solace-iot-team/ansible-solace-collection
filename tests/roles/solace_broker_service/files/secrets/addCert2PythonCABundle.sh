@@ -1,0 +1,1 @@
+../../../../../src/ansible_collections/solace/pubsub_plus/docs/examples/tips-tricks/certs/addCert2PythonCABundle.sh

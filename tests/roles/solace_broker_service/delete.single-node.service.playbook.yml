@@ -1,0 +1,35 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "delete:broker service:single-node:"
+  hosts: all
+  gather_facts: yes
+  any_errors_fatal: true
+  pre_tasks:
+  - include_vars:
+      file: "env.vars.yml"
+      name: env
+  tasks:
+  - name: "Include task: set-facts"
+    include_tasks: ./tasks/set-facts.yml
+
+  - name: "Broker Service Down"
+    include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      project_name: "{{ docker_project_name }}"
+      container_name: "{{ docker_container_name}}"
+      generated_inventory_file: "{{ target_inventory_file }}"
+      state: absent
+
+  - name: "Clean up mount paths"
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - "{{ host_mount_path_data }}"
+      - "{{ host_mount_path_secrets }}"
+      
+###
+# The End.
