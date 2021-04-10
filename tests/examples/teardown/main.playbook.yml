@@ -4,17 +4,16 @@
 -
   name: "main: teardown"
   hosts: localhost
-  gather_facts: no
+  gather_facts: true
   any_errors_fatal: true
   tasks:
-    - name: "Broker Service Delete"
-      include_role:
-        name: solace.pubsub_plus.solace_broker_service
-      vars:
-        service_type: docker_single_node
-        state: absent
+  - name: "Broker service down"
+    include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      docker_compose_settings:
         project_name: quickstart_broker_service_single_node
-        generated_inventory_file: "{{ WORKING_DIR }}/broker.inventory.yml"
+        state: absent
 
 ###
 # The End.
