@@ -1,4 +1,3 @@
-
 -
   name: create broker service
   hosts: all
