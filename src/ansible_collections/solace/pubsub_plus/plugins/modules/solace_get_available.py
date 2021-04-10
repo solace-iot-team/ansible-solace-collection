@@ -95,7 +95,6 @@ from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error im
 from ansible.module_utils.basic import AnsibleModule
 import logging
 import time
-import json
 import uuid
 
 SOLACE_GET_AVAILABLE_HAS_IMPORT_ERROR = False
@@ -128,7 +127,7 @@ class SolaceGetAvailableTask(SolaceBrokerGetTask):
             except (requests.exceptions.SSLError) as e:
                 raise e from None
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
-                self.logException(type(e), e)
+                self.logExceptionAsDebug(type(e), e)
                 ex = str(e)
             try_count += 1
             time.sleep(delay_secs)
@@ -155,7 +154,7 @@ class SolaceGetAvailableTask(SolaceBrokerGetTask):
                 self.sempv2_api.make_delete_request(self.get_config(), delete_path_array)
                 return True, None
             except SolaceApiError as e:
-                self.logException(type(e), e)
+                self.logExceptionAsDebug(type(e), e)
                 ex = e.get_ansible_msg()
             try_count += 1
             time.sleep(delay_secs)
@@ -187,7 +186,7 @@ class SolaceGetAvailableTask(SolaceBrokerGetTask):
             })
         _msg = []
         if semp_ex:
-            _msg += ['SEMP response:', semp_ex]
+            _msg += ['HTTP response:', semp_ex]
         if spool_ex:
             _msg += ['SPOOL response:', spool_ex]
         msg = None if len(_msg) == 0 else _msg

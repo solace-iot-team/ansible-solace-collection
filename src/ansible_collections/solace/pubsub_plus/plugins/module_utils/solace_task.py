@@ -66,41 +66,47 @@ class SolaceTask(object):
         # return: msg(dict) and result(dict)
         raise SolaceInternalErrorAbstractMethod()
 
-    def logException(self, message, e) -> list:
+    def _logException(self, logging_func, message, e) -> list:
         ex = traceback.format_exc()
         ex_msg_list = [str(e)]
         log_msg = [f"{message}"] + ex_msg_list + ex.split('\n')
-        logging.error("%s", json.dumps(log_msg, indent=2))
+        logging_func("%s", json.dumps(log_msg, indent=2))
+
+    def logExceptionAsError(self, message, e) -> list:
+        self._logException(logging.error, message, e)
+
+    def logExceptionAsDebug(self, message, e) -> list:
+        self._logException(logging.debug, message, e)
 
     def execute(self):
         try:
             msg, result = self.do_task()
             self.module.exit_json(msg=msg, **result)
         except SolaceError as e:
-            self.logException(type(e), e)
+            self.logExceptionAsError(type(e), e)
             self.update_result(dict(rc=1, changed=self.changed))
             result_update = e.get_result_update()
             if result_update:
                 self.update_result(result_update)
             self.module.exit_json(msg=e.to_list(), **self.get_result())
         except SolaceApiError as e:
-            self.logException(type(e), e)
+            self.logExceptionAsError(type(e), e)
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=e.get_ansible_msg(), **self.get_result())
         except SolaceInternalError as e:
-            self.logException(type(e), e)
+            self.logExceptionAsError(type(e), e)
             ex = traceback.format_exc()
             ex_msg_list = e.to_list()
             usr_msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceParamsValidationError as e:
-            self.logException(type(e), e)
+            self.logExceptionAsError(type(e), e)
             usr_msg = ["module arg validation failed", str(e)]
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceFeatureNotSupportedError as e:
-            self.logException(type(e), e)
+            self.logExceptionAsError(type(e), e)
             usr_msg = ["Feature currently not supported. Pls raise an new feature request if required.", str(e)]
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
@@ -108,19 +114,19 @@ class SolaceTask(object):
             # these paths do not seem to work
             # logging.debug("ssl verify paths: %s", SolaceUtils.get_ssl_default_verify_paths())
             log_msg = [type(e)] + [f"certificate authority (CA) bundle used:{certifi.where()}"]
-            self.logException(log_msg, e)
+            self.logExceptionAsError(log_msg, e)
             self.update_result(dict(rc=1, changed=self.changed))
             usr_msg = ["Check SSL configuration & certificate required for host"] + \
                       [f"Certificate authority (CA) bundle used: {certifi.where()}"] + \
                       [str(e)]
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
-            self.logException(type(e), e)
+            self.logExceptionAsError(type(e), e)
             self.update_result(dict(rc=1, changed=self.changed))
             usr_msg = str(e)
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except Exception as e:
-            self.logException(type(e), e)
+            self.logExceptionAsError(type(e), e)
             ex = traceback.format_exc()
             ex_msg_list = [str(e)]
             usr_msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
