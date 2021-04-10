@@ -30,9 +30,43 @@
     delegate_to: localhost
 
   - block:
+
+    - debug:
+        msg:
+          - "ansible_os_family={{ ansible_os_family | lower }}"
+          - "ansible_distribution={{ ansible_distribution | lower }}"
+
+# not on mac
+    # - getent:
+    #     database: passwd
+    #     key: "{{ ansible_user_id }}"
+    #
+    # - debug:
+    #     msg: "uid={{ getent_passwd[ansible_user_id] }}"
+    #
+    # - meta: end_play
+    #
+    # - set_fact:
+    #     docker_os_user: "{{ ansible_user_id if settings.broker_host=='localhost' else env.remote.docker_os_user }}"
+    #     # docker_os_user_id: "{{ ansible_user_id if settings.broker_host=='localhost' else env.remote.docker_os_user_id }}"
+    #     docker_os_user_id: "{{ getent_passwd[ansible_user_id] if settings.broker_host=='localhost' else env.remote.docker_os_user_id }}"
+    #
+    # mac
     - set_fact:
         docker_os_user: "{{ ansible_user_id if settings.broker_host=='localhost' else env.remote.docker_os_user }}"
         docker_os_user_id: "{{ ansible_user_id if settings.broker_host=='localhost' else env.remote.docker_os_user_id }}"
+      when: ansible_os_family|lower == 'darwin'
+
+    # ubuntu
+    # - getent:
+    #     database: passwd
+    #     key: "{{ ansible_user_id }}"
+    #   when: ansible_os_family|lower == 'debian'
+    - set_fact:
+        docker_os_user: "{{ env.remote.docker_os_user }}"
+        docker_os_user_id: "{{ env.remote.docker_os_user_id }}"
+      when: ansible_os_family|lower == 'debian'
+
     - name: "Create docker user"
       user:
         name: "{{ docker_os_user }}"
