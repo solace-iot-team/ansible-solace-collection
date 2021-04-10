@@ -1,0 +1,35 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "create: broker service:single-node:default"
+  hosts: all
+  gather_facts: yes
+  any_errors_fatal: true
+  pre_tasks:
+  - include_vars:
+      file: "env.vars.yml"
+      name: env
+  tasks:
+  - include_tasks: ./tasks/settings.yml
+
+  - name: "Set Service Vars"
+    set_fact:
+      _docker_project_name: "{{ settings.docker_project_name }}"
+
+  - name: "Broker Service Up - default"
+    include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      docker_compose_settings:
+        project_name: "{{ _docker_project_name }}"
+        state: present
+
+  - include_tasks: ./tasks/config_db.write.yml
+
+  - name: "Output docker logs"
+    debug:
+      msg: "{{ solace_broker_service_result.broker_service.docker_logs }}"
+
+###
+# The End.

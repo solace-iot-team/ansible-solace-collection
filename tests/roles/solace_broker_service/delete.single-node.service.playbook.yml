@@ -2,7 +2,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "delete:broker service:single-node:"
+  name: "delete:broker service:single-node"
   hosts: all
   gather_facts: yes
   any_errors_fatal: true
@@ -12,24 +12,58 @@
       name: env
   tasks:
   - name: "Include task: set-facts"
-    include_tasks: ./tasks/set-facts.yml
+    include_tasks: ./tasks/settings.yml
+
+  - name: "Load settings file"
+    block:
+      - set_fact:
+          _settings_file: "{{ settings.broker_service.config_db.base_path }}/settings.yml"
+      - stat:
+          path: "{{ _settings_file }}"
+        register: stat_settings_file
+      - set_fact:
+          _deployed_settings: "{{ lookup('file', _settings_file) | from_yaml }}"
+        when: stat_settings_file.stat.exists
+      - meta: end_host
+        when: not stat_settings_file.stat.exists
+    delegate_to: localhost
+
+  - name: "Set Service Vars"
+    set_fact:
+      _deployed_inventory_file: "{{ _deployed_settings.broker_service.config_db.inventory_file }}"
+      _deployed_docker_compose_settings_file: "{{ _deployed_settings.broker_service.config_db.docker_compose_settings_file }}"
+
+  - name: "Load docker_compose_settings_file"
+    block:
+      - stat:
+          path: "{{ _deployed_docker_compose_settings_file }}"
+        register: stat_docker_compose_settings_file
+      - set_fact:
+          _deployed_docker_compose_settings: "{{ lookup('file', _deployed_docker_compose_settings_file) | from_yaml }}"
+        when: stat_docker_compose_settings_file.stat.exists
+    delegate_to: localhost
 
   - name: "Broker Service Down"
     include_role:
       name: solace.pubsub_plus.solace_broker_service
     vars:
-      project_name: "{{ docker_project_name }}"
-      container_name: "{{ docker_container_name}}"
-      generated_inventory_file: "{{ target_inventory_file }}"
+      docker_compose_settings:
+        project_name: "{{ _deployed_docker_compose_settings.project_name }}"
+        definition: "{{ _deployed_docker_compose_settings.definition }}"
+        remove_volumes: yes
+        state: absent
+    when: _deployed_docker_compose_settings is defined
+
+  - name: "Clean up run_time.base_path"
+    file:
+      path: "{{ _deployed_settings.broker_service.run_time.base_path }}"
       state: absent
 
-  - name: "Clean up mount paths"
+  - name: "Clean up config_db"
     file:
-      path: "{{ item }}"
+      path: "{{ _deployed_settings.broker_service.config_db.base_path }}"
       state: absent
-    with_items:
-      - "{{ host_mount_path_data }}"
-      - "{{ host_mount_path_secrets }}"
-      
+    delegate_to: localhost
+
 ###
 # The End.

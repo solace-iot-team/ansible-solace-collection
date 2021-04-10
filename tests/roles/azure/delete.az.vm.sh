@@ -12,24 +12,28 @@ source $PROJECT_HOME/.lib/functions.sh
 ############################################################################################################################
 # Environment Variables
 
-  if [ -z "$WORKING_DIR" ]; then export WORKING_DIR="$PROJECT_HOME/tmp"; mkdir -p $WORKING_DIR; fi
-  if [ -z "$LOG_DIR" ]; then export LOG_DIR="$WORKING_DIR/logs"; mkdir -p $LOG_DIR; fi
-
+  if [ -z "$WORKING_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
+  if [ -z "$LOG_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
+  if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
   if [ -z "$AZURE_PROJECT_NAME" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_PROJECT_NAME"; exit 1; fi
+
+############################################################################################################################
+# Prepare
+
+  resourceGroupName="$AZURE_PROJECT_NAME-rg"
+  outputDir="$CONFIG_DB_DIR/azure_vms/$AZURE_PROJECT_NAME"
 
 ############################################################################################################################
 # Run
 
-resourceGroupName="$AZURE_PROJECT_NAME-rg"
-
-echo " >>> Check Resource Group ..."
+echo " >>> Check resource group ..."
   resp=$(az group exists --name $resourceGroupName)
 echo " >>> Success."
 
 if [ "$resp" == "false" ]; then
   echo " >>> INFO: resoure group does not exist";
 else
-  echo " >>> Deleting Resource Group ..."
+  echo " >>> Deleting resource group ..."
     az group delete \
         --name $resourceGroupName \
         --yes \
@@ -38,9 +42,9 @@ else
   echo " >>> Success."
 fi
 
-echo  " >>> Clean working dir ..."
-  rm -f $WORKING_DIR/azure/*.*
-  if [[ $? != 0 ]]; then echo " >>> ERROR: cleaning working dir"; exit 1; fi
+echo  " >>> Clean output dir ..."
+  rm -rf $outputDir
+  if [[ $? != 0 ]]; then echo " >>> ERROR: cleaning output dir"; exit 1; fi
 echo " >>> Success."
 
 

@@ -1,0 +1,54 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "Check vars"
+  assert:
+    that:
+      - CONFIG_DB_DIR is defined
+      - RUN_TIME_DIR_LOCAL is defined
+      - RUN_TIME_DIR_REMOTE is defined
+      - BROKER_DOCKER_COMPOSE_FILE is defined
+      - BROKER_DOCKER_COMPOSE_FILE_PLAIN_SECURE is defined
+      - solace_broker_service is defined
+      - solace_broker_service.semp_host is defined
+      - env.docker_project_name is defined
+      - env.docker_container_name is defined
+    fail_msg: "one or more variables not defined"
+
+- set_fact:
+    RUN_TIME_DIR: "{{ RUN_TIME_DIR_LOCAL if solace_broker_service.semp_host == 'localhost' else RUN_TIME_DIR_REMOTE }}"
+    _settings:
+      docker_project_name: "{{ env.docker_project_name }}"
+      docker_container_name: "{{ env.docker_container_name }}"
+      broker_host: "{{ solace_broker_service.semp_host }}"
+- set_fact:
+    __settings:
+      broker_service:
+        config_db:
+          base_path: "{{ CONFIG_DB_DIR }}/broker_services/{{ _settings.broker_host }}"
+        run_time:
+          base_path: "{{ RUN_TIME_DIR }}/broker_services/{{ _settings.docker_project_name }}"
+- set_fact:
+    settings:
+      docker_project_name: "{{ _settings.docker_project_name }}"
+      docker_container_name: "{{ _settings.docker_container_name }}"
+      broker_host: "{{ _settings.broker_host }}"
+      broker_service:
+        config_db:
+          base_path: "{{ __settings.broker_service.config_db.base_path }}"
+          inventory_file: "{{ __settings.broker_service.config_db.base_path }}/broker.inventory.yml"
+          docker_compose_settings_file: "{{ __settings.broker_service.config_db.base_path }}/broker.docker_compose_settings.yml"
+        run_time:
+          base_path: "{{ __settings.broker_service.run_time.base_path }}"
+          mount_path_data: "{{ __settings.broker_service.run_time.base_path }}/data"
+          mount_path_secrets: "{{ __settings.broker_service.run_time.base_path }}/secrets"
+
+# - name: "Print settings"
+#   debug:
+#     msg:
+#       - "settings:"
+#       - "{{ settings }}"
+
+###
+# The End.

@@ -1,0 +1,30 @@
+
+version: '3.3'
+services:
+  primary:
+    container_name: "{{ _container_name }}"
+    image: "{{ _image }}"
+    restart: unless-stopped
+    shm_size: 1g
+    user: "{{ _user }}"
+    ulimits:
+      core: 2
+      nofile:
+        soft: 2448
+        hard: 38048
+    volumes:
+      - "{{ host_mount_path_secrets }}:/run/secrets"
+      - "{{ host_mount_path_data }}/spool/softAdb:/usr/sw/internalSpool/softAdb:Z"
+      - "{{ host_mount_path_data }}/spool:/usr/sw/internalSpool:Z"
+      - "{{ host_mount_path_data }}/jail:/usr/sw/jail:Z"
+      - "{{ host_mount_path_data }}/diagnostics:/var/lib/solace/diags:Z"
+      - "{{ host_mount_path_data }}/adbBackup:/usr/sw/adb:Z"
+      - "{{ host_mount_path_data }}/var:/usr/sw/var:Z"
+    ports:
+      - "{{ _generated_inventory_settings.sempv2_port }}:1943"
+      - "8080:8080"
+    environment:
+      - "username_admin_globalaccesslevel={{ _generated_inventory_settings.sempv2_username }}"
+      - "username_admin_password={{ _generated_inventory_settings.sempv2_password }}"
+      - system_scaling_maxconnectioncount=100
+      - "tls_servercertificate_filepath=/run/secrets/{{ _ssl_cert_filename }}"

@@ -15,6 +15,9 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$LOG_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
   if [ -z "$WORKING_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
 
+##############################################################################################################################
+# Prepare
+
   if [ -z "$AZURE_PROJECT_NAME" ]; then export AZURE_PROJECT_NAME="asct"; fi
   if [ -z "$AZURE_LOCATION" ]; then export AZURE_LOCATION="westeurope"; fi
   # az vm image list --output table
@@ -26,11 +29,11 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE" ]; then
     export AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE=$(assertFile $scriptLogName "$scriptDir/files/template.remotehost.inventory.yml") || exit
   fi
-  if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY" ]; then export AZURE_VM_REMOTE_HOST_INVENTORY="$WORKING_DIR/azure/vm.inventory.json"; fi
 
-##############################################################################################################################
-# Prepare
-
+  if [ -z "$CONFIG_DB_DIR" ]; then
+    export CONFIG_DB_DIR="$WORKING_DIR/config_db";
+    mkdir -p $CONFIG_DB_DIR
+  fi
   export ANSIBLE_SOLACE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible-solace.log"
   export ANSIBLE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible.log"
 

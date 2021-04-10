@@ -13,8 +13,9 @@ source $PROJECT_HOME/.lib/functions.sh
 ############################################################################################################################
 # Environment Variables
 
-  if [ -z "$WORKING_DIR" ]; then export WORKING_DIR="$PROJECT_HOME/tmp"; mkdir -p $WORKING_DIR; fi
-  if [ -z "$LOG_DIR" ]; then export LOG_DIR="$WORKING_DIR/logs"; mkdir -p $LOG_DIR; fi
+  if [ -z "$WORKING_DIR" ]; then echo ">>> ERROR: - $scriptName - missing env var: WORKING_DIR"; exit 1; fi
+  if [ -z "$LOG_DIR" ]; then echo ">>> ERROR: - $scriptName - missing env var: LOG_DIR"; exit 1; fi
+  if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
 
   if [ -z "$AZURE_PROJECT_NAME" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_PROJECT_NAME"; exit 1; fi
   if [ -z "$AZURE_LOCATION" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_LOCATION"; exit 1; fi
@@ -23,26 +24,25 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$AZURE_VM_SEMP_SECURE_PORT" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_SECURE_PORT"; exit 1; fi
   if [ -z "$AZURE_VM_ADMIN_USER" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_VM_ADMIN_USER"; exit 1; fi
   if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE"; exit 1; fi
-  if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_VM_REMOTE_HOST_INVENTORY"; exit 1; fi
+
+############################################################################################################################
+# Prepare
+
+  inventoryTemplateFile=$(assertFile $scriptLogName "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE") || exit
+  resourceGroupName="$AZURE_PROJECT_NAME-rg"
+  azLocation="$AZURE_LOCATION"
+  vmImageUrn="$AZURE_VM_IMAGE_URN"
+  vmName="$AZURE_PROJECT_NAME-vm"
+  vmAdminUsr="$AZURE_VM_ADMIN_USER"
+  vmSempPlainPort="$AZURE_VM_SEMP_PLAIN_PORT"
+  vmSempSecurePort="$AZURE_VM_SEMP_SECURE_PORT"
+
+  outputDir="$CONFIG_DB_DIR/azure_vms/$AZURE_PROJECT_NAME"; mkdir -p $outputDir; rm -rf $outputDir/*;
+  outputInfoFile="$outputDir/vm.info.json"
+  outputInventoryFile="$outputDir/vm.inventory.json"
 
 ############################################################################################################################
 # Run
-inventoryTemplateFile=$(assertFile $scriptLogName "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE") || exit
-resourceGroupName="$AZURE_PROJECT_NAME-rg"
-azLocation="$AZURE_LOCATION"
-vmImageUrn="$AZURE_VM_IMAGE_URN"
-vmName="$AZURE_PROJECT_NAME-vm"
-vmAdminUsr="$AZURE_VM_ADMIN_USER"
-vmSempPlainPort="$AZURE_VM_SEMP_PLAIN_PORT"
-vmSempSecurePort="$AZURE_VM_SEMP_SECURE_PORT"
-
-outputDir="$WORKING_DIR/azure"; mkdir -p $outputDir;
-if [ -z "$CLEAN_WORKING_DIR" ]; then rm -rf $outputDir/*; fi
-outputInfoFile="$outputDir/vm.info.json"
-outputSecretsFile="$outputDir/vm.secrets.json"
-outputInventoryFile="$AZURE_VM_REMOTE_HOST_INVENTORY"
-
-
 echo " >>> Creating Resource Group ..."
   az group create \
     --name $resourceGroupName \
@@ -78,8 +78,6 @@ echo " >>> Opening plain semp port on azure vm ..."
     --verbose
   if [[ $? != 0 ]]; then echo " >>> ERROR: opening semp plain port $vmSempPlainPort on azure vm"; exit 1; fi
 echo " >>> Success."
-
-# TODO: how does this work?
 
 echo " >>> Opening secure semp port on azure vm ..."
   az vm open-port \
