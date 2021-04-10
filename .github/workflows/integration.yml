@@ -32,8 +32,8 @@ jobs:
         python-version: [ '3.6' ]
         # python-version: [ '3.6', '3.8', '3.9' ]
         ansible-version: [ 'ansible>=2.10.3' ]
-        # ansible-version: [ 'ansible>=2.9.11,<2.10.0', 'ansible>=2.10.3' ]
-        # ansible-version: [ 'ansible>=2.9.11,<2.10.0' ]
+        # ansible-version: [ 'ansible>=3' ]
+        # ansible-version: [ 'ansible>=2.10.3', 'ansible>=3' ]
     steps:
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'

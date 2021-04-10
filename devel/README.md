@@ -40,7 +40,7 @@ source venv3.6.12/bin/activate
 ````bash
 (venv3.6.12) ...$ cd devel
 (venv3.6.12) ...$ pip install -r devel.requirements.txt
-(venv3.6.12) ...$ pip install -r ../requirements.txt
+(venv3.6.12) ...$ pip install -r ../src/ansible_collections/solace/pubsub_plus/requirements.txt
 # check
 (venv3.6.12) ...$ ansible --version
 ````
