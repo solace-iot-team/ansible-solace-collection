@@ -1,0 +1,36 @@
+-
+  name: broker service create and delete
+  hosts: all
+  tasks:
+  - name: standup broker service
+    include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      docker_compose_settings:
+        project_name: my-docker-project-name
+        state: present
+
+  - name: "Output the role results"
+    debug:
+      msg: "{{ solace_broker_service_result }}"
+
+  - name: "Output the broker service inventory"
+    debug:
+      msg: "{{ solace_broker_service_result.broker_service.inventory }}"
+
+  - name: "Output the docker_compose settings used"
+    debug:
+      msg: "{{ solace_broker_service_result.broker_service.docker_compose_settings }}"
+
+  - name: "Output docker logs"
+    debug:
+      msg: "{{ solace_broker_service_result.broker_service.docker_logs }}"
+
+  - name: delete broker service
+    include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      docker_compose_settings:
+        project_name: my-docker-project-name
+        definition: "{{ solace_broker_service_result.broker_service.docker_compose_settings.definition }}"
+        state: absent

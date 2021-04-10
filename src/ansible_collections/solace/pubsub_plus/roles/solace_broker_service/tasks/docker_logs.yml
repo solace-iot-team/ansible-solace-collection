@@ -1,0 +1,22 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+---
+- set_fact:
+    _service: "{{ item }}"
+    _container_name: "{{ combined_docker_compose_settings.definition.services[item].container_name }}"
+- debug:
+    msg: "Get docker logs for container: {{ _container_name }}"
+- command:
+    argv:
+      - docker
+      - logs
+      - "{{ _container_name }}"
+  register: docker_logs_result
+- debug:
+    msg:
+      - "docker_logs_result ************************************************************************"
+      - "{{ docker_logs_result }}"
+- set_fact:
+    docker_logs_out: "{{ lookup('template', 'docker_logs.j2') | from_json}}"
+- set_fact:
+    combined_docker_logs: "{{ combined_docker_logs | combine(docker_logs_out, recursive=true) if combined_docker_logs is defined else docker_logs_out }}"

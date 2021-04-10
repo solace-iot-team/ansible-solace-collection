@@ -1,16 +1,3 @@
 ---
 args:
   __null__: "__NULL__"
-  service_type:
-    options:
-      - docker_single_node
-      # - docker_ha
-      # - solace_cloud
-  state:
-    options:
-      - present
-      - absent
-  restarted:
-    options:
-      - true
-      - false
