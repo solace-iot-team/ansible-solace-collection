@@ -71,7 +71,7 @@
     - set_fact:
         docker_os_user: "{{ ansible_user_id }}"
         docker_os_user_id: "{{ getent_passwd[ansible_user_id] }}"
-      when: ansible_os_family|lower == 'debian' and settings.broker_hos=='localhost'
+      when: ansible_os_family|lower == 'debian' and settings.broker_host=='localhost'
 
     - name: "Create docker user"
       user:
