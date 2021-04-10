@@ -1,29 +1,17 @@
----
+
 -
   name: create broker service
   hosts: all
   tasks:
+  - name: set docker compose yaml file
+    set_fact:
+      broker_docker_compose_file: "{path}/docker_compose_file.yml"
 
-    - name: create broker service using default definitions
-      include_role:
-        name: solace.pubsub_plus.solace_broker_service
-      vars:
-        service_type: docker_single_node
+  - name: create broker service with docker compose file
+    include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      docker_compose_settings:
+        project_name: my-docker-project-name
         state: present
-        project_name: broker_service_single_node
-        generated_inventory_file: "./tmp/{{ inventory_hostname }}.inventory.yml"
-
-
-    - name: set docker compose yaml file
-      set_fact:
-        broker_docker_compose_file: "{path}/docker_compose_file.yml"
-
-    - name: create broker service with docker compose file
-      include_role:
-        name: solace.pubsub_plus.solace_broker_service
-      vars:
-        service_type: docker_single_node
-        state: present
-        project_name: broker_service_single_node
-        generated_inventory_file: "./tmp/{{ inventory_hostname }}.inventory.yml"
         definition: "{{ lookup('file', broker_docker_compose_file) | from_yaml }}"

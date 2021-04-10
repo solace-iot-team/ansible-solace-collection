@@ -22,5 +22,4 @@ echo ">>> Add new cert to python CA bundle ..."
   code=$?; if [[ $code != 0 ]]; then echo " >>> ERROR: updating $CA_CERT_BUNDLE_FILE - $scriptName"; exit 1; fi
   cat "$certFile" >> "$CA_CERT_BUNDLE_FILE"
   code=$?; if [[ $code != 0 ]]; then echo " >>> ERROR: updating $CA_CERT_BUNDLE_FILE - $scriptName"; exit 1; fi
-  cat "$CA_CERT_BUNDLE_FILE"
 echo ">>> Success."
