@@ -41,6 +41,7 @@ export ANSIBLE_SOLACE_ENABLE_LOGGING=True
 
 export RUN_FG=true
 # export RUN_FG=false
+export NO_GENERATE_NEW_CERT=true
 
 ../_run.sh
 
