@@ -128,7 +128,7 @@ jobs:
           export SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS }}"
           export SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}"
           export LOG_DIR="$GITHUB_WORKSPACE/${TEST_RUNNER_LOGS_DIR}"
-          echo "TODO: generate the self-signed cert"; exit 1;
+          export AZURE_PROJECT_NAME="asct-wf"
           ./${TEST_TEST_RUNNER_SCRIPT}
 
       - name: Archive logs

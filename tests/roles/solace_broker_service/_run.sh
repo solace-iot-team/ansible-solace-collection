@@ -14,7 +14,6 @@ source $PROJECT_HOME/.lib/functions.sh
 
   if [ -z "$LOG_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
   if [ -z "$WORKING_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
-  if [ -z "$AZURE_PROJECT_NAME" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_PROJECT_NAME"; exit 1; fi
   if [ -z "$RUN_FG" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: RUN_FG"; exit 1; fi
   if [ -z "$BROKER_DOCKER_IMAGE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: BROKER_DOCKER_IMAGE"; exit 1; fi
   if [ -z "$SSL_CERT_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SSL_CERT_FILE"; exit 1; fi
@@ -31,7 +30,7 @@ source $PROJECT_HOME/.lib/functions.sh
     export CONFIG_DB_DIR="$WORKING_DIR/config_db";
     mkdir -p $CONFIG_DB_DIR
   fi
-
+  if [ -z "$AZURE_PROJECT_NAME" ]; then export AZURE_PROJECT_NAME="asct"; fi
   # fix docker image to only one here. changing images sometimes fails to start broker properly with certs
   BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
   brokerDockerComposeFile=$(assertFile $scriptLogName "$scriptDir/templates/PubSubStandard_singleNode.yml") || exit

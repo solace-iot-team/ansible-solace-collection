@@ -66,6 +66,7 @@ ansibleSolaceTestTargetGroup="roles"
     mkdir -p $LOG_DIR
 
     export BROKER_DOCKER_IMAGE=$brokerDockerImage
+    if [ -z "$AZURE_PROJECT_NAME" ]; then export AZURE_PROJECT_NAME="asct-tr"; fi
 
     echo "##############################################################################################################"
     echo "# Test target group: $ansibleSolaceTestTargetGroup($brokerDockerImage)"
