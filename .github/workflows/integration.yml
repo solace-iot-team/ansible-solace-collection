@@ -51,6 +51,7 @@ jobs:
           env | grep TEST
           which bash
           bash --version
+          openssl version
 
       - name: Print github env before checkout
         if: env.DEBUG_FLAG == 'true'
