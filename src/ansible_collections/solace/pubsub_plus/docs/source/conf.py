@@ -68,6 +68,7 @@ html_theme = 'sphinx_rtd_theme'
 # }
 
 linkcheck_anchors = False
+linkcheck_ignore = [ 'http://localhost:8080' ]
 # if required, add a list of regex of anchors to ignore
 # linkcheck cannot deal with solace swagger anchors like: ...config/index.html#/queue
 # linkcheck_anchors_ignore
