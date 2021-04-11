@@ -90,8 +90,8 @@ class SolaceApi(object):
         do_retry = True
         while do_retry and try_count < max_tries:
             resp = self._make_request(config, request_func, path_array, json)
-            if resp.status_code == 502:
-                logging.warning("resp.status_code: %d, resp.reason: %s, try number: %d", resp.status_code, resp.reason, try_count)
+            if resp.status_code in [502, 504]:
+                logging.warning("resp.status_code: %d, resp.reason: '%s', try number: %d", resp.status_code, resp.reason, try_count)
                 time.sleep(delay_secs)
             else:
                 do_retry = False
