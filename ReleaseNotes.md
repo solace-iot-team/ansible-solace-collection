@@ -20,7 +20,7 @@ _**Note: this release contains breaking changes.**_
 * **Framework**
   - added explicit exception handling for SSLErrors
   - added detailed traceback of Exceptions to log file
-
+  - handling of 502 Bad Gateway for REST calls (every 30 secs, 20 times max)
 
 ## Version: 1.2.1
 Maintenance release.
