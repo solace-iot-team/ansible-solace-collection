@@ -109,6 +109,11 @@ This playbook will:
 .. literalinclude:: ../../examples/roles/solace_broker_service/example-4.playbook.yml
   :language: yaml
 
+Check the certificate of the broker service:
+
+.. code-block:: bash
+
+  openssl s_client -showcerts -servername {fqdns} -connect {fqdns}:1943
 
 
 Parameters
