@@ -6,20 +6,20 @@ scriptDir=$(cd $(dirname "$0") && pwd);
 scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
 testTarget=${scriptDir##*/}
 scriptLogName="$testTargetGroup.$testTarget.$scriptName"
-if [ -z "$PROJECT_HOME" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
+if [ -z "$PROJECT_HOME" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
 source $PROJECT_HOME/.lib/functions.sh
 
 ############################################################################################################################
 # Environment Variables
 
-  if [ -z "$LOG_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
-  if [ -z "$WORKING_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
-  if [ -z "$RUN_FG" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: RUN_FG"; exit 1; fi
+  if [ -z "$LOG_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
+  if [ -z "$WORKING_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
+  if [ -z "$RUN_FG" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: RUN_FG"; exit 1; fi
 
-  if [ -z "$LOCAL_BROKER_INVENTORY_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: LOCAL_BROKER_INVENTORY_FILE"; exit 1; fi
-  if [ -z "$BROKER_DOCKER_COMPOSE_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: BROKER_DOCKER_COMPOSE_FILE"; exit 1; fi
-  if [ -z "$SOLACE_CLOUD_API_TOKEN" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN"; exit 1; fi
-  if [ -z "$SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE"; exit 1; fi
+  if [ -z "$LOCAL_BROKER_INVENTORY_FILE" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: LOCAL_BROKER_INVENTORY_FILE"; exit 1; fi
+  if [ -z "$BROKER_DOCKER_COMPOSE_FILE" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: BROKER_DOCKER_COMPOSE_FILE"; exit 1; fi
+  if [ -z "$SOLACE_CLOUD_API_TOKEN" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN"; exit 1; fi
+  if [ -z "$SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE"; exit 1; fi
   if [ -z "$TEARDOWN_SOLACE_CLOUD" ]; then export TEARDOWN_SOLACE_CLOUD=True; fi
 
 ##############################################################################################################################
@@ -43,7 +43,7 @@ source $PROJECT_HOME/.lib/functions.sh
                   --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN" \
                   --extra-vars "BROKER_DOCKER_COMPOSE_FILE=$BROKER_DOCKER_COMPOSE_FILE" \
                   --extra-vars "TEARDOWN_SOLACE_CLOUD=$TEARDOWN_SOLACE_CLOUD"
-  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
+  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
 echo ">>> SUCCESS: $scriptLogName"
 

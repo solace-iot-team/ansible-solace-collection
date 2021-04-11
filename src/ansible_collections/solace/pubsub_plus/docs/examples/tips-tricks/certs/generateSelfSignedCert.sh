@@ -29,7 +29,7 @@ echo ">>> Generating self-signed certificate ..."
     -config "$sslConfFile" \
     -subj "$subject"
   code=$?
-  if [[ $code != 0 ]]; then echo " >>> ERROR: generating certificate - $scriptName"; exit 1; fi
+  if [[ $code != 0 ]]; then echo " >>> XT_ERROR: generating certificate - $scriptName"; exit 1; fi
 
   echo "# Subject: $subject" > "$certFile"
   cat "$certFile.x" >> "$certFile"

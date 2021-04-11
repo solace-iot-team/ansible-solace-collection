@@ -14,8 +14,8 @@ scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
 ############################################################################################################################
 # Check Environment Variables
 
-  if [ -z "$vmAdminUsr" ]; then echo ">>> ERROR: - $scriptName - missing env var: vmAdminUsr"; exit 1; fi
-  if [ -z "$vmPublicIpAddress" ]; then echo ">>> ERROR: - $scriptName - missing env var: vmPublicIpAddress"; exit 1; fi
+  if [ -z "$vmAdminUsr" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: vmAdminUsr"; exit 1; fi
+  if [ -z "$vmPublicIpAddress" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: vmPublicIpAddress"; exit 1; fi
 
 ############################################################################################################################
 # Run
@@ -42,7 +42,7 @@ ssh "$vmAdminUsr@$vmPublicIpAddress" <<BOOT_EOL
   sudo apt-get -y upgrade
 BOOT_EOL
 
-if [[ $? != 0 ]]; then echo " >>> ERROR: bootstrap vm"; exit 1; fi
+if [[ $? != 0 ]]; then echo " >>> XT_ERROR: bootstrap vm"; exit 1; fi
 
 echo " >>> Success."
 

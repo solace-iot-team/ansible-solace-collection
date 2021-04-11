@@ -6,16 +6,16 @@ scriptDir=$(cd $(dirname "$0") && pwd);
 scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
 testTarget=${scriptDir##*/}
 scriptLogName="$testTargetGroup.$testTarget.$scriptName"
-if [ -z "$PROJECT_HOME" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
+if [ -z "$PROJECT_HOME" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
 source $PROJECT_HOME/.lib/functions.sh
 
 ############################################################################################################################
 # Environment Variables
 
-  if [ -z "$WORKING_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
-  if [ -z "$LOG_DIR" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
-  if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
-  if [ -z "$AZURE_PROJECT_NAME" ]; then echo ">>> ERROR: - $scriptName - missing env var: AZURE_PROJECT_NAME"; exit 1; fi
+  if [ -z "$WORKING_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
+  if [ -z "$LOG_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
+  if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
+  if [ -z "$AZURE_PROJECT_NAME" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_PROJECT_NAME"; exit 1; fi
 
 ############################################################################################################################
 # Prepare
@@ -38,13 +38,13 @@ else
         --name $resourceGroupName \
         --yes \
         --verbose
-    if [[ $? != 0 ]]; then echo " >>> ERROR: deleting resource group"; exit 1; fi
+    if [[ $? != 0 ]]; then echo " >>> XT_ERROR: deleting resource group"; exit 1; fi
   echo " >>> Success."
 fi
 
 echo  " >>> Clean output dir ..."
   rm -rf $outputDir
-  if [[ $? != 0 ]]; then echo " >>> ERROR: cleaning output dir"; exit 1; fi
+  if [[ $? != 0 ]]; then echo " >>> XT_ERROR: cleaning output dir"; exit 1; fi
 echo " >>> Success."
 
 

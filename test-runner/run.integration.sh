@@ -35,7 +35,7 @@ mkdir -p $LOG_DIR
 FAILED=0
 # $scriptDir/_run.sh > $LOG_DIR/$scriptLogName.out 2>&1
 $scriptDir/_run.integration.sh
-code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - $scriptLogName"; FAILED=1; fi
+code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - $scriptLogName"; FAILED=1; fi
 
 ##############################################################################################################################
 # Check for warnings
@@ -62,7 +62,7 @@ fi
 # Check for errors
 
 filePattern="$LOG_DIR"
-errors=$(grep -n -r -e "ERROR" $filePattern )
+errors=$(grep -n -r -e "XT_ERROR" $filePattern )
 
 if [[ -z "$errors" && "$FAILED" -eq 0 ]]; then
   echo ">>> FINISHED:SUCCESS - $scriptLogName"
@@ -71,7 +71,7 @@ else
   echo ">>> FINISHED:FAILED";
   if [ ! -z "$errors" ]; then
     while IFS= read line; do
-      echo $line >> "$LOG_DIR/$scriptLogName.ERROR.out"
+      echo $line >> "$LOG_DIR/$scriptLogName.XT_ERROR.out"
     done < <(printf '%s\n' "$errors")
   fi
   exit 1
