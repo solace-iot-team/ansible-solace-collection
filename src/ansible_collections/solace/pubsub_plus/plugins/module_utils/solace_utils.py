@@ -115,13 +115,14 @@ class SolaceUtils(object):
         return changes
 
     @staticmethod
-    def parse_response_body(resp_text: str):
-        try:
-            body = json.loads(resp_text)
-        except JSONDecodeError:
+    def parse_response_text(resp_text: str):
+        resp_body = None
+        if resp_text:
             try:
-                body = xmltodict.parse(resp_text)
-            except Exception:
-                # print as text at least
-                body = resp_text
-        return body
+                resp_body = json.loads(resp_text)
+            except json.JSONDecodeError:
+                try:
+                    resp_body = xmltodict.parse(resp_text)
+                except Exception:
+                    resp_body = resp_text
+        return resp_body
