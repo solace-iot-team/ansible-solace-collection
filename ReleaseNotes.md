@@ -1,9 +1,25 @@
 # Release Notes
 
 ## Version: 1.3.0
+Feature Updates.
 
-TODO
+_**Note: this release contains breaking changes.**_
 
+* **Roles:**
+  - [solace_broker_service](https://solace-iot-team.github.io/ansible-solace-collection/roles/solace_broker_service.html)
+    - _note: breaking change: input & output arguments/variables changed._
+    - added example for secure SEMP setup
+    - re-vamp of input vars & merging with defaults
+    - changed output to include final inventory, docker compose settings, and docker logs
+* **Modules:**
+  - [solace_get_available](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_available.html)
+    - added functionality to a) check if broker is reachable, b) check if spool initialized
+    - loops/waits until both are available (no loop required around module any more)
+* **Documentation**
+  - New: [Working with Self-Signed Certificates](https://solace-iot-team.github.io/ansible-solace-collection/tips-tricks-content/certs.html)
+* **Framework**
+  - added explicit exception handling for SSLErrors
+  - added detailed traceback of Exceptions to log file
 
 
 ## Version: 1.2.1

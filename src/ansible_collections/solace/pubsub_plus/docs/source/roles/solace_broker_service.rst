@@ -52,6 +52,17 @@ Switch off host key checking:
 .. literalinclude:: ../../examples/roles/solace_broker_service/remotevm/template.remotehost.inventory.yml
    :language: yaml
 
+**Example Inventory File for Local Machine (the Ansible controller):**
+
+.. code-block:: yaml
+
+  ---
+  all:
+   hosts:
+     localhost:
+       ansible_connection: local
+
+
 **Example Playbook to Create & Delete a Service using the default settings:**
 
 .. literalinclude:: ../../examples/roles/solace_broker_service/example-1.playbook.yml
@@ -93,20 +104,10 @@ This playbook will:
 .. literalinclude:: ../../examples/roles/solace_broker_service/example-3.playbook.yml
   :language: yaml
 
-Start Single Broker on Ansible Controller VM with Default Settings
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+**Example docker compose definition for secure SEMP:**
 
-Use this inventory file to start a broker service in a docker container on your local machine (the ansible controller).
-
-**Inventory File:**
-
-.. code-block:: yaml
-
-  ---
-  all:
-    hosts:
-      localhost:
-        ansible_connection: local
+.. literalinclude:: ../../examples/roles/solace_broker_service/example-4.playbook.yml
+  :language: yaml
 
 
 
