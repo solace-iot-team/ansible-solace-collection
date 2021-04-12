@@ -2,10 +2,10 @@
 
 .. _solace_get_available_module:
 
-solace_get_available -- check if broker is available
-====================================================
+solace_get_available -- check if broker semp & spool is available
+=================================================================
 
-Check if broker/service is reachable and responsive. Calls "GET /about".
+Check if broker service is reachable via SEMP and if the spool is ready. Calls "GET /about/api" and creates/deletes a test queue.
 
 
 
@@ -17,7 +17,6 @@ Examples
 
    
    hosts: all
-   gather_facts: no
    any_errors_fatal: true
    module_defaults:
      solace_get_available:
@@ -27,13 +26,18 @@ Examples
        username: "{{ sempv2_username }}"
        password: "{{ sempv2_password }}"
        timeout: "{{ sempv2_timeout }}"
+       msg_vpn: "{{ vpn }}"
    tasks:
-   - name: "Pause Until Broker/Service available"
-     solace_get_available:
-     register: _result
-     until: "_result.is_available"
-     retries: 25 # 25 * 5 seconds
-     delay: 5 # Every 5 seconds
+     - name: "Wait until broker service available"
+       solace.pubsub_plus.solace_get_available:
+       register: available_result
+
+     - name: "Check if available"
+       debug:
+           msg:
+           - "service not available"
+       when: not available_result.is_available
+       failed_when: true
 
 
 
@@ -42,6 +46,7 @@ Notes
 
 .. note::
    - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about/getAbout
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/createMsgVpnQueue
    - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
    - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
    - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
@@ -58,6 +63,11 @@ host (optional)
 
   | **type**: str
   | **default**: localhost
+
+msg_vpn (required)
+  The message vpn.
+
+  | **type**: str
 
 password (optional)
   Administrator password for Solace Broker.
@@ -97,6 +107,12 @@ username (optional)
   | **type**: str
   | **default**: admin
 
+wait_timeout_minutes (optional)
+  Minutes to run tests for SEMP and spool. Polls every 15 seconds for `wait_timeout_minutes` until service is available.
+
+  | **type**: int
+  | **default**: 10
+
 x_broker (optional)
   Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
 
@@ -110,13 +126,25 @@ Return Values
 -------------
 
 is_available
-  Flag indicating whether broker was reachable or not.
+  Flag indicating whether broker service is available.
+
+  | **returned**: always
+  | **type**: bool
+
+is_semp_available
+  Flag indicating whether broker service SEMP is available.
+
+  | **returned**: always
+  | **type**: bool
+
+is_spool_available
+  Flag indicating whether broker service spool is available.
 
   | **returned**: always
   | **type**: bool
 
 msg
-  The response from the HTTP call in case of error.
+  Details in case of an error.
 
   | **returned**: error
   | **type**: dict

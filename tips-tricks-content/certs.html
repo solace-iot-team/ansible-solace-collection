@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Working with Self-Signed Certificates &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/contentui.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/contentui.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Fact &amp; General Modules" href="../facts_and_general_modules.html" />
+    <link rel="prev" title="Working with Bridges &amp; Links" href="bridges-links.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Using Solace PubSub+ Ansible Collection</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../basics.html">The Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inventory-files.html">Best Practices for Ansible-Solace Inventory Files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tips-tricks.html">Tips &amp; Tricks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="bridges-links.html">Working with Bridges &amp; Links</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Working with Self-Signed Certificates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#generating-the-certificate">Generating the Certificate</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Modules &amp; Roles</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_get_modules.html">Solace Get Object List Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../roles.html">Roles</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Solace PubSub+ Ansible Collection </a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../tips-tricks.html">Tips &amp; Tricks</a> &raquo;</li>
+        
+      <li>Working with Self-Signed Certificates</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/tips-tricks-content/certs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="working-with-self-signed-certificates">
+<span id="tips-tricks-content-certs"></span><h1>Working with Self-Signed Certificates<a class="headerlink" href="#working-with-self-signed-certificates" title="Permalink to this headline">¶</a></h1>
+<p>For development it is sometimes useful to generate and use self-signed certificates and standup Broker Services that use TLS for SEMP calls.</p>
+<p>Here is a set of examples of how to:</p>
+<ul class="simple">
+<li><p>generate a self-signed certificate for a number of domains of your chosing, including <cite>localhost</cite></p></li>
+<li><p>add the certificate to the certificate authority bundle of your python installation</p></li>
+<li><p>add the certificate to your keychain if you are using a Mac</p></li>
+</ul>
+<div class="section" id="generating-the-certificate">
+<h2>Generating the Certificate<a class="headerlink" href="#generating-the-certificate" title="Permalink to this headline">¶</a></h2>
+<p>Using the following example ssl config file, you can add as many domains as needed, including <cite>localhost</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span> req <span class="o">]</span>
+<span class="nv">default_bits</span>       <span class="o">=</span> <span class="m">4096</span>
+<span class="nv">distinguished_name</span> <span class="o">=</span> req_distinguished_name
+<span class="nv">req_extensions</span>     <span class="o">=</span> req_ext
+
+<span class="o">[</span> req_distinguished_name <span class="o">]</span>
+<span class="nv">countryName</span>                 <span class="o">=</span> Country Name <span class="o">(</span><span class="m">2</span> letter code<span class="o">)</span>
+<span class="nv">stateOrProvinceName</span>         <span class="o">=</span> State or Province Name <span class="o">(</span>full name<span class="o">)</span>
+<span class="nv">localityName</span>                <span class="o">=</span> Locality Name <span class="o">(</span>eg, city<span class="o">)</span>
+<span class="nv">organizationName</span>            <span class="o">=</span> Organization Name <span class="o">(</span>eg, company<span class="o">)</span>
+<span class="nv">commonName</span>                  <span class="o">=</span> Common Name <span class="o">(</span>e.g. server FQDN or YOUR name<span class="o">)</span>
+<span class="nv">commonName_max</span>              <span class="o">=</span> <span class="m">64</span>
+
+<span class="o">[</span> req_ext <span class="o">]</span>
+<span class="nv">subjectAltName</span> <span class="o">=</span> @alt_names
+
+<span class="o">[</span>alt_names<span class="o">]</span>
+DNS.1   <span class="o">=</span> localhost
+DNS.2   <span class="o">=</span> *.westeurope.cloudapp.azure.com
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only use 1 wildcard in your domain. For example <cite>*.*.cloudapp.azure.com</cite> will not work.</p>
+</div>
+<p>The following script:</p>
+<ul class="simple">
+<li><p>generates a private key in <cite>asc.key</cite></p></li>
+<li><p>generates a certificate in <cite>asc.crt</cite></p></li>
+<li><p>creates the PEM file combining the certificate &amp; private key in <cite>asc.pem</cite></p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+<span class="nv">scriptDir</span><span class="o">=</span><span class="k">$(</span><span class="nb">cd</span> <span class="k">$(</span>dirname <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="nb">pwd</span><span class="k">)</span><span class="p">;</span>
+<span class="nv">scriptName</span><span class="o">=</span><span class="k">$(</span>basename <span class="k">$(</span><span class="nb">test</span> -L <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span> <span class="o">&amp;&amp;</span> readlink <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span> <span class="o">||</span> <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">))</span><span class="p">;</span>
+
+<span class="c1">##############################################################################################################################</span>
+<span class="c1"># Prepare</span>
+
+  <span class="nv">privateKeyFile</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/asc.key&quot;</span>
+  <span class="nv">certFile</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/asc.crt&quot;</span>
+  <span class="nv">pemFile</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/asc.pem&quot;</span>
+  <span class="nv">sslConfFile</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/ssl.conf&quot;</span>
+
+  <span class="nv">subjectC</span><span class="o">=</span><span class="s2">&quot;UK&quot;</span>
+  <span class="nv">subjectST</span><span class="o">=</span><span class="s2">&quot;London&quot;</span>
+  <span class="nv">subjectL</span><span class="o">=</span><span class="s2">&quot;London&quot;</span>
+  <span class="nv">subjectO</span><span class="o">=</span><span class="s2">&quot;Solace Corporation&quot;</span>
+  <span class="nv">subjectCN</span><span class="o">=</span><span class="s2">&quot;ansible-solace-collection&quot;</span>
+
+<span class="c1">##############################################################################################################################</span>
+<span class="c1"># Run</span>
+
+<span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; Generating self-signed certificate ...&quot;</span>
+
+  <span class="nv">subject</span><span class="o">=</span><span class="s2">&quot;/C=</span><span class="nv">$subjectC</span><span class="s2">/ST=</span><span class="nv">$subjectST</span><span class="s2">/L=</span><span class="nv">$subjectL</span><span class="s2">/O=</span><span class="nv">$subjectO</span><span class="s2">/CN=</span><span class="nv">$subjectCN</span><span class="s2">&quot;</span>
+  openssl req <span class="se">\</span>
+    -newkey rsa:2048 -nodes -keyout <span class="s2">&quot;</span><span class="nv">$privateKeyFile</span><span class="s2">&quot;</span> <span class="se">\</span>
+    -x509 -days <span class="m">3650</span> -out <span class="s2">&quot;</span><span class="nv">$certFile</span><span class="s2">.x&quot;</span> <span class="se">\</span>
+    -extensions req_ext <span class="se">\</span>
+    -config <span class="s2">&quot;</span><span class="nv">$sslConfFile</span><span class="s2">&quot;</span> <span class="se">\</span>
+    -subj <span class="s2">&quot;</span><span class="nv">$subject</span><span class="s2">&quot;</span>
+  <span class="nv">code</span><span class="o">=</span><span class="nv">$?</span>
+  <span class="k">if</span> <span class="o">[[</span> <span class="nv">$code</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot; &gt;&gt;&gt; XT_ERROR: generating certificate - </span><span class="nv">$scriptName</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span> <span class="k">fi</span>
+
+  <span class="nb">echo</span> <span class="s2">&quot;# Subject: </span><span class="nv">$subject</span><span class="s2">&quot;</span> &gt; <span class="s2">&quot;</span><span class="nv">$certFile</span><span class="s2">&quot;</span>
+  cat <span class="s2">&quot;</span><span class="nv">$certFile</span><span class="s2">.x&quot;</span> &gt;&gt; <span class="s2">&quot;</span><span class="nv">$certFile</span><span class="s2">&quot;</span>
+  <span class="nb">echo</span> <span class="s2">&quot;# Subject: </span><span class="nv">$subject</span><span class="s2">&quot;</span> &gt; <span class="s2">&quot;</span><span class="nv">$pemFile</span><span class="s2">&quot;</span>
+  cat <span class="s2">&quot;</span><span class="nv">$certFile</span><span class="s2">.x&quot;</span> &gt;&gt; <span class="s2">&quot;</span><span class="nv">$pemFile</span><span class="s2">&quot;</span>
+  cat <span class="s2">&quot;</span><span class="nv">$privateKeyFile</span><span class="s2">&quot;</span> &gt;&gt; <span class="s2">&quot;</span><span class="nv">$pemFile</span><span class="s2">&quot;</span>
+  rm -f <span class="s2">&quot;</span><span class="nv">$certFile</span><span class="s2">.x&quot;</span>
+  <span class="nb">echo</span> <span class="s2">&quot;    &gt;&gt;&gt; generated pem file:&quot;</span>
+  cat <span class="s2">&quot;</span><span class="nv">$pemFile</span><span class="s2">&quot;</span>
+<span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; Success.&quot;</span>
+</pre></div>
+</div>
+<p>Python does not use the machine’s keychain or truststore but it’s own Certificate Authority Bundle file.
+The following script will:</p>
+<ul class="simple">
+<li><p>find the CA Bundle file your python3 installation uses - <cite>python3 -m certifi</cite></p></li>
+<li><p>make a backup of it - <cite>*.original</cite></p></li>
+<li><p>append the new certificate <cite>asc.crt</cite> to the bundle file</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+<span class="nv">scriptDir</span><span class="o">=</span><span class="k">$(</span><span class="nb">cd</span> <span class="k">$(</span>dirname <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="nb">pwd</span><span class="k">)</span><span class="p">;</span>
+<span class="nv">scriptName</span><span class="o">=</span><span class="k">$(</span>basename <span class="k">$(</span><span class="nb">test</span> -L <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span> <span class="o">&amp;&amp;</span> readlink <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span> <span class="o">||</span> <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">))</span><span class="p">;</span>
+
+<span class="c1">##############################################################################################################################</span>
+<span class="c1"># Prepare</span>
+
+  <span class="nv">certFile</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/asc.crt&quot;</span>
+
+<span class="c1">##############################################################################################################################</span>
+<span class="c1"># Run</span>
+
+<span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; Add new cert to python CA bundle ...&quot;</span>
+  <span class="nv">CA_CERT_BUNDLE_FILE</span><span class="o">=</span><span class="k">$(</span>python3 -m certifi<span class="k">)</span>
+  <span class="nv">originalCACertBundleFile</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$CA_CERT_BUNDLE_FILE</span><span class="s2">.original&quot;</span>
+  <span class="k">if</span> <span class="o">[</span> ! -f <span class="s2">&quot;</span><span class="nv">$originalCACertBundleFile</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    cp <span class="s2">&quot;</span><span class="nv">$CA_CERT_BUNDLE_FILE</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="nv">$originalCACertBundleFile</span><span class="s2">&quot;</span>
+    <span class="nv">code</span><span class="o">=</span><span class="nv">$?</span><span class="p">;</span> <span class="k">if</span> <span class="o">[[</span> <span class="nv">$code</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot; &gt;&gt;&gt; XT_ERROR: updating </span><span class="nv">$CA_CERT_BUNDLE_FILE</span><span class="s2"> - </span><span class="nv">$scriptName</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span> <span class="k">fi</span>
+  <span class="k">fi</span>
+  <span class="c1"># copy original and add to it</span>
+  cp <span class="s2">&quot;</span><span class="nv">$originalCACertBundleFile</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="nv">$CA_CERT_BUNDLE_FILE</span><span class="s2">&quot;</span>
+  <span class="nv">code</span><span class="o">=</span><span class="nv">$?</span><span class="p">;</span> <span class="k">if</span> <span class="o">[[</span> <span class="nv">$code</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot; &gt;&gt;&gt; XT_ERROR: updating </span><span class="nv">$CA_CERT_BUNDLE_FILE</span><span class="s2"> - </span><span class="nv">$scriptName</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span> <span class="k">fi</span>
+  cat <span class="s2">&quot;</span><span class="nv">$certFile</span><span class="s2">&quot;</span> &gt;&gt; <span class="s2">&quot;</span><span class="nv">$CA_CERT_BUNDLE_FILE</span><span class="s2">&quot;</span>
+  <span class="nv">code</span><span class="o">=</span><span class="nv">$?</span><span class="p">;</span> <span class="k">if</span> <span class="o">[[</span> <span class="nv">$code</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot; &gt;&gt;&gt; XT_ERROR: updating </span><span class="nv">$CA_CERT_BUNDLE_FILE</span><span class="s2"> - </span><span class="nv">$scriptName</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span> <span class="k">fi</span>
+<span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; Success.&quot;</span>
+</pre></div>
+</div>
+<p>Finally, if you are using a Mac, this script registers the new certificate with the keychain so you can access the Broker Service via your Browser using https:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+<span class="nv">scriptDir</span><span class="o">=</span><span class="k">$(</span><span class="nb">cd</span> <span class="k">$(</span>dirname <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="nb">pwd</span><span class="k">)</span><span class="p">;</span>
+
+<span class="c1">##############################################################################################################################</span>
+<span class="c1"># Prepare</span>
+
+  <span class="nv">certFile</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/asc.crt&quot;</span>
+  <span class="nv">subjectCN</span><span class="o">=</span><span class="s2">&quot;ansible-solace-collection&quot;</span>
+
+<span class="c1">##############################################################################################################################</span>
+<span class="c1"># Run</span>
+
+<span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; Register self-signed certificate mac ...&quot;</span>
+
+  sudo security delete-certificate -c <span class="s2">&quot;</span><span class="nv">$subjectCN</span><span class="s2">&quot;</span>
+  sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain <span class="s2">&quot;</span><span class="nv">$certFile</span><span class="s2">&quot;</span>
+  sudo security find-certificate -c <span class="s2">&quot;</span><span class="nv">$subjectCN</span><span class="s2">&quot;</span>
+
+<span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; Success.&quot;</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../roles/solace_broker_service.html#solace-broker-service-role"><span class="std std-ref">solace_broker_service - manage a broker service</span></a> - for an example of using a certificate to secure a Broker Service</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../facts_and_general_modules.html" class="btn btn-neutral float-right" title="Fact &amp; General Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="bridges-links.html" class="btn btn-neutral float-left" title="Working with Bridges &amp; Links" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
+      <span class="lastupdated">
+        Last updated on 12 Apr 2021 at 07:20.
+      </span>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

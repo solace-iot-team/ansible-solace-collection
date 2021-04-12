@@ -221,21 +221,26 @@ $ pip install ansible
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
   <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Quickstart Service Playbook</span>
   <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
-  <span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
+  <span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
   <span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
   <span class="nt">tasks</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ensure working_dir exists</span>
-      <span class="nt">file</span><span class="p">:</span>
-        <span class="nt">path</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">WORKING_DIR</span><span class="nv"> </span><span class="s">}}&quot;</span>
-        <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">directory</span>
-
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Local</span><span class="nv"> </span><span class="s">Broker</span><span class="nv"> </span><span class="s">Setup&quot;</span>
-      <span class="nt">include_role</span><span class="p">:</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span>
-      <span class="nt">vars</span><span class="p">:</span>
-        <span class="nt">service_type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">docker_single_node</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Broker</span><span class="nv"> </span><span class="s">service</span><span class="nv"> </span><span class="s">up&quot;</span>
+    <span class="nt">include_role</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span>
+    <span class="nt">vars</span><span class="p">:</span>
+      <span class="nt">docker_compose_settings</span><span class="p">:</span>
         <span class="nt">project_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">quickstart_broker_service_single_node</span>
-        <span class="nt">generated_inventory_file</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">WORKING_DIR</span><span class="nv"> </span><span class="s">}}/broker.inventory.yml&quot;</span>
+        <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Save</span><span class="nv"> </span><span class="s">inventory&quot;</span>
+    <span class="nt">block</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">file</span><span class="p">:</span>
+          <span class="nt">path</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">WORKING_DIR</span><span class="nv"> </span><span class="s">}}&quot;</span>
+          <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">directory</span>
+      <span class="p p-Indicator">-</span> <span class="nt">copy</span><span class="p">:</span>
+          <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result.broker_service.inventory</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">to_nice_yaml(indent=2)</span><span class="nv"> </span><span class="s">}}&quot;</span>
+          <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">WORKING_DIR</span><span class="nv"> </span><span class="s">}}/broker.inventory.yml&quot;</span>
+    <span class="nt">delegate_to</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
 </pre></div>
 </div>
 <p><a class="reference download internal" download="" href="_downloads/1dfe6a37e9d4f72ef7e6a19f577b5c8c/configure.playbook.yml"><code class="xref download docutils literal notranslate"><span class="pre">configure.playbook.yml</span></code></a>:</p>
@@ -313,14 +318,14 @@ to the queue.</p>
 
 <span class="c1"># create broker service</span>
   ansible-playbook <span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/service.playbook.yml&quot;</span> --extra-vars <span class="s2">&quot;WORKING_DIR=</span><span class="nv">$WORKING_DIR</span><span class="s2">&quot;</span>
-  <span class="nv">code</span><span class="o">=</span><span class="nv">$?</span><span class="p">;</span> <span class="k">if</span> <span class="o">[[</span> <span class="nv">$code</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; ERROR - </span><span class="nv">$code</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span> <span class="k">fi</span>
+  <span class="nv">code</span><span class="o">=</span><span class="nv">$?</span><span class="p">;</span> <span class="k">if</span> <span class="o">[[</span> <span class="nv">$code</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; XT_ERROR - </span><span class="nv">$code</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span> <span class="k">fi</span>
 
 <span class="c1"># configure broker service</span>
   <span class="c1"># enable logging</span>
     <span class="nb">export</span> <span class="nv">ANSIBLE_SOLACE_ENABLE_LOGGING</span><span class="o">=</span>True
     <span class="nb">export</span> <span class="nv">ANSIBLE_SOLACE_LOG_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$WORKING_DIR</span><span class="s2">/ansible-solace.log&quot;</span>
   ansible-playbook -i <span class="s2">&quot;</span><span class="nv">$WORKING_DIR</span><span class="s2">/broker.inventory.yml&quot;</span> <span class="s2">&quot;</span><span class="nv">$scriptDir</span><span class="s2">/configure.playbook.yml&quot;</span>
-  <span class="nv">code</span><span class="o">=</span><span class="nv">$?</span><span class="p">;</span> <span class="k">if</span> <span class="o">[[</span> <span class="nv">$code</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; ERROR - </span><span class="nv">$code</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span> <span class="k">fi</span>
+  <span class="nv">code</span><span class="o">=</span><span class="nv">$?</span><span class="p">;</span> <span class="k">if</span> <span class="o">[[</span> <span class="nv">$code</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; XT_ERROR - </span><span class="nv">$code</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span> <span class="k">fi</span>
 </pre></div>
 </div>
 <p>Open a new private window in your browser and log into the Broker’s admin
@@ -357,7 +362,7 @@ console at <a class="reference external" href="http://localhost:8080">http://loc
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 13 Mar 2021 at 14:23.
+        Last updated on 12 Apr 2021 at 07:20.
       </span>
 
     </p>

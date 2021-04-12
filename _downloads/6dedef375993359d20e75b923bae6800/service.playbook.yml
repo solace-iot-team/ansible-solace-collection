@@ -1,18 +1,23 @@
 -
   name: Quickstart Service Playbook
   hosts: localhost
-  gather_facts: no
+  gather_facts: true
   any_errors_fatal: true
   tasks:
-    - name: ensure working_dir exists
-      file:
-        path: "{{ WORKING_DIR }}"
-        state: directory
-
-    - name: "Local Broker Setup"
-      include_role:
-        name: solace.pubsub_plus.solace_broker_service
-      vars:
-        service_type: docker_single_node
+  - name: "Broker service up"
+    include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      docker_compose_settings:
         project_name: quickstart_broker_service_single_node
-        generated_inventory_file: "{{ WORKING_DIR }}/broker.inventory.yml"
+        state: present
+
+  - name: "Save inventory"
+    block:
+      - file:
+          path: "{{ WORKING_DIR }}"
+          state: directory
+      - copy:
+          content: "{{ solace_broker_service_result.broker_service.inventory | to_nice_yaml(indent=2) }}"
+          dest: "{{ WORKING_DIR }}/broker.inventory.yml"
+    delegate_to: localhost
