@@ -14,16 +14,16 @@ export AZURE_PROJECT_NAME="asct-devel"
 
 ansibleSolaceTests=(
   # "teardown"
-  "setup"
+  # "setup"
   "solace_broker_service"
-  "teardown"
+  # "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
 # local broker
   export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
-  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.8.0.12"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.7.0.29"
+  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.6.0.46"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.3.1.28"
 
 export CLEAN_WORKING_DIR=False
@@ -41,6 +41,7 @@ export ANSIBLE_SOLACE_ENABLE_LOGGING=True
 
 export RUN_FG=true
 # export RUN_FG=false
+export NO_GENERATE_NEW_CERT=true
 
 ../_run.sh
 

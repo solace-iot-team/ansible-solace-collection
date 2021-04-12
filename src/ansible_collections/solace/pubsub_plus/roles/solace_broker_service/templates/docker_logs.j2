@@ -1,0 +1,12 @@
+
+{
+  "services": {
+    "{{ _service }}": {
+      "container_name": "{{ _container_name }}",
+      "docker_logs": {
+        "stdout": {{ docker_logs_result.stdout | to_json }},
+        "stdout_lines": {{ docker_logs_result.stdout_lines | to_json }}
+      }
+    }
+  }
+}

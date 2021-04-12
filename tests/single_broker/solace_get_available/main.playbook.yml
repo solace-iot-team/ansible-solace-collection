@@ -17,17 +17,17 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
 
   tasks:
-    - name: "Test Imports / Version"
-      solace_get_available:
-
-    - name: "Pause Until Broker/Service available"
-      solace_get_available:
-      register: _result
-      until: "_result.rc == 0 and _result.is_available"
-      retries: 25 # 25 * 5 seconds
-      delay: 5 # Every 5 seconds
+    - solace_get_available:
+      register: result
+    - assert:
+        that:
+          - result.is_available is defined and result.is_available
+          - result.is_semp_available is defined and result.is_semp_available
+          - result.is_spool_available is defined and result.is_spool_available
+        fail_msg: "one or more return values not defined or false"
 
 ###
 # The End.

@@ -1,73 +1,77 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 ---
-# role args
-service_type: docker_single_node
-generated_inventory_file: "{{ args.__null__ }}"
-
-# docker_compose args
-state: present
-project_name: "{{ args.__null__ }}"
-container_name: "pubSubStandardSingleNode"
-image: "solace/solace-pubsub-standard:latest"
-restarted: yes
-# generated inventory entries
-sempv2_host: localhost
-sempv2_port: 8080
-sempv2_username: admin
-sempv2_password: admin
-sempv2_is_secure_connection: false
-vpn: default
-definition:
-  version: '3.3'
-  services:
-    primary:
-      container_name: "{{ container_name }}"
-      image: "{{ image }}"
-      shm_size: 1g
-      ulimits:
-        core: 2
-        nofile:
-          soft: 2448
-          hard: 38048
-      deploy:
-        restart_policy:
-          condition: on-failure
-          max_attempts: 3
-      ports:
-      #Port Mappings:  Ports are mapped straight through from host to
-      #container.  This may result in port collisions on commonly used
-      #ports that will cause failure of the container to start.
-        #Web transport
-        - '80:80'
-        #Web transport over TLS
-        - '443:443'
-        #SEMP over TLS
-        # - '1943:1943'
-        #MQTT Default VPN
-        - '1883:1883'
-        #AMQP Default VPN over TLS
-        - '5671:5671'
-        #AMQP Default VPN
-        - '5672:5672'
-        #MQTT Default VPN over WebSockets
-        - '8000:8000'
-        #MQTT Default VPN over WebSockets / TLS
-        - '8443:8443'
-        #MQTT Default VPN over TLS
-        - '8883:8883'
-        #SEMP / PubSub+ Manager
-        - "{{ sempv2_port }}:{{ sempv2_port }}"
-        #REST Default VPN
-        - '9000:9000'
-        #REST Default VPN over TLS
-        - '9443:9443'
-        #SMF
-        - '55555:55555'
-        #SMF Compressed
-        - '55003:55003'
-        #SMF over TLS
-        - '55443:55443'
-      environment:
-        - "username_admin_globalaccesslevel={{ sempv2_username }}"
-        - "username_admin_password={{ sempv2_password }}"
-        - system_scaling_maxconnectioncount=100
-        #- routername=ansible-solace__test
+default_generate:
+  inventory_settings:
+    inventory_hostname: "{{ ansible_hostname }}"
+    sempv2_host: "{{ ansible_host }}"
+    sempv2_port: 8080
+    sempv2_username: admin
+    sempv2_password: admin
+    sempv2_is_secure_connection: false
+    vpn: default
+    virtual_router: primary
+default_docker_compose_settings:
+  project_name: "{{ args.__null__ }}"
+  restarted: yes
+  recreate: always
+  state: present
+  definition:
+    version: '3.3'
+    services:
+      primary:
+        container_name: PubSubStandard_singleNode
+        image: solace/solace-pubsub-standard:latest
+        shm_size: 1g
+        ulimits:
+          core: 2
+          nofile:
+            soft: 2448
+            hard: 38048
+        deploy:
+          restart_policy:
+            condition: on-failure
+            max_attempts: 3
+        ports:
+        #Port Mappings:  Ports are mapped straight through from host to
+        #container.  This may result in port collisions on commonly used
+        #ports that will cause failure of the container to start.
+          #Web transport
+          - '80:80'
+          #Web transport over TLS
+          - '443:443'
+          #MQTT Default VPN
+          - '1883:1883'
+          #AMQP Default VPN over TLS
+          - '5671:5671'
+          #AMQP Default VPN
+          - '5672:5672'
+          #MQTT Default VPN over WebSockets
+          - '8000:8000'
+          #MQTT Default VPN over WebSockets / TLS
+          - '8443:8443'
+          #MQTT Default VPN over TLS
+          - '8883:8883'
+          #SEMP over TLS
+          # - "1943:1943"
+          #SEMP / PubSub+ Manager
+          - "{{ combined_generate.inventory_settings.sempv2_port }}:8080"
+          #REST Default VPN
+          - '9000:9000'
+          #REST Default VPN over TLS
+          - '9443:9443'
+          #SMF
+          - '55555:55555'
+          #SMF Compressed
+          - '55003:55003'
+          #SMF over TLS
+          - '55443:55443'
+        environment:
+          - "username_admin_globalaccesslevel={{ combined_generate.inventory_settings.sempv2_username }}"
+          - "username_admin_password={{ combined_generate.inventory_settings.sempv2_password }}"
+          - system_scaling_maxconnectioncount=100
+default_result:
+  broker_service:
+    inventory: null
+    docker_compose_defintion: null
+    docker_logs: null

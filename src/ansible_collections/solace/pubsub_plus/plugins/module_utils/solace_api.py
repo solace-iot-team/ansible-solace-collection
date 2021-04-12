@@ -70,7 +70,7 @@ class SolaceApi(object):
                 return j['data']
         return dict()
 
-    def make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json=None):
+    def _make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json):
         path = SolaceApi.compose_path(path_array)
         url = self.get_url(config, path)
         resp = request_func(
@@ -81,6 +81,21 @@ class SolaceApi(object):
             headers=self.get_headers(config),
             params=None)
         SolaceApi.log_http_roundtrip(resp)
+        return resp
+
+    def make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json=None):
+        try_count = 0
+        delay_secs = 30
+        max_tries = 20
+        do_retry = True
+        while do_retry and try_count < max_tries:
+            resp = self._make_request(config, request_func, path_array, json)
+            if resp.status_code in [502, 504]:
+                logging.warning("resp.status_code: %d, resp.reason: '%s', try number: %d", resp.status_code, resp.reason, try_count)
+                time.sleep(delay_secs)
+            else:
+                do_retry = False
+            try_count += 1
         return self.handle_response(resp)
 
     @staticmethod
@@ -111,6 +126,21 @@ class SolaceApi(object):
             _headers["authorization"] = "***"
         return _headers
 
+    # @staticmethod
+    # def parse_resp_text(resp_text):
+    #     resp_body = None
+    #     if resp_text:
+    #         try:
+    #             resp_body = json.loads(resp_text)
+    #         except json.JSONDecodeError:
+    #             # try XML parsing it
+    #             try:
+    #                 resp_body = xmltodict.parse(resp_text)
+    #             except Exception:
+    #                 # print as text at least
+    #                 resp_body = resp_text
+    #     return resp_body
+
     @staticmethod
     def log_http_roundtrip(resp):
         if not solace_sys.ENABLE_LOGGING:
@@ -123,20 +153,7 @@ class SolaceApi(object):
                 request_body = resp.request.body
         else:
             request_body = "{}"
-
-        if resp.text:
-            try:
-                resp_body = json.loads(resp.text)
-            except json.JSONDecodeError:
-                # try XML parsing it
-                try:
-                    resp_body = xmltodict.parse(resp.text)
-                except Exception:
-                    # print as text at least
-                    resp_body = resp.text
-        else:
-            resp_body = None
-
+        resp_body = SolaceUtils.parse_response_text(resp.text)
         log = {
             'request': {
                 'method': resp.request.method,
@@ -185,7 +202,7 @@ class SolaceSempV2Api(SolaceApi):
         else:
             _resp = dict(status_code=resp.status_code,
                          reason=resp.reason,
-                         body=SolaceUtils.parse_response_body(resp.text)
+                         body=SolaceUtils.parse_response_text(resp.text)
                          )
         raise SolaceApiError(_resp)
 
@@ -410,8 +427,7 @@ class SolaceCloudApi(SolaceApi):
         _resp = dict(status_code=resp.status_code,
                      reason=resp.reason
                      )
-        if resp.text:
-            _resp.update({'body': json.loads(resp.text)})
+        _resp.update({'body': SolaceUtils.parse_response_text(resp.text)})
         raise SolaceApiError(_resp)
 
     def get_data_centers(self, config: SolaceTaskSolaceCloudConfig) -> list:

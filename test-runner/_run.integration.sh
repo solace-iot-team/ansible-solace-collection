@@ -6,15 +6,15 @@ scriptDir=$(cd $(dirname "$0") && pwd);
 scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
 testRunner="test-runner"
 scriptLogName="$testRunner.$scriptName"
-if [ -z "$PROJECT_HOME" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
+if [ -z "$PROJECT_HOME" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
 source $PROJECT_HOME/.lib/functions.sh
 
 ############################################################################################################################
 # Environment Variables
 
-  if [ -z "$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS"; exit 1; fi
-  if [ -z "$SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS" ]; then echo ">>> ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS"; exit 1; fi
-  if [ -z "$LOG_DIR" ]; then echo ">>> ERROR: - $scriptName - missing env var: LOG_DIR"; exit 1; fi
+  if [ -z "$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS"; exit 1; fi
+  if [ -z "$SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS"; exit 1; fi
+  if [ -z "$LOG_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: LOG_DIR"; exit 1; fi
 
 ##############################################################################################################################
 # Settings
@@ -51,7 +51,7 @@ ansibleSolaceTestTargetGroup="examples"
 
     runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
     $runScript
-    code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+    code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
   done
 
@@ -59,22 +59,21 @@ ansibleSolaceTestTargetGroup="examples"
 ansibleSolaceTestTargetGroup="roles"
 #################################################################################################################################################
 
-  for brokerDockerImage in ${brokerDockerImages[@]}; do
-
+  # only run it for the latest image
+    brokerDockerImage="solace/solace-pubsub-standard:latest"
     brokerDockerImageLogPath=${brokerDockerImage//":"/"_"}
     export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup/$brokerDockerImageLogPath"
     mkdir -p $LOG_DIR
 
     export BROKER_DOCKER_IMAGE=$brokerDockerImage
+    if [ -z "$AZURE_PROJECT_NAME" ]; then export AZURE_PROJECT_NAME="asct-tr"; fi
 
     echo "##############################################################################################################"
     echo "# Test target group: $ansibleSolaceTestTargetGroup($brokerDockerImage)"
 
     runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
     $runScript
-    code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
-
-  done
+    code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
 #################################################################################################################################################
 ansibleSolaceTestTargetGroup="single_broker"
@@ -97,7 +96,7 @@ ansibleSolaceTestTargetGroup="single_broker"
 
     runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
     $runScript
-    code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+    code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
   done
 
@@ -114,7 +113,7 @@ ansibleSolaceTestTargetGroup="single_broker"
 
   runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
   $runScript
-  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
 #################################################################################################################################################
 ansibleSolaceTestTargetGroup="two_brokers"
@@ -144,7 +143,7 @@ ansibleSolaceTestTargetGroup="two_brokers"
 
     runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
     $runScript
-    code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+    code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
   done
 
@@ -162,7 +161,7 @@ ansibleSolaceTestTargetGroup="solace_cloud"
 
   runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
   $runScript
-  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
 
 #################################################################################################################################################
@@ -179,7 +178,7 @@ ansibleSolaceTestTargetGroup="dmr"
 
   runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
   $runScript
-  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
 
 ###

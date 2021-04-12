@@ -1,23 +1,17 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 ---
 
 - name: validate inputs
   include_tasks: validate.yml
 
-- name: docker compose definition
-  debug:
-    msg: "{{ definition }}"
-
-- name: docker compose
-  community.general.docker_compose:
-    project_name: "{{ project_name }}"
-    definition: "{{ definition }}"
-    state: "{{ state }}"
-    restarted: "{{ restarted }}"
+- name: "docker compose: {{ combined_docker_compose_settings.project_name }}:{{ combined_docker_compose_settings.state }}"
+  community.general.docker_compose: "{{ combined_docker_compose_settings }}"
 
 - name: state=present
   include_tasks: present.yml
-  when: state == 'present'
+  when: combined_docker_compose_settings.state == 'present'
 
 - name: state=absent
   include_tasks: absent.yml
-  when: state == 'absent'
+  when: combined_docker_compose_settings.state == 'absent'

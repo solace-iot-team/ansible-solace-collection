@@ -1,0 +1,19 @@
+
+{
+  "all": {
+    "hosts": {
+      "{{ combined_generate.inventory_settings.inventory_hostname }}": {
+        "broker_type": "local",
+        "ansible_connection": "local",
+        "sempv2_host": "{{ combined_generate.inventory_settings.sempv2_host }}",
+        "sempv2_port": "{{ combined_generate.inventory_settings.sempv2_port }}",
+        "sempv2_is_secure_connection": "{{ combined_generate.inventory_settings.sempv2_is_secure_connection }}",
+        "sempv2_username": "{{ combined_generate.inventory_settings.sempv2_username }}",
+        "sempv2_password": "{{ combined_generate.inventory_settings.sempv2_password }}",
+        "sempv2_timeout": "60",
+        "vpn": "{{ combined_generate.inventory_settings.vpn }}",
+        "virtual_router": "{{ combined_generate.inventory_settings.virtual_router }}"
+      }
+    }
+  }
+}

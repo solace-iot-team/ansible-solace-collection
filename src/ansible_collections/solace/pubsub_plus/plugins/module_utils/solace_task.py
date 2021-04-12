@@ -11,12 +11,14 @@ from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_con
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceApi, SolaceSempV2Api, SolaceCloudApi, SolaceSempV2PagingGetApi
 from ansible.module_utils.basic import AnsibleModule
 import logging
+import json
 
 SOLACE_TASK_HAS_IMPORT_ERROR = False
 SOLACE_TASK_ERR_TRACEBACK = None
 import traceback
 try:
     import requests
+    import certifi
 except ImportError:
     SOLACE_TASK_HAS_IMPORT_ERROR = True
     SOLACE_TASK_ERR_TRACEBACK = traceback.format_exc()
@@ -36,6 +38,7 @@ class SolaceTask(object):
         SolaceUtils.module_fail_on_import_error(module, SOLACE_TASK_HAS_IMPORT_ERROR, SOLACE_TASK_ERR_TRACEBACK)
         self.module = module
         self.changed = False
+        self.result = SolaceUtils.create_result()
         return
 
     def get_module(self) -> AnsibleModule:
@@ -43,6 +46,15 @@ class SolaceTask(object):
 
     def get_config(self) -> SolaceTaskConfig:
         raise SolaceInternalErrorAbstractMethod()
+
+    def get_result(self) -> dict:
+        return self.result
+
+    def set_result(self, result):
+        self.result = result
+
+    def update_result(self, update):
+        self.result.update(update)
 
     def create_result(self, rc=0, changed=False) -> dict:
         return SolaceUtils.create_result(rc, changed)
@@ -54,43 +66,72 @@ class SolaceTask(object):
         # return: msg(dict) and result(dict)
         raise SolaceInternalErrorAbstractMethod()
 
+    def _logException(self, logging_func, message, e) -> list:
+        ex = traceback.format_exc()
+        ex_msg_list = [str(e)]
+        log_msg = [f"{message}"] + ex_msg_list + ex.split('\n')
+        logging_func("%s", json.dumps(log_msg, indent=2))
+
+    def logExceptionAsError(self, message, e) -> list:
+        self._logException(logging.error, message, e)
+
+    def logExceptionAsDebug(self, message, e) -> list:
+        self._logException(logging.debug, message, e)
+
     def execute(self):
         try:
             msg, result = self.do_task()
             self.module.exit_json(msg=msg, **result)
         except SolaceError as e:
-            result = self.create_result(rc=1, changed=self.changed)
+            self.logExceptionAsError(type(e), e)
+            self.update_result(dict(rc=1, changed=self.changed))
             result_update = e.get_result_update()
             if result_update:
-                result.update(result_update)
-            self.module.exit_json(msg=e.to_list(), **result)
+                self.update_result(result_update)
+            self.module.exit_json(msg=e.to_list(), **self.get_result())
         except SolaceApiError as e:
-            result = self.create_result(rc=1, changed=self.changed)
-            self.module.exit_json(msg=e.get_ansible_msg(), **result)
+            self.logExceptionAsError(type(e), e)
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=e.get_ansible_msg(), **self.get_result())
         except SolaceInternalError as e:
+            self.logExceptionAsError(type(e), e)
             ex = traceback.format_exc()
             ex_msg_list = e.to_list()
-            msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
-            result = self.create_result(rc=1, changed=self.changed)
-            self.module.exit_json(msg=msg, **result)
+            usr_msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceParamsValidationError as e:
-            msg = ["module arg validation failed", str(e)]
-            result = self.create_result(rc=1, changed=False)
-            self.module.exit_json(msg=msg, **result)
+            self.logExceptionAsError(type(e), e)
+            usr_msg = ["module arg validation failed", str(e)]
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceFeatureNotSupportedError as e:
-            msg = ["Feature currently not supported. Pls raise an new feature request if required.", str(e)]
-            result = self.create_result(rc=1, changed=False)
-            self.module.exit_json(msg=msg, **result)
+            self.logExceptionAsError(type(e), e)
+            usr_msg = ["Feature currently not supported. Pls raise an new feature request if required.", str(e)]
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
+        except (requests.exceptions.SSLError) as e:
+            # these paths do not seem to work
+            # logging.debug("ssl verify paths: %s", SolaceUtils.get_ssl_default_verify_paths())
+            log_msg = [type(e)] + [f"certificate authority (CA) bundle used:{certifi.where()}"]
+            self.logExceptionAsError(log_msg, e)
+            self.update_result(dict(rc=1, changed=self.changed))
+            usr_msg = ["Check SSL configuration & certificate required for host"] + \
+                      [f"Certificate authority (CA) bundle used: {certifi.where()}"] + \
+                      [str(e)]
+            self.module.exit_json(msg=usr_msg, **self.get_result())
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
-            # logging.debug("Request Error: %s", str(e))
-            result = self.create_result(rc=1, changed=self.changed)
-            self.module.exit_json(msg=str(e), **result)
+            self.logExceptionAsError(type(e), e)
+            self.update_result(dict(rc=1, changed=self.changed))
+            usr_msg = str(e)
+            self.module.exit_json(msg=usr_msg, **self.get_result())
         except Exception as e:
+            self.logExceptionAsError(type(e), e)
             ex = traceback.format_exc()
             ex_msg_list = [str(e)]
-            msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
-            result = self.create_result(rc=1, changed=self.changed)
-            self.module.exit_json(msg=msg, **result)
+            usr_msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
 
 
 class SolaceReadFactsTask(SolaceTask):

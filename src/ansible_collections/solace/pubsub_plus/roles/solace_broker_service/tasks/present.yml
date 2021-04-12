@@ -1,74 +1,42 @@
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 ---
-- set_fact:
-    broker_url: "{{ 'https' if sempv2_is_secure_connection else 'http' }}://{{ sempv2_host }}:{{ sempv2_port }}"
-  when: service_type == 'docker_single_node'
+- name: "Wait until broker service available"
+  solace.pubsub_plus.solace_get_available:
+    host: "{{ combined_generate.inventory_settings.sempv2_host }}"
+    port: "{{ combined_generate.inventory_settings.sempv2_port }}"
+    secure_connection: "{{ combined_generate.inventory_settings.sempv2_is_secure_connection }}"
+    username: "{{ combined_generate.inventory_settings.sempv2_username }}"
+    password: "{{ combined_generate.inventory_settings.sempv2_password }}"
+    msg_vpn: "{{ combined_generate.inventory_settings.vpn }}"
   delegate_to: localhost
+  register: available_result
 
-- name: "Wait for Broker Up"
-  uri:
-    url: "{{ broker_url }}"
-    return_content: yes
-    status_code: [200, -1]
-  register: result
-  until: result.status == 200
-  retries: 20
-  delay: 5
-  when: service_type == 'docker_single_node'
-  delegate_to: localhost
+- debug:
+    msg:
+     - "container_name: {{ combined_docker_compose_settings.definition.services[item].container_name }}"
+  with_items: "{{ combined_docker_compose_settings.definition.services.keys() | list }}"
 
-- assert:
-    that: result.status == 200
-    fail_msg: "cannot reach broker on {{ broker_url }}"
-  when: service_type == 'docker_single_node'
-  delegate_to: localhost
+- name: "Get docker logs if broker service not available"
+  include_tasks: docker_logs.yml
+  with_items: "{{ combined_docker_compose_settings.definition.services.keys() | list }}"
+  # always, could introduce a docker_logs=always, never, on_error flag as argument
+  # when: not available_result.is_available
 
-# check if spool is fully activated, using create a queue as test
-- name: "Check if message spool is available"
-  solace.pubsub_plus.solace_queue:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    msg_vpn: "{{ vpn }}"
-    name: test_message_spool
-    state: present
-  register: result
-  until: result.rc == 0
-  retries: 20
-  delay: 5
-  when: service_type == 'docker_single_node'
-  delegate_to: localhost
-
-- assert:
-    that: result.rc == 0
-    fail_msg: "failed to create queue: {{ result.msg }}"
-  when: service_type == 'docker_single_node'
-  delegate_to: localhost
-
-- name: "clean up queue"
-  solace.pubsub_plus.solace_queue:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    msg_vpn: "{{ vpn }}"
-    name: test_message_spool
-    state: absent
-  when: service_type == 'docker_single_node'
-  delegate_to: localhost
-
-- name: create inventory
-  set_fact:
-    inventory: "{{ lookup('template', 'docker_single_node.j2') | from_json}}"
-  when: service_type == 'docker_single_node'
-  delegate_to: localhost
-
-- name: "Write Generated Inventory"
-  copy:
-    content: "{{ inventory | to_nice_yaml(indent=2) }}"
-    dest: "{{ generated_inventory_file }}"
+- name: "Set result"
+  block:
+  - set_fact:
+      _inventory: "{{ lookup('template', 'broker_service.inventory.j2') | from_json}}"
+  - set_fact:
+      r: r
+    register: solace_broker_service_result
+  - set_fact:
+      solace_broker_service_result:
+        broker_service:
+          inventory: "{{ _inventory }}"
+          docker_compose_settings:
+            project_name: "{{ combined_docker_compose_settings.project_name }}"
+            services: "{{ combined_docker_compose_settings.services | default(omit) }}"
+            definition: "{{ combined_docker_compose_settings.definition }}"
+          docker_logs: "{{ combined_docker_logs }}"
   delegate_to: localhost

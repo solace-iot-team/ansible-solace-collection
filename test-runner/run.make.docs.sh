@@ -51,7 +51,7 @@ SOLACE_PUBSUB_PLUS_COLLECTION_PATH="$PROJECT_HOME/src/ansible_collections/solace
     $runScript 2>&1 | tee $logFile
   fi
 
-  code=$?; if [[ $code != 0 ]]; then echo ">>> ERROR - $code - script:$scriptLogName"; exit 1; fi
+  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName"; exit 1; fi
   cd $scriptDir
 
 
@@ -64,7 +64,7 @@ errors=$(grep -n -r -e "WARNING" $filePattern )
 if [[ -z "$errors" && "$FAILED" -eq 0 ]]; then
   echo ">>> SUCCESS - $scriptLogName"
 else
-  echo ">>> ERROR - script:$scriptLogName";
+  echo ">>> XT_ERROR - script:$scriptLogName";
   if [ ! -z "$errors" ]; then
     while IFS= read line; do
       echo $line

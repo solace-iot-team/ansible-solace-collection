@@ -13,6 +13,7 @@ import logging
 import re
 import copy
 from json.decoder import JSONDecodeError
+import ssl
 
 SOLACE_UTILS_HAS_IMPORT_ERROR = False
 SOLACE_UTILS_IMPORT_ERR_TRACEBACK = None
@@ -25,6 +26,10 @@ except ImportError:
 
 
 class SolaceUtils(object):
+
+    @staticmethod
+    def get_ssl_default_verify_paths():
+        return ssl.get_default_verify_paths()
 
     @staticmethod
     def module_fail_on_import_error(module: AnsibleModule, is_error: bool, import_error_traceback: str = None):
@@ -110,13 +115,14 @@ class SolaceUtils(object):
         return changes
 
     @staticmethod
-    def parse_response_body(resp_text: str):
-        try:
-            body = json.loads(resp_text)
-        except JSONDecodeError:
+    def parse_response_text(resp_text: str):
+        resp_body = None
+        if resp_text:
             try:
-                body = xmltodict.parse(resp_text)
-            except Exception:
-                # print as text at least
-                body = resp_text
-        return body
+                resp_body = json.loads(resp_text)
+            except json.JSONDecodeError:
+                try:
+                    resp_body = xmltodict.parse(resp_text)
+                except Exception:
+                    resp_body = resp_text
+        return resp_body

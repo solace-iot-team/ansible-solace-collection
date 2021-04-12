@@ -1,0 +1,47 @@
+-
+  name: create broker service
+  hosts: all
+  tasks:
+  - name: set the docker compose definition
+    set_fact:
+      _docker_compose_definition:
+        version: '3.3'
+        services:
+          primary:
+            container_name: my-container
+            image: solace/solace-pubsub-standard:latest
+            restart: unless-stopped
+            shm_size: 1g
+            ulimits:
+              core: 2
+              nofile:
+                soft: 2448
+                hard: 38048
+            volumes:
+              - "/var/local/spool/softAdb:/usr/sw/internalSpool/softAdb:Z"
+              - "/var/local/spool:/usr/sw/internalSpool:Z"
+              - "/var/local/jail:/usr/sw/jail:Z"
+              - "/var/local/diagnostics:/var/lib/solace/diags:Z"
+              - "/var/local/adbBackup:/usr/sw/adb:Z"
+              - "/var/local/var:/usr/sw/var:Z"
+            ports:
+              - "8080:8080"
+              - '1883:1883'
+            environment:
+              - username_admin_globalaccesslevel=admin
+              - username_admin_password=admin
+              - system_scaling_maxconnectioncount=100
+
+  - name: create broker service
+    include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      docker_compose_settings:
+        project_name: my-docker-project-name
+        services:
+          - primary
+        definition: "{{ _docker_compose_definition }}"
+        recreate: always
+        restarted: yes
+        debug: yes
+        state: present

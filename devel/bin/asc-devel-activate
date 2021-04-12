@@ -23,6 +23,9 @@ fi
 
 asc-devel-show() {
   echo > /dev/tty
+  echo "Python env vars" > /dev/tty
+  echo "SSL_CERT_FILE=$SSL_CERT_FILE" > /dev/tty
+  echo "REQUESTS_CA_BUNDLE=$REQUESTS_CA_BUNDLE" > /dev/tty
   echo "Ansible env vars:" > /dev/tty
   env | grep ANSIBLE > /dev/tty
   echo "Links:" > /dev/tty
@@ -40,6 +43,8 @@ asc-devel-deactivate () {
     unset ANSIBLE_SOLACE_ENABLE_LOGGING
     unset ANSIBLE_SOLACE_LOG_PATH
     unset ANSIBLE_PYTHON_INTERPRETER
+    unset SSL_CERT_FILE
+    unset REQUESTS_CA_BUNDLE
 
     if ! [ -z "${_OLD_ASC_PS1+_}" ] ; then
         PS1="$_OLD_ASC_PS1"
@@ -66,6 +71,9 @@ rm -f $logFilename
 export ANSIBLE_SOLACE_LOG_PATH=$logFilename
 
 export ANSIBLE_PYTHON_INTERPRETER=$(python -c "import sys; print(sys.executable)")
+CA_CERT_BUNDLE_FILE=$(python -m certifi)
+export SSL_CERT_FILE=${CA_CERT_BUNDLE_FILE}
+export REQUESTS_CA_BUNDLE=${CA_CERT_BUNDLE_FILE}
 
 # vscode/pylint
 rm -f $pythonSitePackages/ansible_collections/solace
@@ -78,22 +86,6 @@ if [ -z "${_OLD_ASC_PS1+_}" ]; then
 fi
 
 x=$(asc-devel-show)
-
-# # adjust to your python installation
-# export ANSIBLE_PYTHON_INTERPRETER=/usr/local/bin/python
-#
-# export ANSIBLE_SOLACE_ENABLE_LOGGING=true
-#
-#
-# # Prepend ansible-solace path to ansible env vars
-# export ANSIBLE_SOLACE_HOME=`pwd`/..
-# if [[ -z $ANSIBLE_MODULE_UTILS ]]; then COLON=""; else COLON=":"; fi
-# export ANSIBLE_MODULE_UTILS="$ANSIBLE_SOLACE_HOME/lib/ansible/module_utils$COLON$ANSIBLE_MODULE_UTILS"
-# if [[ -z $ANSIBLE_LIBRARY ]]; then COLON=""; else COLON=":"; fi
-# export ANSIBLE_LIBRARY="$ANSIBLE_SOLACE_HOME/lib/ansible/modules$COLON$ANSIBLE_LIBRARY"
-# if [[ -z $ANSIBLE_DOC_FRAGMENT_PLUGINS ]]; then COLON=""; else COLON=":"; fi
-# export ANSIBLE_DOC_FRAGMENT_PLUGINS="$ANSIBLE_SOLACE_HOME/lib/ansible/plugins/doc_fragments$COLON$ANSIBLE_DOC_FRAGMENT_PLUGINS"
-
 
 ###
 # The End.

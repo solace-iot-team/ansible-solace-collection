@@ -17,43 +17,72 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
 
   tasks:
     - name: "Wrong host"
       solace_get_available:
         host: "unknown.host.com"
+        wait_timeout_minutes: 1
       register: result
       ignore_errors: true
     - assert:
-        that: result.rc == 1 and "ConnectionPool(host='unknown.host.com'" in result.msg
+        that:
+          - result.rc == 0
+          - not result.is_available
+          - not result.is_semp_available
+          - not result.is_spool_available
+    - assert:
+        that: result.rc == 0 and "ConnectionPool(host='unknown.host.com'" in result.msg|string
 
     - name: "Wrong SSL"
       solace_get_available:
         secure_connection: "{{ False if sempv2_is_secure_connection else True }}"
+        wait_timeout_minutes: 1
       register: result
       ignore_errors: true
     - assert:
-        that: result.rc == 1 and 'SSLError' in result.msg
+        that:
+          - result.rc == 1
+          - not result.is_available
+          - not result.is_semp_available
+          - not result.is_spool_available
+    - assert:
+        that: result.rc == 1 and 'SSLError' in result.msg|string
       when: sempv2_is_secure_connection == False
     - assert:
-        that: result.rc == 1 and 'The plain HTTP request was sent to HTTPS port' in result.msg.body
+        that: result.rc == 1 and 'The plain HTTP request was sent to HTTPS port' in result.msg|string
       when: sempv2_is_secure_connection == True
 
     - name: "Wrong password"
       solace_get_available:
         password: "unknown_password"
+        wait_timeout_minutes: 1
       register: result
       ignore_errors: true
     - assert:
-        that: result.rc == 0
+        that:
+          - result.rc == 0
+          - not result.is_available
+          - result.is_semp_available
+          - not result.is_spool_available
+    - assert:
+        that: result.rc == 0 and 'UNAUTHORIZED' in result.msg|string
 
     - name: "Wrong username"
       solace_get_available:
         username: "unknown_username"
+        wait_timeout_minutes: 1
       register: result
       ignore_errors: true
     - assert:
-        that: result.rc == 0
+        that:
+          - result.rc == 0
+          - not result.is_available
+          - result.is_semp_available
+          - not result.is_spool_available
+    - assert:
+        that: result.rc == 0 and 'UNAUTHORIZED' in result.msg|string
 
 
 ###

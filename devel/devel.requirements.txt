@@ -7,4 +7,5 @@ rstcheck
 Sphinx
 sphinx-rtd-theme
 sphinxcontrib-contentui
+ansible
 ansible-doc-extractor

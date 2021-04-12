@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
 
@@ -8,14 +6,14 @@ scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
 # Bootstrap Ubuntu-18 VM with prerequisites to run role solace_broker_service.
 # Note:
 #   ssh requires public key to be available in ~/.ssh/
-# 
+#
 
 
 ############################################################################################################################
 # Check Environment Variables
 
-  if [ -z "$vmAdminUsr" ]; then echo ">>> ERROR: - $scriptName - missing env var: vmAdminUsr"; exit 1; fi
-  if [ -z "$vmPublicIpAddress" ]; then echo ">>> ERROR: - $scriptName - missing env var: vmPublicIpAddress"; exit 1; fi
+  if [ -z "$vmAdminUsr" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: vmAdminUsr"; exit 1; fi
+  if [ -z "$vmPublicIpAddress" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: vmPublicIpAddress"; exit 1; fi
 
 ############################################################################################################################
 # Run
@@ -42,7 +40,7 @@ ssh "$vmAdminUsr@$vmPublicIpAddress" <<BOOT_EOL
   sudo apt-get -y upgrade
 BOOT_EOL
 
-if [[ $? != 0 ]]; then echo " >>> ERROR: bootstrap vm"; exit 1; fi
+if [[ $? != 0 ]]; then echo " >>> XT_ERROR: bootstrap vm"; exit 1; fi
 
 echo " >>> Success."
 

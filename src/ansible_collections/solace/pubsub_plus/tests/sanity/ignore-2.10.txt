@@ -85,6 +85,9 @@ docs/examples/quickstart/run.sh shellcheck:SC2046
 docs/examples/roles/solace_broker_service/remotevm/bootstrap.Ubuntu-18.vm.sh shellcheck:SC2046
 docs/examples/roles/solace_broker_service/remotevm/bootstrap.Ubuntu-18.vm.sh shellcheck:SC2154
 docs/examples/roles/solace_broker_service/remotevm/bootstrap.Ubuntu-18.vm.sh shellcheck:SC2181
+docs/examples/tips-tricks/certs/generateSelfSignedCert.sh shellcheck:SC2046
+docs/examples/tips-tricks/certs/addCert2PythonCABundle.sh shellcheck:SC2046
+docs/examples/tips-tricks/certs/registerCert.mac.sh shellcheck:SC2046
 plugins/modules/solace_get_rdps.py compile-2.7!skip
 plugins/modules/solace_get_rdps.py pep8:E501
 plugins/modules/solace_get_rdp_queue_bindings.py compile-2.7!skip
