@@ -28,6 +28,9 @@
         project_name: "{{ _docker_project_name }}"
         definition: "{{ lookup('template', _docker_compose_file) | from_yaml }}"
         state: present
+  - assert:
+      that:
+        - solace_broker_service_result.rc == 0
 
   - include_tasks: ./tasks/config_db.write.yml
 

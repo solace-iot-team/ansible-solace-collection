@@ -152,6 +152,9 @@
         restarted: yes
         debug: yes
         state: present
+  - assert:
+      that:
+        - solace_broker_service_result.rc == 0
 
   - include_tasks: ./tasks/config_db.write.yml
 

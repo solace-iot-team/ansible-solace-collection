@@ -24,6 +24,9 @@
       docker_compose_settings:
         project_name: "{{ _docker_project_name }}"
         state: present
+  - assert:
+      that:
+        - solace_broker_service_result.rc == 0
 
   - include_tasks: ./tasks/config_db.write.yml
 

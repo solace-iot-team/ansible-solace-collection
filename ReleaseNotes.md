@@ -1,5 +1,11 @@
 # Release Notes
 
+## Version: 1.3.1
+Maintenance.
+
+* **roles/solace_broker_service**
+  - additional tests for correct passing of variables and extended error messages
+
 ## Version: 1.3.0
 Feature Updates.
 

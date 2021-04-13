@@ -1,12 +1,44 @@
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 ---
-# generate
+- set_fact:
+    err_msgs: []
+    err_msg_hostname: "{{ args.__null__ }}"
+    err_msg_project_name: "{{ args.__null__ }}"
+# check if ansible_hostname is required and defined
+- set_fact:
+    err_msg_hostname: >
+      'ansible_hostname' not defined and
+      'generate.inventory_settings.inventory_hostname' not defined either.
+      must define at least one.
+  when: |
+    (not ansible_hostname is defined) and
+    (not generate is defined) and
+    (not generate.inventory_settings is defined) and
+    (not generate.inventory_settings.inventory_hostname is defined)
+- set_fact:
+    err_msgs: "{{ err_msgs + [err_msg_hostname] if err_msg_hostname != args.__null__ else err_msgs }}"
+# check if docker_compose_settings.project_name defined
+- set_fact:
+    err_msg_project_name: >
+      'docker_compose_settings.project_name' not defined.
+      must define.
+  when: |
+    (not docker_compose_settings is defined) and
+    (not docker_compose_settings.project_name is defined)
+- set_fact:
+    err_msgs: "{{ err_msgs + [err_msg_project_name] if err_msg_project_name != args.__null__ else err_msgs }}"
+# fail if error messages
+- set_fact:
+    solace_broker_service_result:
+      rc: 1
+      msg: "{{ err_msgs }}"
+  when: err_msgs|length > 0
+- fail:
+    msg: "{{ err_msgs }}"
+  when: err_msgs|length > 0
+# combine defaults with variables
 - set_fact:
     combined_generate: "{{ default_generate | combine(generate, recursive=true) if generate is defined else default_generate }}"
-# docker_compose_settings
-- fail:
-    msg: "arg 'docker_compose_settings.project_name' - must not be empty"
-  when: docker_compose_settings.project_name == args.__null__
 - set_fact:
     combined_docker_compose_settings: "{{ default_docker_compose_settings | combine(docker_compose_settings, recursive=true) if docker_compose_settings is defined else default_docker_compose_settings }}"
