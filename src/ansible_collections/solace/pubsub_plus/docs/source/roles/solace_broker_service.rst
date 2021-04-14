@@ -128,16 +128,22 @@ Parameters
      - Description
 
    * - generate
-     - inventory_settings
-     - Combined with ``default_generate``, allowing to override only required values
+     - optional. sub-element ``inventory_settings``
+     - Combined with ``default_generate``, allowing to override only required values.
 
    * - generate.inventory_settings
-     - inventory_hostname, sempv2_host, sempv2_port, sempv2_username, sempv2_password, sempv2_is_secure_connection, vpn, virtual_router
-     - The settings used to generate the broker service inventory
+     - optional. optional sub-elements:
+       ``inventory_hostname``, ``sempv2_host``, ``sempv2_port``, ``sempv2_username``, ``sempv2_password``, ``sempv2_is_secure_connection``, ``vpn``, ``virtual_router``
+     - The settings used to generate the broker service inventory.
 
    * - docker_compose_settings
-     - all settings provided by `community.general.docker_compose`_
-     - Combined with ``default_docker_compose_settings``, allowing to override only required values
+     - optional. all settings provided by `community.general.docker_compose`_
+     - Combined with ``default_docker_compose_settings``, allowing to override only required values.
+
+   * - solace_get_available.wait_timeout_minutes
+     - optional
+     - ``wait_timeout_minutes`` argument for :ref:`solace_get_available_module`
+
 
 Defaults
 --------
@@ -156,16 +162,22 @@ Return Values
      - Description
 
    * - solace_broker_service_result
-     - Result dict
+     - Result dict.
 
    * - solace_broker_service_result.inventory
-     - The combined inventory for the broker service
+     - The combined inventory for the broker service.
 
    * - solace_broker_service_result.docker_compose_settings
-     - The combined ``docker_compose_settings``
+     - The combined ``docker_compose_settings``.
 
    * - solace_broker_service_result.docker_logs
-     - The docker logs from the created services. Only applies to ``state=present``
+     - The docker logs from the created services. Only applies to ``state=present``.
+
+   * - solace_broker_service_result.rc
+     - The return code of the role. ok:``rc=0``, failed:``rc=1``. Returned always.
+
+   * - solace_broker_service_result.msg
+     - The error details in case of failure (``rc=1``). Returned on error.
 
 
 Example Generated Broker Service Inventory Files

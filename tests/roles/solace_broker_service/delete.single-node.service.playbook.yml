@@ -53,6 +53,10 @@
         remove_volumes: yes
         state: absent
     when: _deployed_docker_compose_settings is defined
+  - assert:
+      that:
+        - solace_broker_service_result.rc == 0
+    when: _deployed_docker_compose_settings is defined
 
   - name: "Clean up run_time.base_path"
     file:

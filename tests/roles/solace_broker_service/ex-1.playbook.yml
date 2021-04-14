@@ -1,0 +1,84 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "ex-1 playbook: gather_facts=no"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  tasks:
+  - name: "Broker Service Up - missing facts"
+    block:
+      - include_role:
+          name: solace.pubsub_plus.solace_broker_service
+    rescue:
+      - debug:
+          msg:
+          - "solace_broker_service_result ******************************************************"
+          - "{{ solace_broker_service_result }}"
+  - assert:
+      that:
+        - solace_broker_service_result.rc == 1
+        - "'ansible_hostname' in solace_broker_service_result.msg|string"
+        - "'docker_compose_settings.project_name' in solace_broker_service_result.msg|string"
+
+  - name: "Broker Service Up - docker compose failure"
+    block:
+      - include_role:
+          name: solace.pubsub_plus.solace_broker_service
+        vars:
+          generate:
+            inventory_settings:
+              inventory_hostname: my-host
+          docker_compose_settings:
+            project_name: "my-project"
+            definition: "wrong-definition"
+            state: absent
+    rescue:
+      - debug:
+          msg:
+          - "solace_broker_service_result ******************************************************"
+          - "{{ solace_broker_service_result }}"
+  - assert:
+      that:
+        - solace_broker_service_result.rc == 1
+        - "'exception' in solace_broker_service_result|string"
+        - "'argument definition' in solace_broker_service_result|string"
+
+  - name: "Broker Service Up - solace_get_available failure"
+    block:
+      - include_role:
+          name: solace.pubsub_plus.solace_broker_service
+        vars:
+          solace_get_available:
+            wait_timeout_minutes: 1
+          generate:
+            inventory_settings:
+              inventory_hostname: my-host
+              sempv2_host: not-a-host
+          docker_compose_settings:
+            project_name: "my-project"
+            state: present
+    rescue:
+      - debug:
+          msg:
+          - "solace_broker_service_result ******************************************************"
+          - "{{ solace_broker_service_result }}"
+  - assert:
+      that:
+        - solace_broker_service_result.rc == 1
+        - not solace_broker_service_result.msg.solace.pubsub_plus.solace_get_available.result.is_available
+
+  - include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      generate:
+        inventory_settings:
+          inventory_hostname: my-host
+      docker_compose_settings:
+        project_name: "my-project"
+        state: absent
+
+
+###
+# The End.

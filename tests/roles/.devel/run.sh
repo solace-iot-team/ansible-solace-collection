@@ -13,10 +13,10 @@ export PROJECT_HOME=$projectHome
 export AZURE_PROJECT_NAME="asct-devel"
 
 ansibleSolaceTests=(
-  # "teardown"
-  # "setup"
+  "teardown"
+  "setup"
   "solace_broker_service"
-  # "teardown"
+  "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 

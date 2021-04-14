@@ -45,6 +45,7 @@ source $PROJECT_HOME/.lib/functions.sh
     "$scriptDir/delete.single-node.service.playbook.yml"
     "$scriptDir/create.single-node.docker-compose-file.playbook.yml"
     "$scriptDir/delete.single-node.service.playbook.yml"
+    "$scriptDir/ex-1.playbook.yml"
   )
   sslCertFile="$scriptDir/files/secrets/asc.pem"
 
