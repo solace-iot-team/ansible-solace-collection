@@ -525,16 +525,21 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 </thead>
 <tbody>
 <tr class="row-even"><td><p>generate</p></td>
-<td><p>inventory_settings</p></td>
-<td><p>Combined with <code class="docutils literal notranslate"><span class="pre">default_generate</span></code>, allowing to override only required values</p></td>
+<td><p>optional. sub-element <code class="docutils literal notranslate"><span class="pre">inventory_settings</span></code></p></td>
+<td><p>Combined with <code class="docutils literal notranslate"><span class="pre">default_generate</span></code>, allowing to override only required values.</p></td>
 </tr>
 <tr class="row-odd"><td><p>generate.inventory_settings</p></td>
-<td><p>inventory_hostname, sempv2_host, sempv2_port, sempv2_username, sempv2_password, sempv2_is_secure_connection, vpn, virtual_router</p></td>
-<td><p>The settings used to generate the broker service inventory</p></td>
+<td><p>optional. optional sub-elements:
+<code class="docutils literal notranslate"><span class="pre">inventory_hostname</span></code>, <code class="docutils literal notranslate"><span class="pre">sempv2_host</span></code>, <code class="docutils literal notranslate"><span class="pre">sempv2_port</span></code>, <code class="docutils literal notranslate"><span class="pre">sempv2_username</span></code>, <code class="docutils literal notranslate"><span class="pre">sempv2_password</span></code>, <code class="docutils literal notranslate"><span class="pre">sempv2_is_secure_connection</span></code>, <code class="docutils literal notranslate"><span class="pre">vpn</span></code>, <code class="docutils literal notranslate"><span class="pre">virtual_router</span></code></p></td>
+<td><p>The settings used to generate the broker service inventory.</p></td>
 </tr>
 <tr class="row-even"><td><p>docker_compose_settings</p></td>
-<td><p>all settings provided by <a class="reference external" href="https://docs.ansible.com/ansible/latest/collections/community/docker/docker_compose_module.html">community.general.docker_compose</a></p></td>
-<td><p>Combined with <code class="docutils literal notranslate"><span class="pre">default_docker_compose_settings</span></code>, allowing to override only required values</p></td>
+<td><p>optional. all settings provided by <a class="reference external" href="https://docs.ansible.com/ansible/latest/collections/community/docker/docker_compose_module.html">community.general.docker_compose</a></p></td>
+<td><p>Combined with <code class="docutils literal notranslate"><span class="pre">default_docker_compose_settings</span></code>, allowing to override only required values.</p></td>
+</tr>
+<tr class="row-odd"><td><p>solace_get_available.wait_timeout_minutes</p></td>
+<td><p>optional</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wait_timeout_minutes</span></code> argument for <a class="reference internal" href="../modules/solace_get_available.html#solace-get-available-module"><span class="std std-ref">solace_get_available – check if broker semp &amp; spool is available</span></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -546,7 +551,7 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 <span class="nn">---</span>
 <span class="nt">default_generate</span><span class="p">:</span>
   <span class="nt">inventory_settings</span><span class="p">:</span>
-    <span class="nt">inventory_hostname</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ansible_hostname</span><span class="nv"> </span><span class="s">}}&quot;</span>
+    <span class="nt">inventory_hostname</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ansible_hostname|default(omit)</span><span class="nv"> </span><span class="s">}}&quot;</span>
     <span class="nt">sempv2_host</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ansible_host</span><span class="nv"> </span><span class="s">}}&quot;</span>
     <span class="nt">sempv2_port</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">8080</span>
     <span class="nt">sempv2_username</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">admin</span>
@@ -555,7 +560,7 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
     <span class="nt">vpn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">default</span>
     <span class="nt">virtual_router</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">primary</span>
 <span class="nt">default_docker_compose_settings</span><span class="p">:</span>
-  <span class="nt">project_name</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">args.__null__</span><span class="nv"> </span><span class="s">}}&quot;</span>
+  <span class="nt">project_name</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">args.__required__</span><span class="nv"> </span><span class="s">}}&quot;</span>
   <span class="nt">restarted</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
   <span class="nt">recreate</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">always</span>
   <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
@@ -635,16 +640,22 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 </thead>
 <tbody>
 <tr class="row-even"><td><p>solace_broker_service_result</p></td>
-<td><p>Result dict</p></td>
+<td><p>Result dict.</p></td>
 </tr>
 <tr class="row-odd"><td><p>solace_broker_service_result.inventory</p></td>
-<td><p>The combined inventory for the broker service</p></td>
+<td><p>The combined inventory for the broker service.</p></td>
 </tr>
 <tr class="row-even"><td><p>solace_broker_service_result.docker_compose_settings</p></td>
-<td><p>The combined <code class="docutils literal notranslate"><span class="pre">docker_compose_settings</span></code></p></td>
+<td><p>The combined <code class="docutils literal notranslate"><span class="pre">docker_compose_settings</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>solace_broker_service_result.docker_logs</p></td>
-<td><p>The docker logs from the created services. Only applies to <code class="docutils literal notranslate"><span class="pre">state=present</span></code></p></td>
+<td><p>The docker logs from the created services. Only applies to <code class="docutils literal notranslate"><span class="pre">state=present</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p>solace_broker_service_result.rc</p></td>
+<td><p>The return code of the role. ok:<code class="docutils literal notranslate"><span class="pre">rc=0</span></code>, failed:<code class="docutils literal notranslate"><span class="pre">rc=1</span></code>. Returned always.</p></td>
+</tr>
+<tr class="row-odd"><td><p>solace_broker_service_result.msg</p></td>
+<td><p>The error details in case of failure (<code class="docutils literal notranslate"><span class="pre">rc=1</span></code>). Returned on error.</p></td>
 </tr>
 </tbody>
 </table>
@@ -753,7 +764,7 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 12 Apr 2021 at 07:20.
+        Last updated on 14 Apr 2021 at 10:19.
       </span>
 
     </p>
