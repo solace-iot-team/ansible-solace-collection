@@ -36,73 +36,96 @@
             serviceClassId: "{{ sc_service_details.serviceClassId }}"
             serviceClassDisplayedAttributes: "{{ sc_service_details.serviceClassDisplayedAttributes }}"
       register: inv_results
+      ignore_errors: yes
 
-    - name: "Save Solace Cloud Service inventory to File"
-      copy:
-        content: "{{ inv_results.facts.formattedHostInventory | to_nice_json }}"
-        dest: "{{ working_dir }}/inventory.{{ sc_service.name }}.json"
-      delegate_to: localhost
+    - name: "Print service state"
+      debug:
+        msg: "service:{{ sc_service_details.name }}, state: {{ inv_results.facts.serviceState }}"
 
-    - name: "Save Solace Cloud Service inventory to File"
-      copy:
-        content: "{{ inv_results.facts.formattedHostInventory | to_nice_yaml }}"
-        dest: "{{ working_dir }}/inventory.{{ sc_service.name }}.yml"
-      delegate_to: localhost
+    - name: "WARNING if not our service"
+      debug:
+        msg:
+          - "WARNING: service in failed state:"
+          - "service:{{ sc_service_details.name }}, state: {{ inv_results.facts.serviceState }}"
+      when: inv_results.facts.serviceState=='failed' and not sc_service_details.name in sc_services|string
 
-    - set_fact:
-        inventory_facts: "{{ inv_results.facts.formattedHostInventory.all.hosts[sc_service.name] }}"
+    - name: "ERROR if is our service"
+      fail:
+        msg:
+          - "ERROR: service in failed state:"
+          - "service:{{ sc_service_details.name }}, state: {{ inv_results.facts.serviceState }}"
+      when: inv_results.facts.serviceState=='failed' and sc_service_details.name in sc_services|string
 
-    - name: "Set Fact: Solace Service SEMP for {{ sc_service.name }}"
-      set_fact:
-        sempv2_host: "{{ inventory_facts.sempv2_host }}"
-        sempv2_port: "{{ inventory_facts.sempv2_port }}"
-        sempv2_is_secure_connection: "{{ inventory_facts.sempv2_is_secure_connection }}"
-        sempv2_username: "{{ inventory_facts.sempv2_username }}"
-        sempv2_password: "{{ inventory_facts.sempv2_password }}"
-        sempv2_timeout: "{{ inventory_facts.sempv2_timeout }}"
-        vpn: "{{ inventory_facts.vpn }}"
+    - name: "discard for failed services"
+      block:
+        - name: "Save Solace Cloud Service inventory to File"
+          copy:
+            content: "{{ inv_results.facts.formattedHostInventory | to_nice_json }}"
+            dest: "{{ working_dir }}/inventory.{{ sc_service.name }}.json"
+          delegate_to: localhost
 
-    - name: "Gather Solace Facts from Service"
-      solace_gather_facts:
-        host: "{{ sempv2_host }}"
-        port: "{{ sempv2_port }}"
-        secure_connection: "{{ sempv2_is_secure_connection }}"
-        username: "{{ sempv2_username }}"
-        password: "{{ sempv2_password }}"
-        timeout: "{{ sempv2_timeout }}"
-        solace_cloud_api_token: "{{ api_token }}"
-        solace_cloud_service_id: "{{ sc_service.serviceId }}"
+        - name: "Save Solace Cloud Service inventory to File"
+          copy:
+            content: "{{ inv_results.facts.formattedHostInventory | to_nice_yaml }}"
+            dest: "{{ working_dir }}/inventory.{{ sc_service.name }}.yml"
+          delegate_to: localhost
 
-    - name: "Save Solace Cloud Service Facts to File"
-      copy:
-        content: "{{ ansible_facts.solace | to_nice_json }}"
-        dest: "{{ working_dir }}/ansible_facts.solace.{{ sc_service.name }}.json"
-      delegate_to: localhost
+        - set_fact:
+            inventory_facts: "{{ inv_results.facts.formattedHostInventory.all.hosts[sc_service.name] }}"
 
-    - name: "Save hostvars"
-      copy:
-        content: "{{ hostvars | to_nice_json }}"
-        dest: "{{ working_dir }}/hostvars.{{ inventory_hostname }}.json"
-      delegate_to: localhost
+        - name: "Set Fact: Solace Service SEMP for {{ sc_service.name }}"
+          set_fact:
+            sempv2_host: "{{ inventory_facts.sempv2_host }}"
+            sempv2_port: "{{ inventory_facts.sempv2_port }}"
+            sempv2_is_secure_connection: "{{ inventory_facts.sempv2_is_secure_connection }}"
+            sempv2_username: "{{ inventory_facts.sempv2_username }}"
+            sempv2_password: "{{ inventory_facts.sempv2_password }}"
+            sempv2_timeout: "{{ inventory_facts.sempv2_timeout }}"
+            vpn: "{{ inventory_facts.vpn }}"
 
-    - name: "Get Facts: all client connection details"
-      solace_get_facts:
-        hostvars: "{{ hostvars }}"
-        hostvars_inventory_hostname: "{{ inventory_hostname }}"
-        msg_vpn: "{{ vpn }}"
-        get_functions:
-          - get_vpnClientConnectionDetails
-      register: result
-      # no_log: true
+        - name: "Gather Solace Facts from Service"
+          solace_gather_facts:
+            host: "{{ sempv2_host }}"
+            port: "{{ sempv2_port }}"
+            secure_connection: "{{ sempv2_is_secure_connection }}"
+            username: "{{ sempv2_username }}"
+            password: "{{ sempv2_password }}"
+            timeout: "{{ sempv2_timeout }}"
+            solace_cloud_api_token: "{{ api_token }}"
+            solace_cloud_service_id: "{{ sc_service.serviceId }}"
 
-    - set_fact:
-        client_connection_details: "{{ result.facts }}"
+        - name: "Save Solace Cloud Service Facts to File"
+          copy:
+            content: "{{ ansible_facts.solace | to_nice_json }}"
+            dest: "{{ working_dir }}/ansible_facts.solace.{{ sc_service.name }}.json"
+          delegate_to: localhost
 
-    - name: "Save 'client_connection_details' to File"
-      copy:
-        content: "{{ client_connection_details | to_nice_json }}"
-        dest: "{{ working_dir }}/facts.solace_cloud_service.{{ sc_service.name }}.client_connection_details.json"
-      delegate_to: localhost
+        - name: "Save hostvars"
+          copy:
+            content: "{{ hostvars | to_nice_json }}"
+            dest: "{{ working_dir }}/hostvars.{{ inventory_hostname }}.json"
+          delegate_to: localhost
+
+        - name: "Get Facts: all client connection details"
+          solace_get_facts:
+            hostvars: "{{ hostvars }}"
+            hostvars_inventory_hostname: "{{ inventory_hostname }}"
+            msg_vpn: "{{ vpn }}"
+            get_functions:
+              - get_vpnClientConnectionDetails
+          register: result
+          # no_log: true
+
+        - set_fact:
+            client_connection_details: "{{ result.facts }}"
+
+        - name: "Save 'client_connection_details' to File"
+          copy:
+            content: "{{ client_connection_details | to_nice_json }}"
+            dest: "{{ working_dir }}/facts.solace_cloud_service.{{ sc_service.name }}.client_connection_details.json"
+          delegate_to: localhost
+      when: inv_results.facts.serviceState!='failed'
+
 
 
 ###

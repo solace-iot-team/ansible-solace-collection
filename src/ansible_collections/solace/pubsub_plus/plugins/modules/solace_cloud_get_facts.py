@@ -16,6 +16,7 @@ module: solace_cloud_get_facts
 short_description: get Solace Cloud service facts
 description:
 - Convenience functions to access Solace Cloud service facts gathered with M(solace_cloud_get_service) or returned by M(solace_cloud_service).
+- Always returns the state of the service in `facts.serviceState`.
 options:
   from_dict:
     description: >
@@ -171,7 +172,8 @@ facts:
     type: dict
     returned: success
     sample:
-      get_formattedHostInventory:
+      serviceState: complete
+      formattedHostInventory:
         all:
             hosts:
                 asc_test_1:
@@ -234,25 +236,34 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
         params = self.get_module().params
         search_dict = params['from_dict']
         solaceCloudServiceFacts = SolaceCloudBrokerFacts(search_dict, None)
-
-        # check state of service
-        service_state = solaceCloudServiceFacts.get_field(search_dict, 'creationState')
-        if service_state != 'completed':
-            raise SolaceParamsValidationError("service creationState", service_state, "is not 'completed'")
-
         facts = dict()
-        param_get_formattedHostInventory = params['get_formattedHostInventory']
-        if param_get_formattedHostInventory:
-            field, value = self.get_formattedHostInventory(solaceCloudServiceFacts,
-                                                           search_dict,
-                                                           param_get_formattedHostInventory['host_entry'],
-                                                           param_get_formattedHostInventory['api_token'],
-                                                           param_get_formattedHostInventory['meta'])
-            facts[field] = value
+        usr_msg = None
+        try:
+          field, value = self.get_serviceState(solaceCloudServiceFacts, search_dict)
+          facts[field] = value
+          if value != 'completed':
+            raise SolaceParamsValidationError("from_dict.creationState", value, "is not 'completed'")
+          param_get_formattedHostInventory = params['get_formattedHostInventory']
+          if param_get_formattedHostInventory:
+              field, value = self.get_formattedHostInventory(solaceCloudServiceFacts,
+                                                            search_dict,
+                                                            param_get_formattedHostInventory['host_entry'],
+                                                            param_get_formattedHostInventory['api_token'],
+                                                            param_get_formattedHostInventory['meta'])
+              facts[field] = value
+        except Exception as e:
+          self.logExceptionAsDebug(type(e), e)
+          ex_msg_list = [f"Error: {str(e)}"]
+          usr_msg = ["Cannot get requested facts from 'from_dict'"] + ex_msg_list
+          self.update_result(dict(rc=1, changed=self.changed))
 
-        result = self.create_result(rc=0, changed=False)
-        result['facts'] = facts
-        return None, result
+        self.update_result(dict(facts=facts))
+        return usr_msg, self.get_result()
+
+    def get_serviceState(self,
+                         solace_cloud_service_facts: SolaceCloudBrokerFacts,
+                         search_dict: dict):
+        return 'serviceState', solace_cloud_service_facts.get_field(search_dict, 'creationState')
 
     def get_formattedHostInventory(self,
                                    solace_cloud_service_facts: SolaceCloudBrokerFacts,
@@ -264,7 +275,6 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
             all=dict()
         )
         hosts = dict()
-
         secured_semp_details = solace_cloud_service_facts.get_semp_client_connection_details()
         msg_vpn_attributes = solace_cloud_service_facts.get_msg_vpn_attributes()
         # import logging, json
@@ -286,7 +296,6 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
         }
         if api_token:
             hosts[host_entry].update({'solace_cloud_api_token': api_token})
-
         inv['all']['hosts'] = hosts
         return 'formattedHostInventory', inv
 

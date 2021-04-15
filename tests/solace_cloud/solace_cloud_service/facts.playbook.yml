@@ -8,6 +8,10 @@
   any_errors_fatal: true
   collections:
     - solace.pubsub_plus
+  pre_tasks:
+  - include_vars:
+      file: "solace-cloud-service.vars.yml"
+      name: sc_services    
   tasks:
     - name: "Check vars"
       set_fact:
