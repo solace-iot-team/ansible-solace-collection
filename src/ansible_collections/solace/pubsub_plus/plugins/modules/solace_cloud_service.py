@@ -251,7 +251,7 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
             return None
 
         if service['creationState'] == 'failed':
-            logging.debug("solace cloud service in failed state - deleting ...")
+            logging.debug("solace cloud service '%s' in failed state - deleting ...", value)
             _resp = self.solace_cloud_api.delete_service(self.get_config(), self._service_id)
             return None
 
