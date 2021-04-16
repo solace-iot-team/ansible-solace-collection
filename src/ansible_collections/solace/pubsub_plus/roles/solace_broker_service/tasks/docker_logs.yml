@@ -17,6 +17,6 @@
       - "docker_logs_result ************************************************************************"
       - "{{ docker_logs_result }}"
 - set_fact:
-    docker_logs_out: "{{ lookup('template', 'docker_logs.j2') | from_json}}"
+    docker_logs_out: "{{ lookup('template', 'docker_logs.j2') | from_json }}"
 - set_fact:
     combined_docker_logs: "{{ combined_docker_logs | combine(docker_logs_out, recursive=true) if combined_docker_logs is defined else docker_logs_out }}"
