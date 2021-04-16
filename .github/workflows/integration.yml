@@ -20,7 +20,7 @@ env:
   # DEBUG_FLAG: ${{ false }}
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
   TEST_TEST_RUNNER_SCRIPT: "test-runner/run.integration.sh"
-  TEST_TEST_RUNNER_LOGS_NAME: test-runner-integration-logs
+  TEST_TEST_RUNNER_LOGS_NAME: asc-test-runner-integration-logs
   TEST_RUNNER_LOGS_DIR: integration-logs
 
 jobs:
