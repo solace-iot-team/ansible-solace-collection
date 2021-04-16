@@ -1,0 +1,75 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: Check vars
+  assert:
+    that:
+      - sc_service is defined
+      - SOLACE_CLOUD_API_TOKEN is defined
+      - output_dir is defined
+    fail_msg: "one or more variables not defined"
+
+- set_fact:
+    service_output_dir: "{{ output_dir }}/{{ sc_service.name }}"
+- file:
+    path: "{{ service_output_dir }}"
+    state: directory
+  delegate_to: localhost
+
+- name: "Create Solace Cloud Service - wait until completed"
+  solace_cloud_service:
+    api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+    name: "{{ sc_service.name }}"
+    wait_timeout_minutes: 30
+    settings:
+      msgVpnName: "{{ sc_service.msgVpnName }}"
+      datacenterId: "{{ sc_service.datacenterId }}"
+      serviceTypeId: "{{ sc_service.serviceTypeId }}"
+      serviceClassId: "{{ sc_service.serviceClassId }}"
+      attributes: "{{ sc_service.attributes | default(omit) }}"
+    state: present
+  register: result
+
+- set_fact:
+    sc_service_id: "{{ result.response.serviceId }}"
+    sc_service_info: "{{ result.response }}"
+
+- name: "Get Solace Cloud Service Inventory"
+  solace_cloud_get_facts:
+    from_dict: "{{ sc_service_info }}"
+    get_formattedHostInventory:
+      host_entry: "{{ sc_service.name }}"
+      meta:
+        service_name: "{{ sc_service_info.name }}"
+        sc_service_id: "{{ sc_service_info.serviceId }}"
+        datacenterId: "{{ sc_service_info.datacenterId }}"
+        serviceTypeId: "{{ sc_service_info.serviceTypeId}}"
+        serviceClassId: "{{ sc_service_info.serviceClassId }}"
+        serviceClassDisplayedAttributes: "{{ sc_service_info.serviceClassDisplayedAttributes }}"
+  register: result
+  delegate_to: localhost
+
+- name: "Create 'via-bastion' Inventory"
+  block:
+    - set_fact:
+        current_inventory: "{{ lookup('file', inventory_file) | from_json }}"
+        solace_broker_service:
+          solace_broker_service_host: "{{ result.facts.formattedHostInventory.all.hosts }}"
+    - set_fact:
+        new_inventory_host_params: "{{ current_inventory.all.hosts[inventory_hostname] | combine(solace_broker_service, recursive=true) | to_json }}"
+    - set_fact:
+        bastion_inventory: "{{ lookup('template', 'bastion.inventory.j2') | from_json }}"
+
+- name: "Save Solace Cloud Service Inventories to Config"
+  block:
+    - copy:
+        content: "{{ result.facts.formattedHostInventory | to_nice_yaml(indent=2) }}"
+        dest: "{{ service_output_dir }}/broker_service.inventory.yml"
+    - copy:
+        content: "{{ bastion_inventory | to_nice_yaml(indent=2) }}"
+        dest: "{{ service_output_dir }}/bastion.broker_service.inventory.yml"
+  delegate_to: localhost
+
+###
+# The End.

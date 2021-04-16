@@ -1,0 +1,35 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+  solace_cloud_services:
+    - name: asct_sc_bastion_1
+      msgVpnName: asct_sc_bastion_1
+      # datacenterId: "aws-eu-west-2a"
+      datacenterId: "aws-ca-central-1a"
+      serviceTypeId: "enterprise"
+      serviceClassId: "enterprise-250-nano"
+      attributes:
+        customizedMessagingPorts:
+          serviceSmfPlainTextListenPort: 55555
+          serviceSmfCompressedListenPort: 55003
+          serviceSmfTlsListenPort: 55443
+          serviceAmqpPlainTextListenPort: 0
+          serviceAmqpTlsListenPort: 0
+          serviceMqttPlainTextListenPort: 0
+          serviceMqttTlsListenPort: 0
+          serviceMqttTlsWebSocketListenPort: 0
+          serviceMqttWebSocketListenPort: 0
+          serviceRestIncomingPlainTextListenPort: 0
+          serviceRestIncomingTlsListenPort: 0
+          serviceWebPlainTextListenPort: 0
+          serviceWebTlsListenPort: 0
+    - name: asct_sc_bastion_2
+      msgVpnName: asct_sc_bastion_2
+      # datacenterId: "aws-eu-west-2a"
+      datacenterId: "aws-ca-central-1a"
+      serviceTypeId: "enterprise"
+      serviceClassId: "enterprise-250-nano"
+
+###
+# The End.
