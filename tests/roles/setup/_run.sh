@@ -18,7 +18,7 @@ source $PROJECT_HOME/.lib/functions.sh
 ##############################################################################################################################
 # Prepare
 
-  if [ -z "$AZURE_PROJECT_NAME" ]; then export AZURE_PROJECT_NAME="asct"; fi
+  if [ -z "$AZURE_PROJECT_NAME" ]; then export AZURE_PROJECT_NAME="asct-broker"; fi
   if [ -z "$AZURE_LOCATION" ]; then export AZURE_LOCATION="westeurope"; fi
   # az vm image list --output table
   # az vm image list --offer UbuntuServer --all --output table
