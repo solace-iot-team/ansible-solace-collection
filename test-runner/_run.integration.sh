@@ -49,26 +49,26 @@ ansibleSolaceTestTargetGroup="bastion"
   $runScript
   code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
-# #################################################################################################################################################
-# ansibleSolaceTestTargetGroup="examples"
-# #################################################################################################################################################
-#
-#   for brokerDockerImage in ${brokerDockerImages[@]}; do
-#
-#     brokerDockerImageLogPath=${brokerDockerImage//":"/"_"}
-#     export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup/$brokerDockerImageLogPath"
-#     mkdir -p $LOG_DIR
-#
-#     export BROKER_DOCKER_IMAGE=$brokerDockerImage
-#
-#     echo "##############################################################################################################"
-#     echo "# Test target group: $ansibleSolaceTestTargetGroup($brokerDockerImage)"
-#
-#     runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
-#     $runScript
-#     code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
-#
-#   done
+#################################################################################################################################################
+ansibleSolaceTestTargetGroup="examples"
+#################################################################################################################################################
+
+  for brokerDockerImage in ${brokerDockerImages[@]}; do
+
+    brokerDockerImageLogPath=${brokerDockerImage//":"/"_"}
+    export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup/$brokerDockerImageLogPath"
+    mkdir -p $LOG_DIR
+
+    export BROKER_DOCKER_IMAGE=$brokerDockerImage
+
+    echo "##############################################################################################################"
+    echo "# Test target group: $ansibleSolaceTestTargetGroup($brokerDockerImage)"
+
+    runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
+    $runScript
+    code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+
+  done
 
 #################################################################################################################################################
 ansibleSolaceTestTargetGroup="roles"
@@ -88,8 +88,6 @@ ansibleSolaceTestTargetGroup="roles"
     runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
     $runScript
     code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
-
-exit 1
 
 #################################################################################################################################################
 ansibleSolaceTestTargetGroup="single_broker"
