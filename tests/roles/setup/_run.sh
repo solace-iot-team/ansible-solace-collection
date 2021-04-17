@@ -18,22 +18,19 @@ source $PROJECT_HOME/.lib/functions.sh
 ##############################################################################################################################
 # Prepare
 
-  if [ -z "$AZURE_PROJECT_NAME" ]; then export AZURE_PROJECT_NAME="asct-broker"; fi
+  if [ -z "$AZURE_BROKER_PROJECT_NAME" ]; then export AZURE_BROKER_PROJECT_NAME="asct-tr-broker"; fi
   if [ -z "$AZURE_LOCATION" ]; then export AZURE_LOCATION="westeurope"; fi
   # az vm image list --output table
   # az vm image list --offer UbuntuServer --all --output table
   if [ -z "$AZURE_VM_IMAGE_URN" ]; then export AZURE_VM_IMAGE_URN="UbuntuLTS"; fi
   if [ -z "$AZURE_VM_SEMP_PLAIN_PORT" ]; then export AZURE_VM_SEMP_PLAIN_PORT="8080"; fi
   if [ -z "$AZURE_VM_SEMP_SECURE_PORT" ]; then export AZURE_VM_SEMP_SECURE_PORT="1943"; fi
-  if [ -z "$AZURE_VM_ADMIN_USER" ]; then export AZURE_VM_ADMIN_USER="$AZURE_PROJECT_NAME-admin"; fi
+  if [ -z "$AZURE_VM_ADMIN_USER" ]; then export AZURE_VM_ADMIN_USER="$AZURE_BROKER_PROJECT_NAME-admin"; fi
   if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE" ]; then
     export AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE=$(assertFile $scriptLogName "$scriptDir/files/template.remotehost.inventory.yml") || exit
   fi
 
-  if [ -z "$CONFIG_DB_DIR" ]; then
-    export CONFIG_DB_DIR="$WORKING_DIR/config_db";
-    mkdir -p $CONFIG_DB_DIR
-  fi
+  if [ -z "$CONFIG_DB_DIR" ]; then export CONFIG_DB_DIR="$WORKING_DIR/config_db"; mkdir -p $CONFIG_DB_DIR; fi
   export ANSIBLE_SOLACE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible-solace.log"
   export ANSIBLE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible.log"
 

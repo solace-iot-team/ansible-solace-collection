@@ -15,13 +15,14 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$WORKING_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
   if [ -z "$LOG_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
   if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
-  if [ -z "$AZURE_PROJECT_NAME" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_PROJECT_NAME"; exit 1; fi
+  if [ -z "$AZURE_BROKER_PROJECT_NAME" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_BROKER_PROJECT_NAME"; exit 1; fi
 
 ############################################################################################################################
 # Prepare
 
-  resourceGroupName="$AZURE_PROJECT_NAME-rg"
-  outputDir="$CONFIG_DB_DIR/azure_vms/$AZURE_PROJECT_NAME"
+  azureProjectName=$AZURE_BROKER_PROJECT_NAME
+  resourceGroupName="$azureProjectName-rg"
+  outputDir="$CONFIG_DB_DIR/azure_vms/$azureProjectName"
 
 ############################################################################################################################
 # Run
