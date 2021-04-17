@@ -38,6 +38,9 @@
 - name: "Get Solace Cloud Service Inventory"
   solace_cloud_get_facts:
     from_dict: "{{ sc_service_info }}"
+    # TODO:
+    # get_remoteFormattedHostInventory:
+    #   - generate inventory for bastion server - see tests/bastion/setup_services/tasks/create.sc-service.yml
     get_formattedHostInventory:
       host_entry: "{{ sc_service.name }}"
       meta:
@@ -54,10 +57,13 @@
   block:
     - set_fact:
         current_inventory: "{{ lookup('file', inventory_file) | from_json }}"
-        solace_broker_service:
-          solace_broker_service_host: "{{ result.facts.formattedHostInventory.all.hosts }}"
+        _solace_broker_service_params: "{{ result.facts.formattedHostInventory.all.hosts[sc_service.name] }}"
     - set_fact:
-        new_inventory_host_params: "{{ current_inventory.all.hosts[inventory_hostname] | combine(solace_broker_service, recursive=true) | to_json }}"
+        # remove ansible_connection
+        solace_broker_service_params: "{{ _solace_broker_service_params | dict2items | rejectattr('key', 'equalto', 'ansible_connection') | list | items2dict }}"
+    - set_fact:
+        new_inventory_hostname: "{{ sc_service.name }}"
+        new_inventory_host_params: "{{ current_inventory.all.hosts[inventory_hostname] | combine(solace_broker_service_params, recursive=true) | to_json }}"
     - set_fact:
         bastion_inventory: "{{ lookup('template', 'bastion.inventory.j2') | from_json }}"
 
