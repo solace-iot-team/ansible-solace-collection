@@ -38,9 +38,17 @@
 - name: "Get Solace Cloud Service Inventory"
   solace_cloud_get_facts:
     from_dict: "{{ sc_service_info }}"
-    # TODO:
-    # get_remoteFormattedHostInventory:
-    #   - generate inventory for bastion server - see tests/bastion/setup_services/tasks/create.sc-service.yml
+    get_remoteFormattedHostInventory:
+      remote_host_inventory: "{{ lookup('file', inventory_file) | from_json }}"
+      remote_host_inventory_hostname: "{{ inventory_hostname }}"
+      host_entry: "{{ sc_service.name }}"
+      meta:
+        service_name: "{{ sc_service_info.name }}"
+        sc_service_id: "{{ sc_service_info.serviceId }}"
+        datacenterId: "{{ sc_service_info.datacenterId }}"
+        serviceTypeId: "{{ sc_service_info.serviceTypeId}}"
+        serviceClassId: "{{ sc_service_info.serviceClassId }}"
+        serviceClassDisplayedAttributes: "{{ sc_service_info.serviceClassDisplayedAttributes }}"
     get_formattedHostInventory:
       host_entry: "{{ sc_service.name }}"
       meta:
@@ -53,27 +61,13 @@
   register: result
   delegate_to: localhost
 
-- name: "Create 'via-bastion' Inventory"
-  block:
-    - set_fact:
-        current_inventory: "{{ lookup('file', inventory_file) | from_json }}"
-        _solace_broker_service_params: "{{ result.facts.formattedHostInventory.all.hosts[sc_service.name] }}"
-    - set_fact:
-        # remove ansible_connection
-        solace_broker_service_params: "{{ _solace_broker_service_params | dict2items | rejectattr('key', 'equalto', 'ansible_connection') | list | items2dict }}"
-    - set_fact:
-        new_inventory_hostname: "{{ sc_service.name }}"
-        new_inventory_host_params: "{{ current_inventory.all.hosts[inventory_hostname] | combine(solace_broker_service_params, recursive=true) | to_json }}"
-    - set_fact:
-        bastion_inventory: "{{ lookup('template', 'bastion.inventory.j2') | from_json }}"
-
 - name: "Save Solace Cloud Service Inventories to Config"
   block:
     - copy:
         content: "{{ result.facts.formattedHostInventory | to_nice_yaml(indent=2) }}"
         dest: "{{ service_output_dir }}/broker_service.inventory.yml"
     - copy:
-        content: "{{ bastion_inventory | to_nice_yaml(indent=2) }}"
+        content: "{{ result.facts.remoteFormattedHostInventory | to_nice_yaml(indent=2) }}"
         dest: "{{ service_output_dir }}/bastion.broker_service.inventory.yml"
   delegate_to: localhost
 

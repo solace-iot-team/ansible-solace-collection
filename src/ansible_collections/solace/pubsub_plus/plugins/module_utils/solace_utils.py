@@ -14,6 +14,7 @@ import re
 import copy
 from json.decoder import JSONDecodeError
 import ssl
+from copy import deepcopy
 
 SOLACE_UTILS_HAS_IMPORT_ERROR = False
 SOLACE_UTILS_IMPORT_ERR_TRACEBACK = None
@@ -126,3 +127,15 @@ class SolaceUtils(object):
                 except Exception:
                     resp_body = resp_text
         return resp_body
+
+    @staticmethod
+    def merge_dicts_recursive(one: dict, two: dict) -> dict:
+        merged = {}
+        overlapping_keys = one.keys() & two.keys()
+        for key in overlapping_keys:
+            merged[key] = SolaceUtils.merge_dicts_recursive(one[key], two[key])
+        for key in one.keys() - overlapping_keys:
+            merged[key] = deepcopy(one[key])
+        for key in two.keys() - overlapping_keys:
+            merged[key] = deepcopy(two[key])
+        return merged
