@@ -43,7 +43,7 @@ source $PROJECT_HOME/.lib/functions.sh
 
 ############################################################################################################################
 # Run
-echo " >>> Creating Resource Group ..."
+echo " >>> Creating Resource Group $resourceGroupName ..."
   az group create \
     --name $resourceGroupName \
     --location "$azLocation" \
