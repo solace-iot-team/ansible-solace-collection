@@ -20,6 +20,8 @@ source $PROJECT_HOME/.lib/functions.sh
       "teardown_bastionhost"
       "setup_bastionhost"
       "setup_services"
+      "bastion_general"
+      "teardown_services"
       "teardown_bastionhost"
     )
   fi

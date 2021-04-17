@@ -27,14 +27,14 @@ source $PROJECT_HOME/.lib/functions.sh
 ############################################################################################################################
 # Run
 
-echo " >>> Check resource group ..."
+echo " >>> Check resource group $resourceGroupName ..."
   resp=$(az group exists --name $resourceGroupName)
 echo " >>> Success."
 
 if [ "$resp" == "false" ]; then
   echo " >>> INFO: resoure group does not exist";
 else
-  echo " >>> Deleting resource group ..."
+  echo " >>> Deleting resource group $resourceGroupName ..."
     az group delete \
         --name $resourceGroupName \
         --yes \
@@ -43,7 +43,7 @@ else
   echo " >>> Success."
 fi
 
-echo  " >>> Clean output dir ..."
+echo  " >>> Clean output dir $outputDir ..."
   rm -rf $outputDir
   if [[ $? != 0 ]]; then echo " >>> XT_ERROR: cleaning output dir"; exit 1; fi
 echo " >>> Success."

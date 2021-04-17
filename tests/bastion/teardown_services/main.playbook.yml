@@ -1,0 +1,43 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+-
+  name: "Delete Solace Cloud Services"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  tasks:
+  - name: Check vars
+    assert:
+      that:
+        - CONFIG_DB_DIR is defined
+        - SOLACE_CLOUD_API_TOKEN is defined
+        - RUN_TIME_DIR
+      fail_msg: "one or more variables not defined"
+
+  - set_fact:
+      service_config_dir: "{{ CONFIG_DB_DIR }}/broker_services/{{ inventory_hostname }}"
+  - name: Check config dir exists for this service
+    stat:
+      path: "{{ service_config_dir }}"
+    register: service_config_dir_stat
+    delegate_to: localhost
+  - assert:
+      that: service_config_dir_stat.stat.islnk is defined
+      fail_msg: "directory not found: service_config_dir={{ service_config_dir }}"
+
+  - name: Delete Solace Cloud Service
+    solace_cloud_service:
+      api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+      solace_cloud_service_id: "{{ meta.sc_service_id }}"
+      state: absent
+
+  - name: Delete Config
+    file:
+      path: "{{ service_config_dir }}"
+      state: absent
+    delegate_to: localhost
+      
+###
+# The End.
