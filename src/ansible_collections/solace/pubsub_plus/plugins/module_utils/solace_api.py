@@ -549,7 +549,16 @@ class SolaceCloudApi(SolaceApi):
     def get_object_settings(self, config: SolaceTaskBrokerConfig, path_array: list) -> dict:
         # returns settings or None if not found
         try:
-            resp = self.make_get_request(config, path_array)
+            _resp = self.make_get_request(config, path_array)
+            # api oddity: 'some' calls return a list with 1 dict in it
+            # logging.debug(f"get_object_settings._resp=\n{json.dumps(_resp, indent=2)}")
+            if isinstance(_resp, list):
+                if len(_resp) == 1 and isinstance(_resp[0], dict):
+                    resp = _resp[0]
+                else:
+                    raise SolaceApiError(_resp)
+            else:        
+                resp = _resp
         except SolaceApiError as e:
             resp = e.get_resp()
             if resp['status_code'] == 404:
