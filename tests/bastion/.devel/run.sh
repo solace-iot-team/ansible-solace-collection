@@ -14,18 +14,17 @@ if [ -z "$AZURE_BROKER_PROJECT_NAME" ]; then export AZURE_BROKER_PROJECT_NAME="a
 if [ -z "$AZURE_BASTION_PROJECT_NAME" ]; then export AZURE_BASTION_PROJECT_NAME="asct-devel-bastion"; fi
 
 ansibleSolaceTests=(
-  # "teardown_bastionhost"
-  # "setup_bastionhost"
+  "teardown_bastionhost"
+  "setup_bastionhost"
   "setup_services"
-  # "bastion_general"
-  # "teardown_services"
-  # "teardown_bastionhost"
+  "bastion_general"
+  "teardown_services"
+  "teardown_bastionhost"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
 # local broker
   export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
-  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.7.0.29"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.6.0.46"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.3.1.28"
 

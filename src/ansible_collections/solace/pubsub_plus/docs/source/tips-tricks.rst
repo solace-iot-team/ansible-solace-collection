@@ -8,3 +8,4 @@ Tips & Tricks
 
   tips-tricks-content/bridges-links
   tips-tricks-content/certs
+  tips-tricks-content/logfile

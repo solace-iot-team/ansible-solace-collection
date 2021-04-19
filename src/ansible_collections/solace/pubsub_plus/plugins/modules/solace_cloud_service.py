@@ -86,6 +86,7 @@ tasks:
         datacenterId: "aws-ca-central-1a"
         serviceTypeId: "enterprise"
         serviceClassId: "enterprise-250-nano"
+        eventBrokerVersion: "9.6"
         state: present
 
 - set_fact:
@@ -272,6 +273,18 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
         }
         data.update(settings)
         return self.solace_cloud_api.create_service(self.get_config(), self.get_module().params['wait_timeout_minutes'], data)
+
+    # TODO: wait until implemented
+    # def update_func(self, key, name, settings=None, delta_settings=None):
+    #     if not settings:
+    #         raise SolaceParamsValidationError('settings', settings, "required for creating a service")
+    #     data = {
+    #         'adminState': 'start',
+    #         'partitionId': 'default',
+    #         'name': name
+    #     }
+    #     data.update(settings)
+    #     return self.solace_cloud_api.create_service(self.get_config(), self.get_module().params['wait_timeout_minutes'], data)
 
     def update_func(self, key, value, settings=None, delta_settings=None):
         msg = [

@@ -3,15 +3,34 @@
 -
   name: "Create Solace Cloud Services"
   hosts: all
-  gather_facts: no
-  any_errors_fatal: true
+  # gather_facts: no
+  # any_errors_fatal: true
   collections:
     - solace.pubsub_plus
   pre_tasks:
   - include_vars:
       file: "solace-cloud-service.vars.yml"
       name: sc_services
+  vars:
+    remote_ansible_solace_log_path: "{{ ansible_solace_log_base_path }}/{{ inventory_hostname }}.ansible-solace.log"
+  environment:
+    ANSIBLE_SOLACE_ENABLE_LOGGING: true
+    ANSIBLE_SOLACE_LOG_PATH: "{{ remote_ansible_solace_log_path }}"
+  handlers:
+  - name: Bring back the log file
+    fetch:
+      src: "{{ remote_ansible_solace_log_path }}"
+      dest: "{{ ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH }}/"
+      flat: yes
+    listen: log-file-handler
+    no_log: true
   tasks:
+  - name: Set up Handler
+    debug:
+      msg: setup handler
+    changed_when: true
+    notify: log-file-handler
+
   - name: Check vars
     assert:
       that:
@@ -26,12 +45,16 @@
       state: directory
     delegate_to: localhost
 
-  - name: Call create sc-service task
-    include_tasks: ./tasks/create.sc-service.yml
-    register: create_sc_service_result
-    loop: "{{ sc_services.solace_cloud_services }}"
-    loop_control:
-      loop_var: sc_service
+  - name: Block Call create sc-service task
+    block:
+      - name: Call create sc-service task
+        include_tasks: ./tasks/create.sc-service.yml
+        register: create_sc_service_result
+        loop: "{{ sc_services.solace_cloud_services }}"
+        loop_control:
+          loop_var: sc_service
+    always:
+      - meta: flush_handlers
 
 ###
 # The End.

@@ -1,6 +1,5 @@
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-
 ---
   solace_cloud_services:
     - name: asct_sc_bastion_1
@@ -9,6 +8,7 @@
       datacenterId: "aws-ca-central-1a"
       serviceTypeId: "enterprise"
       serviceClassId: "enterprise-250-nano"
+      # eventBrokerVersion: "9.6"
       attributes:
         customizedMessagingPorts:
           serviceSmfPlainTextListenPort: 55555
@@ -30,6 +30,7 @@
       datacenterId: "aws-ca-central-1a"
       serviceTypeId: "enterprise"
       serviceClassId: "enterprise-250-nano"
+      # eventBrokerVersion: "9.3"
 
 ###
 # The End.

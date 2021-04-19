@@ -27,6 +27,7 @@
       datacenterId: "{{ sc_service.datacenterId }}"
       serviceTypeId: "{{ sc_service.serviceTypeId }}"
       serviceClassId: "{{ sc_service.serviceClassId }}"
+      eventBrokerVersion: "{{ sc_service.eventBrokerVersion | default(omit) }}"
       attributes: "{{ sc_service.attributes | default(omit) }}"
     state: present
   register: result
@@ -48,6 +49,7 @@
         datacenterId: "{{ sc_service_info.datacenterId }}"
         serviceTypeId: "{{ sc_service_info.serviceTypeId}}"
         serviceClassId: "{{ sc_service_info.serviceClassId }}"
+        eventBrokerVersion: "{{ sc_service.eventBrokerVersion | default(omit) }}"
         serviceClassDisplayedAttributes: "{{ sc_service_info.serviceClassDisplayedAttributes }}"
     get_formattedHostInventory:
       host_entry: "{{ sc_service.name }}"
@@ -57,9 +59,9 @@
         datacenterId: "{{ sc_service_info.datacenterId }}"
         serviceTypeId: "{{ sc_service_info.serviceTypeId}}"
         serviceClassId: "{{ sc_service_info.serviceClassId }}"
+        eventBrokerVersion: "{{ sc_service.eventBrokerVersion | default(omit) }}"
         serviceClassDisplayedAttributes: "{{ sc_service_info.serviceClassDisplayedAttributes }}"
   register: result
-  delegate_to: localhost
 
 - name: "Save Solace Cloud Service Inventories to Config"
   block:

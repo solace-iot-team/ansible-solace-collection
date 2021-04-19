@@ -21,7 +21,7 @@ source $PROJECT_HOME/.lib/functions.sh
 # Prepare
 
   if [ -z "$CONFIG_DB_DIR" ]; then export CONFIG_DB_DIR="$WORKING_DIR/config_db"; mkdir -p $CONFIG_DB_DIR; fi
-  export ANSIBLE_SOLACE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible-solace.log"
+  export ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH="$LOG_DIR/$scriptLogName"
   export ANSIBLE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible.log"
 
 ##############################################################################################################################
@@ -41,7 +41,8 @@ source $PROJECT_HOME/.lib/functions.sh
                   $playbook \
                   --private-key $bastionPrivateKeyFile \
                   --extra-vars "CONFIG_DB_DIR=$CONFIG_DB_DIR" \
-                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS"
+                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS" \
+                  --extra-vars "ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH=$ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH"                  
     code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
   done

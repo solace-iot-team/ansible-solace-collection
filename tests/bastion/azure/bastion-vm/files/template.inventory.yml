@@ -6,3 +6,4 @@ all:
       ansible_user: "admin-user"
       ansible_become: true
       ansible_python_interpreter: "/usr/bin/python3"
+      ansible_solace_log_base_path: /var/local
