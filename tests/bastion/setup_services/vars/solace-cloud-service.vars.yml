@@ -8,7 +8,7 @@
       datacenterId: "aws-ca-central-1a"
       serviceTypeId: "enterprise"
       serviceClassId: "enterprise-250-nano"
-      # eventBrokerVersion: "9.6"
+      eventBrokerVersion: "9.6"
       attributes:
         customizedMessagingPorts:
           serviceSmfPlainTextListenPort: 55555
@@ -30,7 +30,7 @@
       datacenterId: "aws-ca-central-1a"
       serviceTypeId: "enterprise"
       serviceClassId: "enterprise-250-nano"
-      # eventBrokerVersion: "9.3"
+      eventBrokerVersion: "9.3"
 
 ###
 # The End.

@@ -124,6 +124,7 @@ tasks:
           service_name: "{{ sc_service_details.name }}"
           service_id: "{{ sc_service_details.serviceId }}"
           datacenterId: "{{ sc_service_details.datacenterId }}"
+          eventBrokerVersion: "{{ sc_service_details..eventBrokerVersion }}"
           serviceTypeId: "{{ sc_service_details.serviceTypeId}}"
           serviceClassId: "{{ sc_service_details.serviceClassId }}"
           serviceClassDisplayedAttributes: "{{ sc_service_details.serviceClassDisplayedAttributes }}"
@@ -143,6 +144,7 @@ tasks:
           service_name: "{{ sc_service_details.name }}"
           service_id: "{{ sc_service_details.serviceId }}"
           datacenterId: "{{ sc_service_details.datacenterId }}"
+          eventBrokerVersion: "{{ sc_service_details..eventBrokerVersion }}"
           serviceTypeId: "{{ sc_service_details.serviceTypeId}}"
           serviceClassId: "{{ sc_service_details.serviceClassId }}"
           serviceClassDisplayedAttributes: "{{ sc_service_details.serviceClassDisplayedAttributes }}"
@@ -237,6 +239,7 @@ facts:
               broker_type: solace_cloud
               meta:
                 datacenterId: aws-ca-central-1a
+                eventBrokerVersion: '9.6'
                 sc_service_id: 7t8h5axsy5r
                 serviceClassDisplayedAttributes:
                   Clients: '250'
@@ -266,6 +269,7 @@ facts:
                     broker_type: solace_cloud
                     meta:
                         datacenterId: aws-ca-central-1a
+                        eventBrokerVersion: '9.6'
                         serviceClassDisplayedAttributes:
                             Clients: '250'
                             High Availability: HA Group
@@ -329,7 +333,7 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
             field, value = self.get_serviceState(solaceCloudServiceFacts, search_dict)
             facts[field] = value
             if value != 'completed':
-                raise SolaceParamsValidationError("from_dict.creationState", value, "is not 'completed'")
+                raise SolaceParamsValidationError("service.creationState", value, "is not 'completed'")
             param_get_formattedHostInventory = params['get_formattedHostInventory']
             if param_get_formattedHostInventory:
                 field, value = self.get_formattedHostInventory(solaceCloudServiceFacts,

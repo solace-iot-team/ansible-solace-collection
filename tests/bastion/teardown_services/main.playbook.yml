@@ -3,23 +3,27 @@
 -
   name: "Delete Solace Cloud Services"
   hosts: all
-  gather_facts: no
+  gather_facts: yes
   any_errors_fatal: true
   collections:
     - solace.pubsub_plus
-  vars:
-    remote_ansible_solace_log_path: "{{ ansible_solace_log_base_path }}/{{ inventory_hostname }}.ansible-solace.log"
-  environment:
-    ANSIBLE_SOLACE_ENABLE_LOGGING: true
-    ANSIBLE_SOLACE_LOG_PATH: "{{ remote_ansible_solace_log_path }}"
+  pre_tasks:
+  - set_fact:
+      remote_ansible_solace_log_path: "{{ ansible_solace_log_base_path }}/{{ inventory_hostname }}.{{ ansible_date_time.iso8601 }}.ansible-solace.log"
   handlers:
-  - name: Bring back the log file
+  - name: Fetch log file
     fetch:
       src: "{{ remote_ansible_solace_log_path }}"
       dest: "{{ ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH }}/"
       flat: yes
+      fail_on_missing: no
     listen: log-file-handler
-    no_log: true    
+    no_log: true
+  - name: Delete log file
+    file:
+      path: "{{ remote_ansible_solace_log_path }}"
+      state: absent
+    listen: log-file-handler
   tasks:
   - name: Set up Handler
     debug:
@@ -58,6 +62,9 @@
         path: "{{ service_config_dir }}"
         state: absent
       delegate_to: localhost
+    environment:
+      ANSIBLE_SOLACE_ENABLE_LOGGING: true
+      ANSIBLE_SOLACE_LOG_PATH: "{{ remote_ansible_solace_log_path }}"
     always:
       - meta: flush_handlers
 

@@ -55,7 +55,7 @@
       ignore_errors: yes
     - name: "assert for run_number = {{ run_number }}"
       assert:
-        that: result.rc == 1 and ('service creationState=pending' in result.msg[1] or 'service creationState=inProgress' in result.msg[1])
+        that: result.rc == 1 and ('service.creationState=pending' in result.msg[1] or 'service.creationState=inProgress' in result.msg[1])
   when: run_number == 1
 
 - name: "Create Solace Cloud Service - wait until completed"

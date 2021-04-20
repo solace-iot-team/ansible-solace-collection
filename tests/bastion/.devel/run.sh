@@ -14,7 +14,7 @@ if [ -z "$AZURE_BROKER_PROJECT_NAME" ]; then export AZURE_BROKER_PROJECT_NAME="a
 if [ -z "$AZURE_BASTION_PROJECT_NAME" ]; then export AZURE_BASTION_PROJECT_NAME="asct-devel-bastion"; fi
 
 ansibleSolaceTests=(
-  "teardown_bastionhost"
+  # "teardown_bastionhost"
   "setup_bastionhost"
   "setup_services"
   "bastion_general"

@@ -435,19 +435,56 @@ class SolaceCloudApi(SolaceApi):
         resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_DATA_CENTERS])
         return resp
 
+    def _transform_service(self, service: dict) -> dict:
+        
+        # logging.debug(f"BEFORE: _transform_service.service\n{json.dumps(service, indent=2)}")
+        
+        # add eventBrokerVersion --> standardized settings across POST and GET
+        # if it doesn't exist
+        # msgVpnAttributes.vmrVersion="9.6.0.46"
+        # eventBrokerVersion="9.6"
+        vmrVersion = None
+        if service['msgVpnAttributes']:
+            vmrVersion = service['msgVpnAttributes']['vmrVersion']
+        if vmrVersion:                
+            service['eventBrokerVersion'] = vmrVersion[0:3]
+        
+        # logging.debug(f"AFTER: _transform_service.service\n{json.dumps(service, indent=2)}")
+        
+        return service
+
     def get_services(self, config: SolaceTaskSolaceCloudConfig) -> list:
         # GET https://api.solace.cloud/api/v0/services
         try:
-            resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES])
+            _resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES])
         except SolaceApiError as e:
             resp = e.get_resp()
             # TODO: what is the code if solace cloud account has 0 services?
             if resp['status_code'] == 404:
                 return []
             raise SolaceApiError(resp) from e
-        if isinstance(resp, dict):
-            return [resp]
+        if isinstance(_resp, dict):
+            return [self._transform_service(_resp)]
+        # it is a list of services
+        resp = []
+        for _service in _resp:
+            service = self._transform_service(_service)
+            resp.append(service)
         return resp
+
+    # def get_services(self, config: SolaceTaskSolaceCloudConfig) -> list:
+    #     # GET https://api.solace.cloud/api/v0/services
+    #     try:
+    #         _resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES])
+    #     except SolaceApiError as e:
+    #         resp = e.get_resp()
+    #         # TODO: what is the code if solace cloud account has 0 services?
+    #         if resp['status_code'] == 404:
+    #             return []
+    #         raise SolaceApiError(resp) from e
+    #     if isinstance(resp, dict):
+    #         return [resp]
+    #     return resp
 
     def find_service_by_name_in_services(self, services, name):
         if isinstance(services, dict):
@@ -465,13 +502,25 @@ class SolaceCloudApi(SolaceApi):
         # GET https://api.solace.cloud/api/v0/services/{{serviceId}}
         # retrieves a single service
         try:
-            resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES, service_id])
+            _resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES, service_id])
         except SolaceApiError as e:
             resp = e.get_resp()
             if resp['status_code'] == 404:
                 return None
             raise SolaceApiError(resp) from e
-        return resp
+        return self._transform_service(_resp)
+
+    # def get_service(self, config: SolaceTaskSolaceCloudConfig, service_id: str) -> dict:
+    #     # GET https://api.solace.cloud/api/v0/services/{{serviceId}}
+    #     # retrieves a single service
+    #     try:
+    #         resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES, service_id])
+    #     except SolaceApiError as e:
+    #         resp = e.get_resp()
+    #         if resp['status_code'] == 404:
+    #             return None
+    #         raise SolaceApiError(resp) from e
+    #     return resp
 
     def get_services_with_details(self, config: SolaceTaskSolaceCloudConfig) -> list:
         # get services, then for each service, get details
