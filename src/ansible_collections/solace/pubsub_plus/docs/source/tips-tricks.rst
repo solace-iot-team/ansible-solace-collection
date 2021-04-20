@@ -8,4 +8,5 @@ Tips & Tricks
 
   tips-tricks-content/bridges-links
   tips-tricks-content/certs
+  tips-tricks-content/bastion
   tips-tricks-content/logfile
