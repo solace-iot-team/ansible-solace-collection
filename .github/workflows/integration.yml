@@ -142,8 +142,14 @@ jobs:
           export AZURE_PROJECT_NAME="asct-wf"
           ./${TEST_TEST_RUNNER_SCRIPT}
 
+      - name: Test Logs Directory
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          export LOG_DIR="$GITHUB_WORKSPACE/${TEST_RUNNER_LOGS_DIR}"
+          tree $LOG_DIR
+
       - name: Archive logs
-        if: ${{ (failure() && !cancelled()) || (always() && github.event_name == 'workflow_dispatch') }}
+        if: ${{ (failure() && !cancelled()) || (always() && (github.event_name=='workflow_dispatch' || env.DEBUG_FLAG=='true') ) }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.TEST_TEST_RUNNER_LOGS_NAME }}
