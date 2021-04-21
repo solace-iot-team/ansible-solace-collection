@@ -50,8 +50,6 @@ ansibleSolaceTestTargetGroup="bastion"
   $runScript
   code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 
-exit 1
-
 #################################################################################################################################################
 ansibleSolaceTestTargetGroup="examples"
 #################################################################################################################################################

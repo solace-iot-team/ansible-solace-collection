@@ -45,12 +45,12 @@ jobs:
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
         uses: andymckay/cancel-action@0.2
 
-      - name: Install tools
-        run: |
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64
-          sudo add-apt-repository ppa:rmescandon/yq
-          sudo apt update
-          sudo apt install yq -y
+      # - name: Install tools
+      #   run: |
+      #     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64
+      #     sudo add-apt-repository ppa:rmescandon/yq
+      #     sudo apt update
+      #     sudo apt install yq -y
 
       - name: Print test env
         if: env.DEBUG_FLAG == 'true'
@@ -61,7 +61,7 @@ jobs:
           openssl version
           tree --version
           jq --version
-          yq --version
+          # yq --version
 
       - name: Print github env before checkout
         if: env.DEBUG_FLAG == 'true'

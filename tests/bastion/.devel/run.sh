@@ -15,9 +15,9 @@ if [ -z "$AZURE_BASTION_PROJECT_NAME" ]; then export AZURE_BASTION_PROJECT_NAME=
 
 ansibleSolaceTests=(
   # "teardown_bastionhost"
-  # "setup_bastionhost"
-  "setup_services"
-  "bastion_general"
+  "setup_bastionhost"
+  # "setup_services"
+  # "bastion_general"
   # "teardown_services"
   # "teardown_bastionhost"
 )

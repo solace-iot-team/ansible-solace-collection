@@ -20,30 +20,20 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$AZURE_BASTION_PROJECT_NAME" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_BASTION_PROJECT_NAME"; exit 1; fi
   if [ -z "$AZURE_LOCATION" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_LOCATION"; exit 1; fi
   if [ -z "$AZURE_VM_IMAGE_URN" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_IMAGE_URN"; exit 1; fi
-  # if [ -z "$AZURE_VM_SEMP_PLAIN_PORT" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_PLAIN_PORT"; exit 1; fi
-  # if [ -z "$AZURE_VM_SEMP_SECURE_PORT" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_SECURE_PORT"; exit 1; fi
-  # if [ -z "$AZURE_VM_ADMIN_USER" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_ADMIN_USER"; exit 1; fi
-  # if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE"; exit 1; fi
   if [ -z "$SSH_PUBLIC_KEY_FILE" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: SSH_PUBLIC_KEY_FILE"; exit 1; fi
   if [ -z "$SSH_PRIVATE_KEY_FILE" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: SSH_PRIVATE_KEY_FILE"; exit 1; fi
 
 ############################################################################################################################
 # Prepare
   azureProjectName=$AZURE_BASTION_PROJECT_NAME
-  inventoryTemplateFile=$(assertFile $scriptLogName "$scriptDir/files/template.inventory.yml") || exit
+  inventoryTemplateFile=$(assertFile $scriptLogName "$scriptDir/files/template.inventory.json") || exit
   resourceGroupName="$azureProjectName-rg"
   azLocation="$AZURE_LOCATION"
   vmImageUrn="$AZURE_VM_IMAGE_URN"
   vmName="$azureProjectName-vm"
-  # vmAdminUsr="$AZURE_VM_ADMIN_USER"
-  # if [ -z "$AZURE_VM_ADMIN_USER" ]; then export AZURE_VM_ADMIN_USER="asct-admin"; fi
   vmAdminUsr="$azureProjectName"
   vmPrivateKeyFile="$SSH_PRIVATE_KEY_FILE"
   vmPublicKeyFile="$SSH_PUBLIC_KEY_FILE"
-
-  # vmSempPlainPort="$AZURE_VM_SEMP_PLAIN_PORT"
-  # vmSempSecurePort="$AZURE_VM_SEMP_SECURE_PORT"
-
   outputDir="$CONFIG_DB_DIR/azure_vms/$azureProjectName"; mkdir -p $outputDir;
   outputInfoFile="$outputDir/vm.info.json"
   outputInventoryFile="$outputDir/vm.inventory.json"
@@ -107,31 +97,22 @@ echo " >>> Success."
 echo " >>> Vm info ..."
   vmInfo=$(cat $outputInfoFile | jq .)
   export vmAdminUsr
-  # export vmSempPlainPort
-  # export vmSempSecurePort
   export vmPythonPath
   vmInfo=$(echo $vmInfo | jq ".adminUser=env.vmAdminUsr")
-  # vmInfo=$(echo $vmInfo | jq ".semp_port_plain=env.vmSempPlainPort")
-  # vmInfo=$(echo $vmInfo | jq ".semp_port_secure=env.vmSempSecurePort")
   vmInfo=$(echo $vmInfo | jq ".python_path=env.vmPythonPath")
   echo $vmInfo | jq . > "$outputInfoFile"
   cat $outputInfoFile | jq .
 echo " >>> Success."
 
 echo " >>> Creating ansible inventory file ..."
-  inventory=$(cat $inventoryTemplateFile | yq .)
+  inventory=$(cat $inventoryTemplateFile | jq . )
+  if [[ $? != 0 ]]; then echo " >>> XT_ERROR: reading inventoryTemplateFile with jq"; exit 1; fi
   export vmPublicIpAddress=$(cat $outputInfoFile | jq -r '.publicIpAddress')
-  # export vmFQDNS=$(cat $outputInfoFile | jq -r '.fqdns')
   export vmAdminUsr
   export vmPythonPath
-  # export vmSempPlainPort
-  # export vmSempSecurePort
   inventory=$(echo $inventory | jq ".all.hosts.bastionhost.ansible_host=env.vmPublicIpAddress")
   inventory=$(echo $inventory | jq ".all.hosts.bastionhost.ansible_user=env.vmAdminUsr")
   inventory=$(echo $inventory | jq ".all.hosts.bastionhost.ansible_python_interpreter=env.vmPythonPath")
-  # inventory=$(echo $inventory | jq ".all.hosts.remotehost.solace_broker_service.semp_host=env.vmFQDNS")
-  # inventory=$(echo $inventory | jq ".all.hosts.remotehost.solace_broker_service.semp_port_plain=env.vmSempPlainPort")
-  # inventory=$(echo $inventory | jq ".all.hosts.remotehost.solace_broker_service.semp_port_secure=env.vmSempSecurePort")
   echo $inventory | jq . > "$outputInventoryFile"
   cat "$outputInventoryFile" | jq .
 echo " >>> Success."
