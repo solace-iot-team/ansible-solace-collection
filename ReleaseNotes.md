@@ -1,5 +1,29 @@
 # Release Notes
 
+## Version: 1.3.2
+Examples for using Ansible Jump Host & Minor Module Enhancements/Maintenance.
+
+Documentation:
+
+* **[Tips&Tricks:Setting & Retrieving Ansible-Solace Log Files](https://solace-iot-team.github.io/ansible-solace-collection/tips-tricks-content/logfile.html)**
+  - new.
+* **[Tips&Tricks:Working through a Remote ‘Bastion’ or ‘Jump’ Host](https://solace-iot-team.github.io/ansible-solace-collection/tips-tricks-content/bastion.html)**
+  - new.
+
+Enhancements:
+* **solace_cloud_get_facts**
+  - added function: `get_remoteFormattedHostInventory` - retrieve service inventory for remote  bastion host
+
+Maintenance:
+* **solace_cloud_get_facts**
+  - graceful handling of services in state=failed
+* **solace_cloud_service**
+  - handling of retry on service creation failed: added wait between re-tries
+  - added idempotent handling of eventBrokerVersion
+* **solace_api.SolaceCloudApi**
+  - handling return settings as list and dict
+
+
 ## Version: 1.3.1
 Maintenance.
 
