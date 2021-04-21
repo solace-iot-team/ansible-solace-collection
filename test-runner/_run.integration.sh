@@ -59,7 +59,6 @@ ansibleSolaceTestTargetGroup="examples"
     brokerDockerImageLogPath=${brokerDockerImage//":"/"_"}
     export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup/$brokerDockerImageLogPath"
     mkdir -p $LOG_DIR
-
     export BROKER_DOCKER_IMAGE=$brokerDockerImage
 
     echo "##############################################################################################################"
