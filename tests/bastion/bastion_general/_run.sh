@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 scriptDir=$(cd $(dirname "$0") && pwd);
@@ -23,7 +23,7 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$CONFIG_DB_DIR" ]; then export CONFIG_DB_DIR="$WORKING_DIR/config_db"; fi
   if [ ! -d "$CONFIG_DB_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - directory not found: CONFIG_DB_DIR=$CONFIG_DB_DIR"; exit 1; fi
   export RUN_TIME_DIR="$WORKING_DIR/run-time"; mkdir -p $RUN_TIME_DIR
-  export ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH="$LOG_DIR/$scriptLogName"
+  export ANSIBLE_SOLACE_CONTROLLER_LOGS_BASE_PATH="$LOG_DIR/$scriptLogName"
   export ANSIBLE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible.log"
 
 ##############################################################################################################################
@@ -50,7 +50,7 @@ source $PROJECT_HOME/.lib/functions.sh
                   --private-key $bastionPrivateKeyFile \
                   --extra-vars "RUN_TIME_DIR=$RUN_TIME_DIR" \
                   --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS" \
-                  --extra-vars "ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH=$ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH"      
+                  --extra-vars "ANSIBLE_SOLACE_CONTROLLER_LOGS_BASE_PATH=$ANSIBLE_SOLACE_CONTROLLER_LOGS_BASE_PATH"
     code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
   done

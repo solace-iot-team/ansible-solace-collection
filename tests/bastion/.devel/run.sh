@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 scriptDir=$(cd $(dirname "$0") && pwd);
@@ -15,11 +15,11 @@ if [ -z "$AZURE_BASTION_PROJECT_NAME" ]; then export AZURE_BASTION_PROJECT_NAME=
 
 ansibleSolaceTests=(
   # "teardown_bastionhost"
-  "setup_bastionhost"
+  # "setup_bastionhost"
   "setup_services"
   "bastion_general"
-  "teardown_services"
-  "teardown_bastionhost"
+  # "teardown_services"
+  # "teardown_bastionhost"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 

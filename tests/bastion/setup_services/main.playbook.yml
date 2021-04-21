@@ -17,7 +17,7 @@
   - name: Fetch log file
     fetch:
       src: "{{ remote_ansible_solace_log_path }}"
-      dest: "{{ ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH }}/"
+      dest: "{{ ANSIBLE_SOLACE_CONTROLLER_LOGS_BASE_PATH }}/"
       flat: yes
       fail_on_missing: no
     listen: log-file-handler
@@ -39,6 +39,7 @@
       that:
         - CONFIG_DB_DIR is defined
         - SOLACE_CLOUD_API_TOKEN is defined
+        - ANSIBLE_SOLACE_CONTROLLER_LOGS_BASE_PATH is defined
       fail_msg: "one or more variables not defined"
 
   - set_fact:

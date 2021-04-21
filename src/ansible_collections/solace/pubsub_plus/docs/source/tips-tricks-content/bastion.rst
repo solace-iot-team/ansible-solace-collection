@@ -8,6 +8,7 @@ In the case the Broker Services are running in a private & secured subnet, using
 Here, we explore the following setup and how the inventory and playbooks using Ansible Solace may be structured to support this setup:
 
 - 2 or more VPCs running Broker Services, both with a ``Bastion Host``
+  - either self-hosted (Figure 1) or with Solace Cloud (Figure 2)
 - configured from a single point, the ``Ansible Controller``
 
 The flow inside a playbook is as follows:
@@ -20,8 +21,31 @@ The flow inside a playbook is as follows:
 
 This mechanism also allows for the creation of bridges & DMR clusters between ``Broker Service Instances`` across ``VPCs`` - using the same playbook.
 
-.. image:: ../images/bastion-concepts.png
-   :width: 900
+.. figure:: ../images/bastion-concepts.png
+   :width: 800
+
+   Figure 1: Setup with self-hosted Broker Services
+
+.. figure:: ../images/bastion-concepts-sc.png
+  :width: 800
+
+  Figure 2: Setup with Broker Services managed by Solace Cloud
+
+Setting up the ``Bastion Host``
++++++++++++++++++++++++++++++++
+
+The Ansible scripts are executed on the ``Bastion Host``. It therefor needs to be setup with the following:
+
+- Python 3 (upgrade pip3 as well)
+- Python dependencies :download:`requirements <../../examples/requirements.txt>`:
+
+.. literalinclude:: ../../examples/requirements.txt
+
+Note: there is no need to install Ansible or Ansible Solace Collection on the ``Bastion Host``.
+
+
+Inventory & Playbook Example
+++++++++++++++++++++++++++++
 
 Consider the following inventory file that describes two ``Bastion Hosts`` with two ``Broker Service Instances``:
 
