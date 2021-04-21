@@ -67,14 +67,5 @@ source $PROJECT_HOME/.lib/functions.sh
                 --extra-vars "PYTHON_REQUIREMENTS_FILE=$requirementsFile"
   code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
-  # runScript="$scriptDir/../azure/broker-vm/create.az.vm.sh"
-  # $runScript
-  # code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
-  #
-  # echo "*********************************************************************************************************************";
-  # echo "CONTINUE HERE: use ansible to bootstrap both: bastion and broker vm";
-  # exit 1;
-
-
 ###
 # The End.

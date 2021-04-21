@@ -27,6 +27,11 @@ source $PROJECT_HOME/.lib/functions.sh
   export ANSIBLE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible.log"
 
 ##############################################################################################################################
+# Test
+
+  tree $CONFIG_DB_DIR
+
+##############################################################################################################################
 # Run
 
   inventory_array=($(ls $CONFIG_DB_DIR/broker_services/**/bastion.broker_service.inventory.yml))

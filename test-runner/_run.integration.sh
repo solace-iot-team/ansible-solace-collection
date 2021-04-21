@@ -28,7 +28,7 @@ source $PROJECT_HOME/.lib/functions.sh
   # "solace/solace-pubsub-standard:9.3.1.28"
   # "solace/solace-pubsub-standard:9.5.0.30"
   # "solace/solace-pubsub-standard:9.7.0.29"
-  
+
   brokerDockerImages=(
     "solace/solace-pubsub-standard:9.6.0.46"
     "solace/solace-pubsub-standard:9.8.0.12"
@@ -41,7 +41,7 @@ source $PROJECT_HOME/.lib/functions.sh
 ansibleSolaceTestTargetGroup="bastion"
 #################################################################################################################################################
 
-  export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup/$brokerDockerImageLogPath"
+  export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup"
   mkdir -p $LOG_DIR
   echo "##############################################################################################################"
   echo "# Test target group: $ansibleSolaceTestTargetGroup"
@@ -49,6 +49,8 @@ ansibleSolaceTestTargetGroup="bastion"
   runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
   $runScript
   code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+
+exit 1
 
 #################################################################################################################################################
 ansibleSolaceTestTargetGroup="examples"
