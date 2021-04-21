@@ -18,7 +18,6 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-
   tasks:
     - solace_get_available:
       register: result
