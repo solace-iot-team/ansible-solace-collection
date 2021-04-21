@@ -9,7 +9,9 @@
     - solace.pubsub_plus
   pre_tasks:
   - set_fact:
-      remote_ansible_solace_log_path: "{{ ansible_solace_log_base_path }}/{{ inventory_hostname }}.{{ ansible_date_time.iso8601 }}.ansible-solace.log"
+      date_time_file: "{{ lookup('pipe','date +%Y-%m-%d-%H-%M-%S') }}"
+  - set_fact:
+      remote_ansible_solace_log_path: "{{ ansible_solace_log_base_path }}/{{ inventory_hostname }}.{{ date_time_file }}.ansible-solace.log"
   - include_vars:
       file: "solace-cloud-service.vars.yml"
       name: sc_services
