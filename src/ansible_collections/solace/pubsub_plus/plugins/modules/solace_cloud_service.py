@@ -243,28 +243,19 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
             service_id = service[self.KEY_SERVICE_ID]
         else:
             service_id = value
-
         # save service_id
         self._service_id = service_id
-
         service = self.solace_cloud_api.get_service(self.get_config(), self._service_id)
         if not service:
             return None
-
-        # TODO: delete logging
-        import logging, json
-        logging.debug(f"solace_cloud_service.get_func: SERVICE=\n{json.dumps(service, indent=2)}")
-
         if service['creationState'] == 'failed':
             logging.debug("solace cloud service '%s' in failed state - deleting ...", value)
             _resp = self.solace_cloud_api.delete_service(self.get_config(), self._service_id)
             return None
-
         wait_timeout_minutes = self.get_module().params['wait_timeout_minutes']
         if service['creationState'] != 'completed' and wait_timeout_minutes > 0:
             logging.debug("solace cloud service creationState not completed (creationState=%s) - waiting to complete ...", service['creationState'])
             service = self.solace_cloud_api.wait_for_service_create_completion(self.get_config(), wait_timeout_minutes, self._service_id)
-
         return service
 
     def create_func(self, key, name, settings=None):
@@ -278,7 +269,7 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
         data.update(settings)
         return self.solace_cloud_api.create_service(self.get_config(), self.get_module().params['wait_timeout_minutes'], data)
 
-    # TODO: wait until implemented
+    # TODO: wait until implemented in Solace Cloud API
     # def update_func(self, key, name, settings=None, delta_settings=None):
     #     if not settings:
     #         raise SolaceParamsValidationError('settings', settings, "required for creating a service")
