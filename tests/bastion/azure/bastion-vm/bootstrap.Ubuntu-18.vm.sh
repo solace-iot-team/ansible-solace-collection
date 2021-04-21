@@ -23,22 +23,21 @@ echo " >>> Bootstrap vm ..."
 
 ssh -i $vmPrivateKeyFile "$vmAdminUsr@$vmPublicIpAddress" <<BOOT_EOL
   sudo apt-get update
+  if [[ $? != 0 ]]; then exit 1; fi
   sudo apt-get -y upgrade
-  # echo ">>> docker =================================================="
-  # sudo apt-get install apt-transport-https ca-certificates curl software-properties-common -y
-  # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  # sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
-  # apt-cache policy docker-ce
-  # sudo apt-get install --upgrade docker-ce -y
+  if [[ $? != 0 ]]; then exit 1; fi
   echo ">>> python =================================================="
   sudo apt-get install --upgrade python3
+  if [[ $? != 0 ]]; then exit 1; fi
   sudo apt-get install --upgrade python3-pip -y
+  if [[ $? != 0 ]]; then exit 1; fi
   sudo -H python3 -m pip install --upgrade pip
-  # sudo -H python3 -m pip install --upgrade docker
-  # sudo -H python3 -m pip install --upgrade docker-compose
+  if [[ $? != 0 ]]; then exit 1; fi
   echo ">>> upgrading =================================================="
   sudo apt-get update
+  if [[ $? != 0 ]]; then exit 1; fi
   sudo apt-get -y upgrade
+  if [[ $? != 0 ]]; then exit 1; fi
 BOOT_EOL
 
 if [[ $? != 0 ]]; then echo " >>> XT_ERROR: bootstrap vm"; exit 1; fi
