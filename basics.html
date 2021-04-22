@@ -97,6 +97,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">The Basics</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#types-of-modules">Types of Modules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ansible-hosts-are-not-hosts-but-brokers">Ansible Hosts are not Hosts but Brokers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#logging-the-semp-solace-api-calls">Logging the SEMP/Solace API Calls</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="inventory-files.html">Best Practices for Ansible-Solace Inventory Files</a></li>
@@ -204,15 +205,38 @@ For example: SEMP v2 API: <a class="reference external" href="https://docs.solac
 <dl class="simple">
 <dt>Which means a few things:</dt><dd><ul class="simple">
 <li><p>Ansible cannot login and run it’s normal setup / fact gathering routines</p></li>
-<li><p>instead, <cite>ansible-solace</cite> provides specialized fact gathering modules: <a class="reference internal" href="modules/solace_gather_facts.html#solace-gather-facts-module"><span class="std std-ref">solace_gather_facts – gather broker facts</span></a> and <a class="reference internal" href="modules/solace_cloud_account_gather_facts.html#solace-cloud-account-gather-facts-module"><span class="std std-ref">solace_cloud_account_gather_facts – gather account services facts</span></a></p></li>
-<li><p>therefore, always use the following settings in your inventory / playbooks:</p></li>
+<li><p>instead, <code class="docutils literal notranslate"><span class="pre">ansible-solace</span></code> provides specialized fact gathering modules: <a class="reference internal" href="modules/solace_gather_facts.html#solace-gather-facts-module"><span class="std std-ref">solace_gather_facts – gather broker facts</span></a> and <a class="reference internal" href="modules/solace_cloud_account_gather_facts.html#solace-cloud-account-gather-facts-module"><span class="std std-ref">solace_cloud_account_gather_facts – gather account services facts</span></a></p></li>
+<li><p>therefore, use the following settings in your inventory / playbooks unless you are <a class="reference internal" href="tips-tricks-content/bastion.html#tips-tricks-content-bastion"><span class="std std-ref">Working through a Remote ‘Bastion’ or ‘Jump’ Host</span></a>:</p></li>
 </ul>
 </dd>
 </dl>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ansible_connection</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">local</span>
-<span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="logging-the-semp-solace-api-calls">
+<h2>Logging the SEMP/Solace API Calls<a class="headerlink" href="#logging-the-semp-solace-api-calls" title="Permalink to this headline">¶</a></h2>
+<p>In order to log the REST calls made by <code class="docutils literal notranslate"><span class="pre">ansible-solace</span></code>, set the following environment variables:</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Env Variable</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>export ANSIBLE_SOLACE_ENABLE_LOGGING=True|False</p></td>
+<td><p>switch logging on or off</p></td>
+</tr>
+<tr class="row-odd"><td><p>export ANSIBLE_SOLACE_LOG_PATH=”path/log-file-name.log”</p></td>
+<td><p>the full path &amp; name of the log file to write to. <code class="docutils literal notranslate"><span class="pre">ansible-solace</span></code> will create the directory/ies if they don’t exist. appends log entries to an existing log file or creates a new one.</p></td>
+</tr>
+</tbody>
+</table>
+<p>See also <a class="reference internal" href="tips-tricks-content/logfile.html#tips-tricks-content-logfile"><span class="std std-ref">Setting &amp; Retrieving Ansible-Solace Log Files</span></a> for a further discussion of logging.</p>
 </div>
 </div>
 
@@ -232,7 +256,7 @@ For example: SEMP v2 API: <a class="reference external" href="https://docs.solac
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 14 Apr 2021 at 10:19.
+        Last updated on 22 Apr 2021 at 06:20.
       </span>
 
     </p>

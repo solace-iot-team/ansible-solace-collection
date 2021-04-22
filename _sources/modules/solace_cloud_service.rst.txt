@@ -46,6 +46,7 @@ Examples
            datacenterId: "aws-ca-central-1a"
            serviceTypeId: "enterprise"
            serviceClassId: "enterprise-250-nano"
+           eventBrokerVersion: "9.6"
            state: present
 
    - set_fact:

@@ -7,6 +7,8 @@ solace_cloud_get_facts -- get Solace Cloud service facts
 
 Convenience functions to access Solace Cloud service facts gathered with :ref:`solace_cloud_get_service <solace_cloud_get_service_module>` or returned by :ref:`solace_cloud_service <solace_cloud_service_module>`.
 
+Always returns the state of the service in `facts.serviceState`.
+
 
 
 
@@ -17,7 +19,7 @@ Examples
 
    
    hosts: all
-   gather_facts: no
+   gather_facts: yes
    any_errors_fatal: true
    collections:
    - solace.pubsub_plus
@@ -50,7 +52,7 @@ Examples
          dest: "./solace_cloud_service.{{ sc_service.name }}.details.json"
        delegate_to: localhost
 
-     - name: get host inventory for service
+     - name: get local host inventory for service
        solace_cloud_get_facts:
          from_dict: "{{ sc_service_details }}"
          get_formattedHostInventory:
@@ -60,15 +62,43 @@ Examples
              service_name: "{{ sc_service_details.name }}"
              service_id: "{{ sc_service_details.serviceId }}"
              datacenterId: "{{ sc_service_details.datacenterId }}"
+             eventBrokerVersion: "{{ sc_service_details.eventBrokerVersion }}"
              serviceTypeId: "{{ sc_service_details.serviceTypeId}}"
              serviceClassId: "{{ sc_service_details.serviceClassId }}"
              serviceClassDisplayedAttributes: "{{ sc_service_details.serviceClassDisplayedAttributes }}"
        register: result
 
-     - name: save new service inventory to file
+     - name: get remote host inventory for service
+       solace_cloud_get_facts:
+         from_dict: "{{ sc_service_details }}"
+         get_remoteFormattedHostInventory:
+           # load the inventory file ansible-playbook was called with
+           remote_host_inventory: "{{ lookup('file', inventory_file) | from_json }}"
+           # extract the current inventory_hostname from it
+           remote_host_inventory_hostname: "{{ inventory_hostname }}"
+           host_entry: "{{ sc_service.name }}"
+           api_token: "{{ api_token }}"
+           meta:
+             service_name: "{{ sc_service_details.name }}"
+             service_id: "{{ sc_service_details.serviceId }}"
+             datacenterId: "{{ sc_service_details.datacenterId }}"
+             eventBrokerVersion: "{{ sc_service_details.eventBrokerVersion }}"
+             serviceTypeId: "{{ sc_service_details.serviceTypeId}}"
+             serviceClassId: "{{ sc_service_details.serviceClassId }}"
+             serviceClassDisplayedAttributes: "{{ sc_service_details.serviceClassDisplayedAttributes }}"
+       register: remote_result
+       delegate_to: localhost
+
+     - name: save new service local inventory to file
        copy:
          content: "{{ result.facts.formattedHostInventory | to_nice_yaml }}"
-         dest: "./inventory.{{ sc_service.name }}.yml"
+         dest: "./local.inventory.{{ sc_service.name }}.yml"
+       delegate_to: localhost
+
+     - name: save new service remote inventory to file
+       copy:
+         content: "{{ result.facts.remoteFormattedHostInventory | to_nice_yaml }}"
+         dest: "./remote.inventory.{{ sc_service.name }}.yml"
        delegate_to: localhost
 
      - name: extract the service facts
@@ -141,7 +171,7 @@ from_dict (required)
   | **type**: dict
 
 get_formattedHostInventory (optional)
-  Get the facts formatted as a JSON host inventory. Retrieve the inventory field by field or save to file and use in subsequent playbooks as an inventory.
+  Get the facts formatted as a local host inventory. Retrieve the inventory field by field or save to file and use in subsequent playbooks as an inventory.
 
 
   | **type**: dict
@@ -160,6 +190,38 @@ get_formattedHostInventory (optional)
     Additional meta data describing the service instance.
 
     | **type**: dict
+
+
+get_remoteFormattedHostInventory (optional)
+  Get the facts formatted as a remote host inventory. Retrieve the inventory field by field or save to file and use in subsequent playbooks as an inventory.
+
+
+  | **type**: dict
+
+  api_token (optional)
+    The API token to access the Solace Cloud Service API.
+
+    | **type**: str
+
+  host_entry (required)
+    The entry for this broker / service in the hosts file. Must be a valid JSON key.
+
+    | **type**: str
+
+  meta (required)
+    Additional meta data describing the service instance.
+
+    | **type**: dict
+
+  remote_host_inventory (required)
+    The inventory that contains the entry for the remote host.
+
+    | **type**: dict
+
+  remote_host_inventory_hostname (required)
+    The host entry in ``remote_host_inventory`` to extract the inventory parameters from.
+
+    | **type**: str
 
 
 
@@ -203,7 +265,7 @@ facts
   .. code-block:: json
 
      {
-     "get_formattedHostInventory": {
+     "formattedHostInventory": {
        "all": {
          "hosts": {
            "asc_test_1": {
@@ -211,6 +273,7 @@ facts
              "broker_type": "solace_cloud",
              "meta": {
                "datacenterId": "aws-ca-central-1a",
+               "eventBrokerVersion": "9.6",
                "serviceClassDisplayedAttributes": {
                  "Clients": "250",
                  "High Availability": "HA Group",
@@ -237,7 +300,47 @@ facts
            }
          }
        }
-     }
+     },
+     "remoteFormattedHostInventory": {
+       "all": {
+         "hosts": {
+           "asct_sc_bastion_1": {
+             "ansible_become": true,
+             "ansible_host": "104.214.217.165",
+             "ansible_python_interpreter": "/usr/bin/python3",
+             "ansible_user": "asct-devel-bastion",
+             "broker_type": "solace_cloud",
+             "meta": {
+               "datacenterId": "aws-ca-central-1a",
+               "eventBrokerVersion": "9.6",
+               "sc_service_id": "7t8h5axsy5r",
+               "serviceClassDisplayedAttributes": {
+                 "Clients": "250",
+                 "High Availability": "HA Group",
+                 "Message Broker Tenancy": "Dedicated",
+                 "Network Speed": "450 Mbps",
+                 "Network Usage": "50 GB per month",
+                 "Queues": "250",
+                 "Storage": "25 GB"
+               },
+               "serviceClassId": "enterprise-250-nano",
+               "serviceTypeId": "enterprise",
+               "service_name": "asct_sc_bastion_1"
+             },
+             "sempv2_host": "mr6jrt3zdpf5n.messaging.solace.cloud",
+             "sempv2_is_secure_connection": true,
+             "sempv2_password": "eo0v8ptme0k9ha96qpc5661ac8",
+             "sempv2_port": 943,
+             "sempv2_timeout": "60",
+             "sempv2_username": "asct_sc_bastion_1-admin",
+             "solace_cloud_service_id": "7t8h5axsy5r",
+             "virtual_router": "primary",
+             "vpn": "asct_sc_bastion_1"
+           }
+         }
+       }
+     },
+     "serviceState": "complete"
    }
 
 
