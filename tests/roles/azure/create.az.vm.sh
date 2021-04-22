@@ -16,8 +16,7 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$WORKING_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: WORKING_DIR"; exit 1; fi
   if [ -z "$LOG_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: LOG_DIR"; exit 1; fi
   if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
-
-  if [ -z "$AZURE_PROJECT_NAME" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_PROJECT_NAME"; exit 1; fi
+  if [ -z "$AZURE_BROKER_PROJECT_NAME" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_BROKER_PROJECT_NAME"; exit 1; fi
   if [ -z "$AZURE_LOCATION" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_LOCATION"; exit 1; fi
   if [ -z "$AZURE_VM_IMAGE_URN" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_IMAGE_URN"; exit 1; fi
   if [ -z "$AZURE_VM_SEMP_PLAIN_PORT" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_PLAIN_PORT"; exit 1; fi
@@ -29,25 +28,26 @@ source $PROJECT_HOME/.lib/functions.sh
 # Prepare
 
   inventoryTemplateFile=$(assertFile $scriptLogName "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE") || exit
-  resourceGroupName="$AZURE_PROJECT_NAME-rg"
+  azureProjectName=$AZURE_BROKER_PROJECT_NAME
+  resourceGroupName="$azureProjectName-rg"
   azLocation="$AZURE_LOCATION"
   vmImageUrn="$AZURE_VM_IMAGE_URN"
-  vmName="$AZURE_PROJECT_NAME-vm"
+  vmName="$azureProjectName-vm"
   vmAdminUsr="$AZURE_VM_ADMIN_USER"
   vmSempPlainPort="$AZURE_VM_SEMP_PLAIN_PORT"
   vmSempSecurePort="$AZURE_VM_SEMP_SECURE_PORT"
 
-  outputDir="$CONFIG_DB_DIR/azure_vms/$AZURE_PROJECT_NAME"; mkdir -p $outputDir; rm -rf $outputDir/*;
+  outputDir="$CONFIG_DB_DIR/azure_vms/$azureProjectName"; mkdir -p $outputDir; rm -rf $outputDir/*;
   outputInfoFile="$outputDir/vm.info.json"
   outputInventoryFile="$outputDir/vm.inventory.json"
 
 ############################################################################################################################
 # Run
-echo " >>> Creating Resource Group ..."
+echo " >>> Creating Resource Group $resourceGroupName ..."
   az group create \
     --name $resourceGroupName \
     --location "$azLocation" \
-    --tags projectName=$AZURE_PROJECT_NAME \
+    --tags projectName=$azureProjectName \
     --verbose
   if [[ $? != 0 ]]; then echo " >>> XT_ERROR: creating resource group"; exit 1; fi
 echo " >>> Success."

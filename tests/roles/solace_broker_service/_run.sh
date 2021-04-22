@@ -30,12 +30,13 @@ source $PROJECT_HOME/.lib/functions.sh
     export CONFIG_DB_DIR="$WORKING_DIR/config_db";
     mkdir -p $CONFIG_DB_DIR
   fi
-  if [ -z "$AZURE_PROJECT_NAME" ]; then export AZURE_PROJECT_NAME="asct"; fi
+  if [ -z "$AZURE_BROKER_PROJECT_NAME" ]; then export AZURE_BROKER_PROJECT_NAME="asct-tr-broker"; fi
   # fix docker image to only one here. changing images sometimes fails to start broker properly with certs
   BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
+  azureProjectName=$AZURE_BROKER_PROJECT_NAME
   brokerDockerComposeFile=$(assertFile $scriptLogName "$scriptDir/templates/PubSubStandard_singleNode.yml") || exit
   brokerDockerComposeFilePlainSecure=$(assertFile $scriptLogName "$scriptDir/templates/PubSubStandard_singleNode.plain+secure.yml") || exit
-  remoteInventory=$(assertFile $scriptLogName "$CONFIG_DB_DIR/azure_vms/$AZURE_PROJECT_NAME/vm.inventory.json") || exit
+  remoteInventory=$(assertFile $scriptLogName "$CONFIG_DB_DIR/azure_vms/$azureProjectName/vm.inventory.json") || exit
   localInventory=$(assertFile $scriptLogName "$scriptDir/files/inventory.yml") || exit
   playbooks=(
     "$scriptDir/delete.single-node.service.playbook.yml"

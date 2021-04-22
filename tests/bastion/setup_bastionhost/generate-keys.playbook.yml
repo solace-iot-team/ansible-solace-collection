@@ -1,0 +1,25 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+-
+  name: "generate keys"
+  hosts: localhost
+  gather_facts: no
+  connection: local
+  any_errors_fatal: true
+  tasks:
+  - name: "Check vars"
+    assert:
+      that:
+        - WORKING_DIR is defined
+        - KEYS_DIR is defined
+        - KEY_NAME is defined
+      fail_msg: "one or more variables not defined"
+
+  - name: generate SSH key "{{ KEY_NAME }}"
+    community.crypto.openssh_keypair:
+      path: "{{ KEYS_DIR }}/{{KEY_NAME}}"
+      type: rsa
+      size: 4096
+      state: present
+      force: no
+      # mode: 0600

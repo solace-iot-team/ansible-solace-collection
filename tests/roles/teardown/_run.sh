@@ -18,7 +18,7 @@ source $PROJECT_HOME/.lib/functions.sh
 ##############################################################################################################################
 # Prepare
 
-  if [ -z "$AZURE_PROJECT_NAME" ]; then export AZURE_PROJECT_NAME="asct"; fi
+  if [ -z "$AZURE_BROKER_PROJECT_NAME" ]; then export AZURE_BROKER_PROJECT_NAME="asct-tr-broker"; fi
   export ANSIBLE_SOLACE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible-solace.log"
   export ANSIBLE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible.log"
   if [ -z "$CONFIG_DB_DIR" ]; then export CONFIG_DB_DIR="$WORKING_DIR/config_db"; fi

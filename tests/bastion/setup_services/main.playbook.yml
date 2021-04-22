@@ -1,0 +1,69 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+-
+  name: "Create Solace Cloud Services"
+  hosts: all
+  gather_facts: yes
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  pre_tasks:
+  - set_fact:
+      date_time_file: "{{ lookup('pipe','date +%Y-%m-%d-%H-%M-%S') }}"
+  - set_fact:
+      remote_ansible_solace_log_path: "{{ ansible_solace_log_base_path }}/{{ inventory_hostname }}.{{ date_time_file }}.ansible-solace.log"
+  - include_vars:
+      file: "solace-cloud-service.vars.yml"
+      name: sc_services
+  handlers:
+  - name: Fetch log file
+    fetch:
+      src: "{{ remote_ansible_solace_log_path }}"
+      dest: "{{ ANSIBLE_SOLACE_CONTROLLER_LOGS_BASE_PATH }}/"
+      flat: yes
+      fail_on_missing: no
+    listen: log-file-handler
+    no_log: true
+  - name: Delete log file
+    file:
+      path: "{{ remote_ansible_solace_log_path }}"
+      state: absent
+    listen: log-file-handler
+  tasks:
+  - name: Set up Handler
+    debug:
+      msg: setup handler
+    changed_when: true
+    notify: log-file-handler
+
+  - name: Check vars
+    assert:
+      that:
+        - CONFIG_DB_DIR is defined
+        - SOLACE_CLOUD_API_TOKEN is defined
+        - ANSIBLE_SOLACE_CONTROLLER_LOGS_BASE_PATH is defined
+      fail_msg: "one or more variables not defined"
+
+  - set_fact:
+      output_dir: "{{ CONFIG_DB_DIR }}/broker_services"
+  - file:
+      path: "{{ output_dir }}"
+      state: directory
+    delegate_to: localhost
+
+  - name: Block Call create sc-service task
+    block:
+      - name: Call create sc-service task
+        include_tasks: ./tasks/create.sc-service.yml
+        register: create_sc_service_result
+        loop: "{{ sc_services.solace_cloud_services }}"
+        loop_control:
+          loop_var: sc_service
+    environment:
+      ANSIBLE_SOLACE_ENABLE_LOGGING: true
+      ANSIBLE_SOLACE_LOG_PATH: "{{ remote_ansible_solace_log_path }}"
+    always:
+      - meta: flush_handlers
+
+###
+# The End.

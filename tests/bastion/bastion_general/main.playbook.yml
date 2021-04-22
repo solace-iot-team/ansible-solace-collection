@@ -1,0 +1,143 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+-
+  name: Bastion General Tests
+  hosts: all
+  gather_facts: yes
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_client_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ meta.sc_service_id if broker_type=='solace_cloud' else omit }}"
+    solace_acl_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_client_username:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_queue:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  vars:
+    client_profile_name: "asct-client-profile"
+    acl_profile_name: "asct-acl-profile"
+    client_username: "asct-client-username"
+    queue_name: "asct-queue"
+  pre_tasks:
+  - set_fact:
+      date_time_file: "{{ lookup('pipe','date +%Y-%m-%d-%H-%M-%S') }}"
+  - set_fact:
+      remote_ansible_solace_log_path: "{{ ansible_solace_log_base_path }}/{{ inventory_hostname }}.{{ date_time_file }}.ansible-solace.log"
+  handlers:
+  - name: Fetch log file
+    fetch:
+      src: "{{ remote_ansible_solace_log_path }}"
+      dest: "{{ ANSIBLE_SOLACE_CONTROLLER_LOGS_BASE_PATH }}/"
+      flat: yes
+      fail_on_missing: no
+    listen: log-file-handler
+    no_log: true
+  - name: Delete log file
+    file:
+      path: "{{ remote_ansible_solace_log_path }}"
+      state: absent
+    listen: log-file-handler
+  tasks:
+  - name: Set up Handler
+    debug:
+      msg: setup handler
+    changed_when: true
+    notify: log-file-handler
+
+  - name: Check vars
+    assert:
+      that:
+        - RUN_TIME_DIR is defined
+        - SOLACE_CLOUD_API_TOKEN is defined
+        - ANSIBLE_SOLACE_CONTROLLER_LOGS_BASE_PATH is defined
+      fail_msg: "one or more variables not defined"
+
+  - name: Block
+    block:
+    - name: Create Client Profile
+      solace_client_profile:
+        name: "{{ client_profile_name }}"
+        state: present
+
+    - name: Create ACL Profile
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        settings:
+          clientConnectDefaultAction: "disallow"
+          publishTopicDefaultAction: "disallow"
+          subscribeTopicDefaultAction: "disallow"
+        state: present
+
+    - name: Create Client Username
+      solace_client_username:
+        name: "{{ client_username }}"
+        settings:
+          clientProfileName: "{{ client_profile_name }}"
+          aclProfileName: "{{ acl_profile_name }}"
+        state: present
+
+    - name: Create Queue
+      solace_queue:
+        name: "{{ queue_name }}"
+        settings:
+          owner: "{{ client_username }}"
+          egressEnabled: false
+          ingressEnabled: false
+        state: present
+
+    - name: Delete Queue
+      solace_queue:
+        name: "{{ queue_name }}"
+        state: absent
+
+    - name: Delete Client Username
+      solace_client_username:
+        name: "{{ client_username }}"
+        state: absent
+
+    - name: Delete ACL Profile
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        state: absent
+
+    - name: Delete Client Profile
+      solace_client_profile:
+        name: "{{ client_profile_name }}"
+        state: absent
+    environment:
+      ANSIBLE_SOLACE_ENABLE_LOGGING: true
+      ANSIBLE_SOLACE_LOG_PATH: "{{ remote_ansible_solace_log_path }}"
+    always:
+      - meta: flush_handlers
+
+###
+# The End.

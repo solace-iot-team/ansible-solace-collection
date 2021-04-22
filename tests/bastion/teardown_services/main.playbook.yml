@@ -1,0 +1,75 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+-
+  name: "Delete Solace Cloud Services"
+  hosts: all
+  gather_facts: yes
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  pre_tasks:
+  - set_fact:
+      date_time_file: "{{ lookup('pipe','date +%Y-%m-%d-%H-%M-%S') }}"
+  - set_fact:
+      remote_ansible_solace_log_path: "{{ ansible_solace_log_base_path }}/{{ inventory_hostname }}.{{ date_time_file }}.ansible-solace.log"
+  handlers:
+  - name: Fetch log file
+    fetch:
+      src: "{{ remote_ansible_solace_log_path }}"
+      dest: "{{ ANSIBLE_SOLACE_CONTROLLER_LOGS_BASE_PATH }}/"
+      flat: yes
+      fail_on_missing: no
+    listen: log-file-handler
+    no_log: true
+  - name: Delete log file
+    file:
+      path: "{{ remote_ansible_solace_log_path }}"
+      state: absent
+    listen: log-file-handler
+  tasks:
+  - name: Set up Handler
+    debug:
+      msg: setup handler
+    changed_when: true
+    notify: log-file-handler
+
+  - name: Check vars
+    assert:
+      that:
+        - CONFIG_DB_DIR is defined
+        - SOLACE_CLOUD_API_TOKEN is defined
+        - RUN_TIME_DIR is defined
+        - ANSIBLE_SOLACE_CONTROLLER_LOGS_BASE_PATH is defined
+      fail_msg: "one or more variables not defined"
+
+  - set_fact:
+      service_config_dir: "{{ CONFIG_DB_DIR }}/broker_services/{{ inventory_hostname }}"
+  - name: Check config dir exists for this service
+    stat:
+      path: "{{ service_config_dir }}"
+    register: service_config_dir_stat
+    delegate_to: localhost
+  - assert:
+      that: service_config_dir_stat.stat.islnk is defined
+      fail_msg: "directory not found: service_config_dir={{ service_config_dir }}"
+
+  - name: Block
+    block:
+    - name: Delete Solace Cloud Service
+      solace_cloud_service:
+        api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+        solace_cloud_service_id: "{{ meta.sc_service_id }}"
+        state: absent
+    - name: Delete Config
+      file:
+        path: "{{ service_config_dir }}"
+        state: absent
+      delegate_to: localhost
+    environment:
+      ANSIBLE_SOLACE_ENABLE_LOGGING: true
+      ANSIBLE_SOLACE_LOG_PATH: "{{ remote_ansible_solace_log_path }}"
+    always:
+      - meta: flush_handlers
+
+###
+# The End.

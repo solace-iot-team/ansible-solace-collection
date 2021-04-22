@@ -20,7 +20,7 @@ env:
   # DEBUG_FLAG: ${{ false }}
   TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
   TEST_TEST_RUNNER_SCRIPT: "test-runner/run.integration.sh"
-  TEST_TEST_RUNNER_LOGS_NAME: test-runner-integration-logs
+  TEST_TEST_RUNNER_LOGS_NAME: asc-test-runner-integration-logs
   TEST_RUNNER_LOGS_DIR: integration-logs
 
 jobs:
@@ -45,6 +45,13 @@ jobs:
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
         uses: andymckay/cancel-action@0.2
 
+      # - name: Install tools
+      #   run: |
+      #     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64
+      #     sudo add-apt-repository ppa:rmescandon/yq
+      #     sudo apt update
+      #     sudo apt install yq -y
+
       - name: Print test env
         if: env.DEBUG_FLAG == 'true'
         run: |
@@ -52,6 +59,9 @@ jobs:
           which bash
           bash --version
           openssl version
+          tree --version
+          jq --version
+          # yq --version
 
       - name: Print github env before checkout
         if: env.DEBUG_FLAG == 'true'
@@ -132,8 +142,14 @@ jobs:
           export AZURE_PROJECT_NAME="asct-wf"
           ./${TEST_TEST_RUNNER_SCRIPT}
 
+      - name: Test Logs Directory
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          export LOG_DIR="$GITHUB_WORKSPACE/${TEST_RUNNER_LOGS_DIR}"
+          tree $LOG_DIR
+
       - name: Archive logs
-        if: ${{ (failure() && !cancelled()) || (always() && github.event_name == 'workflow_dispatch') }}
+        if: ${{ (failure() && !cancelled()) || (always() && (github.event_name=='workflow_dispatch' || env.DEBUG_FLAG=='true') ) }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.TEST_TEST_RUNNER_LOGS_NAME }}

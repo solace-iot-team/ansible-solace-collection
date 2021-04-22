@@ -416,8 +416,6 @@ class SolaceCloudApi(SolaceApi):
         # POST: ../requests returns 202: accepted if long running request
         if resp.status_code not in [200, 201, 202]:
             self.handle_bad_response(resp)
-        # if resp.status_code == 202:
-        #     return self.wait_for_request_completion(resp)
         # TODO: test for deleting service (failed state)
         # import logging
         # logging.debug(f">>>>> handling good response, resp.status_code={resp.status_code}")
@@ -435,18 +433,37 @@ class SolaceCloudApi(SolaceApi):
         resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_DATA_CENTERS])
         return resp
 
+    def _transform_service(self, service: dict) -> dict:
+        # ----------
+        # add eventBrokerVersion --> standardized settings across POST and GET
+        # if it doesn't exist
+        # msgVpnAttributes.vmrVersion="9.6.0.46"
+        # eventBrokerVersion="9.6"
+        vmrVersion = None
+        if service['msgVpnAttributes']:
+            vmrVersion = service['msgVpnAttributes']['vmrVersion']
+        if vmrVersion:
+            service['eventBrokerVersion'] = vmrVersion[0:3]
+        # ----------
+        return service
+
     def get_services(self, config: SolaceTaskSolaceCloudConfig) -> list:
         # GET https://api.solace.cloud/api/v0/services
         try:
-            resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES])
+            _resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES])
         except SolaceApiError as e:
             resp = e.get_resp()
             # TODO: what is the code if solace cloud account has 0 services?
             if resp['status_code'] == 404:
                 return []
             raise SolaceApiError(resp) from e
-        if isinstance(resp, dict):
-            return [resp]
+        if isinstance(_resp, dict):
+            return [self._transform_service(_resp)]
+        # it is a list of services
+        resp = []
+        for _service in _resp:
+            service = self._transform_service(_service)
+            resp.append(service)
         return resp
 
     def find_service_by_name_in_services(self, services, name):
@@ -465,13 +482,13 @@ class SolaceCloudApi(SolaceApi):
         # GET https://api.solace.cloud/api/v0/services/{{serviceId}}
         # retrieves a single service
         try:
-            resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES, service_id])
+            _resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES, service_id])
         except SolaceApiError as e:
             resp = e.get_resp()
             if resp['status_code'] == 404:
                 return None
             raise SolaceApiError(resp) from e
-        return resp
+        return self._transform_service(_resp)
 
     def get_services_with_details(self, config: SolaceTaskSolaceCloudConfig) -> list:
         # get services, then for each service, get details
@@ -488,10 +505,12 @@ class SolaceCloudApi(SolaceApi):
         if wait_timeout_minutes > 0:
             res = self.wait_for_service_create_completion(config, wait_timeout_minutes, resp['serviceId'])
             if "failed" in res:
-                logging.warn("solace cloud service creation failed, try number: %d", try_count)
+                logging.warn("solace cloud service creation failed, service_id=%s, try number: %d", _service_id, try_count)
                 if try_count < 3:
+                    time.sleep(10)
                     logging.warn("solace cloud service in failed state - deleting service_id=%s ...", _service_id)
                     _resp = self.delete_service(config, _service_id)
+                    time.sleep(30)
                     logging.warn("creating solace cloud service again ...")
                     _resp = self.create_service(config, wait_timeout_minutes, data, try_count + 1)
                     logging.warn("new service_id=%s", _resp['serviceId'])
@@ -515,7 +534,7 @@ class SolaceCloudApi(SolaceApi):
         max_retries = (timeout_minutes * 60) // delay
 
         while not is_completed and not is_failed and try_count < max_retries:
-            logging.debug("try number: %d", try_count + 1)
+            logging.debug("service_id:%s, try number: %d", service_id, try_count + 1)
             resp = self.get_service(config, service_id)
             if not resp:
                 # edge case: service deleted before creation completed
@@ -547,7 +566,16 @@ class SolaceCloudApi(SolaceApi):
     def get_object_settings(self, config: SolaceTaskBrokerConfig, path_array: list) -> dict:
         # returns settings or None if not found
         try:
-            resp = self.make_get_request(config, path_array)
+            _resp = self.make_get_request(config, path_array)
+            # api oddity: 'some' calls return a list with 1 dict in it
+            # logging.debug(f"get_object_settings._resp=\n{json.dumps(_resp, indent=2)}")
+            if isinstance(_resp, list):
+                if len(_resp) == 1 and isinstance(_resp[0], dict):
+                    resp = _resp[0]
+                else:
+                    raise SolaceApiError(_resp)
+            else:
+                resp = _resp
         except SolaceApiError as e:
             resp = e.get_resp()
             if resp['status_code'] == 404:

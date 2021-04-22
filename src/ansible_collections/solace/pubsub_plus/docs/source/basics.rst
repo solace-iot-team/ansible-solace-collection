@@ -34,10 +34,29 @@ The Ansible concept of a host is that, a machine which Ansible logs into, transf
 
 Which means a few things:
   - Ansible cannot login and run it's normal setup / fact gathering routines
-  - instead, `ansible-solace` provides specialized fact gathering modules: :ref:`solace_gather_facts_module` and :ref:`solace_cloud_account_gather_facts_module`
-  - therefore, always use the following settings in your inventory / playbooks:
+  - instead, ``ansible-solace`` provides specialized fact gathering modules: :ref:`solace_gather_facts_module` and :ref:`solace_cloud_account_gather_facts_module`
+  - therefore, use the following settings in your inventory / playbooks unless you are :ref:`tips-tricks-content-bastion`:
 
 .. code-block:: yaml
 
   ansible_connection: local
-  gather_facts: no
+
+Logging the SEMP/Solace API Calls
+---------------------------------
+
+In order to log the REST calls made by ``ansible-solace``, set the following environment variables:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 30
+
+   * - Env Variable
+     - Description
+
+   * - export ANSIBLE_SOLACE_ENABLE_LOGGING=True|False
+     - switch logging on or off
+
+   * - export ANSIBLE_SOLACE_LOG_PATH="path/log-file-name.log"
+     - the full path & name of the log file to write to. ``ansible-solace`` will create the directory/ies if they don't exist. appends log entries to an existing log file or creates a new one.
+
+See also :ref:`tips-tricks-content-logfile` for a further discussion of logging.

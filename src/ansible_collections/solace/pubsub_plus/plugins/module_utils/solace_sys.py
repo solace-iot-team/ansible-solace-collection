@@ -31,14 +31,17 @@ if enableLoggingEnvVal is not None and enableLoggingEnvVal != '':
         ENABLE_LOGGING = bool(strtobool(enableLoggingEnvVal))
     except ValueError as e:
         # note: from e ==> import error python 2.7
-        raise ValueError("failed: invalid value for env var: 'ANSIBLE_SOLACE_ENABLE_LOGGING={enableLoggingEnvVal}'. use 'true' or 'false' instead.") from e
+        raise ValueError("failed: invalid value for env var: 'ANSIBLE_SOLACE_ENABLE_LOGGING'", enableLoggingEnvVal, "use 'true' or 'false' instead.") from e
 
 if ENABLE_LOGGING:
     logFile = './ansible-solace.log'
     if loggingPathEnvVal is not None and loggingPathEnvVal != '':
         log_path = os.path.dirname(loggingPathEnvVal)
         if not os.path.exists(log_path):
-            os.makedirs(log_path)
+            try:
+                os.makedirs(log_path)
+            except Exception as e:
+                raise ValueError("failed to make dirs for log path 'ANSIBLE_SOLACE_LOG_PATH'", loggingPathEnvVal) from e
         logFile = loggingPathEnvVal
     logging.basicConfig(filename=logFile,
                         level=logging.DEBUG,
