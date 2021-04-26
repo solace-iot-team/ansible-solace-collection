@@ -11,7 +11,8 @@ on:
 
   schedule:
     # - cron: '0 5 * * THU'
-    - cron: '0 5 * * *'
+    # - cron: '0 5 * * *'
+    - cron: 0 5 */2 * *  # every two days
   pull_request:
     branches:
       - main
