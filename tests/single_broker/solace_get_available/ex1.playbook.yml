@@ -10,6 +10,15 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
     solace_get_available:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
@@ -20,6 +29,13 @@
       msg_vpn: "{{ vpn }}"
 
   tasks:
+    - name: "gather facts"
+      solace_gather_facts:
+    # - debug:
+    #     msg: "{{ ansible_facts.solace }}"
+    - set_fact:
+        sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
+
     - name: "Wrong host"
       solace_get_available:
         host: "unknown.host.com"
@@ -60,14 +76,32 @@
         wait_timeout_minutes: 1
       register: result
       ignore_errors: true
+
+    - debug:
+        msg: "sempv2 version greater 2.19"
+      when: sempv2_version|float > 2.19
+
+    - debug:
+        msg: "sempv2 version less or equal 2.19"
+      when: sempv2_version|float <= 2.19
+
+      # from SEMP version=2.21 returns rc=1 (response code=401), before rc=0 (response code=200)
     - assert:
         that:
           - result.rc == 0
           - not result.is_available
           - result.is_semp_available
           - not result.is_spool_available
+      when: sempv2_version|float <= 2.19
     - assert:
-        that: result.rc == 0 and 'UNAUTHORIZED' in result.msg|string
+        that:
+          - result.rc == 1
+          - not result.is_available
+          - not result.is_semp_available
+          - not result.is_spool_available
+      when: sempv2_version|float > 2.19
+    - assert:
+        that: "'UNAUTHORIZED' in result.msg|string"
 
     - name: "Wrong username"
       solace_get_available:
@@ -81,8 +115,16 @@
           - not result.is_available
           - result.is_semp_available
           - not result.is_spool_available
+      when: sempv2_version|float <= 2.19
     - assert:
-        that: result.rc == 0 and 'UNAUTHORIZED' in result.msg|string
+        that:
+          - result.rc == 1
+          - not result.is_available
+          - not result.is_semp_available
+          - not result.is_spool_available
+      when: sempv2_version|float > 2.19
+    - assert:
+        that: "'UNAUTHORIZED' in result.msg|string"
 
 
 ###
