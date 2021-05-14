@@ -12,7 +12,7 @@ export PROJECT_HOME=$projectHome
 
 
 ansibleSolaceTests=(
-  # "setup"
+  "setup"
   "solace_get_available"
   # "solace_replay"
   # "solace_facts"
@@ -32,6 +32,7 @@ export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
 # local broker
   export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
+  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.9.0.23"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.8.0.12"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.7.0.29"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.6.0.46"

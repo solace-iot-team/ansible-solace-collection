@@ -90,6 +90,12 @@
     topic_2: "no/subscription/for/this/topic"
     queue: "asc_replay_test"
   tasks:
+  - name: "gather facts"
+    solace_gather_facts:
+  # - debug:
+  #     msg: "{{ ansible_facts.solace }}"
+  - set_fact:
+      sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
 
   - name: "main: check vars"
     set_fact:
@@ -165,7 +171,7 @@
     solace_replay_log_trim_logged_msgs:
       name: "{{ replay_log_name }}"
       settings:
-        olderThanTime: "{{ ansible_date_time.epoch }}"    
+        olderThanTime: "{{ ansible_date_time.epoch }}"
 
   - name: "main: solace_get_replay_logs:monitor:all - 1"
     solace_get_replay_logs:
@@ -245,13 +251,16 @@
       that:
         - result.rc==0
         - result.result_list_count==1
+
   - set_fact:
-      # msg_count: "{{ result.result_list[0].collections.msgs.count }}"
-      current_spooled_msg_count: "{{ result.result_list[0].data.currentSpooledMsgCount }}"
+      spooled_msg_count: "{{ result.result_list[0].data.currentSpooledMsgCount }}"
+    when: sempv2_version|float <= 2.19
+  - set_fact:
+      spooled_msg_count: "{{ result.result_list[0].data.spooledMsgCount }}"
+      when: sempv2_version|float > 2.19
   - assert:
       that:
-        # - msg_count|int==10
-        - current_spooled_msg_count|int==10
+        - spooled_msg_count|int==10
 
   - name: "main: solace_queue_cancel_replay"
     solace_queue_cancel_replay:
