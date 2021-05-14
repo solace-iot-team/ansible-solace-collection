@@ -1,5 +1,13 @@
 # Release Notes
 
+## Version: 1.3.3
+Maintenance
+
+* **tests**
+  - fixed tests for new broker release, sempv2 version 2.21
+* **[Tips&Tricks:Setting & Retrieving Ansible-Solace Log Files](https://solace-iot-team.github.io/ansible-solace-collection/tips-tricks-content/logfile.html)**
+  - fixed example playbook
+
 ## Version: 1.3.2
 Examples for using Ansible Jump Host & Minor Module Enhancements/Maintenance.
 
