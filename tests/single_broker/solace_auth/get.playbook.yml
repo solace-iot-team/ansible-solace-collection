@@ -1,0 +1,95 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+-
+  name: "get: solace_get_queues"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_authorization_group:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_authorization_groups:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  pre_tasks:
+  - include_vars:
+      file: "authorization_groups.vars.yml"
+      name: target_list
+  tasks:
+  - name: "get: delete authorization_groups"
+    solace_authorization_group:
+      name: "{{ item.name }}"
+      state: absent
+    loop: "{{ target_list.authorization_groups }}"
+
+  - name: "get: solace_get_authorization_groups:config:all"
+    solace_get_authorization_groups:
+    register: result
+  - assert:
+      that:
+        - result.rc==0
+        - result.result_list==[]
+        - result.result_list_count==0
+
+  - name: "create authorization groups"
+    solace_authorization_group:
+      name: "{{ item.name }}"
+      settings:
+        enabled: false
+      state: present
+    loop: "{{ target_list.authorization_groups }}"
+
+  - name: "get: solace_get_authorization_groups(config)"
+    solace_get_authorization_groups:
+      api: config
+      query_params:
+        where:
+          - "authorizationGroupName==asct_*"
+        select:
+          - "authorizationGroupName"
+          - "enabled"
+    register: result
+  - assert:
+      that: result.result_list_count == 3
+
+  - name: "get: solace_get_authorization_groups(monitor)"
+    solace_get_authorization_groups:
+      api: monitor
+      query_params:
+        where:
+          - "authorizationGroupName==asct_*"
+    register: result
+  - assert:
+      that: result.result_list_count == 3
+
+  - name: "get: delete authorization_groups"
+    solace_authorization_group:
+      name: "{{ item.name }}"
+      state: absent
+    loop: "{{ target_list.authorization_groups }}"
+
+  - name: "get: solace_get_authorization_groups(monitor)"
+    solace_get_authorization_groups:
+      api: monitor
+      query_params:
+        where:
+          - "authorizationGroupName==asct_*"
+    register: result
+  - assert:
+      that: result.result_list_count == 0
+
+###
+# The End.
