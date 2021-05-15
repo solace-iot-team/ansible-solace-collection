@@ -12,19 +12,19 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: solace_get_authorization_groups
-short_description: get list of authorization groups
+module: solace_get_authentication_oauth_providers
+short_description: get list of oauth providers
 description:
-- "Get a list of Authorization Group objects."
+- "Get a list of Authentication OAuth Provider objects."
 notes:
-- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/authorizationGroup/getMsgVpnAuthorizationGroups"
-- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/authorizationGroup/getMsgVpnAuthorizationGroups"
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/authenticationOauthProvider/getMsgVpnAuthenticationOauthProviders"
+- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/authenticationOauthProvider/getMsgVpnAuthenticationOauthProviders"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
 seealso:
-- module: solace_authorization_group
+- module: solace_authentication_oauth_provider
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -36,7 +36,7 @@ any_errors_fatal: true
 collections:
 - solace.pubsub_plus
 module_defaults:
-  solace_authorization_group:
+  solace_authentication_oauth_provider:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -44,7 +44,7 @@ module_defaults:
     password: "{{ sempv2_password }}"
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
-  solace_get_authorization_groups:
+  solace_get_authentication_oauth_providers:
     host: "{{ sempv2_host }}"
     port: "{{ sempv2_port }}"
     secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -53,16 +53,16 @@ module_defaults:
     timeout: "{{ sempv2_timeout }}"
     msg_vpn: "{{ vpn }}"
 tasks:
-- name: create authorization group
-  solace_authorization_group:
+- name: create oauth provider
+  solace_authentication_oauth_provider:
     name: bar
     state: present
 
 - name: get list config
-  solace_get_authorization_groups:
+  solace_get_authentication_oauth_providers:
     query_params:
       where:
-      - "authorizationGroupName==bar*"
+      - "oauthProviderName==bar*"
   register: result
 
 - name: print result
@@ -72,13 +72,13 @@ tasks:
     - "{{ result.result_list_count }}"
 
 - name: get list monitor
-  solace_get_authorization_groups:
+  solace_get_authentication_oauth_providers:
     api: monitor
     query_params:
       where:
-      - "authorizationGroupName==bar*"
+      - "oauthProviderName==bar*"
       select:
-      - "authorizationGroupName"
+      - "oauthProviderName"
       - "enabled"
   register: result
 
@@ -120,14 +120,14 @@ from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_con
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceGetAuthorizationGroupsTask(SolaceBrokerGetPagingTask):
+class SolaceGetAuthenticationOAuthProvidersTask(SolaceBrokerGetPagingTask):
 
     def __init__(self, module):
         super().__init__(module)
 
     def get_path_array(self, params: dict) -> list:
-        # GET /msgVpns/{msgVpnName}/authorizationGroups
-        return ['msgVpns', params['msg_vpn'], 'authorizationGroups']
+        # GET /msgVpns/{msgVpnName}/authenticationOauthProviders
+        return ['msgVpns', params['msg_vpn'], 'authenticationOauthProviders']
 
 
 def run_module():
@@ -143,7 +143,7 @@ def run_module():
         supports_check_mode=True
     )
 
-    solace_task = SolaceGetAuthorizationGroupsTask(module)
+    solace_task = SolaceGetAuthenticationOAuthProvidersTask(module)
     solace_task.execute()
 
 
