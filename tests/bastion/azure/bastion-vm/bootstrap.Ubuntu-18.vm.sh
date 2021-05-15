@@ -22,8 +22,14 @@ scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
 echo " >>> Bootstrap vm ..."
 
 ssh -i $vmPrivateKeyFile "$vmAdminUsr@$vmPublicIpAddress" <<BOOT_EOL
+  echo ">>> uptime =================================================="
+  uptime
+  sleep 10
+  uptime
+  echo ">>> update =================================================="
   sudo apt-get update
   if [[ $? != 0 ]]; then exit 1; fi
+  sleep 10
   sudo apt-get -y upgrade
   if [[ $? != 0 ]]; then exit 1; fi
   echo ">>> python =================================================="

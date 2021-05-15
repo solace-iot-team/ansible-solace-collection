@@ -1,5 +1,13 @@
 # Release Notes
 
+## Version: 1.4.0
+New modules.
+
+* [**solace_get_authorization_groups**](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_authorization_groups.html)
+* [**solace_authorization_group**](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_authorization_group.html)
+* [**solace_get_authentication_oauth_providers**](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_authentication_oauth_providers.html)
+* [**solace_authentication_oauth_provider**](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_authentication_oauth_provider.html)
+
 ## Version: 1.3.3
 Maintenance
 
