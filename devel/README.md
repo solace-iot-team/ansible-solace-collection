@@ -76,6 +76,10 @@ ansible-test sanity {module_name}
 # project
 ansible-test sanity
 ````
+
+**See also [sanity ignore file(s)](../src/ansible_collections/solace/pubsub_plus/tests/sanity)**.
+
+
 ### docs
 ````bash
 pip3 install ansible-doc-extractor

@@ -1,0 +1,95 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+-
+  name: "get: solace_get_queues"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_authentication_oauth_provider:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_authentication_oauth_providers:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  pre_tasks:
+  - include_vars:
+      file: "solace_authentication_oauth_providers.vars.yml"
+      name: target_list
+  tasks:
+  - name: "main: delete oauth providers"
+    solace_authentication_oauth_provider:
+      name: "{{ item.name }}"
+      state: absent
+    loop: "{{ target_list.oauth_providers }}"
+
+  - name: "get: solace_get_authentication_oauth_providers:config:all"
+    solace_get_authentication_oauth_providers:
+    register: result
+  - assert:
+      that:
+        - result.rc==0
+        - result.result_list==[]
+        - result.result_list_count==0
+
+  - name: "create oauth providers"
+    solace_authentication_oauth_provider:
+      name: "{{ item.name }}"
+      settings:
+        enabled: false
+      state: present
+    loop: "{{ target_list.oauth_providers }}"
+
+  - name: "get: solace_get_authentication_oauth_providers(config)"
+    solace_get_authentication_oauth_providers:
+      api: config
+      query_params:
+        where:
+          - "oauthProviderName==asct_*"
+        select:
+          - "oauthProviderName"
+          - "enabled"
+    register: result
+  - assert:
+      that: result.result_list_count == 3
+
+  - name: "get: solace_get_authentication_oauth_providers(monitor)"
+    solace_get_authentication_oauth_providers:
+      api: monitor
+      query_params:
+        where:
+          - "oauthProviderName==asct_*"
+    register: result
+  - assert:
+      that: result.result_list_count == 3
+
+  - name: "main: delete oauth providers"
+    solace_authentication_oauth_provider:
+      name: "{{ item.name }}"
+      state: absent
+    loop: "{{ target_list.oauth_providers }}"
+
+  - name: "get: solace_get_authentication_oauth_providers(monitor)"
+    solace_get_authentication_oauth_providers:
+      api: monitor
+      query_params:
+        where:
+          - "oauthProviderName==asct_*"
+    register: result
+  - assert:
+      that: result.result_list_count == 0
+
+###
+# The End.

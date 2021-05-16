@@ -7,8 +7,10 @@
       msgVpnName: asct_solace_cloud
       # datacenterId: "aws-eu-west-2a"
       datacenterId: "aws-ca-central-1a"
-      serviceTypeId: "enterprise"
-      serviceClassId: "enterprise-250-nano"
+      serviceTypeId: "developer"
+      serviceClassId: "developer"
+      # serviceTypeId: "enterprise"
+      # serviceClassId: "enterprise-250-nano"
       attributes:
         customizedMessagingPorts:
           serviceSmfPlainTextListenPort: 55555
@@ -28,8 +30,10 @@
       msgVpnName: asct_solace_cloud_2
       # datacenterId: "aws-eu-west-2a"
       datacenterId: "aws-ca-central-1a"
-      serviceTypeId: "enterprise"
-      serviceClassId: "enterprise-250-nano"
+      serviceTypeId: "developer"
+      serviceClassId: "developer"
+      # serviceTypeId: "enterprise"
+      # serviceClassId: "enterprise-250-nano"
 
 ###
 # The End.

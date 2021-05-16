@@ -1,0 +1,5 @@
+---
+oauth_providers:
+- name: asct_oauth_provider_1
+- name: asct_oauth_provider_2
+- name: asct_oauth_provider_3

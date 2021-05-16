@@ -79,6 +79,10 @@ plugins/modules/solace_get_dmr_cluster_link_remote_addresses.py compile-2.7!skip
 plugins/modules/solace_get_dmr_cluster_link_remote_addresses.py pep8:E501
 plugins/modules/solace_dmr_bridge.py compile-2.7!skip
 plugins/modules/solace_get_dmr_bridges.py compile-2.7!skip
+plugins/modules/solace_get_authorization_groups.py compile-2.7!skip
+plugins/modules/solace_get_authorization_groups.py pep8:E501
+plugins/modules/solace_get_authentication_oauth_providers.py compile-2.7!skip
+plugins/modules/solace_get_authentication_oauth_providers.py pep8:E501
 docs/examples/quickstart/_run.sh shellcheck:SC2046
 docs/examples/quickstart/_run.sh shellcheck:SC2154
 docs/examples/quickstart/run.sh shellcheck:SC2155

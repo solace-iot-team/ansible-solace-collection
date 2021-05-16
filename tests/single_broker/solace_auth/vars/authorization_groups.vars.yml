@@ -1,0 +1,5 @@
+---
+authorization_groups:
+- name: asct_auth_group_1
+- name: asct_auth_group_2
+- name: asct_auth_group_3

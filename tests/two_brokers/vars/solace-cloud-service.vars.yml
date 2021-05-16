@@ -6,8 +6,10 @@
   msgVpnName: asct_two_brokers
   # datacenterId: "aws-eu-west-2a"
   datacenterId: "aws-ca-central-1a"
-  serviceTypeId: "enterprise"
-  serviceClassId: "enterprise-250-nano"
+  serviceTypeId: "developer"
+  serviceClassId: "developer"
+  # serviceTypeId: "enterprise"
+  # serviceClassId: "enterprise-250-nano"
   attributes:
     customizedMessagingPorts:
       serviceSmfPlainTextListenPort: 55555

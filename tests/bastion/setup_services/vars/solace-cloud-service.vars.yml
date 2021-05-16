@@ -6,8 +6,10 @@
       msgVpnName: asct_sc_bastion_1
       # datacenterId: "aws-eu-west-2a"
       datacenterId: "aws-ca-central-1a"
-      serviceTypeId: "enterprise"
-      serviceClassId: "enterprise-250-nano"
+      serviceTypeId: "developer"
+      serviceClassId: "developer"
+      # serviceTypeId: "enterprise"
+      # serviceClassId: "enterprise-250-nano"
       # TODO: switch on if / after Solace Cloud supports it again.
       # eventBrokerVersion: "9.6"
       attributes:
@@ -29,8 +31,10 @@
       msgVpnName: asct_sc_bastion_2
       # datacenterId: "aws-eu-west-2a"
       datacenterId: "aws-ca-central-1a"
-      serviceTypeId: "enterprise"
-      serviceClassId: "enterprise-250-nano"
+      serviceTypeId: "developer"
+      serviceClassId: "developer"
+      # serviceTypeId: "enterprise"
+      # serviceClassId: "enterprise-250-nano"
       # TODO: switch on if / after Solace Cloud supports it again.
       # eventBrokerVersion: "9.3"
 

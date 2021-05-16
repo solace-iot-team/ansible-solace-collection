@@ -1,0 +1,45 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "ex1: solace_authorization_group"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_authorization_group:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  pre_tasks:
+  - include_vars:
+      file: "authorization_groups.vars.yml"
+      name: target_list
+  tasks:
+  - name: "main: delete authorization_groups"
+    solace_authorization_group:
+      name: "{{ item.name }}"
+      state: absent
+    loop: "{{ target_list.authorization_groups }}"
+
+  - name: "exception: create authorization groups"
+    solace_authorization_group:
+      name: "{{ target_list.authorization_groups[0] }}"
+      settings:
+        enabled: false
+        clientProfileName: doesNotExist
+      state: present
+    ignore_errors: yes
+    register: result
+  - assert:
+      that:
+        - result.rc == 1
+        - "'NOT_FOUND' in result.msg|string"
+###
+# The End.

@@ -70,9 +70,14 @@ echo " >>> Test ssh to vm ..."
   tries=0; max=10; code=1;
   while [[ $tries -lt $max && $code -gt 0 ]]; do
     ((tries++))
-    ssh_test=$(ssh -i $vmPrivateKeyFile "$vmAdminUsr@$vmPublicIpAddress" "bash --version")
+    # ssh_test=$(ssh -i $vmPrivateKeyFile "$vmAdminUsr@$vmPublicIpAddress" "bash --version")
+    ssh_test=$(ssh -i $vmPrivateKeyFile "$vmAdminUsr@$vmPublicIpAddress" "uptime")
     code=$?
     echo "tries=$tries, ssh_test=$ssh_test"
+    if [[ $code == 0 ]]; then
+      uptime=$(echo $ssh_test| awk -F'load average:' '{ print $2 }' | cut -d ',' -f 1)
+      echo "uptime = '$uptime'"
+    fi
     if [[ $code != 0 ]]; then echo "code=$code && tries=$tries, sleep 1m"; sleep 1m; fi
   done
   if [[ $code != 0 || -z "$ssh_test" ]]; then echo " >>> XT_ERROR: ssh into vm"; exit 1; fi
