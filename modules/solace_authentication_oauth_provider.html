@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>solace_replay_log – replay log &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  <title>solace_authentication_oauth_provider – oauth provider &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
   
 
   
@@ -43,8 +43,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="solace_replay_log_trim_logged_msgs – trim msgs on replay log" href="solace_replay_log_trim_logged_msgs.html" />
-    <link rel="prev" title="solace_rdp_rest_consumer_trusted_cn – trusted common name on rdp rest consumer" href="solace_rdp_rest_consumer_trusted_cn.html" /> 
+    <link rel="next" title="solace_authorization_group – authorization group" href="solace_authorization_group.html" />
+    <link rel="prev" title="solace_acl_subscribe_topic_exception – subscribe topic exception for acl profile" href="solace_acl_subscribe_topic_exception.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -114,7 +114,14 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_publish_topic_exception.html">solace_acl_publish_topic_exception – publish topic exception for acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_share_name_exception.html">solace_acl_subscribe_share_name_exception – subscribe share name exception for acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_topic_exception.html">solace_acl_subscribe_topic_exception – subscribe topic exception for acl profile</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_authentication_oauth_provider.html">solace_authentication_oauth_provider – oauth provider</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_authentication_oauth_provider – oauth provider</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="solace_authorization_group.html">solace_authorization_group – authorization group</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge.html">solace_bridge – bridge</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_subscription.html">solace_bridge_remote_subscription – remote subscription on a bridge</a></li>
@@ -138,14 +145,7 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_queue_binding.html">solace_rdp_queue_binding – queue bindining on rdp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer.html">solace_rdp_rest_consumer – rest consumer on rdp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer_trusted_cn.html">solace_rdp_rest_consumer_trusted_cn – trusted common name on rdp rest consumer</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_replay_log – replay log</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="solace_replay_log.html">solace_replay_log – replay log</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_replay_log_trim_logged_msgs.html">solace_replay_log_trim_logged_msgs – trim msgs on replay log</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_topic_endpoint.html">solace_topic_endpoint – topic endpoint</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_vpn.html">solace_vpn – vpn</a></li>
@@ -207,7 +207,7 @@
         
           <li><a href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a> &raquo;</li>
         
-      <li>solace_replay_log – replay log</li>
+      <li>solace_authentication_oauth_provider – oauth provider</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -215,7 +215,7 @@
           
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_replay_log.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_authentication_oauth_provider.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -229,10 +229,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="solace-replay-log-replay-log">
-<span id="solace-replay-log-module"></span><h1>solace_replay_log – replay log<a class="headerlink" href="#solace-replay-log-replay-log" title="Permalink to this headline">¶</a></h1>
-<p>Configure a Replay Log object on a Message Vpn. Allows addition, removal and configuration of Replay Log objects in an idempotent manner.</p>
-<p>Note: Solace Cloud currently does not support creating, deleting, updating Replay Log objects. Module will return an error.</p>
+  <div class="section" id="solace-authentication-oauth-provider-oauth-provider">
+<span id="solace-authentication-oauth-provider-module"></span><h1>solace_authentication_oauth_provider – oauth provider<a class="headerlink" href="#solace-authentication-oauth-provider-oauth-provider" title="Permalink to this headline">¶</a></h1>
+<p>Configure a Authentication OAuth Provider object on a Message Vpn. Allows addition, removal and configuration of objects in an idempotent manner.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
@@ -241,7 +240,7 @@
 <span class="nt">collections</span><span class="p">:</span>
 <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span>
 <span class="nt">module_defaults</span><span class="p">:</span>
-  <span class="nt">solace_replay_log</span><span class="p">:</span>
+  <span class="nt">solace_authentication_oauth_provider</span><span class="p">:</span>
     <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
@@ -249,25 +248,24 @@
     <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">solace_cloud_api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">SOLACE_CLOUD_API_TOKEN</span> <span class="k">if</span> <span class="nv">broker_type</span><span class="o">==</span><span class="s1">&#39;solace_cloud&#39;</span> <span class="k">else</span> <span class="nv">omit</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">solace_cloud_service_id</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">solace_cloud_service_id</span> <span class="o">|</span> <span class="nf">default</span><span class="o">(</span><span class="nv">omit</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="nt">tasks</span><span class="p">:</span>
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">add replay log</span>
-  <span class="nt">solace_replay</span><span class="p">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">add</span>
+  <span class="nt">solace_authentication_oauth_provider</span><span class="p">:</span>
     <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">bar</span>
+    <span class="nt">setttings</span><span class="p">:</span>
+      <span class="nt">enabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">audienceClaimName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
     <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">update replay log</span>
-  <span class="nt">solace_replay</span><span class="p">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">update</span>
+  <span class="nt">solace_authentication_oauth_provider</span><span class="p">:</span>
     <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">bar</span>
-    <span class="nt">settings</span><span class="p">:</span>
-      <span class="nt">egressEnabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-      <span class="nt">ingressEnabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-      <span class="nt">maxSpoolUsage</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
+    <span class="nt">setttings</span><span class="p">:</span>
+      <span class="nt">enabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
     <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">remove replay log</span>
-  <span class="nt">solace_replay</span><span class="p">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">remove</span>
+  <span class="nt">solace_authentication_oauth_provider</span><span class="p">:</span>
     <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">bar</span>
     <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">absent</span>
 </pre></div>
@@ -278,7 +276,7 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
-<li><p>Module Sempv2 Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/replayLog">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/replayLog</a></p></li>
+<li><p>Module Sempv2 Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/authenticationOauthProvider">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/authenticationOauthProvider</a></p></li>
 <li><p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a></p></li>
 <li><p>Sempv2 Monitor Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/</a></p></li>
 <li><p>Sempv2 Action Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/</a></p></li>
@@ -290,8 +288,7 @@
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="solace_get_replay_logs.html#solace-get-replay-logs-module"><span class="std std-ref">solace_get_replay_logs – get list of replay logs</span></a></p></li>
-<li><p><a class="reference internal" href="solace_replay_log_trim_logged_msgs.html#solace-replay-log-trim-logged-msgs-module"><span class="std std-ref">solace_replay_log_trim_logged_msgs – trim msgs on replay log</span></a></p></li>
+<li><p><a class="reference internal" href="solace_get_authentication_oauth_providers.html#solace-get-authentication-oauth-providers-module"><span class="std std-ref">solace_get_authentication_oauth_providers – get list of oauth providers</span></a></p></li>
 </ul>
 </div>
 </div>
@@ -309,10 +306,10 @@
 <div class="line"><strong>type</strong>: str</div>
 </div>
 </dd>
-<dt>name (required)</dt><dd><p>Name of the replayLog. Maps to ‘replayLogName’ in the API.</p>
+<dt>name (required)</dt><dd><p>Name of the OAuth Provider. Maps to ‘oauthProviderName’ in the API.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>aliases</strong>: replay_log_name</div>
+<div class="line"><strong>aliases</strong>: oauth_provider, oauth_provider_name</div>
 </div>
 </dd>
 <dt>password (optional)</dt><dd><p>Administrator password for Solace Broker.</p>
@@ -343,20 +340,6 @@
 <dt>settings (optional)</dt><dd><p>JSON dictionary of additional configuration, see Reference documentation.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: dict</div>
-</div>
-</dd>
-<dt>solace_cloud_api_token (optional)</dt><dd><p>The API Token.</p>
-<p>Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.</p>
-<p>Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>solace_cloud_service_id (optional)</dt><dd><p>The service id in Solace Cloud.</p>
-<p>Click on the service in Solace Cloud - the service id is in the URL.</p>
-<p>Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
 </div>
 </dd>
 <dt>state (optional)</dt><dd><p>Target state.</p>
@@ -427,8 +410,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="solace_replay_log_trim_logged_msgs.html" class="btn btn-neutral float-right" title="solace_replay_log_trim_logged_msgs – trim msgs on replay log" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="solace_rdp_rest_consumer_trusted_cn.html" class="btn btn-neutral float-left" title="solace_rdp_rest_consumer_trusted_cn – trusted common name on rdp rest consumer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="solace_authorization_group.html" class="btn btn-neutral float-right" title="solace_authorization_group – authorization group" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="solace_acl_subscribe_topic_exception.html" class="btn btn-neutral float-left" title="solace_acl_subscribe_topic_exception – subscribe topic exception for acl profile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

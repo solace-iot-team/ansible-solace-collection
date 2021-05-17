@@ -100,6 +100,7 @@ Module Reference
    :maxdepth: 1
 
    modules/solace_acl_*
+   modules/solace_auth*
    modules/solace_bridge*
    modules/solace_cert_authority*
    modules/solace_client*
