@@ -24,8 +24,9 @@ echo " >>> Bootstrap vm ..."
 ssh -i $vmPrivateKeyFile "$vmAdminUsr@$vmPublicIpAddress" <<BOOT_EOL
   echo ">>> uptime =================================================="
   uptime
-  sleep 10
+  sleep 60
   uptime
+  sleep 30
   echo ">>> update =================================================="
   sudo apt-get update
   if [[ $? != 0 ]]; then exit 1; fi
