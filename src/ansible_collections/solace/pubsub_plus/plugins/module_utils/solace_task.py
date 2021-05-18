@@ -8,7 +8,7 @@ import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError, SolaceSempv1VersionNotSupportedError, SolaceNoModuleSupportForSolaceCloudError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudServiceConfig, SolaceTaskSolaceCloudConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceSempV1Api, SolaceCloudApi, SolaceSempV2PagingGetApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi, SolaceSempV2PagingGetApi
 from ansible.module_utils.basic import AnsibleModule
 import logging
 import json
@@ -259,39 +259,6 @@ class SolaceBrokerCRUDTask(SolaceCRUDTask):
     def get_config(self) -> SolaceTaskBrokerConfig:
         return self.config
 
-    # TODO: DELETEME
-    # def get_sempv2_version_as_float(self) -> float:
-    #     if self.config.sempv2_version is None:
-    #         sempv2_api = SolaceSempV2Api(self.module)
-    #         sempv2_version = sempv2_api.get_sempv2_version(self.get_config())
-    #         self.config.set_sempv2_version(sempv2_version)
-    #     try:
-    #         v = float(self.config.sempv2_version)
-    #     except ValueError as e:
-    #         raise SolaceParamsValidationError('sempv2_version', self.config.sempv2_version, "value cannot be converted to a float") from e
-    #     return v
-
-
-    # TODO: DELETEME
-    # def get_sempv1_version_as_version(self) -> Version:
-    #    _v = Version("9.9")
-    #    return _v
-
-
-    # TODO: DELETEME
-    # def get_sempv1_version_as_float(self) -> float:
-    #     if self.config.sempv1_version is None:
-    #         sempv1_api = SolaceSempV1Api(self.module)
-    #         sempv1_version = sempv1_api.get_sempv1_version(self.get_config())
-    #         self.config.set_sempv1_version(sempv1_version)
-    #     try:
-    #         # example: soltr/9_9VMR
-    #         s = self.config.sempv1_version[6:9].replace('_', '.')
-    #         v = float(s)
-    #     except ValueError as e:
-    #         raise SolaceParamsValidationError('sempv1_version', self.config.sempv1_version, "value cannot be converted to a float") from e
-    #     return v
-
 
 class SolaceCloudCRUDTask(SolaceCRUDTask):
     def __init__(self, module: AnsibleModule):
@@ -317,6 +284,7 @@ class SolaceGetTask(SolaceTask):
         ))
         return result
 
+
 class SolaceBrokerGetTask(SolaceGetTask):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
@@ -331,7 +299,6 @@ class SolaceBrokerGetTask(SolaceGetTask):
 
     def get_sempv2_api(self) -> SolaceSempV2Api:
         return self.sempv2_api
-
 
 
 class SolaceBrokerGetPagingTask(SolaceGetTask):

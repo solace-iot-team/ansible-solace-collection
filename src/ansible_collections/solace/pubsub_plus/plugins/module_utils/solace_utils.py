@@ -7,22 +7,19 @@ __metaclass__ = type
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceFeatureNotSupportedError
 from ansible.module_utils.basic import AnsibleModule
-import urllib.parse
 import json
-import logging
 import re
 import copy
-from json.decoder import JSONDecodeError
 import ssl
 from copy import deepcopy
 import xml.etree.ElementTree as ET
-
 
 SOLACE_UTILS_HAS_IMPORT_ERROR = False
 SOLACE_UTILS_IMPORT_ERR_TRACEBACK = None
 import traceback
 try:
     import xmltodict
+    import packaging
 except ImportError:
     SOLACE_UTILS_HAS_IMPORT_ERROR = True
     SOLACE_UTILS_IMPORT_ERR_TRACEBACK = traceback.format_exc()
@@ -162,4 +159,12 @@ class SolaceUtils(object):
 
     @staticmethod
     def stringContainsAnyChars(str: str, set: str) -> bool:
-      return 1 in [c in str for c in set]
+        return 1 in [c in str for c in set]
+
+    @staticmethod
+    def create_version(s: str):
+        try:
+            v = packaging.version.Version(s)
+        except packaging.version.InvalidVersion as e:
+            raise SolaceInternalError(f"version parsing failed: {s}") from e
+        return v

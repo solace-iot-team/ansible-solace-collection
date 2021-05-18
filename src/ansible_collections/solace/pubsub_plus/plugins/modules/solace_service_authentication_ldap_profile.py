@@ -133,17 +133,14 @@ rc:
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceParamsValidationError, SolaceNoModuleSupportForSolaceCloudError, SolaceSempv1VersionNotSupportedError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError, SolaceNoModuleSupportForSolaceCloudError, SolaceSempv1VersionNotSupportedError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV1Api, SolaceCloudApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
-from packaging.version import Version
 
 
 class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
-
-    MIN_SEMP_V1_VERSION = Version("9.3")
 
     def __init__(self, module):
         super().__init__(module)
@@ -151,9 +148,10 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
         self.solace_cloud_api = SolaceCloudApi(module)
 
     def check_min_sempv1_supported_version(self):
+        MIN_SEMP_V1_VERSION = SolaceUtils.create_version("9.3")
         raw_api_version, version = self.sempv1_api.get_sempv1_version(self.get_config())
-        if version < self.MIN_SEMP_V1_VERSION:
-            raise SolaceSempv1VersionNotSupportedError(self.get_module()._name, f"{version}({raw_api_version})", self.MIN_SEMP_V1_VERSION)
+        if version < MIN_SEMP_V1_VERSION:
+            raise SolaceSempv1VersionNotSupportedError(self.get_module()._name, f"{version}({raw_api_version})", MIN_SEMP_V1_VERSION)
 
     def do_task_extension(self, args, new_state, new_settings, current_settings):
         is_enabled = True if current_settings['shutdown'] == 'No' else False

@@ -27,7 +27,7 @@ options:
     aliases: [msg_vpn_name]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-- solace.pubsub_plus.solace.settings
+- solace.pubsub_plus.solace.sempv2_settings
 - solace.pubsub_plus.solace.state
 seealso:
 - module: solace_get_vpns

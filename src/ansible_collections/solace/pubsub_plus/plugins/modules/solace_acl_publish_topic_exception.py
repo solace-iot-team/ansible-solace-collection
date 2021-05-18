@@ -41,7 +41,7 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.state
-- solace.pubsub_plus.solace.settings
+- solace.pubsub_plus.solace.sempv2_settings
 seealso:
 - module: solace_acl_profile
 author:
@@ -120,12 +120,12 @@ rc:
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
 from ansible.module_utils.basic import AnsibleModule
-from packaging.version import Version
 
 
 class SolaceACLPublishTopicExceptionTask(SolaceBrokerCRUDTask):
@@ -154,9 +154,9 @@ class SolaceACLPublishTopicExceptionTask(SolaceBrokerCRUDTask):
         return [params['msg_vpn'], params['acl_profile_name'], params['topic_syntax'], params['name']]
 
     def get_sempv2_version_map_key(self, semp_version: float) -> str:
-        if semp_version <= Version("2.13"):
+        if semp_version <= SolaceUtils.create_version("2.13"):
             return '<=2.13'
-        elif semp_version >= Version("2.14"):
+        elif semp_version >= SolaceUtils.create_version("2.14"):
             return '>=2.14'
         raise SolaceInternalError(f"sempv2_version: {semp_version} not supported")
 

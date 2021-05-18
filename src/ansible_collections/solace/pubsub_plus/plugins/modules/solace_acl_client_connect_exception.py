@@ -32,7 +32,7 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.state
-- solace.pubsub_plus.solace.settings
+- solace.pubsub_plus.solace.sempv2_settings
 author:
   - Mark Street (@mkst)
   - Swen-Helge Huber (@ssh)

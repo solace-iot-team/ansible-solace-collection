@@ -14,7 +14,6 @@ import urllib.parse
 import logging
 import time
 import xml.etree.ElementTree as ET
-import packaging.version as version
 
 SOLACE_API_HAS_IMPORT_ERROR = False
 SOLACE_API_IMPORT_ERR_TRACEBACK = None
@@ -22,6 +21,7 @@ import traceback
 try:
     import requests
     import xmltodict
+    # import packaging.version as version
 except ImportError:
     SOLACE_API_HAS_IMPORT_ERROR = True
     SOLACE_API_IMPORT_ERR_TRACEBACK = traceback.format_exc()
@@ -188,9 +188,9 @@ class SolaceSempV2Api(SolaceApi):
         raw_api_version = SolaceUtils.get_key(resp, "sempVersion")
         # format: 2.21
         try:
-          v = version.Version(raw_api_version)
-        except version.InvalidVersion as e:
-          raise SolaceInternalError(f"sempv2 version parsing failed: {raw_api_version}") from e
+            v = SolaceUtils.create_version(raw_api_version)
+        except SolaceInternalError as e:
+            raise SolaceInternalError(f"sempv2 version parsing failed: {raw_api_version}") from e
         return raw_api_version, v
 
     def handle_bad_response(self, resp):
@@ -327,9 +327,9 @@ class SolaceSempV1Api(SolaceApi):
         # format: soltr/9_9VMR
         s = raw_api_version[6:9].replace('_', '.')
         try:
-          v = version.Version(s)
-        except version.InvalidVersion as e:
-          raise SolaceInternalError(f"sempv1 version parsing failed: {raw_api_version}") from e
+            v = SolaceUtils.create_version(s)
+        except SolaceInternalError as e:
+            raise SolaceInternalError(f"sempv1 version parsing failed: {raw_api_version}") from e
         return raw_api_version, v
 
     def get_headers(self, config: SolaceTaskConfig) -> dict:

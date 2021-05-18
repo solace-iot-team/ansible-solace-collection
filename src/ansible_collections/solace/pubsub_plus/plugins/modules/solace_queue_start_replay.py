@@ -27,7 +27,7 @@ options:
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
-- solace.pubsub_plus.solace.settings
+- solace.pubsub_plus.solace.sempv2_settings
 seealso:
 - module: solace_queue
 - module: solace_queue_cancel_replay

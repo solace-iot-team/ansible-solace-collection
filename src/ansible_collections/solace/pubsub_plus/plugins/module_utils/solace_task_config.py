@@ -77,10 +77,6 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         self.broker_url = ('https' if is_secure else 'http') + '://' + host + ':' + str(port)
         self.timeout = float(module.params['timeout'])
         self.x_broker = module.params.get('x_broker', None)
-        # TODO: DELETEME
-        # self.sempv1_version = module.params.get('sempv1_version', None)
-        # self.sempv2_version = module.params.get('sempv2_version', None)
-
         solace_cloud_api_token = module.params.get('solace_cloud_api_token', None)
         solace_cloud_service_id = module.params.get('solace_cloud_service_id', None)
         # either both are provided or none
@@ -103,13 +99,6 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             self.solace_cloud_auth = BearerAuth(self.solace_cloud_config['api_token'])
         self.semp_auth = (module.params['username'], module.params['password'])
         return
-
-        # TODO: DELETEME
-    # def set_sempv1_version(self, sempv1_version: str):
-    #     self.sempv1_version = sempv1_version
-
-    # def set_sempv2_version(self, sempv2_version: str):
-    #     self.sempv2_version = sempv2_version
 
     def is_solace_cloud(self) -> bool:
         return (self.solace_cloud_config is not None)
@@ -143,10 +132,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             username=dict(type='str', default='admin'),
             password=dict(type='str', default='admin', no_log=True),
             timeout=dict(type='int', default='10', required=False),
-            x_broker=dict(type='str', default=None),
-            # TODO: DELETEME
-            # sempv2_version=dict(type='str', required=False, default=None, aliases=['semp_version']),
-            # sempv1_version=dict(type='str', required=False, default=None)
+            x_broker=dict(type='str', default=None)
         )
 
     @staticmethod
