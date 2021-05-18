@@ -24,9 +24,10 @@ options:
     required: true
     type: str
     aliases: [replay_log_name]
-  settings:
+  sempv2_settings:
     description: JSON dictionary of additional configuration, see Reference documentation.
     required: false
+    aliases: [settings]
     type: dict
     suboptions:
         olderThanTime:
@@ -125,7 +126,7 @@ def run_module():
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
-    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_settings())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_sempv2_settings())
     arg_spec.update(module_args)
 
     module = AnsibleModule(

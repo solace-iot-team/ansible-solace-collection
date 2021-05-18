@@ -13,21 +13,22 @@ export PROJECT_HOME=$projectHome
 
 ansibleSolaceTests=(
   # "setup"
-  # "solace_get_available"
-  # "solace_auth"
+  "solace_service_auth"
+  "solace_get_available"
+  "solace_auth"
   "solace_oauth"
-  # "solace_replay"
-  # "solace_facts"
-  # "solace_vpn"
-  # "solace_client_profile"
-  # "solace_acl_profile"
-  # "solace_rdp"
-  # "solace_cert_authority"
-  # "solace_queue"
-  # "solace_client_username"
-  # "solace_mqtt"
-  # "solace_topic_endpoint"
-  # "solace_get_vpn_clients"
+  "solace_replay"
+  "solace_facts"
+  "solace_vpn"
+  "solace_client_profile"
+  "solace_acl_profile"
+  "solace_rdp"
+  "solace_cert_authority"
+  "solace_queue"
+  "solace_client_username"
+  "solace_mqtt"
+  "solace_topic_endpoint"
+  "solace_get_vpn_clients"
   # "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
@@ -44,10 +45,10 @@ export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
   export BROKER_DOCKER_COMPOSE_FILE="$projectHome/test-runner/files/PubSubStandard_singleNode.yml"
   export INVENTORY_FILE=$LOCAL_BROKER_INVENTORY_FILE
 
-# solace cloud broker
-  export BROKER_TYPE="solace_cloud"
-  export INVENTORY_FILE="$projectHome/test-runner/files/solace-cloud-account.inventory.yml"
-  export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
+# # solace cloud broker
+#   export BROKER_TYPE="solace_cloud"
+#   export INVENTORY_FILE="$projectHome/test-runner/files/solace-cloud-account.inventory.yml"
+#   export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
 
 export CLEAN_WORKING_DIR=False
 

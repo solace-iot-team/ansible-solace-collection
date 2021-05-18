@@ -1,0 +1,57 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "ex: solace_service_authentication_ldap_profile"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_service_authentication_ldap_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+  tasks:
+  - name: "ldap-profile:ex delete non-existing profile"
+    solace_service_authentication_ldap_profile:
+      # name: "does-not-exist"
+      name: "does_not_exist"
+      state: absent
+    ignore_errors: yes
+    register: result
+  - assert:
+      that:
+        - result.rc == 1
+        - "'solace_service_authentication_ldap_profile' in result.msg|string"
+        - "'not supported' in result.msg|string"
+    when: broker_type == 'solace_cloud'
+  - assert:
+      that:
+        - result.rc == 0
+    when: broker_type != 'solace_cloud'
+
+  - name: "ldap-profile:ex:end if solace cloud"
+    meta: end_play
+    when: broker_type == 'solace_cloud'
+
+  - name: "ldap-profile:ex:wrong name format"
+    solace_service_authentication_ldap_profile:
+      name: "does-not-exist"
+      state: absent
+    ignore_errors: yes
+    register: result
+  - assert:
+      that:
+        - result.rc == 1
+        - "' contains 1 or more invalid chars from set' in result.msg|string"
+
+
+###
+# The End.

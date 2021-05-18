@@ -157,7 +157,7 @@ def run_module():
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
-    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_settings())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_sempv2_settings())
     arg_spec.update(module_args)
 
     module = AnsibleModule(

@@ -6,9 +6,9 @@ __metaclass__ = type
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError, SolaceSempv1VersionNotSupportedError, SolaceNoModuleSupportForSolaceCloudError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudServiceConfig, SolaceTaskSolaceCloudConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceApi, SolaceSempV2Api, SolaceCloudApi, SolaceSempV2PagingGetApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceSempV1Api, SolaceCloudApi, SolaceSempV2PagingGetApi
 from ansible.module_utils.basic import AnsibleModule
 import logging
 import json
@@ -43,6 +43,9 @@ class SolaceTask(object):
 
     def get_module(self) -> AnsibleModule:
         return self.module
+
+    def get_settings_arg_name(self) -> str:
+        raise SolaceInternalErrorAbstractMethod()
 
     def get_config(self) -> SolaceTaskConfig:
         raise SolaceInternalErrorAbstractMethod()
@@ -110,6 +113,16 @@ class SolaceTask(object):
             usr_msg = ["Feature currently not supported. Pls raise an new feature request if required.", str(e)]
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
+        except SolaceSempv1VersionNotSupportedError as e:
+            self.logExceptionAsError(type(e), e)
+            usr_msg = [str(e)]
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
+        except SolaceNoModuleSupportForSolaceCloudError as e:
+            self.logExceptionAsError(type(e), e)
+            usr_msg = [str(e), "Solace Cloud not supported", "raise a feature request if required"]
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
         except (requests.exceptions.SSLError) as e:
             # these paths do not seem to work
             # logging.debug("ssl verify paths: %s", SolaceUtils.get_ssl_default_verify_paths())
@@ -174,7 +187,7 @@ class SolaceCRUDTask(SolaceTask):
         raise SolaceInternalErrorAbstractMethod()
 
     def get_new_settings(self) -> dict:
-        s = self.get_module().params['settings']
+        s = self.get_module().params[self.get_settings_arg_name()]
         if s:
             SolaceUtils.type_conversion(s, self.get_config().is_solace_cloud())
         return s
@@ -190,6 +203,9 @@ class SolaceCRUDTask(SolaceTask):
 
     def delete_func(self, *args) -> dict:
         raise SolaceInternalErrorAbstractMethod()
+
+    def do_task_extension(self, args, new_state, new_settings, current_settings):
+        raise SolaceInternalError(f"unhandled task-state combination, state={new_state}")
 
     def do_task(self):
         self.validate_params()
@@ -224,13 +240,12 @@ class SolaceCRUDTask(SolaceTask):
             if update_settings:
                 result = self.create_result(rc=0, changed=True)
                 if not self.get_module().check_mode:
-                    # sending all settings to update ==> no missing together, required, check necessary
+                    # sending all settings to update ==> no missing together or required check necessary
                     args.append(new_settings)
                     args.append(update_settings)
                     result['response'] = self.update_func(*args)
             return None, result
-        # should never get here
-        raise SolaceInternalError("unhandled task combination")
+        return self.do_task_extension(args, new_state, new_settings, current_settings)
 
 
 class SolaceBrokerCRUDTask(SolaceCRUDTask):
@@ -238,25 +253,53 @@ class SolaceBrokerCRUDTask(SolaceCRUDTask):
         super().__init__(module)
         self.config = SolaceTaskBrokerConfig(module)
 
+    def get_settings_arg_name(self) -> str:
+        return 'sempv2_settings'
+
     def get_config(self) -> SolaceTaskBrokerConfig:
         return self.config
 
-    def get_sempv2_version_as_float(self) -> float:
-        if self.config.sempv2_version is None:
-            sempv2_api = SolaceSempV2Api(self.module)
-            sempv2_version = sempv2_api.get_sempv2_version(self.get_config())
-            self.config.set_sempv2_version(sempv2_version)
-        try:
-            v = float(self.config.sempv2_version)
-        except ValueError as e:
-            raise SolaceParamsValidationError('sempv2_version', self.config.sempv2_version, "value cannot be converted to a float") from e
-        return v
+    # TODO: DELETEME
+    # def get_sempv2_version_as_float(self) -> float:
+    #     if self.config.sempv2_version is None:
+    #         sempv2_api = SolaceSempV2Api(self.module)
+    #         sempv2_version = sempv2_api.get_sempv2_version(self.get_config())
+    #         self.config.set_sempv2_version(sempv2_version)
+    #     try:
+    #         v = float(self.config.sempv2_version)
+    #     except ValueError as e:
+    #         raise SolaceParamsValidationError('sempv2_version', self.config.sempv2_version, "value cannot be converted to a float") from e
+    #     return v
+
+
+    # TODO: DELETEME
+    # def get_sempv1_version_as_version(self) -> Version:
+    #    _v = Version("9.9")
+    #    return _v
+
+
+    # TODO: DELETEME
+    # def get_sempv1_version_as_float(self) -> float:
+    #     if self.config.sempv1_version is None:
+    #         sempv1_api = SolaceSempV1Api(self.module)
+    #         sempv1_version = sempv1_api.get_sempv1_version(self.get_config())
+    #         self.config.set_sempv1_version(sempv1_version)
+    #     try:
+    #         # example: soltr/9_9VMR
+    #         s = self.config.sempv1_version[6:9].replace('_', '.')
+    #         v = float(s)
+    #     except ValueError as e:
+    #         raise SolaceParamsValidationError('sempv1_version', self.config.sempv1_version, "value cannot be converted to a float") from e
+    #     return v
 
 
 class SolaceCloudCRUDTask(SolaceCRUDTask):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
         self.config = SolaceTaskSolaceCloudServiceConfig(module)
+
+    def get_settings_arg_name(self) -> str:
+        return 'solace_cloud_settings'
 
     def get_config(self) -> SolaceTaskSolaceCloudServiceConfig:
         return self.config
@@ -274,7 +317,6 @@ class SolaceGetTask(SolaceTask):
         ))
         return result
 
-
 class SolaceBrokerGetTask(SolaceGetTask):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
@@ -284,8 +326,12 @@ class SolaceBrokerGetTask(SolaceGetTask):
     def get_config(self) -> SolaceTaskBrokerConfig:
         return self.config
 
+    def get_settings_arg_name(self) -> str:
+        return 'sempv2_settings'
+
     def get_sempv2_api(self) -> SolaceSempV2Api:
         return self.sempv2_api
+
 
 
 class SolaceBrokerGetPagingTask(SolaceGetTask):
@@ -294,11 +340,14 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
         self.config = SolaceTaskBrokerConfig(module)
         self.sempv2_get_paging_api = SolaceSempV2PagingGetApi(module, self.is_supports_paging())
 
+    def get_config(self) -> SolaceTaskBrokerConfig:
+        return self.config
+
     def is_supports_paging(self):
         return True
 
-    def get_config(self) -> SolaceTaskBrokerConfig:
-        return self.config
+    def get_settings_arg_name(self) -> str:
+        return 'sempv2_settings'
 
     def get_sempv2_get_paging_api(self) -> SolaceSempV2Api:
         return self.sempv2_get_paging_api
@@ -326,6 +375,9 @@ class SolaceCloudGetTask(SolaceGetTask):
 
     def get_config(self) -> SolaceTaskSolaceCloudConfig:
         return self.config
+
+    def get_settings_arg_name(self) -> str:
+        return 'solace_cloud_settings'
 
     def get_solace_cloud_api(self) -> SolaceCloudApi:
         return self.solace_cloud_api

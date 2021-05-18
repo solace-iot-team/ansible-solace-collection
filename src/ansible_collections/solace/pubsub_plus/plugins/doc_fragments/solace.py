@@ -54,14 +54,19 @@ options:
     description: Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
     required: false
     type: str
-  sempv2_version:
-    description:
-      - The SEMP V2 API version of the broker. See M(solace_get_facts) for info on how to retrieve the version from the broker.
-      - "Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'."
-    required: false
-    type: str
-    aliases: [semp_version]
 '''
+  # sempv2_version:
+  #   description:
+  #     - The SEMP V2 API version of the broker. See M(solace_get_facts) for info on how to retrieve the version from the broker.
+  #     - "Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'."
+  #   required: false
+  #   type: str
+  #   aliases: [semp_version]
+  # sempv1_version:
+  #   description:
+  #     - The SEMP V1 API version of the broker.
+  #   required: false
+  #   type: str
 
     VPN = r'''
 options:
@@ -130,10 +135,37 @@ options:
 
     SETTINGS = r'''
 options:
-  settings:
-    description: JSON dictionary of additional configuration, see Reference documentation.
+  sempv2_settings:
+    description: JSON dictionary of additional configuration for the SEMP V2 API. See Reference documentation.
     required: false
     type: dict
+    aliases: [settings]
+'''
+
+    SEMPV2_SETTINGS = r'''
+options:
+  sempv2_settings:
+    description: JSON dictionary of additional configuration for the SEMP V2 API. See Reference documentation.
+    required: false
+    type: dict
+    aliases: [settings]
+'''
+
+    SEMPV1_SETTINGS = r'''
+options:
+  sempv1_settings:
+    description: JSON dictionary of additional configuration for the SEMP V1 API. Converted automatically to RPC XML. See Reference documentation.
+    required: false
+    type: dict
+'''
+
+    SOLACE_CLOUD_SETTINGS = r'''
+options:
+  solace_cloud_settings:
+    description: JSON dictionary of additional configuration for the Solace Cloud API. See Reference documentation.
+    required: false
+    type: dict
+    aliases: [settings]
 '''
 
     STATE = r'''

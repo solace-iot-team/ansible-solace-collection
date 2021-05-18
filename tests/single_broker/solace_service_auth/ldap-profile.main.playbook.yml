@@ -1,0 +1,132 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_service_authentication_ldap_profile"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_service_authentication_ldap_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+  tasks:
+  - name: "ldap-profile:main end for solace cloud"
+    meta: end_play
+    when: broker_type == 'solace_cloud'
+
+  - name: "ldap-profile:main delete"
+    solace_service_authentication_ldap_profile:
+      name: "asct_ldap_profile_1"
+      state: absent
+
+  - name: "ldap-profile:main create"
+    solace_service_authentication_ldap_profile:
+      name: "asct_ldap_profile_1"
+      sempv1_settings:
+        admin:
+          admin-dn: adminDN
+        search:
+          base-dn:
+            distinguished-name: baseDN
+          filter:
+            filter: searchFilter
+        ldap-server:
+          ldap-host: ldap://192.167.123.4:389
+          server-index: "1"
+      state: present
+
+  - name: "ldap-profile:main update"
+    solace_service_authentication_ldap_profile:
+      name: "asct_ldap_profile_1"
+      sempv1_settings:
+        admin:
+          admin-dn: adminDN
+        search:
+          base-dn:
+            distinguished-name: DC=dev,DC=solace,DC=local
+          filter:
+            filter: "(SamAccountName= $CLIENT_USERNAME)"
+        ldap-server:
+          ldap-host: ldap://192.167.123.4:388
+          server-index: 2
+      state: present
+
+# NOTE: module does not support idempotency
+  # - name: "ldap-profile:main update - no change"
+  #   solace_service_authentication_ldap_profile:
+  #     name: "asct_ldap_profile_1"
+  #     sempv1_settings:
+  #       admin:
+  #         admin-dn: adminDN
+  #       search:
+  #         base-dn:
+  #           distinguished-name: DC=dev,DC=solace,DC=local
+  #         filter:
+  #           filter: "(SamAccountName= $CLIENT_USERNAME)"
+  #       ldap-server:
+  #         ldap-host: ldap://192.167.123.4:388
+  #         server-index: 2
+  #     state: present
+  #   register: result
+  # - assert:
+  #     that:
+  #       - not result.changed
+
+  - name: "ldap-profile:main enable"
+    solace_service_authentication_ldap_profile:
+      name: "asct_ldap_profile_1"
+      state: enabled
+
+  - name: "ldap-profile:main enable: idempotency"
+    solace_service_authentication_ldap_profile:
+      name: "asct_ldap_profile_1"
+      state: enabled
+    register: result
+  - assert:
+      that:
+        - not result.changed
+
+  - name: "ldap-profile:main disable"
+    solace_service_authentication_ldap_profile:
+      name: "asct_ldap_profile_1"
+      state: disabled
+
+  - name: "ldap-profile:main disable: idempotency"
+    solace_service_authentication_ldap_profile:
+      name: "asct_ldap_profile_1"
+      state: disabled
+    register: result
+  - assert:
+      that:
+        - not result.changed
+
+  - name: "ldap-profile:main enable"
+    solace_service_authentication_ldap_profile:
+      name: "asct_ldap_profile_1"
+      state: enabled
+
+  - name: "ldap-profile:main delete"
+    solace_service_authentication_ldap_profile:
+      name: "asct_ldap_profile_1"
+      state: absent
+
+  - name: "ldap-profile:main delete: idempotency"
+    solace_service_authentication_ldap_profile:
+      name: "asct_ldap_profile_1"
+      state: absent
+    register: result
+  - assert:
+      that:
+        - not result.changed
+
+###
+# The End.
