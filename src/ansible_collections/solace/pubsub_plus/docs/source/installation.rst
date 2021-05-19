@@ -1,13 +1,16 @@
 Installation
 ============
 
+.. note::
+  Supported ansible version: 'ansible>=2.10.3,<2.11'
+
 Installation & Dependencies
 ---------------------------
 
 Prerequisites
 +++++++++++++
 
-  - install python >=3.6
+  - install python >=3.8
 
 Python dependencies:
 :download:`requirements <../../requirements.txt>`:
