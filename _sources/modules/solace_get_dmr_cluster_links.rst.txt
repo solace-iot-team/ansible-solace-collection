@@ -142,14 +142,6 @@ secure_connection (optional)
   | **type**: bool
   | **default**: False
 
-sempv2_version (optional)
-  The SEMP V2 API version of the broker. See :ref:`solace_get_facts <solace_get_facts_module>` for info on how to retrieve the version from the broker.
-
-  Note: If the module requires it and not provided, the module will fetch it using the SEMP call 'about/api'.
-
-  | **type**: str
-  | **aliases**: semp_version
-
 timeout (optional)
   Connection timeout in seconds for the http request.
 

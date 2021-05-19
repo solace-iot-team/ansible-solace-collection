@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>solace_bridge_remote_subscription – remote subscription on a bridge &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  <title>solace_service_authentication_ldap_profile – ldap profile &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
   
 
   
@@ -43,8 +43,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="solace_bridge_remote_vpn – bridge remote vpn" href="solace_bridge_remote_vpn.html" />
-    <link rel="prev" title="solace_bridge – bridge" href="solace_bridge.html" /> 
+    <link rel="next" title="solace_topic_endpoint – topic endpoint" href="solace_topic_endpoint.html" />
+    <link rel="prev" title="solace_replay_log_trim_logged_msgs – trim msgs on replay log" href="solace_replay_log_trim_logged_msgs.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -117,13 +117,7 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_authentication_oauth_provider.html">solace_authentication_oauth_provider – oauth provider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_authorization_group.html">solace_authorization_group – authorization group</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge.html">solace_bridge – bridge</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_bridge_remote_subscription – remote subscription on a bridge</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_subscription.html">solace_bridge_remote_subscription – remote subscription on a bridge</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_vpn.html">solace_bridge_remote_vpn – bridge remote vpn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge_trusted_cn.html">solace_bridge_trusted_cn – trusted common name for bridge</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_cert_authority.html">solace_cert_authority – certificate authority</a></li>
@@ -146,7 +140,13 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer_trusted_cn.html">solace_rdp_rest_consumer_trusted_cn – trusted common name on rdp rest consumer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_replay_log.html">solace_replay_log – replay log</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_replay_log_trim_logged_msgs.html">solace_replay_log_trim_logged_msgs – trim msgs on replay log</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_service_authentication_ldap_profile.html">solace_service_authentication_ldap_profile – ldap profile</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_service_authentication_ldap_profile – ldap profile</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="solace_topic_endpoint.html">solace_topic_endpoint – topic endpoint</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_vpn.html">solace_vpn – vpn</a></li>
 </ul>
@@ -207,7 +207,7 @@
         
           <li><a href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a> &raquo;</li>
         
-      <li>solace_bridge_remote_subscription – remote subscription on a bridge</li>
+      <li>solace_service_authentication_ldap_profile – ldap profile</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -215,7 +215,7 @@
           
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_bridge_remote_subscription.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_service_authentication_ldap_profile.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -229,9 +229,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="solace-bridge-remote-subscription-remote-subscription-on-a-bridge">
-<span id="solace-bridge-remote-subscription-module"></span><h1>solace_bridge_remote_subscription – remote subscription on a bridge<a class="headerlink" href="#solace-bridge-remote-subscription-remote-subscription-on-a-bridge" title="Permalink to this headline">¶</a></h1>
-<p>Configure a Remote Subscription Object on a bridge. Allows addition and removal of remote subscription objects on a bridge in an idempotent manner.</p>
+  <div class="section" id="solace-service-authentication-ldap-profile-ldap-profile">
+<span id="solace-service-authentication-ldap-profile-module"></span><h1>solace_service_authentication_ldap_profile – ldap profile<a class="headerlink" href="#solace-service-authentication-ldap-profile-ldap-profile" title="Permalink to this headline">¶</a></h1>
+<p>Configure a LDAP Profile object on a Broker Service.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
@@ -240,43 +240,62 @@
 <span class="nt">collections</span><span class="p">:</span>
 <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span>
 <span class="nt">module_defaults</span><span class="p">:</span>
-  <span class="nt">solace_bridge</span><span class="p">:</span>
+  <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
     <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
-  <span class="nt">solace_bridge_remote_subscription</span><span class="p">:</span>
-    <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">solace_cloud_api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">SOLACE_CLOUD_API_TOKEN</span> <span class="k">if</span> <span class="nv">broker_type</span><span class="o">==</span><span class="s1">&#39;solace_cloud&#39;</span> <span class="k">else</span> <span class="nv">omit</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">solace_cloud_service_id</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">solace_cloud_service_id</span> <span class="o">|</span> <span class="nf">default</span><span class="o">(</span><span class="nv">omit</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="nt">tasks</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create a bridge - disabled</span>
-    <span class="nt">solace_bridge</span><span class="p">:</span>
-      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">the_bridge</span>
-      <span class="nt">settings</span><span class="p">:</span>
-        <span class="nt">enabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-      <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create</span>
+  <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">sempv1_settings</span><span class="p">:</span>
+      <span class="nt">admin</span><span class="p">:</span>
+        <span class="nt">admin-dn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">adminDN</span>
+      <span class="nt">search</span><span class="p">:</span>
+        <span class="nt">base-dn</span><span class="p">:</span>
+          <span class="nt">distinguished-name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">baseDN</span>
+        <span class="nt">filter</span><span class="p">:</span>
+          <span class="nt">filter</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">searchFilter</span>
+      <span class="nt">ldap-server</span><span class="p">:</span>
+        <span class="nt">ldap-host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ldap://192.167.123.4:389</span>
+        <span class="nt">server-index</span><span class="p">:</span> <span class="s">&quot;1&quot;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">add a remote subscription</span>
-    <span class="nt">solace_bridge_remote_subscription</span><span class="p">:</span>
-      <span class="nt">bridge_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">the_bridge</span>
-      <span class="nt">remote_subscription_topic</span><span class="p">:</span> <span class="s">&quot;ansible/solace/test/bridge/da/&gt;&quot;</span>
-      <span class="nt">settings</span><span class="p">:</span>
-        <span class="nt">deliverAlwaysEnabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-      <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">update</span>
+  <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">sempv1_settings</span><span class="p">:</span>
+      <span class="nt">admin</span><span class="p">:</span>
+        <span class="nt">admin-dn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">adminDN</span>
+      <span class="nt">search</span><span class="p">:</span>
+        <span class="nt">base-dn</span><span class="p">:</span>
+          <span class="nt">distinguished-name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">DC=dev,DC=solace,DC=local</span>
+        <span class="nt">filter</span><span class="p">:</span>
+          <span class="nt">filter</span><span class="p">:</span> <span class="s">&quot;(SamAccountName=</span><span class="nv"> </span><span class="s">$CLIENT_USERNAME)&quot;</span>
+      <span class="nt">ldap-server</span><span class="p">:</span>
+        <span class="nt">ldap-host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ldap://192.167.123.5:389</span>
+        <span class="nt">server-index</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">remove remote subscription</span>
-    <span class="nt">solace_bridge_remote_subscription</span><span class="p">:</span>
-      <span class="nt">bridge_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">the_bridge</span>
-      <span class="nt">remote_subscription_topic</span><span class="p">:</span> <span class="s">&quot;ansible/solace/test/bridge/da/&gt;&quot;</span>
-      <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">absent</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">enable</span>
+  <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">enabled</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">disable</span>
+  <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">disabled</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">delete</span>
+  <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">absent</span>
 </pre></div>
 </div>
 </div>
@@ -285,7 +304,10 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
-<li><p>Module Sempv2 Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeRemoteSubscription">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeRemoteSubscription</a></p></li>
+<li><p>STATUS: <strong>EXPERIMENTAL</strong></p></li>
+<li><p>Does not support Solace Cloud API. If required, submit a feature request.</p></li>
+<li><p>Module Sempv1 Config: <a class="reference external" href="https://docs.solace.com/Configuring-and-Managing/Configuring-LDAP-Authentication.htm">https://docs.solace.com/Configuring-and-Managing/Configuring-LDAP-Authentication.htm</a></p></li>
+<li><p>Note: Self-Hosted Broker Service: most operations are NOT idempotent.</p></li>
 <li><p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a></p></li>
 <li><p>Sempv2 Monitor Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/</a></p></li>
 <li><p>Sempv2 Action Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/</a></p></li>
@@ -295,34 +317,16 @@
 <div class="section" id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
-<dt>bridge_name (required)</dt><dd><p>The bridge. Maps to ‘bridgeName’ in the API.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>bridge_virtual_router (optional)</dt><dd><p>The bridge virtual router. Maps to ‘bridgeVirtualRouter’ in the API.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: auto</div>
-<div class="line"><strong>choices</strong>: primary, backup, auto</div>
-<div class="line"><strong>aliases</strong>: virtual_router</div>
-</div>
-</dd>
 <dt>host (optional)</dt><dd><p>Hostname of Solace Broker.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: str</div>
 <div class="line"><strong>default</strong>: localhost</div>
 </div>
 </dd>
-<dt>msg_vpn (required)</dt><dd><p>The message vpn.</p>
+<dt>name (required)</dt><dd><p>Name of the LDAP Profile. Maps to ‘ldap-profile’ in the SEMP V1 API.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>name (required)</dt><dd><p>The subscription topic. Maps to ‘remoteSubscriptionTopic’ in the API.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>aliases</strong>: topic, remote_subscription_topic</div>
+<div class="line"><strong>aliases</strong>: ldap_profile, ldap_profile_name</div>
 </div>
 </dd>
 <dt>password (optional)</dt><dd><p>Administrator password for Solace Broker.</p>
@@ -343,7 +347,26 @@
 <div class="line"><strong>default</strong>: False</div>
 </div>
 </dd>
-<dt>sempv2_settings (optional)</dt><dd><p>JSON dictionary of additional configuration for the SEMP V2 API. See Reference documentation.</p>
+<dt>sempv1_settings (optional)</dt><dd><p>JSON dictionary of additional configuration for the SEMP V1 API. Converted automatically to RPC XML. See Reference documentation.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+</dd>
+<dt>solace_cloud_api_token (optional)</dt><dd><p>The API Token.</p>
+<p>Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.</p>
+<p>Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>solace_cloud_service_id (optional)</dt><dd><p>The service id in Solace Cloud.</p>
+<p>Click on the service in Solace Cloud - the service id is in the URL.</p>
+<p>Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>solace_cloud_settings (optional)</dt><dd><p>JSON dictionary of additional configuration for the Solace Cloud API. See Reference documentation.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: dict</div>
 <div class="line"><strong>aliases</strong>: settings</div>
@@ -353,7 +376,7 @@
 <div class="line-block">
 <div class="line"><strong>type</strong>: str</div>
 <div class="line"><strong>default</strong>: present</div>
-<div class="line"><strong>choices</strong>: present, absent</div>
+<div class="line"><strong>choices</strong>: present, absent, enabled, disabled</div>
 </div>
 </dd>
 <dt>timeout (optional)</dt><dd><p>Connection timeout in seconds for the http request.</p>
@@ -378,7 +401,7 @@
 <div class="section" id="return-values">
 <h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <dl>
-<dt>response</dt><dd><p>The response from the Solace Sempv2 request.</p>
+<dt>response</dt><dd><p>The call/response to/from the API request.</p>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: success</div>
 <div class="line"><strong>type</strong>: dict</div>
@@ -417,8 +440,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="solace_bridge_remote_vpn.html" class="btn btn-neutral float-right" title="solace_bridge_remote_vpn – bridge remote vpn" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="solace_bridge.html" class="btn btn-neutral float-left" title="solace_bridge – bridge" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="solace_topic_endpoint.html" class="btn btn-neutral float-right" title="solace_topic_endpoint – topic endpoint" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="solace_replay_log_trim_logged_msgs.html" class="btn btn-neutral float-left" title="solace_replay_log_trim_logged_msgs – trim msgs on replay log" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

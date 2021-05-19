@@ -146,6 +146,7 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer_trusted_cn.html">solace_rdp_rest_consumer_trusted_cn – trusted common name on rdp rest consumer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_replay_log.html">solace_replay_log – replay log</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_replay_log_trim_logged_msgs.html">solace_replay_log_trim_logged_msgs – trim msgs on replay log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_service_authentication_ldap_profile.html">solace_service_authentication_ldap_profile – ldap profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_topic_endpoint.html">solace_topic_endpoint – topic endpoint</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_vpn.html">solace_vpn – vpn</a></li>
 </ul>
@@ -332,16 +333,10 @@
 <div class="line"><strong>default</strong>: False</div>
 </div>
 </dd>
-<dt>sempv2_version (optional)</dt><dd><p>The SEMP V2 API version of the broker. See <a class="reference internal" href="solace_get_facts.html#solace-get-facts-module"><span class="std std-ref">solace_get_facts</span></a> for info on how to retrieve the version from the broker.</p>
-<p>Note: If the module requires it and not provided, the module will fetch it using the SEMP call ‘about/api’.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>aliases</strong>: semp_version</div>
-</div>
-</dd>
-<dt>settings (optional)</dt><dd><p>JSON dictionary of additional configuration, see Reference documentation.</p>
+<dt>sempv2_settings (optional)</dt><dd><p>JSON dictionary of additional configuration for the SEMP V2 API. See Reference documentation.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: dict</div>
+<div class="line"><strong>aliases</strong>: settings</div>
 </div>
 </dd>
 <dt>state (optional)</dt><dd><p>Target state.</p>
@@ -430,7 +425,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 17 May 2021 at 08:54.
+        Last updated on 19 May 2021 at 14:10.
       </span>
 
     </p>

@@ -188,13 +188,17 @@
             
   <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Supported ansible versions: ‘ansible&gt;=2.10.3,&lt;2.11’</p>
+</div>
 <div class="section" id="installation-dependencies">
 <h2>Installation &amp; Dependencies<a class="headerlink" href="#installation-dependencies" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="prerequisites">
 <h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <div><ul class="simple">
-<li><p>install python &gt;=3.6</p></li>
+<li><p>install python &gt;=3.8</p></li>
 </ul>
 </div></blockquote>
 <p>Python dependencies:
@@ -303,7 +307,7 @@ $ ansible-galaxy collection list
 <p class="tab-title">Virtual Env</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ brew install pyenv
 <span class="c1"># download a Python version</span>
-$ pyenv install <span class="m">3</span>.6.12 <span class="c1"># or another version</span>
+$ pyenv install <span class="m">3</span>.8.6 <span class="c1"># or another version</span>
 <span class="c1"># bin: ~/.pyenv/versions/3.6.12/bin/python3</span>
 $ pip3 install virtualenv
 
@@ -314,13 +318,13 @@ $ mkdir venvs
 $ <span class="nb">cd</span> venvs
 
 <span class="c1"># create virtual env</span>
-$ virtualenv -p ~/.pyenv/versions/3.6.12/bin/python3 venv3.6.12
+$ virtualenv -p ~/.pyenv/versions/3.8.6/bin/python3 venv3.8.6
 <span class="c1"># activate virtual env</span>
-<span class="nb">source</span> venv3.6.12/bin/activate
+<span class="nb">source</span> venv3.8.6/bin/activate
 <span class="c1"># check</span>
-<span class="o">(</span>venv3.6.12<span class="o">)</span> ...$ python -V
+<span class="o">(</span>venv3.8.6<span class="o">)</span> ...$ python -V
 <span class="c1"># upgrade pip</span>
-<span class="o">(</span>venv3.6.12<span class="o">)</span> ...$ python -m pip install --upgrade pip
+<span class="o">(</span>venv3.8.6<span class="o">)</span> ...$ python -m pip install --upgrade pip
 
 <span class="c1"># ansible</span>
 $ pip install ansible
@@ -332,10 +336,10 @@ $ pip show ansible
 
 <span class="c1"># collection dependencies &amp; collection</span>
 $ pip install -r requirements.txt
-$ ansible-galaxy collection install solace.pubsub_plus -p venv3.6.12/lib/python3.6/site-packages/ansible_collections/
-<span class="c1"># [WARNING]: The specified collections path &#39;{root}/my-project/venvs/venv3.6.12/lib/python3.6/site-packages/ansible_collections&#39; is not part ...</span>
+$ ansible-galaxy collection install solace.pubsub_plus -p venv3.8.6/lib/python3.8/site-packages/ansible_collections/
+<span class="c1"># [WARNING]: The specified collections path &#39;{root}/my-project/venvs/venv3.8.6/lib/python3.8/site-packages/ansible_collections&#39; is not part ...</span>
 <span class="c1"># add install path to ANSIBLE_COLLECTIONS_PATH</span>
-<span class="nb">export</span> <span class="nv">ANSIBLE_COLLECTIONS_PATH</span><span class="o">={</span>root<span class="o">}</span>/my-project/venvs/venv3.6.12/lib/python3.6/site-packages/ansible_collections
+<span class="nb">export</span> <span class="nv">ANSIBLE_COLLECTIONS_PATH</span><span class="o">={</span>root<span class="o">}</span>/my-project/venvs/venv3.8.6/lib/python3.8/site-packages/ansible_collections
 <span class="c1"># check install path</span>
 $ ansible-galaxy collection list
 </pre></div>
@@ -417,7 +421,7 @@ $ ansible-galaxy collection list
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 17 May 2021 at 08:54.
+        Last updated on 19 May 2021 at 14:10.
       </span>
 
     </p>

@@ -1,13 +1,16 @@
 Installation
 ============
 
+.. important::
+  Supported ansible versions: 'ansible>=2.10.3,<2.11'
+
 Installation & Dependencies
 ---------------------------
 
 Prerequisites
 +++++++++++++
 
-  - install python >=3.6
+  - install python >=3.8
 
 Python dependencies:
 :download:`requirements <../../requirements.txt>`:
@@ -127,7 +130,7 @@ Sequence:
 
         $ brew install pyenv
         # download a Python version
-        $ pyenv install 3.6.12 # or another version
+        $ pyenv install 3.8.6 # or another version
         # bin: ~/.pyenv/versions/3.6.12/bin/python3
         $ pip3 install virtualenv
 
@@ -138,13 +141,13 @@ Sequence:
         $ cd venvs
 
         # create virtual env
-        $ virtualenv -p ~/.pyenv/versions/3.6.12/bin/python3 venv3.6.12
+        $ virtualenv -p ~/.pyenv/versions/3.8.6/bin/python3 venv3.8.6
         # activate virtual env
-        source venv3.6.12/bin/activate
+        source venv3.8.6/bin/activate
         # check
-        (venv3.6.12) ...$ python -V
+        (venv3.8.6) ...$ python -V
         # upgrade pip
-        (venv3.6.12) ...$ python -m pip install --upgrade pip
+        (venv3.8.6) ...$ python -m pip install --upgrade pip
 
         # ansible
         $ pip install ansible
@@ -156,10 +159,10 @@ Sequence:
 
         # collection dependencies & collection
         $ pip install -r requirements.txt
-        $ ansible-galaxy collection install solace.pubsub_plus -p venv3.6.12/lib/python3.6/site-packages/ansible_collections/
-        # [WARNING]: The specified collections path '{root}/my-project/venvs/venv3.6.12/lib/python3.6/site-packages/ansible_collections' is not part ...
+        $ ansible-galaxy collection install solace.pubsub_plus -p venv3.8.6/lib/python3.8/site-packages/ansible_collections/
+        # [WARNING]: The specified collections path '{root}/my-project/venvs/venv3.8.6/lib/python3.8/site-packages/ansible_collections' is not part ...
         # add install path to ANSIBLE_COLLECTIONS_PATH
-        export ANSIBLE_COLLECTIONS_PATH={root}/my-project/venvs/venv3.6.12/lib/python3.6/site-packages/ansible_collections
+        export ANSIBLE_COLLECTIONS_PATH={root}/my-project/venvs/venv3.8.6/lib/python3.8/site-packages/ansible_collections
         # check install path
         $ ansible-galaxy collection list
 

@@ -128,13 +128,6 @@ name (optional)
 
   | **type**: str
 
-settings (optional)
-  Additional settings for state=present. See Reference documentation output of :ref:`solace_cloud_get_service <solace_cloud_get_service_module>` for details.
-
-  Note: For state=present, provide at least: msgVpnName, datacenterId, serviceTypeId, serviceClassId.
-
-  | **type**: dict
-
 solace_cloud_api_token (required)
   The API Token.
 
@@ -150,6 +143,14 @@ solace_cloud_service_id (optional)
 
   | **type**: str
   | **aliases**: service_id
+
+solace_cloud_settings (optional)
+  Additional settings for state=present. See Reference documentation output of :ref:`solace_cloud_get_service <solace_cloud_get_service_module>` for details.
+
+  Note: For state=present, provide at least: msgVpnName, datacenterId, serviceTypeId, serviceClassId.
+
+  | **type**: dict
+  | **aliases**: settings
 
 state (optional)
   Target state.

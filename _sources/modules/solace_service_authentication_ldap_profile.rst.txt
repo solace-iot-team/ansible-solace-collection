@@ -1,13 +1,11 @@
-:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_cert_authority.py
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_service_authentication_ldap_profile.py
 
-.. _solace_cert_authority_module:
+.. _solace_service_authentication_ldap_profile_module:
 
-solace_cert_authority -- certificate authority
-==============================================
+solace_service_authentication_ldap_profile -- ldap profile
+==========================================================
 
-Allows addition, removal and configuration of certificate authority objects on Solace Brokers in an idempotent manner.
-
-Supports standalone brokers and Solace Cloud.
+Configure a LDAP Profile object on a Broker Service.
 
 
 
@@ -24,7 +22,7 @@ Examples
    collections:
    - solace.pubsub_plus
    module_defaults:
-     solace_cert_authority:
+     solace_service_authentication_ldap_profile:
        host: "{{ sempv2_host }}"
        port: "{{ sempv2_port }}"
        secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -34,35 +32,52 @@ Examples
        solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
        solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
    tasks:
-     - name: set files
-       set_fact:
-         cert_key_file: ./tmp/key.pem
-         cert_file: ./tmp/cert.pem
+   - name: create
+     solace_service_authentication_ldap_profile:
+       name: foo
+       sempv1_settings:
+         admin:
+           admin-dn: adminDN
+         search:
+           base-dn:
+             distinguished-name: baseDN
+           filter:
+             filter: searchFilter
+         ldap-server:
+           ldap-host: ldap://192.167.123.4:389
+           server-index: "1"
+       state: present
 
-     - name: generate certificate
-       command: >
-         openssl req
-         -x509
-         -newkey
-         rsa:4096
-         -keyout {{ cert_key_file }}
-         -out {{ cert_file }}
-         -days 365
-         -nodes
-         -subj "/C=UK/ST=London/L=London/O=Solace/OU=Org/CN=www.example.com"
+   - name: update
+     solace_service_authentication_ldap_profile:
+       name: foo
+       sempv1_settings:
+         admin:
+           admin-dn: adminDN
+         search:
+           base-dn:
+             distinguished-name: DC=dev,DC=solace,DC=local
+           filter:
+             filter: "(SamAccountName= $CLIENT_USERNAME)"
+         ldap-server:
+           ldap-host: ldap://192.167.123.5:389
+           server-index: 2
+       state: present
 
-     - name: add
-       solace_cert_authority:
-         name: foo
-         settings:
-           certContent: "{{ lookup('file', cert_file) }}"
-           revocationCheckEnabled: false
-         state: present
+   - name: enable
+     solace_service_authentication_ldap_profile:
+       name: foo
+       state: enabled
 
-     - name: remove
-       solace_cert_authority:
-         name: foo
-         state: absent
+   - name: disable
+     solace_service_authentication_ldap_profile:
+       name: foo
+       state: disabled
+
+   - name: delete
+     solace_service_authentication_ldap_profile:
+       name: foo
+       state: absent
 
 
 
@@ -70,20 +85,15 @@ Notes
 -----
 
 .. note::
-   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority
-   - Module Solace Cloud API: not available
-   - Uses deprecated SempV2 API. Since 2.19, broker supports 'clientCertAuthority' & 'domainCertAuthority' instead. Raise an issue if these are required.
+   - STATUS: **EXPERIMENTAL**
+   - Does not support Solace Cloud API. If required, submit a feature request.
+   - Module Sempv1 Config: https://docs.solace.com/Configuring-and-Managing/Configuring-LDAP-Authentication.htm
+   - Note: Self-Hosted Broker Service: most operations are NOT idempotent.
    - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
    - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
    - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
 
 
-See Also
---------
-
-.. seealso::
-
-   - :ref:`solace_get_cert_authorities_module`
 
 
 
@@ -97,9 +107,10 @@ host (optional)
   | **default**: localhost
 
 name (required)
-  The name of the Certificate Authority. Maps to 'certAuthorityName' in the Sempv2 API.
+  Name of the LDAP Profile. Maps to 'ldap-profile' in the SEMP V1 API.
 
   | **type**: str
+  | **aliases**: ldap_profile, ldap_profile_name
 
 password (optional)
   Administrator password for Solace Broker.
@@ -119,11 +130,10 @@ secure_connection (optional)
   | **type**: bool
   | **default**: False
 
-sempv2_settings (optional)
-  JSON dictionary of additional configuration for the SEMP V2 API. See Reference documentation.
+sempv1_settings (optional)
+  JSON dictionary of additional configuration for the SEMP V1 API. Converted automatically to RPC XML. See Reference documentation.
 
   | **type**: dict
-  | **aliases**: settings
 
 solace_cloud_api_token (optional)
   The API Token.
@@ -143,12 +153,18 @@ solace_cloud_service_id (optional)
 
   | **type**: str
 
+solace_cloud_settings (optional)
+  JSON dictionary of additional configuration for the Solace Cloud API. See Reference documentation.
+
+  | **type**: dict
+  | **aliases**: settings
+
 state (optional)
   Target state.
 
   | **type**: str
   | **default**: present
-  | **choices**: present, absent
+  | **choices**: present, absent, enabled, disabled
 
 timeout (optional)
   Connection timeout in seconds for the http request.
@@ -175,7 +191,7 @@ Return Values
 -------------
 
 response
-  The response from the Solace Sempv2 request.
+  The call/response to/from the API request.
 
   | **returned**: success
   | **type**: dict
