@@ -21,7 +21,6 @@ import traceback
 try:
     import requests
     import xmltodict
-    # import packaging.version as version
 except ImportError:
     SOLACE_API_HAS_IMPORT_ERROR = True
     SOLACE_API_IMPORT_ERR_TRACEBACK = traceback.format_exc()

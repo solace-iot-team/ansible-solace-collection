@@ -19,7 +19,7 @@ SOLACE_UTILS_IMPORT_ERR_TRACEBACK = None
 import traceback
 try:
     import xmltodict
-    import packaging
+    import packaging.version
 except ImportError:
     SOLACE_UTILS_HAS_IMPORT_ERROR = True
     SOLACE_UTILS_IMPORT_ERR_TRACEBACK = traceback.format_exc()

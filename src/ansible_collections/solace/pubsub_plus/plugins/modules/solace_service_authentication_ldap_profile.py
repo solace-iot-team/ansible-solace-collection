@@ -142,16 +142,18 @@ from ansible.module_utils.basic import AnsibleModule
 
 class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
 
+    MIN_SEMP_V1_VERSION = "9.3"
+
     def __init__(self, module):
         super().__init__(module)
         self.sempv1_api = SolaceSempV1Api(module)
         self.solace_cloud_api = SolaceCloudApi(module)
 
     def check_min_sempv1_supported_version(self):
-        MIN_SEMP_V1_VERSION = SolaceUtils.create_version("9.3")
+        min_sempv1_version = SolaceUtils.create_version(self.MIN_SEMP_V1_VERSION)
         raw_api_version, version = self.sempv1_api.get_sempv1_version(self.get_config())
-        if version < MIN_SEMP_V1_VERSION:
-            raise SolaceSempv1VersionNotSupportedError(self.get_module()._name, f"{version}({raw_api_version})", MIN_SEMP_V1_VERSION)
+        if version < min_sempv1_version:
+            raise SolaceSempv1VersionNotSupportedError(self.get_module()._name, f"{version}({raw_api_version})", min_sempv1_version)
 
     def do_task_extension(self, args, new_state, new_settings, current_settings):
         is_enabled = True if current_settings['shutdown'] == 'No' else False
