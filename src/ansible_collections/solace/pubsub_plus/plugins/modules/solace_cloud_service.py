@@ -47,12 +47,13 @@ options:
     type: int
     required: false
     default: 30
-  settings:
+  solace_cloud_settings:
     description:
     - Additional settings for state=present. See Reference documentation output of M(solace_cloud_get_service) for details.
     - "Note: For state=present, provide at least: msgVpnName, datacenterId, serviceTypeId, serviceClassId."
     type: dict
     required: false
+    aliases: [settings]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
 - solace.pubsub_plus.solace.state
@@ -301,7 +302,7 @@ def run_module():
     arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud()
     arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service_id())
     arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_state())
-    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_settings())
+    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_settings())
     arg_spec.update(module_args)
 
     module = AnsibleModule(

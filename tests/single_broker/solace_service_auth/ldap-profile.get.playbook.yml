@@ -1,0 +1,68 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "get: solace_service_authentication_ldap_profile"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_service_authentication_ldap_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_get_service_authentication_ldap_profiles:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+
+# TODO: define 3 profiles in vars
+  # pre_tasks:
+  # - include_vars:
+  #     file: "authorization_groups.vars.yml"
+  #     name: target_list
+  tasks:
+
+  # - delete them all
+  # - get all
+  # - create all
+  # - get all
+  # - delete all
+
+
+  # - meta: end_play
+  - fail:
+      msg: continue here
+
+
+  # - name: "ldap-profile:main get"
+  #   solace_get_service_authentication_ldap_profiles:
+  #     api: monitor
+  #     query_params:
+  #       where:
+  #         - "authorizationGroupName==asct_*"
+  #   register: result
+  # - assert:
+  #     that: result.result_list_count == 3
+
+
+  - name: "ldap-profile:main delete"
+    solace_service_authentication_ldap_profile:
+      name: "asct_ldap_profile_1"
+      state: absent
+
+
+###
+# The End.

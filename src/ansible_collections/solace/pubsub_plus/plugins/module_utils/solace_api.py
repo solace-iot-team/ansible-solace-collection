@@ -13,6 +13,7 @@ import json
 import urllib.parse
 import logging
 import time
+import xml.etree.ElementTree as ET
 
 SOLACE_API_HAS_IMPORT_ERROR = False
 SOLACE_API_IMPORT_ERR_TRACEBACK = None
@@ -126,25 +127,8 @@ class SolaceApi(object):
             _headers["authorization"] = "***"
         return _headers
 
-    # @staticmethod
-    # def parse_resp_text(resp_text):
-    #     resp_body = None
-    #     if resp_text:
-    #         try:
-    #             resp_body = json.loads(resp_text)
-    #         except json.JSONDecodeError:
-    #             # try XML parsing it
-    #             try:
-    #                 resp_body = xmltodict.parse(resp_text)
-    #             except Exception:
-    #                 # print as text at least
-    #                 resp_body = resp_text
-    #     return resp_body
-
     @staticmethod
-    def log_http_roundtrip(resp):
-        if not solace_sys.ENABLE_LOGGING:
-            return
+    def get_http_request_body(resp):
         if hasattr(resp.request, 'body') and resp.request.body:
             try:
                 decoded_body = resp.request.body.decode()
@@ -153,6 +137,13 @@ class SolaceApi(object):
                 request_body = resp.request.body
         else:
             request_body = "{}"
+        return request_body
+
+    @staticmethod
+    def log_http_roundtrip(resp):
+        if not solace_sys.ENABLE_LOGGING:
+            return
+        request_body = SolaceApi.get_http_request_body(resp)
         resp_body = SolaceUtils.parse_response_text(resp.text)
         log = {
             'request': {
@@ -191,9 +182,15 @@ class SolaceSempV2Api(SolaceApi):
     def get_url(self, config: SolaceTaskBrokerConfig, path: str) -> str:
         return config.get_semp_url(path)
 
-    def get_sempv2_version(self, config: SolaceTaskBrokerConfig) -> str:
+    def get_sempv2_version(self, config: SolaceTaskBrokerConfig):
         resp = self.make_get_request(config, [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + ["about", "api"])
-        return SolaceUtils.get_key(resp, "sempVersion")
+        raw_api_version = SolaceUtils.get_key(resp, "sempVersion")
+        # format: 2.21
+        try:
+            v = SolaceUtils.create_version(raw_api_version)
+        except SolaceInternalError as e:
+            raise SolaceInternalError(f"sempv2 version parsing failed: {raw_api_version}") from e
+        return raw_api_version, v
 
     def handle_bad_response(self, resp):
         _resp = dict()
@@ -318,7 +315,21 @@ class SolaceSempV1Api(SolaceApi):
 
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
+        self.call_num = -1
         return
+
+    def get_sempv1_version(self, config: SolaceTaskBrokerConfig):
+        rpc_xml = "<rpc><show><service></service></show></rpc>"
+        resp = self.make_post_request(config, rpc_xml)
+        rpc_reply = resp['rpc-reply']
+        raw_api_version = SolaceUtils.get_key(rpc_reply, "@semp-version")
+        # format: soltr/9_9VMR
+        s = raw_api_version[6:9].replace('_', '.')
+        try:
+            v = SolaceUtils.create_version(s)
+        except SolaceInternalError as e:
+            raise SolaceInternalError(f"sempv1 version parsing failed: {raw_api_version}") from e
+        return raw_api_version, v
 
     def get_headers(self, config: SolaceTaskConfig) -> dict:
         headers = {
@@ -336,10 +347,26 @@ class SolaceSempV1Api(SolaceApi):
         try:
             code = resp_body['rpc-reply']['execute-result']['@code']
         except KeyError as e:
-            raise SolaceApiError(resp_body) from e
+            _err = {
+                'call': xmltodict.parse(SolaceApi.get_http_request_body(resp)),
+                'response': resp_body
+            }
+            raise SolaceApiError(_err) from e
         if code != "ok":
-            raise SolaceApiError(resp_body)
+            _err = {
+                'call': xmltodict.parse(SolaceApi.get_http_request_body(resp)),
+                'response': resp_body
+            }
+            raise SolaceApiError(_err)
         return resp_body
+
+    def convertDict2Sempv1RpcXmlString(self, d) -> str:
+        rpc_elem = SolaceUtils.convertDict2XmlElem('rpc', d)
+        return ET.tostring(rpc_elem, encoding='utf-8').decode('utf-8')
+
+    def getNextCallKey(self):
+        self.call_num = self.call_num + 1
+        return 'rpc-call-' + str(self.call_num)
 
     def make_post_request(self, config: SolaceTaskConfig, xml_data: str):
         url = config.get_semp_url(self.API_BASE_SEMPV1)

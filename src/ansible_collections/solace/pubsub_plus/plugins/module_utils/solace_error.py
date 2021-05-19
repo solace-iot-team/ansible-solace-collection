@@ -43,6 +43,16 @@ class SolaceFeatureNotSupportedError(Exception):
         super().__init__(f"feature: '{feature}")
 
 
+class SolaceNoModuleSupportForSolaceCloudError(Exception):
+    def __init__(self, module_name):
+        super().__init__(f"module '{module_name}'")
+
+
+class SolaceSempv1VersionNotSupportedError(Exception):
+    def __init__(self, module_name, sempv1_version_float, min_sempv1_version_float):
+        super().__init__(f"module '{module_name}': service SEMP V1 version: {sempv1_version_float}; minimum version required: {min_sempv1_version_float}")
+
+
 class SolaceError(Exception):
     def __init__(self, message, result_update: dict = None):
         self.message = message

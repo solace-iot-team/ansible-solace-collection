@@ -5,22 +5,21 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceFeatureNotSupportedError
 from ansible.module_utils.basic import AnsibleModule
-import urllib.parse
 import json
-import logging
 import re
 import copy
-from json.decoder import JSONDecodeError
 import ssl
 from copy import deepcopy
+import xml.etree.ElementTree as ET
 
 SOLACE_UTILS_HAS_IMPORT_ERROR = False
 SOLACE_UTILS_IMPORT_ERR_TRACEBACK = None
 import traceback
 try:
     import xmltodict
+    import packaging.version
 except ImportError:
     SOLACE_UTILS_HAS_IMPORT_ERROR = True
     SOLACE_UTILS_IMPORT_ERR_TRACEBACK = traceback.format_exc()
@@ -99,7 +98,10 @@ class SolaceUtils(object):
     def deep_dict_diff(new: dict, old: dict, changes: dict = dict()):
         for k in new.keys():
             if not isinstance(new[k], dict):
-                if new[k] != old.get(k, None):
+                _old = old.get(k, None) if hasattr(old, 'get') else old
+                # BEFORE: (DELETE_ME)
+                # if new[k] != old.get(k, None):
+                if new[k] != _old:
                     changes[k] = new[k]
             else:
                 # changes[k] = dict()
@@ -139,3 +141,30 @@ class SolaceUtils(object):
         for key in two.keys() - overlapping_keys:
             merged[key] = deepcopy(two[key])
         return merged
+
+    @staticmethod
+    def convertDict2XmlElem(tag: str, d: dict) -> ET.Element:
+        elem = ET.Element(tag)
+        for key, val in d.items():
+            if isinstance(val, dict):
+                child = SolaceUtils.convertDict2XmlElem(key, val)
+            elif isinstance(val, list):
+                raise SolaceFeatureNotSupportedError('arrays/list handling')
+            else:
+                child = ET.Element(key)
+                if str(val) != 'None':
+                    child.text = str(val)
+            elem.append(child)
+        return elem
+
+    @staticmethod
+    def stringContainsAnyChars(str: str, set: str) -> bool:
+        return 1 in [c in str for c in set]
+
+    @staticmethod
+    def create_version(s: str):
+        try:
+            v = packaging.version.Version(s)
+        except packaging.version.InvalidVersion as e:
+            raise SolaceInternalError(f"version parsing failed: {s}") from e
+        return v

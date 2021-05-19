@@ -1,5 +1,18 @@
 # Release Notes
 
+## Version: 1.4.1
+Introduction of SEMP V1 Task Framework.
+
+Added support for writing modules that use the SEMP V1 API.
+
+_Note: it is experimental at this point._
+
+New modules:
+
+* **[solace_service_authentication_ldap_profile](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_service_authentication_ldap_profile.html)**
+  - module uses the SEMP V1 API
+  - Solace Cloud API not implemented (yet)
+
 ## Version: 1.4.0
 New modules.
 

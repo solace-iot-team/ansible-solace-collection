@@ -79,19 +79,6 @@
     - assert:
         that: result.rc == 1
 
-    - name: "EX_1: no float semp_version"
-      solace_acl_subscribe_topic_exception:
-        acl_profile_name: "{{ acl_profile_name }}"
-        semp_version: "2.x"
-        name: "test/ansible/solace"
-        state: present
-      ignore_errors: yes
-      register: result
-    - assert:
-        that:
-          - result.rc == 1
-          - "'value cannot be converted to a float' in result.msg[1]"
-
     - name: "EX_1: Delete ACL Profile"
       solace_acl_profile:
         name: "{{ acl_profile_name }}"

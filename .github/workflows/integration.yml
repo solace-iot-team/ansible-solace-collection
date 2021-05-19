@@ -30,9 +30,10 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        python-version: [ '3.6' ]
-        # python-version: [ '3.6', '3.8', '3.9' ]
-        ansible-version: [ 'ansible>=2.10.3' ]
+        # python-version: [ '3.6' ]
+        python-version: [ '3.8' ]
+        # python-version: [ '3.8', '3.9' ]
+        ansible-version: [ 'ansible>=2.10.3,<2.11' ]
         # ansible-version: [ 'ansible>=3' ]
         # ansible-version: [ 'ansible>=2.10.3', 'ansible>=3' ]
     steps:
@@ -102,10 +103,15 @@ jobs:
       - name: Test Installation
         if: env.DEBUG_FLAG == 'true'
         run: |
+          echo ">>>>>>>> pip show ansible"
           pip show ansible
+          echo ">>>>>>>> ansible --version"
           ansible --version
+          echo ">>>>>>>> ansible-galaxy --version"
           ansible-galaxy --version
+          echo ">>>>>>>> pip show xmltodict"
           pip show xmltodict
+          echo ">>>>>>>> ls collection dir"
           ls -la ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
 
       - name: Build and install collection

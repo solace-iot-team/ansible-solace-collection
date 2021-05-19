@@ -27,7 +27,7 @@ options:
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
-- solace.pubsub_plus.solace.settings
+- solace.pubsub_plus.solace.sempv2_settings
 seealso:
 - module: solace_queue
 - module: solace_queue_start_replay
@@ -157,7 +157,7 @@ def run_module():
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
-    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_settings())
+    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_sempv2_settings())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
