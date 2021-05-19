@@ -159,7 +159,7 @@ Sequence:
 
         # collection dependencies & collection
         $ pip install -r requirements.txt
-        $ ansible-galaxy collection install solace.pubsub_plus -p venv3.8.6/lib/python3.6/site-packages/ansible_collections/
+        $ ansible-galaxy collection install solace.pubsub_plus -p venv3.8.6/lib/python3.8/site-packages/ansible_collections/
         # [WARNING]: The specified collections path '{root}/my-project/venvs/venv3.8.6/lib/python3.8/site-packages/ansible_collections' is not part ...
         # add install path to ANSIBLE_COLLECTIONS_PATH
         export ANSIBLE_COLLECTIONS_PATH={root}/my-project/venvs/venv3.8.6/lib/python3.8/site-packages/ansible_collections
