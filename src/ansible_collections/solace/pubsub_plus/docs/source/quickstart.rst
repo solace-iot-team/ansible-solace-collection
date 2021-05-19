@@ -4,8 +4,8 @@ Quickstart for Solace PubSub+ Ansible Collection
 Installation & Dependencies
 ---------------------------
 
-.. note::
-  Supported ansible version: 'ansible>=2.10.3,<2.11'
+.. important::
+  Supported ansible versions: 'ansible>=2.10.3,<2.11'
 
 
 Prerequisites:
