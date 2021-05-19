@@ -30,8 +30,8 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        python-version: [ '3.8' ]
-        # python-version: [ '3.6', '3.8', '3.9' ]
+        python-version: [ '3.6' ]
+        # python-version: [ '3.8', '3.9' ]
         ansible-version: [ 'ansible>=2.10.3,<2.11' ]
         # ansible-version: [ 'ansible>=3' ]
         # ansible-version: [ 'ansible>=2.10.3', 'ansible>=3' ]
