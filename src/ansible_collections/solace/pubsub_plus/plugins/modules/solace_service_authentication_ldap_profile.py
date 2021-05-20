@@ -42,6 +42,8 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.sempv1_settings
 - solace.pubsub_plus.solace.solace_cloud_settings
 - solace.pubsub_plus.solace.broker_config_solace_cloud
+seealso:
+- module: solace_get_service_authentication_ldap_profiles
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''

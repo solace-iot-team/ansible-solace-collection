@@ -24,7 +24,7 @@ inventory=$(assertFile $scriptLogName $INVENTORY_FILE) || exit
 
 playbooks=(
   "$scriptDir/ldap-profile.main.playbook.yml"
-  # "$scriptDir/ldap-profile.get.playbook.yml"
+  "$scriptDir/ldap-profile.get.playbook.yml"
   "$scriptDir/ldap-profile.ex.playbook.yml"
 )
 

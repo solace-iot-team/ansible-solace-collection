@@ -144,6 +144,7 @@ class SolaceUtils(object):
 
     @staticmethod
     def convertDict2XmlElem(tag: str, d: dict) -> ET.Element:
+        # xml_data = xmltodict.unparse(request)
         elem = ET.Element(tag)
         for key, val in d.items():
             if isinstance(val, dict):

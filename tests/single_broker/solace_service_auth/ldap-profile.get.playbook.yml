@@ -27,42 +27,88 @@
       timeout: "{{ sempv2_timeout }}"
       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-
-# TODO: define 3 profiles in vars
-  # pre_tasks:
-  # - include_vars:
-  #     file: "authorization_groups.vars.yml"
-  #     name: target_list
+  pre_tasks:
+  - include_vars:
+      file: "ldap_profiles.vars.yml"
+      name: target_list
+  vars:
+    generated_doc_sample_solace_cloud_file: "GENERATED_DOC_SAMPLE.LDAP_PROFILE.GET.SOLACE_CLOUD.yml"
+    generated_doc_sample_self_hosted_file: "GENERATED_DOC_SAMPLE.LDAP_PROFILE.GET.SELF_HOSTED.yml"
   tasks:
+  - name: "ldap-profile:main end for solace cloud"
+    meta: end_play
+    when: broker_type == 'solace_cloud'
 
-  # - delete them all
-  # - get all
-  # - create all
-  # - get all
-  # - delete all
-
-
-  # - meta: end_play
-  - fail:
-      msg: continue here
-
-
-  # - name: "ldap-profile:main get"
-  #   solace_get_service_authentication_ldap_profiles:
-  #     api: monitor
-  #     query_params:
-  #       where:
-  #         - "authorizationGroupName==asct_*"
-  #   register: result
-  # - assert:
-  #     that: result.result_list_count == 3
-
-
-  - name: "ldap-profile:main delete"
+  - name: "ldap-profile:get delete"
     solace_service_authentication_ldap_profile:
-      name: "asct_ldap_profile_1"
+      name: "{{ item.name }}"
       state: absent
+    loop: "{{ target_list.ldap_profiles }}"
 
+  - name: "ldap-profile:get get "
+    solace_get_service_authentication_ldap_profiles:
+      where_name: "*"
+    register: result
+    # there is the default profile
+
+  - name: "ldap-profile:get create"
+    solace_service_authentication_ldap_profile:
+      name: "{{ item.name }}"
+      sempv1_settings:
+        admin:
+          admin-dn: "{{ item.name }}_DN"
+        search:
+          base-dn:
+            distinguished-name: "{{ item.name }}_DN"
+          filter:
+            filter: searchFilter
+        ldap-server:
+          ldap-host: ldap://192.167.123.4:389
+          server-index: "{{ idx|int + 1 }}"
+      state: present
+    loop: "{{ target_list.ldap_profiles }}"
+    loop_control:
+      index_var: idx
+
+  - name: "ldap-profile:get get "
+    solace_get_service_authentication_ldap_profiles:
+      where_name: "*"
+    register: result
+  - assert:
+      that: result.result_list_count == 4
+
+  - name: "ldap-profile:get get "
+    solace_get_service_authentication_ldap_profiles:
+      where_name: "*_1"
+    register: result
+  - assert:
+      that: result.result_list_count == 1
+
+  - name: "ldap-profile:get delete"
+    solace_service_authentication_ldap_profile:
+      name: "{{ item.name }}"
+      state: absent
+    loop: "{{ target_list.ldap_profiles }}"
+
+  - name: "ldap-profile:get get "
+    solace_get_service_authentication_ldap_profiles:
+      where_name: "*"
+    register: result
+  - assert:
+      that: result.result_list_count == 1
+
+  # generate sample for doc
+  - set_fact:
+        generated_doc_sample_file: "{{ generated_doc_sample_solace_cloud_file }}"
+    when: broker_type == 'solace_cloud'
+  - set_fact:
+        generated_doc_sample_file: "{{ generated_doc_sample_self_hosted_file }}"
+    when: broker_type != 'solace_cloud'
+  - name: save
+    copy:
+      content: "{{ result.result_list | to_nice_yaml }}"
+      dest: "{{ WORKING_DIR }}/{{ generated_doc_sample_file }}"
+    delegate_to: localhost
 
 ###
 # The End.
