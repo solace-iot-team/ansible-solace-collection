@@ -42,7 +42,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.6'
+          # ansible-doc-extractor required version
+          python-version: '3.6.12'
 
       - name: Install ansible and collection dependencies
         env:
