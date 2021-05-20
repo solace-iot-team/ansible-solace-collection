@@ -45,6 +45,7 @@ plugins/modules/solace_mqtt_session_subscription.py pep8:E501
 plugins/modules/solace_get_mqtt_session_subscriptions.py compile-2.7!skip
 plugins/modules/solace_get_mqtt_session_subscriptions.py pep8:E501
 plugins/modules/solace_get_magic_queues.py compile-2.7!skip
+plugins/modules/solace_get_magic_queues.py pep8:E501
 plugins/modules/solace_queue_subscription.py compile-2.7!skip
 plugins/modules/solace_queue_cancel_replay.py compile-2.7!skip
 plugins/modules/solace_queue_start_replay.py compile-2.7!skip
@@ -85,6 +86,8 @@ plugins/modules/solace_get_authentication_oauth_providers.py compile-2.7!skip
 plugins/modules/solace_get_authentication_oauth_providers.py pep8:E501
 plugins/modules/solace_service_authentication_ldap_profile.py compile-2.7!skip
 plugins/modules/solace_service_authentication_ldap_profile.py pep8:E501
+plugins/modules/solace_get_service_authentication_ldap_profiles.py compile-2.7!skip
+plugins/modules/solace_get_service_authentication_ldap_profiles.py pep8:E501
 docs/examples/quickstart/_run.sh shellcheck:SC2046
 docs/examples/quickstart/_run.sh shellcheck:SC2154
 docs/examples/quickstart/run.sh shellcheck:SC2155

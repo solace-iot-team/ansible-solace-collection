@@ -42,6 +42,8 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.sempv1_settings
 - solace.pubsub_plus.solace.solace_cloud_settings
 - solace.pubsub_plus.solace.broker_config_solace_cloud
+seealso:
+- module: solace_get_service_authentication_ldap_profiles
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -154,6 +156,15 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
         raw_api_version, version = self.sempv1_api.get_sempv1_version(self.get_config())
         if version < min_sempv1_version:
             raise SolaceSempv1VersionNotSupportedError(self.get_module()._name, f"{version}({raw_api_version})", min_sempv1_version)
+
+    def normalize_current_settings(self, current_settings: dict, new_settings: dict) -> dict:
+        if self.get_config().is_solace_cloud():
+            return current_settings
+        # SEMP V1
+        # TODO: implement to test if changes are requested.
+        # not trivial, what is the schema?
+        # convert current_settings to same data structure as new_settings
+        return current_settings
 
     def do_task_extension(self, args, new_state, new_settings, current_settings):
         is_enabled = True if current_settings['shutdown'] == 'No' else False

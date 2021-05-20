@@ -1,0 +1,5 @@
+---
+ldap_profiles:
+- name: asct_ldap_profile_1
+- name: asct_ldap_profile_2
+- name: asct_ldap_profile_3

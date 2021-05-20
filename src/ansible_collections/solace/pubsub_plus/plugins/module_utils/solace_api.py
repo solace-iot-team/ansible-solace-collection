@@ -368,11 +368,11 @@ class SolaceSempV1Api(SolaceApi):
         self.call_num = self.call_num + 1
         return 'rpc-call-' + str(self.call_num)
 
-    def make_post_request(self, config: SolaceTaskConfig, xml_data: str):
+    def make_post_request(self, config: SolaceTaskConfig, xml_cmd: str):
         url = config.get_semp_url(self.API_BASE_SEMPV1)
         resp = requests.post(
             url,
-            data=xml_data,
+            data=xml_cmd,
             auth=config.get_semp_auth(),
             timeout=config.get_timeout(),
             headers=self.get_headers(config),
@@ -388,12 +388,11 @@ class SolaceSempV1PagingGetApi(SolaceSempV1Api):
         super().__init__(module)
         return
 
-    def get_objects(self, config: SolaceTaskBrokerConfig, request: dict, reponse_list_path_array: list) -> list:
-        xml_data = xmltodict.unparse(request)
+    def get_objects(self, config: SolaceTaskBrokerConfig, xml_cmd: str, reponse_list_path_array: list) -> list:
         result_list = []
         hasNextPage = True
         while hasNextPage:
-            semp_resp = self.make_post_request(config, xml_data)
+            semp_resp = self.make_post_request(config, xml_cmd)
             # extract the list
             _d = semp_resp
             for path in reponse_list_path_array:
@@ -414,7 +413,7 @@ class SolaceSempV1PagingGetApi(SolaceSempV1Api):
             if 'more-cookie' in semp_resp['rpc-reply']:
                 more_cookie = semp_resp['rpc-reply']['more-cookie']
             if more_cookie:
-                xml_data = xmltodict.unparse(more_cookie)
+                xml_cmd = xmltodict.unparse(more_cookie)
                 hasNextPage = True
             else:
                 hasNextPage = False
