@@ -61,6 +61,9 @@ jobs:
       - name: Install docs make dependencies
         run: |
           pip install -r devel/devel.requirements.txt
+          pip install --upgrade jinja2==2.11.2
+          echo ">>>>> jinja2"
+          pip show jinja2
 
       - name: Make docs
         run: |
