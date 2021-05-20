@@ -1,17 +1,11 @@
-:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_cert_authorities.py
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_service_authentication_ldap_profiles.py
 
-.. _solace_get_cert_authorities_module:
+.. _solace_get_service_authentication_ldap_profiles_module:
 
-solace_get_cert_authorities -- get list of cert authorities
-===========================================================
+solace_get_service_authentication_ldap_profiles -- get ldap profiles
+====================================================================
 
-Get a list of Certificate Authority objects.
-
-Implements the config and monitor API.
-
-Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter.
-
-Supports Solace Cloud Brokers as well as Solace Standalone Brokers.
+Get a list of LDAP Profile Objects configured on a Broker Service.
 
 
 
@@ -26,60 +20,53 @@ Examples
    gather_facts: no
    any_errors_fatal: true
    collections:
-     - solace.pubsub_plus
+   - solace.pubsub_plus
    module_defaults:
-     solace_cert_authority:
+     solace_service_authentication_ldap_profile:
        host: "{{ sempv2_host }}"
        port: "{{ sempv2_port }}"
        secure_connection: "{{ sempv2_is_secure_connection }}"
        username: "{{ sempv2_username }}"
        password: "{{ sempv2_password }}"
        timeout: "{{ sempv2_timeout }}"
-       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
+       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
        solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-     solace_get_cert_authorities:
+     solace_get_service_authentication_ldap_profiles:
        host: "{{ sempv2_host }}"
        port: "{{ sempv2_port }}"
        secure_connection: "{{ sempv2_is_secure_connection }}"
        username: "{{ sempv2_username }}"
        password: "{{ sempv2_password }}"
        timeout: "{{ sempv2_timeout }}"
-       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN | default(omit) }}"
+       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
        solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
    tasks:
-   - name: create cert authority
-     solace_cert_authority:
+   - name: create ldap profile
+     solace_service_authentication_ldap_profile:
        name: foo
-       settings:
-         certContent: "the-cert"
-         state: present
+       sempv1_settings:
+         admin:
+           admin-dn: adminDN
+         search:
+           base-dn:
+             distinguished-name: baseDN
+           filter:
+             filter: searchFilter
+         ldap-server:
+           ldap-host: ldap://192.167.123.4:389
+           server-index: "1"
+       state: present
 
-   - name: get list config
-     solace_get_cert_authorities:
-       query_params:
-         where:
-           - "certAuthorityName==foo"
+   - name: get
+     solace_get_service_authentication_ldap_profiles:
+       where_name: "foo"
      register: result
 
    - name: print result
      debug:
        msg:
-         - "{{ result.result_list }}"
-         - "{{ result.result_list_count }}"
-
-   - name: get list monitor
-     solace_get_cert_authorities:
-       api: monitor
-       query_params:
-         where:
-           - "certAuthorityName==foo"
-     register: result
-
-   - name: print result
-     debug:
-       msg:
-         - "{{ result.result_list }}"
-         - "{{ result.result_list_count }}"
+       - "{{ result.result_list }}"
+       - "{{ result.result_list_count }}"
 
 
 
@@ -87,11 +74,9 @@ Notes
 -----
 
 .. note::
-   - Using Solace Cloud: where clause only supports operations: '=='
-   - 
-   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority/getCertAuthorities
-   - Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/certAuthority/getCertAuthorities
-   - Module Solace Cloud API: not available
+   - STATUS: **EXPERIMENTAL**
+   - Does not support Solace Cloud API. If required, submit a feature request.
+   - Module Sempv1: https://docs.solace.com/Configuring-and-Managing/Configuring-LDAP-Authentication.htm
    - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
    - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
    - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
@@ -102,19 +87,12 @@ See Also
 
 .. seealso::
 
-   - :ref:`solace_cert_authority_module`
+   - :ref:`solace_service_authentication_ldap_profile_module`
 
 
 
 Parameters
 ----------
-
-api (optional)
-  The API the query should run against.
-
-  | **type**: str
-  | **default**: config
-  | **choices**: config, monitor
 
 host (optional)
   Hostname of Solace Broker.
@@ -133,27 +111,6 @@ port (optional)
 
   | **type**: int
   | **default**: 8080
-
-query_params (optional)
-  The query parameters.
-
-  | **type**: dict
-  | **default**: AnsibleMapping()
-
-  select (optional)
-    Include in the response only selected attributes of the object, or exclude from the response selected attributes of the object. See the documentation for the select parameter.
-
-    | **type**: list
-    | **default**: []
-
-  where (optional)
-    Include in the response only objects where certain conditions are true. See the the documentation for the where parameter.
-
-    Note: URL encoded automatically, you can safely use '/, <, <=, >, >=, != .. '
-
-    | **type**: list
-    | **default**: []
-
 
 secure_connection (optional)
   If true, use https rather than http.
@@ -191,6 +148,11 @@ username (optional)
   | **type**: str
   | **default**: admin
 
+where_name (required)
+  Query for ldap profile name. Maps to 'profile-name' in the SEMP V1 API.
+
+  | **type**: str
+
 x_broker (optional)
   Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
 
@@ -208,6 +170,61 @@ result_list
 
   | **returned**: success
   | **type**: list
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "sempv1-sample": [
+       {
+         "admin-dn": null,
+         "group-membership-secondary-search": {
+           "base-dn": null,
+           "deref": "always",
+           "filter": "(member=$ATTRIBUTE_VALUE_FROM_PRIMARY_SEARCH)",
+           "filter-attribute-from-primary-search": "dn",
+           "follow-continuation-references": "Yes",
+           "scope": "subtree",
+           "shutdown": "Yes",
+           "timeout": "5"
+         },
+         "ldap-servers-v2": {
+           "ldap-server": [
+             {
+               "index": "1",
+               "ldap-uri": null
+             },
+             {
+               "index": "2",
+               "ldap-uri": null
+             },
+             {
+               "index": "3",
+               "ldap-uri": null
+             }
+           ]
+         },
+         "profile-name": "default",
+         "referral-session": {
+           "last-error": "None",
+           "last-error-time": null,
+           "referral-host-uri": null
+         },
+         "search": {
+           "base-dn": null,
+           "deref": "always",
+           "filter": "(cn=$CLIENT_USERNAME)",
+           "follow-continuation-references": "Yes",
+           "scope": "subtree",
+           "timeout": "5"
+         },
+         "shutdown": "Yes",
+         "starttls": "No",
+         "tls": "No",
+         "unauthenticated-authentication": "Disallowed"
+       }
+     ]
+   }
 
 result_list_count
   Number of items in result_list.

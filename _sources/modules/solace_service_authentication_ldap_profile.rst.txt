@@ -94,6 +94,12 @@ Notes
    - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
 
 
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_get_service_authentication_ldap_profiles_module`
 
 
 

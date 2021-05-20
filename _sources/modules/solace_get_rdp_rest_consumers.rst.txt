@@ -117,7 +117,7 @@ query_params (optional)
   The query parameters.
 
   | **type**: dict
-  | **default**: {}
+  | **default**: AnsibleMapping()
 
   select (optional)
     Include in the response only selected attributes of the object, or exclude from the response selected attributes of the object. See the documentation for the select parameter.
