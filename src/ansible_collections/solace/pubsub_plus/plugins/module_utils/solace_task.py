@@ -205,7 +205,7 @@ class SolaceCRUDTask(SolaceTask):
         raise SolaceInternalErrorAbstractMethod()
 
     def delete_func(self, *args) -> dict:
-        raise SolaceInternalErrorAbstractMethod()   
+        raise SolaceInternalErrorAbstractMethod()
 
     def do_task_extension(self, args, new_state, new_settings, current_settings):
         raise SolaceInternalError(f"unhandled task-state combination, state={new_state}")
@@ -237,12 +237,6 @@ class SolaceCRUDTask(SolaceTask):
             update_settings = None
             if new_settings is not None:
                 update_settings = SolaceUtils.deep_dict_diff(new_settings, current_settings)
-
-
-                import logging, json
-                logging.debug(f">>>>> update_settings=\n{json.dumps(update_settings, indent=2)}")
-
-
             if not update_settings:
                 result = self.create_result(rc=0, changed=False)
                 result['response'] = current_settings

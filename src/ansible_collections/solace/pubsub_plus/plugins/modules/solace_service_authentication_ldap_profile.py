@@ -161,7 +161,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
         if self.get_config().is_solace_cloud():
             return current_settings
         # SEMP V1
-        # TODO: implement to test if changes are requested. 
+        # TODO: implement to test if changes are requested.
         # not trivial, what is the schema?
         # convert current_settings to same data structure as new_settings
         return current_settings
