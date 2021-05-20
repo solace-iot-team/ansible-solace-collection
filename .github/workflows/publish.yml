@@ -17,7 +17,7 @@ env:
   TEST_TEST_RUNNER_LOGS_NAME: test-runner-publish-logs
 
 jobs:
-  publish:
+  publish_release:
     runs-on: ubuntu-18.04
     strategy:
       max-parallel: 1

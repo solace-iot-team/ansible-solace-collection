@@ -23,7 +23,7 @@ env:
   PIP_DEVEL_REQUIREMENTS_FILE: "devel/devel.requirements.txt"
 
 jobs:
-  test:
+  ansbile_test:
     runs-on: ubuntu-18.04
     # runs-on: ubuntu-latest
       # pre-installed: /usr/bin/python=2.7.17 and /usr/bin/python3=3.6.9
