@@ -1,0 +1,24 @@
+---
+all:
+  hosts:
+    broker_service_1:
+      broker_type: self_hosted
+      ansible_connection: local
+      semp_is_secure_connection: true
+      semp_host: {proxy-host}
+      semp_port: {proxy-port}
+      semp_username: admin
+      semp_password: admin
+      semp_timeout: 60
+      semp_reverse_proxy:
+        # use semp_username + semp_password as basic auth
+        use_basic_auth: false
+        # dictionary of parameters the reverse proxy requires
+        # for example: api-key
+        query_params:
+          KeyId: {api-key}
+          another_param: {value}
+        # base path prepended to standard semp api paths 
+        semp_base_path: {proxy-semp-base-path}
+      vpn: default
+      # virtual_router: primary

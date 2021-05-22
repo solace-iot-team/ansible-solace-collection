@@ -1,0 +1,17 @@
+---
+queues:
+- name: asc/test/__1__/topic/subscription/__xx__
+  subscriptions:
+  - asc/test/__1__/topic/subscription/1/>
+  - asc/test/__1__/topic/subscription/2/>
+  - asc/test/__1__/topic/subscription/3/>
+- name: asc/test/__2__/topic/subscription/__xx__
+  subscriptions:
+  - asc/test/__2__/topic/subscription/1/>
+  - asc/test/__2__/topic/subscription/2/>
+  - asc/test/__2__/topic/subscription/3/>
+- name: asc/test/__3__/topic/subscription/__xx__
+  subscriptions:
+  - asc/test/__3__/topic/subscription/1/>
+  - asc/test/__3__/topic/subscription/2/>
+  - asc/test/__3__/topic/subscription/3/>

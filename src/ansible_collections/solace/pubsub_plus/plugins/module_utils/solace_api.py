@@ -44,17 +44,17 @@ class SolaceApi(object):
     def make_get_request(self, config: SolaceTaskConfig, path_array: list):
         return self.make_request(config, requests.get, path_array)
 
-    def make_post_request(self, config: SolaceTaskConfig, path_array: list, json=None):
-        return self.make_request(config, requests.post, path_array, json)
+    def make_post_request(self, config: SolaceTaskConfig, path_array: list, json_body=None):
+        return self.make_request(config, requests.post, path_array, json_body)
 
     def make_delete_request(self, config: SolaceTaskConfig, path_array: list):
         return self.make_request(config, requests.delete, path_array)
 
-    def make_patch_request(self, config: SolaceTaskConfig, path_array: list, json=None):
-        return self.make_request(config, requests.patch, path_array, json)
+    def make_patch_request(self, config: SolaceTaskConfig, path_array: list, json_body=None):
+        return self.make_request(config, requests.patch, path_array, json_body)
 
-    def make_put_request(self, config: SolaceTaskConfig, path_array: list, json=None):
-        return self.make_request(config, requests.put, path_array, json)
+    def make_put_request(self, config: SolaceTaskConfig, path_array: list, json_body=None):
+        return self.make_request(config, requests.put, path_array, json_body)
 
     def handle_response(self, resp):
         if resp.status_code != 200:
@@ -71,26 +71,57 @@ class SolaceApi(object):
                 return j['data']
         return dict()
 
-    def _make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json):
-        path = SolaceApi.compose_path(path_array)
-        url = self.get_url(config, path)
+    def _make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json_body, query_params):
+        _path = SolaceApi.compose_path(path_array)
+        _url = self.get_url(config, _path)
+        _query_params = query_params if query_params else dict()
+        _reverse_proxy_query_params = config.get_reverse_proxy_query_params()
+        if _reverse_proxy_query_params:
+            _query_params.update(_reverse_proxy_query_params)
+
+# TODO: DELETEME
+        import logging, json
+        logging.debug(f">>>> _make_request: query_params={json.dumps(query_params, indent=2)}")  
+        logging.debug(f">>>> _make_request: _path={_path}")  
+        logging.debug(f">>>> _make_request: _url={_url}")  
+        logging.debug(f">>>> _make_request: _query_params={_query_params}")  
+
+# TODO: DELETEME
+        # raise SolaceInternalError("continue here")  
+
+
+
         resp = request_func(
-            url,
-            json=json,
+            _url,
+            json=json_body,
             auth=self.get_auth(config),
             timeout=config.get_timeout(),
             headers=self.get_headers(config),
-            params=None)
+            params=_query_params)
         SolaceApi.log_http_roundtrip(resp)
         return resp
 
-    def make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json=None):
+# TODO: DELETEME
+    # def _make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json):
+    #     path = SolaceApi.compose_path(path_array)
+    #     url = self.get_url(config, path)
+    #     resp = request_func(
+    #         url,
+    #         json=json,
+    #         auth=self.get_auth(config),
+    #         timeout=config.get_timeout(),
+    #         headers=self.get_headers(config),
+    #         params=None)
+    #     SolaceApi.log_http_roundtrip(resp)
+    #     return resp
+
+    def make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json_body=None, query_params=None):
         try_count = 0
         delay_secs = 30
         max_tries = 20
         do_retry = True
         while do_retry and try_count < max_tries:
-            resp = self._make_request(config, request_func, path_array, json)
+            resp = self._make_request(config, request_func, path_array, json_body, query_params)
             if resp.status_code in [502, 504]:
                 logging.warning("resp.status_code: %d, resp.reason: '%s', try number: %d", resp.status_code, resp.reason, try_count)
                 time.sleep(delay_secs)
@@ -193,16 +224,31 @@ class SolaceSempV2Api(SolaceApi):
         return raw_api_version, v
 
     def handle_bad_response(self, resp):
-        _resp = dict()
-        if not resp.text:
-            _resp = resp
-        else:
-            _resp = dict(status_code=resp.status_code,
-                         reason=resp.reason,
-                         body=SolaceUtils.parse_response_text(resp.text)
-                         )
+        _resp = dict(status_code=resp.status_code,
+                        reason=resp.reason if resp.reason else None
+                        )
+        if resp.text:
+            _resp.update( dict(
+              body=SolaceUtils.parse_response_text(resp.text)
+            ))
+        # TODO: DELETEME
+        # import logging, json
+        # logging.debug(f">>>>>> handle_bad_response._resp = \n{json.dumps(_resp, indent=2)}")
+
         raise SolaceApiError(_resp)
 
+# TODO: DELETEME
+    # def handle_bad_response(self, resp):
+    #     _resp = dict()
+    #     if not resp.text:
+    #         _resp = resp
+    #     else:
+    #         _resp = dict(status_code=resp.status_code,
+    #                      reason=resp.reason,
+    #                      body=SolaceUtils.parse_response_text(resp.text)
+    #                      )
+    #     raise SolaceApiError(_resp)
+  
     def get_object_settings(self, config: SolaceTaskBrokerConfig, path_array: list) -> dict:
         # returns settings or None if not found
         try:
@@ -232,6 +278,8 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
         return
 
     def get_url(self, config: SolaceTaskBrokerConfig, path: str) -> str:
+
+# TODO: FIX_URL_PAGING
         if self.next_url:
             return self.next_url
         return config.get_semp_url(path) + ("?" + self.query if self.query else '')
@@ -619,8 +667,8 @@ class SolaceCloudApi(SolaceApi):
             resp['adminProgress'] = 'inProgress'
         return resp
 
-    def make_service_post_request(self, config: SolaceTaskBrokerConfig, path_array: list, service_id: str, json=None):
-        resp = self.make_request(config, requests.post, path_array, json)
+    def make_service_post_request(self, config: SolaceTaskBrokerConfig, path_array: list, service_id: str, json_body=None):
+        resp = self.make_request(config, requests.post, path_array, json_body)
         # import logging, json
         # logging.debug(f"resp (make_request) = \n{json.dumps(resp, indent=2)}")
         request_id = resp['id']

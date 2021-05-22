@@ -74,7 +74,16 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         is_secure = module.params['secure_connection']
         host = module.params['host']
         port = module.params['port']
+        self.reverse_proxy = module.params.get('reverse_proxy', None)
         self.broker_url = ('https' if is_secure else 'http') + '://' + host + ':' + str(port)
+        if self.reverse_proxy:
+            semp_base_path = self.reverse_proxy.get('semp_base_path', None)
+            if semp_base_path:
+              self.broker_url += '/' + semp_base_path        
+        # TODO: DELETEME
+        # self.broker_url = ('https' if is_secure else 'http') + '://' + host + ':' + str(port)
+          
+
         self.timeout = float(module.params['timeout'])
         self.x_broker = module.params.get('x_broker', None)
         solace_cloud_api_token = module.params.get('solace_cloud_api_token', None)
@@ -97,7 +106,12 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         self.solace_cloud_auth = None
         if self.solace_cloud_config is not None:
             self.solace_cloud_auth = BearerAuth(self.solace_cloud_config['api_token'])
+
         self.semp_auth = (module.params['username'], module.params['password'])
+        if self.reverse_proxy:
+            use_basic_auth = self.reverse_proxy.get('use_basic_auth', False)
+            if not use_basic_auth:
+                self.semp_auth = None
         return
 
     def is_solace_cloud(self) -> bool:
@@ -105,6 +119,11 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
 
     def get_semp_url(self, path: str) -> str:
         return self.broker_url + path
+
+    def get_reverse_proxy_query_params(self) -> dict:
+        if self.reverse_proxy:
+            return self.reverse_proxy.get('query_params', None)
+        return None    
 
     def get_solace_cloud_url(self, path: str) -> str:
         return path
@@ -132,8 +151,29 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             username=dict(type='str', default='admin'),
             password=dict(type='str', default='admin', no_log=True),
             timeout=dict(type='int', default='10', required=False),
-            x_broker=dict(type='str', default=None)
+            x_broker=dict(type='str', default=None),
+            reverse_proxy=dict(type='dict', required=False,
+                                options=dict(
+                                    semp_base_path=dict(type='str', required=False, default=None),
+                                    use_basic_auth=dict(type='bool', required=False, default=False),
+                                    query_params=dict(type='dict', required=False, default=None)
+                                    # headers=dict(type='dict', required=False, default=None)
+                                )  
+                              )
         )
+
+# TODO: DELETEME
+    # @staticmethod
+    # def arg_spec_broker_config() -> dict:
+    #     return dict(
+    #         host=dict(type='str', default='localhost'),
+    #         port=dict(type='int', default=8080),
+    #         secure_connection=dict(type='bool', default=False),
+    #         username=dict(type='str', default='admin'),
+    #         password=dict(type='str', default='admin', no_log=True),
+    #         timeout=dict(type='int', default='10', required=False),
+    #         x_broker=dict(type='str', default=None)
+    #     )
 
     @staticmethod
     def arg_spec_solace_cloud() -> dict:

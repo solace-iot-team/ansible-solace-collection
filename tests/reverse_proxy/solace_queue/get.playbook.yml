@@ -1,0 +1,136 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+-
+  name: "get: solace_get_queues"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_queue:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_queues:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+      msg_vpn: "{{ vpn }}"
+    # solace_queue_subscription:
+    #   host: "{{ sempv2_host }}"
+    #   port: "{{ sempv2_port }}"
+    #   secure_connection: "{{ sempv2_is_secure_connection }}"
+    #   username: "{{ sempv2_username }}"
+    #   password: "{{ sempv2_password }}"
+    #   timeout: "{{ sempv2_timeout }}"
+    #   msg_vpn: "{{ vpn }}"
+    # solace_get_queue_subscriptions:
+    #   host: "{{ sempv2_host }}"
+    #   port: "{{ sempv2_port }}"
+    #   secure_connection: "{{ sempv2_is_secure_connection }}"
+    #   username: "{{ sempv2_username }}"
+    #   password: "{{ sempv2_password }}"
+    #   timeout: "{{ sempv2_timeout }}"
+    #   msg_vpn: "{{ vpn }}"
+  pre_tasks:
+  - include_vars:
+      file: "queues.vars.yml"
+      name: target_list
+  tasks:
+
+    # - name: "get: solace_queue: remove all queues"
+    #   solace_queue:
+    #     name: "{{ item.name }}"
+    #     state: absent
+    #   loop: "{{ target_list.queues }}"
+
+    # - name: "get: solace_get_queues:config:all"
+    #   solace_get_queues:
+    #   register: result
+    # - assert:
+    #     that:
+    #       - result.rc==0
+    #       - result.result_list==[]
+    #       - result.result_list_count==0
+
+    # - name: "get: call tasks to create queues & subscriptions"
+    #   include_tasks: ./tasks/queue.tasks.yml
+    #   register: result
+    #   loop: "{{ target_list.queues }}"
+    #   loop_control:
+    #     loop_var: queue_item
+    #
+    - name: "get: solace_get_queues(config)"
+      solace_get_queues:
+        api: config
+        query_params:
+          where:
+            - "queueName==ansible-solace/test*"
+            - "ingressEnabled==true"
+            - "maxMsgSpoolUsage<101"
+            - "eventMsgSpoolUsageThreshold.clearPercent<=60"
+          select:
+            - "queueName"
+            - "eventMsgSpoolUsageThreshold"
+      register: result
+    # - assert:
+    #     that: result.result_list_count == 3
+    #
+    # - name: "get: solace_get_queues(monitor)"
+    #   solace_get_queues:
+    #     api: monitor
+    #     query_params:
+    #       where:
+    #         - "queueName==ansible-solace/test*"
+    #   register: result
+    # - assert:
+    #     that: result.result_list_count == 3
+    #
+    # - name: "get: solace_get_queue_subscriptions(config)"
+    #   solace_get_queue_subscriptions:
+    #     queue_name: "{{ item.name }}"
+    #     query_params:
+    #       where:
+    #         - "subscriptionTopic==ansible-solace/test*"
+    #   register: result
+    #   failed_when: result.result_list_count!=3
+    #   loop: "{{ target_list.queues }}"
+    #
+    # - name: "get: solace_get_queue_subscriptions(monitor)"
+    #   solace_get_queue_subscriptions:
+    #     queue_name: "{{ item.name }}"
+    #     api: monitor
+    #     query_params:
+    #       where:
+    #         - "subscriptionTopic==ansible-solace/test*"
+    #   register: result
+    #   failed_when: result.result_list_count!=3
+    #   loop: "{{ target_list.queues }}"
+    #
+    # - name: "get: remove all queues"
+    #   solace_queue:
+    #     name: "{{ item.name }}"
+    #     state: absent
+    #   loop: "{{ target_list.queues }}"
+    #
+    # - name: "get: solace_get_queues(monitor)"
+    #   solace_get_queues:
+    #     query_params:
+    #       where:
+    #         - "queueName==ansible-solace/test*"
+    #   register: result
+    # - assert:
+    #     that: result.result_list_count == 0
+
+###
+# The End.

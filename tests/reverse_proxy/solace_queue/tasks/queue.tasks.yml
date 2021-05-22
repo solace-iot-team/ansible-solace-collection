@@ -1,0 +1,40 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "queue: create"
+  solace_queue:
+    name: "{{ queue_item.name }}"
+    settings:
+      egressEnabled: false
+      ingressEnabled: false
+    state: present
+
+- fail:
+    msg: continue here
+
+- name: "queue: update"
+  solace_queue:
+    name: "{{ queue_item.name }}"
+    settings:
+      permission: "consume"
+      maxMsgSpoolUsage: 100
+    state: present
+
+- name: "queue: add/update subscriptions"
+  solace_queue_subscription:
+    name: "{{ item }}"
+    queue_name: "{{ queue_item.name }}"
+    state: present
+  loop: "{{ queue_item.subscriptions }}"
+
+- name: "queue: enable egress"
+  solace_queue:
+    name: "{{ queue_item.name }}"
+    settings:
+      egressEnabled: true
+      ingressEnabled: true
+    state: present
+
+###
+# The End.
