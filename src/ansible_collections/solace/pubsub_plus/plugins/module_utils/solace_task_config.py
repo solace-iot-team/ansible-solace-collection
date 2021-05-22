@@ -43,6 +43,9 @@ class SolaceTaskConfig(object):
     def get_headers(self) -> dict:
         raise SolaceInternalErrorAbstractMethod()
 
+    def get_reverse_proxy_query_params(self) -> dict:
+        raise SolaceInternalErrorAbstractMethod()
+
     @staticmethod
     def arg_spec_state():
         return dict(
@@ -74,16 +77,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         is_secure = module.params['secure_connection']
         host = module.params['host']
         port = module.params['port']
-        self.reverse_proxy = module.params.get('reverse_proxy', None)
         self.broker_url = ('https' if is_secure else 'http') + '://' + host + ':' + str(port)
-        if self.reverse_proxy:
-            semp_base_path = self.reverse_proxy.get('semp_base_path', None)
-            if semp_base_path:
-              self.broker_url += '/' + semp_base_path        
-        # TODO: DELETEME
-        # self.broker_url = ('https' if is_secure else 'http') + '://' + host + ':' + str(port)
-          
-
         self.timeout = float(module.params['timeout'])
         self.x_broker = module.params.get('x_broker', None)
         solace_cloud_api_token = module.params.get('solace_cloud_api_token', None)
@@ -108,7 +102,17 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             self.solace_cloud_auth = BearerAuth(self.solace_cloud_config['api_token'])
 
         self.semp_auth = (module.params['username'], module.params['password'])
+
+        # reverse proxy
+        self.reverse_proxy = module.params.get('reverse_proxy', None)
         if self.reverse_proxy:
+            if self.solace_cloud_config:
+                result = SolaceUtils.create_result(rc=1)
+                msg = f"No support for reverse proxy for Solace Cloud, remove 'reverse_proxy' from module arguments."
+                module.fail_json(msg=msg, **result)
+            semp_base_path = self.reverse_proxy.get('semp_base_path', None)
+            if semp_base_path:
+              self.broker_url += '/' + semp_base_path        
             use_basic_auth = self.reverse_proxy.get('use_basic_auth', False)
             if not use_basic_auth:
                 self.semp_auth = None
@@ -261,6 +265,9 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
 
     def get_headers(self) -> dict:
         return dict()
+
+    def get_reverse_proxy_query_params(self) -> dict:
+        return None
 
     @staticmethod
     def arg_spec_solace_cloud() -> dict:
