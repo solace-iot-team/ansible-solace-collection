@@ -54,6 +54,34 @@ options:
     description: Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
     required: false
     type: str
+  reverse_proxy:
+    description: Use a reverse proxy / api gateway
+    required: false
+    type: dict
+    suboptions:
+      semp_base_path:
+        description: "Base path prepended to all SEMP calls. Example: 'my/base/path'. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}"
+        type: str
+        required: false
+      use_basic_auth:
+        description: Flag to use basic authentication in the http(s) call or not. Uses 'username'/'password'.
+        type: bool
+        required: false
+        default: false
+      query_params:
+        description: "Additional query paramters to add to the URL. Example: 'apiCode: {my-api-code}'."
+        type: dict
+        required: false
+      headers:
+        description: "Additional headers to add to the http call. Example: 'apiKey: {my-api-key}'."
+        type: dict
+        required: false
+        suboptions:
+          x-asc-module:
+            description: "Flag for the module to add the header 'x-asc-module:{module-name}' to the http call with it's module name."
+            type: bool
+            required: false
+            default: false
 '''
 
     VPN = r'''
