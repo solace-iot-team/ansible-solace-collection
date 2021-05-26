@@ -1,5 +1,18 @@
 # Release Notes
 
+## Version: 1.4.3
+Enhancements & New Features.
+
+**Module Enhancements:**
+* **[solace_service_authentication_ldap_profile](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_service_authentication_ldap_profile.html)**
+  - added support for Solace Cloud API
+* **[solace_get_service_authentication_ldap_profiles](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_service_authentication_ldap_profiles.html)**
+  - added support for Solace Cloud API
+
+**New Features:**
+- TODO
+- reverse_proxy support
+
 ## Version: 1.4.2
 Enhancements of SEMP V1 Framework.
 
