@@ -2,7 +2,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "main: solace_service_authentication_ldap_profile"
+  name: "solace_service_authentication_ldap_profile example"
   hosts: all
   gather_facts: no
   any_errors_fatal: true
@@ -19,36 +19,39 @@
       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
   tasks:
-
   - name: set args for ldap profile
     set_fact:
       ldap_profile_settings:
         ldap_profile_name: "{{ 'asct_ldap_profile_1' if broker_type != 'solace_cloud' else 'default' }}"
-        admin_dn: adminDn
-        admin_pwd: adminPwd
+        allow_unauthentication_authentication: false
+        admin_dn: uid=solace_service,ou=Users,o=orgId,dc=myorg,dc=com
+        admin_pwd: solace_service_pwd
+        start_tls: false
         ldap_server_uri_1: ldap://ldap_1.myorg.com:389
         ldap_server_uri_2: ldap://ldap_2.myorg.com:389
         search:
           base_dn: ou=Users,o=orgId,dc=myorg,dc=com
           filter: (cn=$CLIENT_USERNAME)
+          follow_continuation_references: true
           deref: always
           scope: subtree
           timeout: 20
 
-  - name: "ldap-profile:main delete"
-    solace_service_authentication_ldap_profile:
-      name: "{{ ldap_profile_settings.ldap_profile_name }}"
-      state: "{{ 'absent' if broker_type != 'solace_cloud' else 'disabled' }}"
-
-  - name: "ldap-profile:main create"
+  - name: create
     solace_service_authentication_ldap_profile:
       name: "{{ ldap_profile_settings.ldap_profile_name }}"
       solace_cloud_settings:
+        allowUnauthenticatedAuthentication: "{{ ldap_profile_settings.allow_unauthentication_authentication }}"
         adminDn: "{{ ldap_profile_settings.admin_dn }}"
         adminPassword: "{{ ldap_profile_settings.admin_pwd }}"
         ldapServerOne: "{{ ldap_profile_settings.ldap_server_uri_1 }}"
         searchBaseDn: "{{ ldap_profile_settings.search.base_dn }}"
         searchFilter: "{{ ldap_profile_settings.search.filter }}"
+        searchFollowContinuationReferences: "{{ ldap_profile_settings.search.follow_continuation_references }}"
+        searchDeref: "{{ ldap_profile_settings.search.deref }}"
+        searchScope: "{{ ldap_profile_settings.search.scope }}"
+        searchTimeout: "{{ ldap_profile_settings.search.timeout }}"
+        startTls: "{{ ldap_profile_settings.start_tls }}"
       sempv1_settings:
         admin:
           admin-dn: "{{ ldap_profile_settings.admin_dn }}"
@@ -58,12 +61,14 @@
             distinguished-name: "{{ ldap_profile_settings.search.base_dn }}"
           filter:
             filter: "{{ ldap_profile_settings.search.filter }}"
+          timeout:
+            duration: "{{ ldap_profile_settings.search.timeout }}"
         ldap-server:
           ldap-host: "{{ ldap_profile_settings.ldap_server_uri_1 }}"
           server-index: "1"
       state: present
 
-  - name: "ldap-profile:main update"
+  - name: update
     solace_service_authentication_ldap_profile:
       name: "{{ ldap_profile_settings.ldap_profile_name }}"
       solace_cloud_settings:
@@ -74,67 +79,18 @@
           server-index: 2
       state: present
 
-# NOTE: module does not support idempotency for sempv1
-  - name: "ldap-profile:main update"
-    solace_service_authentication_ldap_profile:
-      name: "{{ ldap_profile_settings.ldap_profile_name }}"
-      solace_cloud_settings:
-        ldapServerTwo: "{{ ldap_profile_settings.ldap_server_uri_2 }}"
-      state: present
-    register: result
-    when: broker_type == 'solace_cloud'
-  - assert:
-      that:
-        - not result.changed
-    when: broker_type == 'solace_cloud'
-
-  - name: "ldap-profile:main enable"
+  - name: enable
     solace_service_authentication_ldap_profile:
       name: "{{ ldap_profile_settings.ldap_profile_name }}"
       state: enabled
 
-  - name: "ldap-profile:main enable: idempotency"
-    solace_service_authentication_ldap_profile:
-      name: "{{ ldap_profile_settings.ldap_profile_name }}"
-      state: enabled
-    register: result
-  - assert:
-      that:
-        - not result.changed
-
-  - name: "ldap-profile:main disable"
+  - name: disable
     solace_service_authentication_ldap_profile:
       name: "{{ ldap_profile_settings.ldap_profile_name }}"
       state: disabled
 
-  - name: "ldap-profile:main disable: idempotency"
+  - name: delete
     solace_service_authentication_ldap_profile:
       name: "{{ ldap_profile_settings.ldap_profile_name }}"
-      state: disabled
-    register: result
-  - assert:
-      that:
-        - not result.changed
-
-  - name: "ldap-profile:main enable"
-    solace_service_authentication_ldap_profile:
-      name: "{{ ldap_profile_settings.ldap_profile_name }}"
-      state: enabled
-
-  - block:
-    - name: "ldap-profile:main delete"
-      solace_service_authentication_ldap_profile:
-        name: "{{ ldap_profile_settings.ldap_profile_name }}"
-        state: absent
-    - name: "ldap-profile:main delete: idempotency"
-      solace_service_authentication_ldap_profile:
-        name: "{{ ldap_profile_settings.ldap_profile_name }}"
-        state: absent
-      register: result
-    - assert:
-        that:
-          - not result.changed
+      state: absent
     when: broker_type != 'solace_cloud'
-
-###
-# The End.

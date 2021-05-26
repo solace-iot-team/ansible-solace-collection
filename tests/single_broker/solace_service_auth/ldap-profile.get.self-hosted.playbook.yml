@@ -2,7 +2,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "get: solace_service_authentication_ldap_profile"
+  name: "get.self-hosted: solace_service_authentication_ldap_profile"
   hosts: all
   gather_facts: no
   any_errors_fatal: true
@@ -32,7 +32,6 @@
       file: "ldap_profiles.vars.yml"
       name: target_list
   vars:
-    generated_doc_sample_solace_cloud_file: "GENERATED_DOC_SAMPLE.LDAP_PROFILE.GET.SOLACE_CLOUD.yml"
     generated_doc_sample_self_hosted_file: "GENERATED_DOC_SAMPLE.LDAP_PROFILE.GET.SELF_HOSTED.yml"
   tasks:
   - name: "ldap-profile:main end for solace cloud"
@@ -72,10 +71,10 @@
 
   - name: "ldap-profile:get get "
     solace_get_service_authentication_ldap_profiles:
-      where_name: "*"
+      where_name: "asct*"
     register: result
   - assert:
-      that: result.result_list_count == 4
+      that: result.result_list_count == 3
 
   - name: "ldap-profile:get get "
     solace_get_service_authentication_ldap_profiles:
@@ -99,11 +98,7 @@
 
   # generate sample for doc
   - set_fact:
-        generated_doc_sample_file: "{{ generated_doc_sample_solace_cloud_file }}"
-    when: broker_type == 'solace_cloud'
-  - set_fact:
-        generated_doc_sample_file: "{{ generated_doc_sample_self_hosted_file }}"
-    when: broker_type != 'solace_cloud'
+      generated_doc_sample_file: "{{ generated_doc_sample_self_hosted_file }}"
   - name: save
     copy:
       content: "{{ result.result_list | to_nice_yaml }}"

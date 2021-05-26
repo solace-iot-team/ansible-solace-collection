@@ -28,55 +28,21 @@
       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
   tasks:
-  - name: "ldap-profile:ex:get "
-    solace_get_service_authentication_ldap_profiles:
-      where_name: "*"
-    ignore_errors: yes
-    register: result
-  - assert:
-      that:
-        - result.rc == 1
-        - "'solace_get_service_authentication_ldap_profiles' in result.msg|string"
-        - "'not supported' in result.msg|string"
-    when: broker_type == 'solace_cloud'
-  - assert:
-      that:
-        - result.rc == 0
-    when: broker_type != 'solace_cloud'
-
-  - name: "ldap-profile:ex delete non-existing profile"
-    solace_service_authentication_ldap_profile:
-      # name: "does-not-exist"
-      name: "does_not_exist"
-      state: absent
-    ignore_errors: yes
-    register: result
-  - assert:
-      that:
-        - result.rc == 1
-        - "'solace_service_authentication_ldap_profile' in result.msg|string"
-        - "'not supported' in result.msg|string"
-    when: broker_type == 'solace_cloud'
-  - assert:
-      that:
-        - result.rc == 0
-    when: broker_type != 'solace_cloud'
-
-  - name: "ldap-profile:ex:end if solace cloud"
+  - name: "ldap-profile:main end for self-hosted"
     meta: end_play
-    when: broker_type == 'solace_cloud'
+    when: broker_type != 'solace_cloud'
 
-  - name: "ldap-profile:ex:wrong name format"
+  - name: "ldap-profile:ex update wrong name"
     solace_service_authentication_ldap_profile:
-      name: "does-not-exist"
-      state: absent
+      name: "not-default"
+      state: present
     ignore_errors: yes
     register: result
   - assert:
       that:
         - result.rc == 1
-        - "' contains 1 or more invalid chars from set' in result.msg|string"
-
+        - "'Solace Cloud' in result.msg|string"
+        - "'default' in result.msg|string"
 
 ###
 # The End.

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
@@ -18,13 +18,15 @@ description:
 - "Get a list of LDAP Profile Objects configured on a Broker Service."
 notes:
 - "STATUS: B(EXPERIMENTAL)"
-- "Does not support Solace Cloud API. If required, submit a feature request."
 - "Module Sempv1: https://docs.solace.com/Configuring-and-Managing/Configuring-LDAP-Authentication.htm"
+- "Module Solace Cloud: no API documentation available, reverse engineer from console."
 options:
     where_name:
         description:
         - "Query for ldap profile name. Maps to 'profile-name' in the SEMP V1 API."
-        required: true
+        - "Has no effect for Solace Cloud, there is only 1 profile named 'default'."
+        required: false
+        default: '*'
         type: str
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
@@ -61,26 +63,44 @@ module_defaults:
     solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
     solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
 tasks:
-- name: create ldap profile
-  solace_service_authentication_ldap_profile:
-    name: foo
-    sempv1_settings:
-      admin:
-        admin-dn: adminDN
-      search:
-        base-dn:
-          distinguished-name: baseDN
-        filter:
-          filter: searchFilter
-      ldap-server:
-        ldap-host: ldap://192.167.123.4:389
-        server-index: "1"
-    state: present
+- name: example for self-hosted broker
+  block:
+    - name: create ldap profile
+      solace_service_authentication_ldap_profile:
+        name: foo
+        sempv1_settings:
+          admin:
+            admin-dn: adminDN
+          search:
+            base-dn:
+              distinguished-name: baseDN
+            filter:
+              filter: searchFilter
+          ldap-server:
+            ldap-host: ldap://192.167.123.4:389
+            server-index: "1"
+        state: present
 
-- name: get
-  solace_get_service_authentication_ldap_profiles:
-    where_name: "foo"
-  register: result
+    - name: get
+      solace_get_service_authentication_ldap_profiles:
+        where_name: "foo"
+      register: result
+  when: broker_type != 'solace_cloud'
+
+- name: example for Solace Cloud broker
+  block:
+    - name: create or update ldap profile
+      solace_service_authentication_ldap_profile:
+        name: default
+        solace_cloud_settings:
+          adminDn: adminDN
+          ldapServerOne: ldap://192.167.123.4:389
+          searchBaseDn: baseDN
+          searchFilter: searchFilter
+    - name: get
+      solace_get_service_authentication_ldap_profiles:
+      register: result
+  when: broker_type == 'solace_cloud'
 
 - name: print result
   debug:
@@ -96,6 +116,33 @@ result_list:
   type: list
   elements: dict
   sample:
+    solace-cloud-sample:
+      -   adminDn: adminDn
+          adminPassword: adminPwd
+          allowUnauthenticatedAuthentication: false
+          enabled: true
+          groupMembershipSecondarySearchBaseDn: null
+          groupMembershipSecondarySearchDeref: ALWAYS
+          groupMembershipSecondarySearchEnabled: false
+          groupMembershipSecondarySearchFilter: (member=$ATTRIBUTE_VALUE_FROM_PRIMARY_SEARCH)
+          groupMembershipSecondarySearchFilterAttributeFromPrimarySearch: null
+          groupMembershipSecondarySearchFollowContinuationReferences: false
+          groupMembershipSecondarySearchFollowContinuationShutdown: false
+          groupMembershipSecondarySearchScope: SUBTREE
+          groupMembershipSecondarySearchTimeout: 5
+          id: default
+          ldapServerOne: ldap://ldap_1.myorg.com:389
+          ldapServerThree: null
+          ldapServerTwo: ldap://ldap_2.myorg.com:389
+          profileName: default
+          searchBaseDn: ou=Users,o=orgId,dc=myorg,dc=com
+          searchDeref: ALWAYS
+          searchFilter: (cn=$CLIENT_USERNAME)
+          searchFollowContinuationReferences: false
+          searchScope: SUBTREE
+          searchTimeout: 5
+          startTls: false
+          type: ldapAuthenticationProfile    
     sempv1-sample:
       - admin-dn: null
         group-membership-secondary-search:
@@ -153,7 +200,7 @@ msg:
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceNoModuleSupportForSolaceCloudError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceGetTask
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV1PagingGetApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV1PagingGetApi, SolaceCloudApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
@@ -164,12 +211,17 @@ class SolaceGetServiceAuthenticationLdapProfilesTask(SolaceGetTask):
         super().__init__(module)
         self.config = SolaceTaskBrokerConfig(module)
         self.sempv1_get_paging_api = SolaceSempV1PagingGetApi(module)
+        self.solace_cloud_api = SolaceCloudApi(module)
 
     def get_config(self) -> SolaceTaskBrokerConfig:
         return self.config
 
     def _get_list_solace_cloud(self):
-        raise SolaceNoModuleSupportForSolaceCloudError(self.get_module()._name)
+        # GET services/{service-id}/requests/ldapAuthenticationProfile/default
+        # only 1 exists, name=default
+        service_id = self.get_config().get_params()['solace_cloud_service_id']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, 'ldapAuthenticationProfile', 'default']
+        return [self.solace_cloud_api.get_object_settings(self.get_config(), path_array)]
 
     def get_list(self):
         if self.get_config().is_solace_cloud():
@@ -197,7 +249,7 @@ class SolaceGetServiceAuthenticationLdapProfilesTask(SolaceGetTask):
 
 def run_module():
     module_args = dict(
-        where_name=dict(type='str', required=True)
+        where_name=dict(type='str', required=False, default='*')
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_solace_cloud())
