@@ -191,7 +191,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
 
     def normalize_current_settings(self, current_settings: dict, new_settings: dict) -> dict:
         if self.get_config().is_solace_cloud():
-            # remember current_settings for update call: it needs it 
+            # remember current_settings for update call: it needs it
             self.current_settings = current_settings
             return current_settings
         # SEMP V1
@@ -206,9 +206,9 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
             usr_msg = f"ldap profile '{name}' does not exist; cannot enable/disable"
             raise SolaceModuleUsageError(self.get_module()._name, new_state, usr_msg)
         if self.get_config().is_solace_cloud():
-          is_enabled = current_settings['enabled']
-        else:  
-          is_enabled = True if current_settings['shutdown'] == 'No' else False
+            is_enabled = current_settings['enabled']
+        else:
+            is_enabled = True if current_settings['shutdown'] == 'No' else False
         if new_state == 'enabled':
             if is_enabled:
                 return None, self.create_result(rc=0, changed=False)
@@ -229,7 +229,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
         params = self.get_module().params
         name = params.get('name', None)
         if self.get_config().is_solace_cloud() and name != 'default':
-            raise SolaceParamsValidationError('name', name, f"ldap profile name for Solace Cloud must be 'default'.")
+            raise SolaceParamsValidationError('name', name, "ldap profile name for Solace Cloud must be 'default'.")
         invalid_chars = '-'
         if SolaceUtils.stringContainsAnyChars(name, invalid_chars):
             raise SolaceParamsValidationError('name', name, f"contains 1 or more invalid chars from set: '{invalid_chars}'")
@@ -303,7 +303,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
         data = {
             'enabled': True
         }
-        return self._make_solace_cloud_update_request(ldap_profile_name, data)      
+        return self._make_solace_cloud_update_request(ldap_profile_name, data)
 
     def enable_func(self, ldap_profile_name):
         if self.get_config().is_solace_cloud():
@@ -355,7 +355,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
             "groupMembershipSecondarySearchDeref": "ALWAYS",
             "groupMembershipSecondarySearchFilter": "(member=$ATTRIBUTE_VALUE_FROM_PRIMARY_SEARCH)",
             "groupMembershipSecondarySearchScope": "SUBTREE",
-            "groupMembershipSecondarySearchTimeout": 5                
+            "groupMembershipSecondarySearchTimeout": 5
         }
         data.update(settings if settings else {})
         return self._make_solace_cloud_update_request(ldap_profile_name, data)

@@ -142,7 +142,7 @@ result_list:
           searchScope: SUBTREE
           searchTimeout: 5
           startTls: false
-          type: ldapAuthenticationProfile    
+          type: ldapAuthenticationProfile
     sempv1-sample:
       - admin-dn: null
         group-membership-secondary-search:
