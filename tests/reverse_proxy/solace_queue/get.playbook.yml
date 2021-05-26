@@ -48,6 +48,10 @@
       name: target_list
   tasks:
 
+    - name: "get: solace_get_queues(config)"
+      solace_get_queues:
+      register: result
+
     # - name: "get: solace_queue: remove all queues"
     #   solace_queue:
     #     name: "{{ item.name }}"

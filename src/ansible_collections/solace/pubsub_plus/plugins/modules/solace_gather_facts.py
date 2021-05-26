@@ -98,6 +98,7 @@ msg:
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi, SolaceSempV1Api, SolaceSempV2PagingGetApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -158,11 +159,11 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
         else:
             # get service
             xml_post_cmd = "<rpc><show><service></service></show></rpc>"
-            resp_service = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd)
+            resp_service = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd, SolaceTaskOps.OP_READ_OBJECT)
             resp['service'] = resp_service['rpc-reply']['rpc']['show']['service']['services']
             # get virtual router
             xml_post_cmd = "<rpc><show><router-name></router-name></show></rpc>"
-            resp_virtual_router = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd)
+            resp_virtual_router = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd, SolaceTaskOps.OP_READ_OBJECT)
             resp['virtualRouterName'] = resp_virtual_router['rpc-reply']['rpc']['show']['router-name']['router-name']
 
         return resp

@@ -13,13 +13,13 @@ export PROJECT_HOME=$projectHome
 
 ansibleSolaceTests=(
   "setup"
-  "solace_service_auth"
+  # "solace_service_auth"
   # "solace_get_available"
   # "solace_auth"
   # "solace_oauth"
   # "solace_replay"
   # "solace_facts"
-  # "solace_vpn"
+  "solace_vpn"
   # "solace_client_profile"
   # "solace_acl_profile"
   # "solace_rdp"

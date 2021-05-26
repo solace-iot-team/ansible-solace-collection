@@ -5,8 +5,8 @@
 
 - name: "vpn.tasks: create vpn: {{ vpn.name }}"
   solace_vpn:
-    name: "{{ vpn.name }}"
-    settings: "{{ vpn.settings }}"
+    name: "{{ msg_vpn.name }}"
+    settings: "{{ msg_vpn.settings }}"
     state: present
 
 ###

@@ -55,7 +55,7 @@ options:
     required: false
     type: str
   reverse_proxy:
-    description: Use a reverse proxy / api gateway
+    description: "Use a reverse proxy / api gateway. Note: B(Experimental, not fully implemented)."
     required: false
     type: dict
     suboptions:
@@ -79,6 +79,11 @@ options:
         suboptions:
           x-asc-module:
             description: "Flag for the module to add the header 'x-asc-module:{module-name}' to the http call with it's module name."
+            type: bool
+            required: false
+            default: false
+          x-asc-module-op:
+            description: "Flag for the module to add the header 'x-asc-module-op:{module operation}' to the http call with the module's operation."
             type: bool
             required: false
             default: false

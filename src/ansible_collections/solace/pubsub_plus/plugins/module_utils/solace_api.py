@@ -6,6 +6,7 @@ __metaclass__ = type
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceInternalError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudConfig
 from ansible.module_utils.basic import AnsibleModule
@@ -38,22 +39,22 @@ class SolaceApi(object):
     def get_url(self, config: SolaceTaskConfig, path: str) -> str:
         raise SolaceInternalErrorAbstractMethod()
 
-    def get_headers(self, config: SolaceTaskConfig) -> dict:
-        return config.get_headers()
+    def get_headers(self, config: SolaceTaskConfig, op: str) -> dict:
+        return config.get_headers(op)
 
-    def make_get_request(self, config: SolaceTaskConfig, path_array: list):
-        return self.make_request(config, requests.get, path_array)
+    def make_get_request(self, config: SolaceTaskConfig, path_array: list, op=SolaceTaskOps.OP_READ_OBJECT):
+        return self.make_request(config, requests.get, path_array, json_body=None, query_params=None, op=op)
 
-    def make_post_request(self, config: SolaceTaskConfig, path_array: list, json_body=None):
-        return self.make_request(config, requests.post, path_array, json_body)
+    def make_post_request(self, config: SolaceTaskConfig, path_array: list, json_body=None, op=SolaceTaskOps.OP_CREATE_OBJECT):
+        return self.make_request(config, requests.post, path_array, json_body, query_params=None, op=op)
 
-    def make_delete_request(self, config: SolaceTaskConfig, path_array: list):
-        return self.make_request(config, requests.delete, path_array)
+    def make_delete_request(self, config: SolaceTaskConfig, path_array: list, op=SolaceTaskOps.OP_DELETE_OBJECT):
+        return self.make_request(config, requests.delete, path_array, json_body=None, query_params=None, op=op)
 
-    def make_patch_request(self, config: SolaceTaskConfig, path_array: list, json_body=None):
-        return self.make_request(config, requests.patch, path_array, json_body)
+    def make_patch_request(self, config: SolaceTaskConfig, path_array: list, json_body=None, op=SolaceTaskOps.OP_UPDATE_OBJECT):
+        return self.make_request(config, requests.patch, path_array, json_body, query_params=None, op=op)
 
-    def make_put_request(self, config: SolaceTaskConfig, path_array: list, json_body=None):
+    def make_put_request(self, config: SolaceTaskConfig, path_array: list, json_body=None, op=SolaceTaskOps.OP_UPDATE_OBJECT):
         return self.make_request(config, requests.put, path_array, json_body)
 
     def handle_response(self, resp):
@@ -71,14 +72,14 @@ class SolaceApi(object):
                 return j['data']
         return dict()
 
-    def _make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json_body, query_params):
+    def _make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json_body, query_params, op):
         _path = SolaceApi.compose_path(path_array)
         _url = self.get_url(config, _path)
         _query_params = query_params if query_params else dict()
         _reverse_proxy_query_params = config.get_reverse_proxy_query_params()
         if _reverse_proxy_query_params:
             _query_params.update(_reverse_proxy_query_params)
-        _headers = self.get_headers(config)
+        _headers = self.get_headers(config, op)
 # TODO: DELETEME
         logging.debug(f">>>> _make_request: query_params={json.dumps(query_params, indent=2)}")
         logging.debug(f">>>> _make_request: _path={_path}")
@@ -111,13 +112,13 @@ class SolaceApi(object):
     #     SolaceApi.log_http_roundtrip(resp)
     #     return resp
 
-    def make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json_body=None, query_params=None):
+    def make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json_body=None, query_params=None, op=None):
         try_count = 0
         delay_secs = 30
         max_tries = 20
         do_retry = True
         while do_retry and try_count < max_tries:
-            resp = self._make_request(config, request_func, path_array, json_body, query_params)
+            resp = self._make_request(config, request_func, path_array, json_body, query_params, op)
             if resp.status_code in [502, 504]:
                 logging.warning("resp.status_code: %d, resp.reason: '%s', try number: %d", resp.status_code, resp.reason, try_count)
                 time.sleep(delay_secs)
@@ -246,10 +247,10 @@ class SolaceSempV2Api(SolaceApi):
     #                      )
     #     raise SolaceApiError(_resp)
 
-    def get_object_settings(self, config: SolaceTaskBrokerConfig, path_array: list) -> dict:
+    def get_object_settings(self, config: SolaceTaskBrokerConfig, path_array: list, op=SolaceTaskOps.OP_READ_OBJECT) -> dict:
         # returns settings or None if not found
         try:
-            resp = self.make_get_request(config, path_array)
+            resp = self.make_get_request(config, path_array, op)
         except SolaceApiError as e:
             resp = e.get_resp()
             # check if not found error, otherwise raise error
@@ -321,7 +322,7 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
         hasNextPage = True
         self.query = query
         while hasNextPage:
-            body = self.make_get_request(config, path_array)
+            body = self.make_get_request(config, path_array, op=SolaceTaskOps.OP_READ_OBJECT_LIST)
             data_list = []
             # monitor api may have collections as well
             collections_list = []
@@ -365,7 +366,7 @@ class SolaceSempV1Api(SolaceApi):
 
     def get_sempv1_version(self, config: SolaceTaskBrokerConfig):
         rpc_xml = "<rpc><show><service></service></show></rpc>"
-        resp = self.make_post_request(config, rpc_xml)
+        resp = self.make_post_request(config, rpc_xml, SolaceTaskOps.OP_READ_SEMP_VERSION)
         rpc_reply = resp['rpc-reply']
         raw_api_version = SolaceUtils.get_key(rpc_reply, "@semp-version")
         # format: soltr/9_9VMR
@@ -376,19 +377,19 @@ class SolaceSempV1Api(SolaceApi):
             raise SolaceInternalError(f"sempv1 version parsing failed: {raw_api_version}") from e
         return raw_api_version, v
 
-    def get_headers(self, config: SolaceTaskConfig) -> dict:
+    def get_headers(self, config: SolaceTaskConfig, op: str) -> dict:
         headers = {
             'Content-Type': 'application/xml'
         }
-        headers.update(config.get_headers())
+        headers.update(config.get_headers(op))
         return headers
 
     def handle_response(self, resp):
         # SEMP v1 always returns 200 (it seems)
         # error: rpc-reply.execute-result.@code != ok or missing
+        resp_body = xmltodict.parse(resp.text) if resp.text else None
         if resp.status_code != 200:
-            raise SolaceInternalError("SEMP v1 call not successful")
-        resp_body = xmltodict.parse(resp.text)
+            raise SolaceApiError(resp_body)
         try:
             code = resp_body['rpc-reply']['execute-result']['@code']
         except KeyError as e:
@@ -413,14 +414,14 @@ class SolaceSempV1Api(SolaceApi):
         self.call_num = self.call_num + 1
         return 'rpc-call-' + str(self.call_num)
 
-    def make_post_request(self, config: SolaceTaskConfig, xml_cmd: str):
+    def make_post_request(self, config: SolaceTaskConfig, xml_cmd: str, op: str):
         url = config.get_semp_url(self.API_BASE_SEMPV1)
         resp = requests.post(
             url,
             data=xml_cmd,
             auth=config.get_semp_auth(),
             timeout=config.get_timeout(),
-            headers=self.get_headers(config),
+            headers=self.get_headers(config, op),
             params=None
         )
         SolaceApi.log_http_roundtrip(resp)
@@ -437,7 +438,7 @@ class SolaceSempV1PagingGetApi(SolaceSempV1Api):
         result_list = []
         hasNextPage = True
         while hasNextPage:
-            semp_resp = self.make_post_request(config, xml_cmd)
+            semp_resp = self.make_post_request(config, xml_cmd, SolaceTaskOps.OP_READ_OBJECT_LIST)
             # extract the list
             _d = semp_resp
             for path in reponse_list_path_array:
@@ -521,7 +522,7 @@ class SolaceCloudApi(SolaceApi):
     def get_services(self, config: SolaceTaskSolaceCloudConfig) -> list:
         # GET https://api.solace.cloud/api/v0/services
         try:
-            _resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES])
+            _resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_SERVICES], SolaceTaskOps.OP_READ_OBJECT_LIST)
         except SolaceApiError as e:
             resp = e.get_resp()
             # TODO: what is the code if solace cloud account has 0 services?

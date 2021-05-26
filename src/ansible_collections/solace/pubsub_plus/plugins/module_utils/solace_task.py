@@ -39,6 +39,7 @@ class SolaceTask(object):
         self.module = module
         self.changed = False
         self.result = SolaceUtils.create_result()
+        self.current_operation = 'this-is-the-current-operation'
         return
 
     def get_module(self) -> AnsibleModule:

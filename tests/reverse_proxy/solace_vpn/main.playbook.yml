@@ -52,10 +52,10 @@
       register: result
       loop: "{{ vpns }}"
       loop_control:
-        loop_var: vpn
+        loop_var: msg_vpn
 
     - fail:
-        msg: continue here    
+        msg: continue here
 
     - name: "main: get vpns config"
       solace_get_vpns:

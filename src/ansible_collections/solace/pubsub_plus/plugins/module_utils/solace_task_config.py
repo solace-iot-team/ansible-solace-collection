@@ -8,7 +8,6 @@ from ansible.module_utils.basic import AnsibleModule
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalErrorAbstractMethod, SolaceInternalError, SolaceParamsValidationError
-import logging
 
 SOLACE_TASK_CONFIG_HAS_IMPORT_ERROR = False
 SOLACE_TASK_CONFIG_ERR_TRACEBACK = None
@@ -43,7 +42,7 @@ class SolaceTaskConfig(object):
     def get_timeout(self) -> float:
         raise SolaceInternalErrorAbstractMethod()
 
-    def get_headers(self) -> dict:
+    def get_headers(self, op: str) -> dict:
         raise SolaceInternalErrorAbstractMethod()
 
     def get_reverse_proxy_query_params(self) -> dict:
@@ -146,14 +145,12 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             return self.reverse_proxy.get('query_params', None)
         return None
 
-    def get_reverse_proxy_headers(self) -> dict:
+    def get_reverse_proxy_headers(self, op: str) -> dict:
         if self.reverse_proxy:
             _headers = self.reverse_proxy.get('headers', None)
             if _headers:
                 _headers['x-asc-module'] = self.module._name if _headers['x-asc-module'] else None
-                # x-asc-module-op not supported currently. if needed, put into framework
-                # _headers['x-asc-module-op'] = 'todo-insert-module-op' if _headers['x-asc-module-op'] else None
-                _headers['x-asc-module-op'] = None
+                _headers['x-asc-module-op'] = op if _headers['x-asc-module-op'] else None
             return _headers
         return None
 
@@ -171,13 +168,13 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
     def get_timeout(self) -> float:
         return self.timeout
 
-    def get_headers(self) -> dict:
+    def get_headers(self, op) -> dict:
         _headers = {
             'x-broker-name': self.x_broker
         }
-        _reverse_proxy_headers = self.get_reverse_proxy_headers()
+        _reverse_proxy_headers = self.get_reverse_proxy_headers(op)
         if _reverse_proxy_headers:
-            _headers.update(self.get_reverse_proxy_headers())
+            _headers.update(_reverse_proxy_headers)
         return _headers
 
     @staticmethod
@@ -298,7 +295,7 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
     def get_timeout(self) -> float:
         return self.timeout
 
-    def get_headers(self) -> dict:
+    def get_headers(self, op) -> dict:
         return dict()
 
     def get_reverse_proxy_query_params(self) -> dict:

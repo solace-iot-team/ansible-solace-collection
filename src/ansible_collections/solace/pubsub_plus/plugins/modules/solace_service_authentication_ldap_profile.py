@@ -165,6 +165,7 @@ rc:
 '''
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError, SolaceNoModuleStateSupportError, SolaceSempv1VersionNotSupportedError, SolaceModuleUsageError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
@@ -263,7 +264,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 }
             }
         }
-        _resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict))
+        _resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), SolaceTaskOps.OP_READ_OBJECT)
         _resp_ldap_profile = _resp['rpc-reply']['rpc']['show']['ldap-profile']
         if _resp_ldap_profile:
             return _resp_ldap_profile['ldap-profile']
@@ -288,7 +289,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 }
             }
         }
-        _resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict))
+        _resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), SolaceTaskOps.OP_UPDATE_OBJECT)
         _call_log = {
             self.sempv1_api.getNextCallKey(): {
                 'enable': {
@@ -319,7 +320,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 }
             }
         }
-        _resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict))
+        _resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), SolaceTaskOps.OP_UPDATE_OBJECT)
         _call_log = {
             self.sempv1_api.getNextCallKey(): {
                 'enable': {
@@ -373,15 +374,15 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 }
             }
         }
-        resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(create_rpc_dict))
+        resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(create_rpc_dict), SolaceTaskOps.OP_CREATE_OBJECT)
         if settings:
-            resp = self._update_func_sempv1(ldap_profile_name, settings, settings)
+            resp = self._update_func_sempv1(ldap_profile_name, settings, settings, SolaceTaskOps.OP_CREATE_OBJECT)
         return resp
 
     def _update_func_solace_cloud(self, ldap_profile_name, settings, delta_settings):
         return self._make_solace_cloud_update_request(ldap_profile_name, settings)
 
-    def _send_sempv1_update(self, ldap_profile_name, key, val):
+    def _send_sempv1_update(self, ldap_profile_name, key, val, op):
         _rpc_update_dict = {
             'authentication': {
                 'ldap-profile': {
@@ -397,9 +398,9 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
             }
         }
         rpc_dict = SolaceUtils.merge_dicts_recursive(_rpc_dict, _rpc_update_dict)
-        return self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict))
+        return self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), op)
 
-    def _update_func_sempv1(self, ldap_profile_name, settings, delta_settings):
+    def _update_func_sempv1(self, ldap_profile_name, settings, delta_settings, op):
         if not settings:
             return None
         combined_resps = {}
@@ -409,7 +410,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 if key == 'search' and isinstance(val, dict):
                     # iterate through sarch
                     for skey, sval in val.items():
-                        _resp = self._send_sempv1_update(ldap_profile_name, key, {skey: sval})
+                        _resp = self._send_sempv1_update(ldap_profile_name, key, {skey: sval}, op)
                         _call_log = {
                             self.sempv1_api.getNextCallKey(): {
                                 key: {
@@ -420,7 +421,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                         }
                         combined_resps = SolaceUtils.merge_dicts_recursive(combined_resps, _call_log)
                 else:
-                    _resp = self._send_sempv1_update(ldap_profile_name, key, val)
+                    _resp = self._send_sempv1_update(ldap_profile_name, key, val, op)
                     _call_log = {
                         self.sempv1_api.getNextCallKey(): {
                             key: val,
@@ -433,7 +434,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
     def update_func(self, ldap_profile_name, settings=None, delta_settings=None):
         if self.get_config().is_solace_cloud():
             return self._update_func_solace_cloud(ldap_profile_name, settings, delta_settings)
-        return self._update_func_sempv1(ldap_profile_name, settings, delta_settings)
+        return self._update_func_sempv1(ldap_profile_name, settings, delta_settings, SolaceTaskOps.OP_UPDATE_OBJECT)
 
     def _delete_func_solace_cloud(self, ldap_profile_name):
         raise SolaceNoModuleStateSupportError(self.get_module()._name, self.get_module().params['state'], 'Solace Cloud', 'disable profile instead')
@@ -451,7 +452,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 }
             }
         }
-        return self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict))
+        return self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), SolaceTaskOps.OP_DELETE_OBJECT)
 
 
 def run_module():
