@@ -18,7 +18,6 @@
       timeout: "{{ semp_timeout }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
       msg_vpn: "{{ vpn }}"
-
     # solace_queue_subscription:
     #   host: "{{ sempv2_host }}"
     #   port: "{{ sempv2_port }}"

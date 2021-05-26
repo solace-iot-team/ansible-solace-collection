@@ -78,25 +78,21 @@ class SolaceApi(object):
         _reverse_proxy_query_params = config.get_reverse_proxy_query_params()
         if _reverse_proxy_query_params:
             _query_params.update(_reverse_proxy_query_params)
-
+        _headers = self.get_headers(config)
 # TODO: DELETEME
-        import logging, json
-        logging.debug(f">>>> _make_request: query_params={json.dumps(query_params, indent=2)}")  
-        logging.debug(f">>>> _make_request: _path={_path}")  
-        logging.debug(f">>>> _make_request: _url={_url}")  
-        logging.debug(f">>>> _make_request: _query_params={_query_params}")  
-
-# TODO: DELETEME
-        # raise SolaceInternalError("continue here")  
-
-
+        logging.debug(f">>>> _make_request: query_params={json.dumps(query_params, indent=2)}")
+        logging.debug(f">>>> _make_request: _path={_path}")
+        logging.debug(f">>>> _make_request: _url={_url}")
+        logging.debug(f">>>> _make_request: _query_params={_query_params}")
+        logging.debug(f">>>> _make_request: _headers={_headers}")
+        # raise SolaceInternalError("continue here")
 
         resp = request_func(
             _url,
             json=json_body,
             auth=self.get_auth(config),
             timeout=config.get_timeout(),
-            headers=self.get_headers(config),
+            headers=_headers,
             params=_query_params)
         SolaceApi.log_http_roundtrip(resp)
         return resp
@@ -224,12 +220,13 @@ class SolaceSempV2Api(SolaceApi):
         return raw_api_version, v
 
     def handle_bad_response(self, resp):
-        _resp = dict(status_code=resp.status_code,
-                        reason=resp.reason if resp.reason else None
-                        )
+        _resp = dict(
+            status_code=resp.status_code,
+            reason=resp.reason if resp.reason else None
+        )
         if resp.text:
-            _resp.update( dict(
-              body=SolaceUtils.parse_response_text(resp.text)
+            _resp.update(dict(
+                body=SolaceUtils.parse_response_text(resp.text)
             ))
         # TODO: DELETEME
         # import logging, json
@@ -248,7 +245,7 @@ class SolaceSempV2Api(SolaceApi):
     #                      body=SolaceUtils.parse_response_text(resp.text)
     #                      )
     #     raise SolaceApiError(_resp)
-  
+
     def get_object_settings(self, config: SolaceTaskBrokerConfig, path_array: list) -> dict:
         # returns settings or None if not found
         try:
@@ -279,7 +276,7 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
 
     def get_url(self, config: SolaceTaskBrokerConfig, path: str) -> str:
 
-# TODO: FIX_URL_PAGING
+        # TODO: FIX_URL_PAGING
         if self.next_url:
             return self.next_url
         return config.get_semp_url(path) + ("?" + self.query if self.query else '')

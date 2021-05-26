@@ -13,12 +13,16 @@ all:
       semp_reverse_proxy:
         # use semp_username + semp_password as basic auth
         use_basic_auth: false
-        # dictionary of parameters the reverse proxy requires
-        # for example: api-key
+        # dictionary of query parameters the reverse proxy requires
         query_params:
-          KeyId: {api-key}
+          code: {code}
           another_param: {value}
-        # base path prepended to standard semp api paths 
+        # dictionary of headers the reverse proxy requires
+        headers:
+          KeyId: {api-key}
+          # set to true to include the module name in the heder
+          x-asc-module: true
+        # base path prepended to standard semp api paths
         semp_base_path: {proxy-semp-base-path}
       vpn: default
       # virtual_router: primary

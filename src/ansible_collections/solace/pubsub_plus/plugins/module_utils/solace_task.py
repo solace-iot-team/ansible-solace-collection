@@ -6,7 +6,7 @@ __metaclass__ = type
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError, SolaceSempv1VersionNotSupportedError, SolaceNoModuleSupportForSolaceCloudError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceModuleUsageError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError, SolaceSempv1VersionNotSupportedError, SolaceNoModuleSupportForSolaceCloudError, SolaceNoModuleStateSupportError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudServiceConfig, SolaceTaskSolaceCloudConfig
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi, SolaceSempV2PagingGetApi
 from ansible.module_utils.basic import AnsibleModule
@@ -83,6 +83,9 @@ class SolaceTask(object):
 
     def execute(self):
         try:
+            config = self.get_config()
+            if config:
+                config.validate_params()
             msg, result = self.do_task()
             self.module.exit_json(msg=msg, **result)
         except SolaceError as e:
@@ -111,6 +114,27 @@ class SolaceTask(object):
         except SolaceFeatureNotSupportedError as e:
             self.logExceptionAsError(type(e), e)
             usr_msg = ["Feature currently not supported. Pls raise an new feature request if required.", str(e)]
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
+        except SolaceNoModuleStateSupportError as e:
+            usr_msg = [
+                "combination not supported:",
+                f" module: '{e.module_name}'",
+                f" broker_type: '{e.broker_type}'",
+                f" state: '{e.state}'"
+            ]
+            if e.msg:
+                usr_msg.append(e.msg)
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
+        except SolaceModuleUsageError as e:
+            usr_msg = [
+                "module usage error:",
+                f" module: '{e.module_name}'",
+                f" state: '{e.state}'"
+            ]
+            if e.msg:
+                usr_msg.append(e.msg)
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceSempv1VersionNotSupportedError as e:
@@ -150,6 +174,9 @@ class SolaceTask(object):
 class SolaceReadFactsTask(SolaceTask):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
+
+    def get_config(self):
+        return None
 
     def validate_param_get_functions(self, valid_get_funcs: list, param_get_funcs: list) -> bool:
         if param_get_funcs and len(param_get_funcs) > 0:

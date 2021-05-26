@@ -7,7 +7,7 @@ __metaclass__ = type
 from ansible.module_utils.basic import AnsibleModule
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalErrorAbstractMethod, SolaceInternalError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalErrorAbstractMethod, SolaceInternalError, SolaceParamsValidationError
 import logging
 
 SOLACE_TASK_CONFIG_HAS_IMPORT_ERROR = False
@@ -33,6 +33,9 @@ if not SOLACE_TASK_CONFIG_HAS_IMPORT_ERROR:
 class SolaceTaskConfig(object):
     def __init__(self, module: AnsibleModule):
         self.module = module
+
+    def validate_params(self):
+        pass
 
     def get_params(self) -> list:
         return self.module.params
@@ -108,14 +111,28 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         if self.reverse_proxy:
             if self.solace_cloud_config:
                 result = SolaceUtils.create_result(rc=1)
-                msg = f"No support for reverse proxy for Solace Cloud, remove 'reverse_proxy' from module arguments."
+                msg = "No support for reverse proxy for Solace Cloud, remove 'reverse_proxy' from module arguments."
                 module.fail_json(msg=msg, **result)
             semp_base_path = self.reverse_proxy.get('semp_base_path', None)
             if semp_base_path:
-              self.broker_url += '/' + semp_base_path        
+                self.broker_url += '/' + semp_base_path
             use_basic_auth = self.reverse_proxy.get('use_basic_auth', False)
             if not use_basic_auth:
                 self.semp_auth = None
+            _reverse_proxy_headers = self.reverse_proxy.get('headers', None)
+            if _reverse_proxy_headers:
+                _reverse_proxy_headers_include_x_asc_module = _reverse_proxy_headers.get('x-asc-module', False)
+                if not isinstance(_reverse_proxy_headers_include_x_asc_module, bool):
+                    result = SolaceUtils.create_result(rc=1)
+                    msg = f"argument: 'reverse_proxy.headers.x-asc-module={_reverse_proxy_headers_include_x_asc_module}, is not of type 'bool'; use True/False or yes/no"
+                    module.fail_json(msg=msg, **result)
+                _reverse_proxy_headers_include_x_asc_module_op = _reverse_proxy_headers.get('x-asc-module-op', False)
+                if not isinstance(_reverse_proxy_headers_include_x_asc_module_op, bool):
+                    result = SolaceUtils.create_result(rc=1)
+                    msg = f"argument: 'reverse_proxy.headers.x-asc-module-op={_reverse_proxy_headers_include_x_asc_module_op}, is not of type 'bool'; use True/False or yes/no"
+                    module.fail_json(msg=msg, **result)
+                self.reverse_proxy['headers']['x-asc-module'] = _reverse_proxy_headers_include_x_asc_module
+                self.reverse_proxy['headers']['x-asc-module-op'] = _reverse_proxy_headers_include_x_asc_module_op
         return
 
     def is_solace_cloud(self) -> bool:
@@ -127,7 +144,18 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
     def get_reverse_proxy_query_params(self) -> dict:
         if self.reverse_proxy:
             return self.reverse_proxy.get('query_params', None)
-        return None    
+        return None
+
+    def get_reverse_proxy_headers(self) -> dict:
+        if self.reverse_proxy:
+            _headers = self.reverse_proxy.get('headers', None)
+            if _headers:
+                _headers['x-asc-module'] = self.module._name if _headers['x-asc-module'] else None
+                # x-asc-module-op not supported currently. if needed, put into framework
+                # _headers['x-asc-module-op'] = 'todo-insert-module-op' if _headers['x-asc-module-op'] else None
+                _headers['x-asc-module-op'] = None
+            return _headers
+        return None
 
     def get_solace_cloud_url(self, path: str) -> str:
         return path
@@ -144,7 +172,13 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         return self.timeout
 
     def get_headers(self) -> dict:
-        return {'x-broker-name': self.x_broker}
+        _headers = {
+            'x-broker-name': self.x_broker
+        }
+        _reverse_proxy_headers = self.get_reverse_proxy_headers()
+        if _reverse_proxy_headers:
+            _headers.update(self.get_reverse_proxy_headers())
+        return _headers
 
     @staticmethod
     def arg_spec_broker_config() -> dict:
@@ -156,14 +190,15 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             password=dict(type='str', default='admin', no_log=True),
             timeout=dict(type='int', default='10', required=False),
             x_broker=dict(type='str', default=None),
-            reverse_proxy=dict(type='dict', required=False,
-                                options=dict(
-                                    semp_base_path=dict(type='str', required=False, default=None),
-                                    use_basic_auth=dict(type='bool', required=False, default=False),
-                                    query_params=dict(type='dict', required=False, default=None)
-                                    # headers=dict(type='dict', required=False, default=None)
-                                )  
-                              )
+            reverse_proxy=dict(
+                type='dict', required=False,
+                options=dict(
+                    semp_base_path=dict(type='str', required=False, default=None),
+                    use_basic_auth=dict(type='bool', required=False, default=False),
+                    query_params=dict(type='dict', required=False, default=None),
+                    headers=dict(type='dict', required=False, default=None)
+                )
+            )
         )
 
 # TODO: DELETEME

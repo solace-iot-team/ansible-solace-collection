@@ -48,6 +48,21 @@ class SolaceNoModuleSupportForSolaceCloudError(Exception):
         super().__init__(f"module '{module_name}'")
 
 
+class SolaceNoModuleStateSupportError(Exception):
+    def __init__(self, module_name, state, broker_type, msg=None):
+        self.module_name = module_name
+        self.state = state
+        self.broker_type = broker_type
+        self.msg = msg
+
+
+class SolaceModuleUsageError(Exception):
+    def __init__(self, module_name, state, msg=None):
+        self.module_name = module_name
+        self.state = state
+        self.msg = msg
+
+
 class SolaceSempv1VersionNotSupportedError(Exception):
     def __init__(self, module_name, sempv1_version_float, min_sempv1_version_float):
         super().__init__(f"module '{module_name}': service SEMP V1 version: {sempv1_version_float}; minimum version required: {min_sempv1_version_float}")
