@@ -19,13 +19,11 @@ source $PROJECT_HOME/.lib/functions.sh
 # Settings
 export ANSIBLE_SOLACE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible-solace.log"
 export ANSIBLE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible.log"
-INVENTORY_FILE="$WORKING_DIR/broker.inventory.yml"
-inventory=$(assertFile $scriptLogName $INVENTORY_FILE) || exit
+existingInventoryFile="$scriptDir/../files/broker.inventory.yml"
+targetInventoryFile="$WORKING_DIR/broker.inventory.yml"
 
 playbooks=(
   "$scriptDir/main.playbook.yml"
-  "$scriptDir/get.playbook.yml"
-  "$scriptDir/ex.playbook.yml"
 )
 
 ##############################################################################################################################
@@ -34,9 +32,13 @@ for playbook in ${playbooks[@]}; do
 
   playbook=$(assertFile $scriptLogName $playbook) || exit
   ansible-playbook \
-                  -i $inventory \
                   $playbook \
-                  --extra-vars "WORKING_DIR=$WORKING_DIR"
+                  --extra-vars "WORKING_DIR=$WORKING_DIR" \
+                  --extra-vars "EXISTING_INVENTORY_FILE=$existingInventoryFile" \
+                  --extra-vars "TARGET_INVENTORY_FILE=$targetInventoryFile" \
+                  --extra-vars "REVERSE_PROXY_HOST=$REVERSE_PROXY_HOST" \
+                  --extra-vars "REVERSE_PROXY_API_KEY=$REVERSE_PROXY_API_KEY" \
+                  --extra-vars "REVERSE_PROXY_SEMP_BASE_PATH=$REVERSE_PROXY_SEMP_BASE_PATH"
   code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
 done

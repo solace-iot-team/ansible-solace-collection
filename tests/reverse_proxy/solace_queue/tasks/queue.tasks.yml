@@ -5,18 +5,16 @@
 - name: "queue: create"
   solace_queue:
     name: "{{ queue_item.name }}"
+    msg_vpn: "{{ msg_vpn }}"
     settings:
       egressEnabled: false
       ingressEnabled: false
     state: present
 
-- fail:
-    msg: continue here
-
-
 - name: "queue: update"
   solace_queue:
     name: "{{ queue_item.name }}"
+    msg_vpn: "{{ msg_vpn }}"
     settings:
       permission: "consume"
       maxMsgSpoolUsage: 100
@@ -26,12 +24,14 @@
   solace_queue_subscription:
     name: "{{ item }}"
     queue_name: "{{ queue_item.name }}"
+    msg_vpn: "{{ msg_vpn }}"
     state: present
   loop: "{{ queue_item.subscriptions }}"
 
 - name: "queue: enable egress"
   solace_queue:
     name: "{{ queue_item.name }}"
+    msg_vpn: "{{ msg_vpn }}"
     settings:
       egressEnabled: true
       ingressEnabled: true

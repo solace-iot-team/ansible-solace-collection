@@ -19,7 +19,7 @@ source $PROJECT_HOME/.lib/functions.sh
 # Settings
 export ANSIBLE_SOLACE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible-solace.log"
 export ANSIBLE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible.log"
-INVENTORY_FILE="$scriptDir/../files/broker.inventory.yml"
+INVENTORY_FILE="$WORKING_DIR/broker.inventory.yml"
 inventory=$(assertFile $scriptLogName $INVENTORY_FILE) || exit
 
 playbooks=(
@@ -35,8 +35,7 @@ for playbook in ${playbooks[@]}; do
   ansible-playbook \
                   -i $inventory \
                   $playbook \
-                  --extra-vars "WORKING_DIR=$WORKING_DIR" \
-                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN"
+                  --extra-vars "WORKING_DIR=$WORKING_DIR"
   code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
 done

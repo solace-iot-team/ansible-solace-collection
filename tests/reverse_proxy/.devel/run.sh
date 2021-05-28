@@ -10,11 +10,12 @@ if [[ ! $projectHome =~ "ansible-solace-collection" ]]; then
 fi
 export PROJECT_HOME=$projectHome
 
-
+# "solace_vpn" -- this does not work, don't switch on
 ansibleSolaceTests=(
-  # "solace_vpn"
-  # "solace_client_username"
+  "setup"
+  "solace_client_username"
   "solace_queue"
+  "error_handling"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 

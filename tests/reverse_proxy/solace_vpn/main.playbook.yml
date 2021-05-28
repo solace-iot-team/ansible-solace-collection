@@ -1,4 +1,4 @@
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
@@ -9,15 +9,6 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    # solace_gather_facts:
-    #   host: "{{ sempv2_host }}"
-    #   port: "{{ sempv2_port }}"
-    #   secure_connection: "{{ sempv2_is_secure_connection }}"
-    #   username: "{{ sempv2_username }}"
-    #   password: "{{ sempv2_password }}"
-    #   timeout: "{{ sempv2_timeout }}"
-    #   solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
-    #   solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
     solace_vpn:
       secure_connection: "{{ semp_is_secure_connection }}"
       host: "{{ semp_host }}"
@@ -38,15 +29,6 @@
   - include_vars:
       file: "vpn.vars.yml"
   tasks:
-    # - name: "Check vars"
-    #   set_fact:
-    #     working_dir: "{{ WORKING_DIR }}"
-    #
-    # - name: "main: gather facts"
-    #   solace_gather_facts:
-    # - set_fact:
-    #     is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud}}"
-
     - name: "main: call tasks: vpn.tasks"
       include_tasks: ./tasks/vpn.tasks.yml
       register: result

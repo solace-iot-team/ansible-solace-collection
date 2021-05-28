@@ -9,6 +9,14 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
+    solace_get_vpns:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
     solace_client_profile:
       secure_connection: "{{ semp_is_secure_connection }}"
       host: "{{ semp_host }}"
@@ -19,11 +27,18 @@
       solace_cloud_api_token: "not-a-token"
       solace_cloud_service_id: "not-a-service"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-      msg_vpn: "{{ vpn }}"
-  pre_tasks:
   tasks:
+  - name: "get: get vpns"
+    solace_get_vpns:
+      query_params:
+        select:
+          - msgVpnName
+    register: result
+  - set_fact:
+      msg_vpn: "{{ result.result_list[0].data.msgVpnName }}"
   - name: "ex: Delete Client Profile"
     solace_client_profile:
+      msg_vpn: "{{ msg_vpn }}"
       name: "asct-client-profile"
       state: absent
     ignore_errors: yes
