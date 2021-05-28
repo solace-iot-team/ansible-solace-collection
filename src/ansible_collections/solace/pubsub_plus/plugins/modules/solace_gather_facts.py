@@ -99,8 +99,9 @@ msg:
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceApiError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetTask
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi, SolaceSempV1Api, SolaceSempV2PagingGetApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi, SolaceSempV1Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
@@ -159,7 +160,13 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
         else:
             # get service
             xml_post_cmd = "<rpc><show><service></service></show></rpc>"
-            resp_service = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd, SolaceTaskOps.OP_READ_OBJECT)
+            try:
+                resp_service = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd, SolaceTaskOps.OP_READ_OBJECT)
+            except SolaceApiError as e:
+                if self.get_config().reverse_proxy:
+                    self.logExceptionAsWarning(f"using reverse-proxy, failed to execute SEMP V1 call: {xml_post_cmd}", e)
+                    return resp
+                raise e
             resp['service'] = resp_service['rpc-reply']['rpc']['show']['service']['services']
             # get virtual router
             xml_post_cmd = "<rpc><show><router-name></router-name></show></rpc>"

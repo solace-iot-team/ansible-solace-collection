@@ -1,0 +1,121 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_get_list"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_client_username:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_client_usernames:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  pre_tasks:
+  - include_vars:
+      file: "client_usernames.vars.yml"
+      name: target_list
+  tasks:
+  - name: "main: solace_get_list - delete client usernames"
+    solace_client_username:
+      name: "{{ item.name }}"
+      state: absent
+    loop: "{{ target_list.clientUsernames }}"
+
+  - name: "main: solace_get_list: creating client usernames"
+    solace_client_username:
+      name: "{{ item.name }}"
+      state: present
+    loop: "{{ target_list.clientUsernames }}"
+
+  - name: "main: solace_get_client_usernames(config)"
+    solace_get_client_usernames:
+      count: -1
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+    register: result
+  - assert:
+      that:
+        - result.result_list_count == 3
+
+  - name: "main: solace_get_client_usernames(config)"
+    solace_get_client_usernames:
+      count: 10
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.clientUsernames[0].name }}"
+    register: result
+  - assert:
+      that:
+        - result.result_list_count == 1
+
+  - name: "main: solace_get_client_usernames(config)"
+    solace_get_client_usernames:
+      count: 5
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+    register: result
+  - assert:
+      that:
+        - result.result_list_count == 3
+
+  - name: "main: solace_get_client_usernames(config)"
+    solace_get_client_usernames:
+      count: 10
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+    register: result
+  - assert:
+      that:
+        - result.result_list_count == 3
+
+  - name: "main: solace_get_client_usernames(config)"
+    solace_get_client_usernames:
+      count: 10
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+    register: result
+  - assert:
+      that:
+        - result.result_list_count == 3
+
+  - name: "main: solace_get_client_usernames(config)"
+    solace_get_client_usernames:
+      count: 0
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.rc == 1
+        - "'arg \\'count=0\\': must not be zero' in result.msg|string"
+
+  - name: "main: solace_get_client_usernames(config)"
+    solace_get_client_usernames:
+      count: 1000
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.rc == 1
+        - "'arg \\'count=1000\\': must not be be greater than 999' in result.msg|string"
+
+###
+# The End.

@@ -10,8 +10,9 @@ Enhancements & New Features.
   - added support for Solace Cloud API
 
 **New Features:**
-- TODO
-- reverse_proxy support
+* **[support for reverse-proxy](https://solace-iot-team.github.io/ansible-solace-collection//tips-tricks-content/reverse-proxy.html)**
+  - reverse proxy settings for self-hosted brokers
+  - status: **Experimental** 
 
 ## Version: 1.4.2
 Enhancements of SEMP V1 Framework.

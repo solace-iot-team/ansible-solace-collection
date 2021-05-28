@@ -16,3 +16,11 @@ vpns:
     serviceMqttPlainTextEnabled: true
     serviceMqttMaxConnectionCount: 10
     serviceMqttPlainTextListenPort: 1885
+solace_cloud_sempv2_not_allowed_vpn_settings:
+  authenticationBasicEnabled: true
+  authenticationBasicType: "LDAP"
+  authenticationClientCertEnabled: false
+  authenticationClientCertValidateDateEnabled: false
+  authenticationOauthEnabled: false
+  authenticationClientCertAllowApiProvidedUsernameEnabled: false
+  authenticationClientCertUsernameSource: "COMMON_NAME"

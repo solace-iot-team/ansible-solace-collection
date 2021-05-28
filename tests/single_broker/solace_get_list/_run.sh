@@ -23,11 +23,7 @@ INVENTORY_FILE="$WORKING_DIR/broker.inventory.yml"
 inventory=$(assertFile $scriptLogName $INVENTORY_FILE) || exit
 
 playbooks=(
-  # "$scriptDir/main.local.playbook.yml"
-  "$scriptDir/main.solace-cloud.playbook.yml"
-  # "$scriptDir/idempotency.playbook.yml"
-  # "$scriptDir/get.playbook.yml"
-  # "$scriptDir/ex.playbook.yml"
+  "$scriptDir/main.playbook.yml"
 )
 
 ##############################################################################################################################
@@ -38,8 +34,7 @@ for playbook in ${playbooks[@]}; do
   ansible-playbook \
                   -i $inventory \
                   $playbook \
-                  --extra-vars "WORKING_DIR=$WORKING_DIR" \
-                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN"
+                  --extra-vars "WORKING_DIR=$WORKING_DIR"
   code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
 done

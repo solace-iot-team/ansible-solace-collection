@@ -19,8 +19,9 @@ source $PROJECT_HOME/.lib/functions.sh
     export ANSIBLE_SOLACE_TESTS=(
       "setup"
       "solace_get_available"
+      "solace_get_list"
       "solace_auth"
-      "solace_oauth"      
+      "solace_oauth"
       "solace_facts"
       "solace_acl_profile"
       "solace_client_profile"

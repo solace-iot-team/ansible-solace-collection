@@ -8,7 +8,7 @@ import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceModuleUsageError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError, SolaceSempv1VersionNotSupportedError, SolaceNoModuleSupportForSolaceCloudError, SolaceNoModuleStateSupportError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudServiceConfig, SolaceTaskSolaceCloudConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi, SolaceSempV2PagingGetApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceApi, SolaceSempV2Api, SolaceCloudApi, SolaceSempV2PagingGetApi
 from ansible.module_utils.basic import AnsibleModule
 import logging
 import json
@@ -39,7 +39,6 @@ class SolaceTask(object):
         self.module = module
         self.changed = False
         self.result = SolaceUtils.create_result()
-        self.current_operation = 'this-is-the-current-operation'
         return
 
     def get_module(self) -> AnsibleModule:
@@ -70,17 +69,20 @@ class SolaceTask(object):
         # return: msg(dict) and result(dict)
         raise SolaceInternalErrorAbstractMethod()
 
-    def _logException(self, logging_func, message, e) -> list:
+    def _logException(self, logging_func, message, e):
         ex = traceback.format_exc()
         ex_msg_list = [str(e)]
         log_msg = [f"{message}"] + ex_msg_list + ex.split('\n')
         logging_func("%s", json.dumps(log_msg, indent=2))
 
-    def logExceptionAsError(self, message, e) -> list:
+    def logExceptionAsError(self, message, e):
         self._logException(logging.error, message, e)
 
-    def logExceptionAsDebug(self, message, e) -> list:
+    def logExceptionAsDebug(self, message, e):
         self._logException(logging.debug, message, e)
+
+    def logExceptionAsWarning(self, message, e):
+        self._logException(logging.warn, message, e)
 
     def execute(self):
         try:
@@ -96,10 +98,67 @@ class SolaceTask(object):
             if result_update:
                 self.update_result(result_update)
             self.module.exit_json(msg=e.to_list(), **self.get_result())
+
+
+# "response": {
+#           "body": {
+#               "meta": {
+#                   "error": {
+#                       "code": 72,
+#                       "description": "Problem with certAuthorityName: Command prohibited due to Authorization Access Level",
+#                       "status": "UNAUTHORIZED"
+#                   },
+#                   "request": {
+#                       "method": "GET",
+#                       "uri": "https://si0vmc2190.de.bosch.com:1082/SEMP/v2/config/certAuthorities/asct_error_handling"
+#                   },
+#                   "responseCode": 400
+#               }
+#           },
+#           "reason": "Bad Request",
+#           "status_code": 400
+
         except SolaceApiError as e:
-            self.logExceptionAsError(type(e), e)
+            http_resp = e.get_http_resp()
+            # check if error comes from broker
+            is_broker_error = False
+            response = e.get_ansible_msg()
+            if isinstance(response, dict):
+                if ('body' in response and 'meta' in response['body']):
+                    is_broker_error = True
+            if not is_broker_error and http_resp is not None and self.get_config().reverse_proxy:
+                usr_msg = {
+                    'details': {
+                        "module": {
+                            "name": f"{e.get_module_name()}",
+                            "operation": f"{e.get_module_op()}"
+                        },
+                        "http": {
+                            "request": {
+                                "method": f"{http_resp.request.method}",
+                                "resource": f"{SolaceApi.get_uri_path(http_resp.url)}",
+                                "query": f"{SolaceApi.get_uri_query(http_resp.url)}"
+                            },
+                            "response": e.get_ansible_msg()
+                        }
+                    },
+                    'hint': {
+                        "possible reason: reverse proxy/api gateway error"
+                    }
+                }
+                # NOTE: reverse_proxy should NOT return 404, here for historical reasons
+                if http_resp.status_code in [404, 501]:
+                    usr_msg_update = {
+                        'hint': {
+                            "possible reason: resource not configured or blocked on the reverse proxy/api gateway"
+                        }
+                    }
+                    usr_msg.update(usr_msg_update)
+            else:
+                usr_msg = e.get_ansible_msg()
+                self.logExceptionAsError(type(e), e)
             self.update_result(dict(rc=1, changed=self.changed))
-            self.module.exit_json(msg=e.get_ansible_msg(), **self.get_result())
+            self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceInternalError as e:
             self.logExceptionAsError(type(e), e)
             ex = traceback.format_exc()
@@ -109,7 +168,7 @@ class SolaceTask(object):
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceParamsValidationError as e:
             self.logExceptionAsError(type(e), e)
-            usr_msg = ["module arg validation failed", str(e)]
+            usr_msg = [f"module '{self.get_module()._name}': argument validation failed", str(e)]
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceFeatureNotSupportedError as e:
@@ -216,12 +275,15 @@ class SolaceCRUDTask(SolaceTask):
 
     def get_new_settings(self) -> dict:
         s = self.get_module().params[self.get_settings_arg_name()]
-        if s:
-            SolaceUtils.type_conversion(s, self.get_config().is_solace_cloud())
-        return s
+        return self.normalize_new_settings(s)
 
     def normalize_current_settings(self, current_settings: dict, new_settings: dict) -> dict:
         return current_settings
+
+    def normalize_new_settings(self, new_settings) -> dict:
+        if new_settings:
+            SolaceUtils.type_conversion(new_settings, self.get_config().is_solace_cloud())
+        return new_settings
 
     def get_func(self, *args) -> dict:
         raise SolaceInternalErrorAbstractMethod()
@@ -360,8 +422,9 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
     def do_task(self):
         params = self.get_config().get_params()
         api = params['api']
+        count = params['count']
         query_params = params['query_params']
-        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, self.get_path_array(params), query_params, self.get_monitor_api_base)
+        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, count, self.get_path_array(params), query_params, self.get_monitor_api_base)
         result = self.create_result_with_list(objects)
         return None, result
 

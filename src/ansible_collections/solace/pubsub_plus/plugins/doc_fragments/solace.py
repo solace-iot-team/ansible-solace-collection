@@ -55,7 +55,7 @@ options:
     required: false
     type: str
   reverse_proxy:
-    description: "Use a reverse proxy / api gateway. Note: B(Experimental, not fully implemented)."
+    description: "Use a reverse proxy / api gateway. Note: B(Experimental. Not permitted for Solace Cloud API)."
     required: false
     type: dict
     suboptions:
@@ -206,6 +206,11 @@ options:
    choices:
      - config
      - monitor
+  count:
+   description: "The number of results to be fetched from broker. Set to `count: -1` to fetch all available results. Allowed values: '-1, 1..999'."
+   required: false
+   type: int
+   default: -1
   query_params:
     description: The query parameters.
     required: false
@@ -239,6 +244,11 @@ options:
    default: monitor
    choices:
      - monitor
+count:
+   description: "The number of results to be fetched from broker. Set to `count: -1` to fetch all available results. Allowed values: '-1, 1..999'."
+   required: false
+   type: int
+   default: -1
   query_params:
     description: The query parameters.
     required: false

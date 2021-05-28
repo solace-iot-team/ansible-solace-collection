@@ -23,14 +23,26 @@ class SolaceInternalErrorAbstractMethod(SolaceInternalError):
 
 
 class SolaceApiError(Exception):
-    def __init__(self, resp):
+    def __init__(self, http_resp, resp, module_name, module_op):
+        self.http_resp = http_resp
         self.resp = resp
+        self.module_name = module_name
+        self.module_op = module_op
 
     def get_ansible_msg(self):
         return self.resp
 
     def get_resp(self):
         return self.resp
+
+    def get_http_resp(self):
+        return self.http_resp
+
+    def get_module_name(self):
+        return self.module_name
+
+    def get_module_op(self):
+        return self.module_op
 
 
 class SolaceParamsValidationError(Exception):
