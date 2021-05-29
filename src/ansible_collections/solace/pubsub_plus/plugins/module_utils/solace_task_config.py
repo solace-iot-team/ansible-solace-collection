@@ -145,6 +145,12 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         parse_result = urllib.parse.urlparse(self.broker_url)
         return parse_result.netloc
 
+    def get_broker_semp_base_path(self):
+        if self.reverse_proxy:
+            return self.reverse_proxy.get('semp_base_path', '')
+        else:
+            return ''    
+
     def get_semp_url(self, path: str) -> str:
         return self.broker_url + path
 
@@ -265,9 +271,9 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         )
 
     @staticmethod
-    def _arg_spec_get_object_list_count():
+    def _arg_spec_get_object_list_page_count():
         return dict(
-            count=dict(type='int', default=-1, required=False)
+            page_count=dict(type='int', default=100, required=False)
         )
 
     @staticmethod
@@ -275,7 +281,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         d = dict(
             api=dict(type='str', default='config', choices=['config', 'monitor'])
         )
-        d.update(SolaceTaskBrokerConfig._arg_spec_get_object_list_count())
+        d.update(SolaceTaskBrokerConfig._arg_spec_get_object_list_page_count())
         d.update(SolaceTaskBrokerConfig._arg_spec_get_query_params())
         return d
 
@@ -284,7 +290,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         d = dict(
             api=dict(type='str', default='monitor', choices=['monitor'])
         )
-        d.update(SolaceTaskBrokerConfig._arg_spec_get_object_list_count())
+        d.update(SolaceTaskBrokerConfig._arg_spec_get_object_list_page_count())
         d.update(SolaceTaskBrokerConfig._arg_spec_get_query_params())
         return d
 

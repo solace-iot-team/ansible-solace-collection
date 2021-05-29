@@ -28,7 +28,7 @@
   tasks:
   - name: get 1 vpn config
     solace_get_vpns:
-      count: 1
+      page_count: 1
     register: result
 
   - set_fact:

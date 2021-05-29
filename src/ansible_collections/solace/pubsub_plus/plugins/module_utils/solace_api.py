@@ -47,8 +47,8 @@ class SolaceApi(object):
     def get_headers(self, config: SolaceTaskConfig, op: str) -> dict:
         return config.get_headers(op)
 
-    def make_get_request(self, config: SolaceTaskConfig, path_array: list, module_op=SolaceTaskOps.OP_READ_OBJECT):
-        return self.make_request(config, requests.get, path_array, json_body=None, query_params=None, module_op=module_op)
+    def make_get_request(self, config: SolaceTaskConfig, path_array: list, module_op=SolaceTaskOps.OP_READ_OBJECT, query_params=None):
+        return self.make_request(config, requests.get, path_array, json_body=None, query_params=query_params, module_op=module_op)
 
     def make_post_request(self, config: SolaceTaskConfig, path_array: list, json_body=None, module_op=SolaceTaskOps.OP_CREATE_OBJECT):
         return self.make_request(config, requests.post, path_array, json_body, query_params=None, module_op=module_op)
@@ -93,13 +93,18 @@ class SolaceApi(object):
         logging.debug(f">>>> _make_request: _headers={_headers}")
         # raise SolaceInternalError("continue here")
 
+        # NOTE: url encode query params manually for SEMP
+        _query_params_str = ''
+        if _query_params:
+            # _query_params_str = "&".join("%s=%s" % (k,v) for k,v in _query_params.items())
+            _query_params_str = urllib.parse.urlencode(_query_params, safe=',*')
         resp = request_func(
             _url,
             json=json_body,
             auth=self.get_auth(config),
             timeout=config.get_timeout(),
             headers=_headers,
-            params=_query_params)
+            params=_query_params_str)
         SolaceApi.log_http_roundtrip(resp)
         return resp
 
@@ -210,6 +215,7 @@ class SolaceApi(object):
 class SolaceSempV2Api(SolaceApi):
 
     API_BASE_SEMPV2_CONFIG = "/SEMP/v2/config"
+    API_BASE_SEMPV2_PRIVATE_CONFIG = "/SEMP/v2/__private_config__"
     API_BASE_SEMPV2_MONITOR = "/SEMP/v2/monitor"
     API_BASE_SEMPV2_PRIVATE_MONITOR = "/SEMP/v2/__private_monitor__"
     API_BASE_SEMPV2_ACTION = "/SEMP/v2/action"
@@ -226,7 +232,7 @@ class SolaceSempV2Api(SolaceApi):
         return config.get_semp_url(path)
 
     def get_sempv2_version(self, config: SolaceTaskBrokerConfig):
-        resp = self.make_get_request(config, [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + ["about", "api"])
+        resp = self.make_get_request(config, [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + ["about", "api"], query_params=None)
         raw_api_version = SolaceUtils.get_key(resp, "sempVersion")
         # format: 2.21
         try:
@@ -286,16 +292,44 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
     def __init__(self, module: AnsibleModule, is_supports_paging: bool = True):
         super().__init__(module)
         self.next_url = None
-        self.query = None
+        # self.query = None
         self.is_supports_paging = is_supports_paging
         return
 
     def get_url(self, config: SolaceTaskBrokerConfig, path: str) -> str:
+        # NOTE: 
+
+        # TODO: DELETEME
+        import logging
+        logging.debug(f">>>>>> path = {path}")  
+
         if self.next_url:
             parse_result = urllib.parse.urlparse(self.next_url)
+            next_url_path = parse_result.path
+            next_url_query = parse_result.query
+
+  
+            logging.debug(f">>>>>> next_url_path = {next_url_path}")  
+            logging.debug(f">>>>>> next_url_query = {next_url_query}")
+
             new_parse_result = parse_result._replace(netloc=config.get_broker_netloc())
+            new_parse_result = new_parse_result._replace(path=config.get_broker_semp_base_path() + next_url_path)
+            new_parse_result = new_parse_result._replace(query=next_url_query)
+            
+            new_next_url = new_parse_result.geturl()
+            logging.debug(f">>>>>> new_next_url = {new_next_url}")
+
+
             return new_parse_result.geturl()
-        return config.get_semp_url(path) + ("?" + self.query if self.query else '')
+
+        # logging.debug(f">>>>>> self.query = {self.query}")
+
+        # new_next_url = config.get_semp_url(path) + ("?" + self.query if self.query else '')
+        new_next_url = config.get_semp_url(path)
+        logging.debug(f">>>>>> new_next_url = {new_next_url}")
+
+        # return config.get_semp_url(path) + ("?" + self.query if self.query else '')
+        return new_next_url
 
     def handle_good_response(self, resp, module_op):
         if resp.text:
@@ -308,48 +342,92 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
     def get_objects(self,
                     config: SolaceTaskBrokerConfig,
                     api: str,
-                    count: int,
+                    page_count: int,
                     path_array: list,
                     query_params: dict = None,
                     get_monitor_api_base_func=get_monitor_api_base) -> list:
-        query = ""
-        if count == 0:
-            raise SolaceParamsValidationError(
-                'count',
-                count,
-                "must not be zero. 'count: -1': fetch all results, 'count: >0': fetch exactly this number of results"
-            )
-        if count > 999:
-            raise SolaceParamsValidationError(
-                'count',
-                count,
-                "must not be be greater than 999. 'count: -1': fetch all results, 'count: >0': fetch exactly this number of results"
-            )
-        if count > 0:
-            do_paging = False
-            # NOTE: seems SEMP v2 returns always 1 less
-            page_count = count + 1
-        else:
-            do_paging = True
-            page_count = 100
+        # query = ""
+        # if count == 0:
+        #     raise SolaceParamsValidationError(
+        #         'count',
+        #         count,
+        #         "must not be zero. 'count: -1': fetch all results, 'count: >0': fetch exactly this number of results"
+        #     )
+        # if count > 999:
+        #     raise SolaceParamsValidationError(
+        #         'count',
+        #         count,
+        #         "must not be be greater than 999. 'count: -1': fetch all results, 'count: >0': fetch exactly this number of results"
+        #     )
+        # if count > 0:
+        #     do_paging = True
+        #     # do_paging = False
+        #     page_count = count
+        # else:
+        #     do_paging = True
+        #     page_count = 100
+
+
+        # TODO: DELETEME
+        import logging, json
+        logging.debug(f">>>>>> query_params = \n{json.dumps(query_params, indent=2)}")  
+
+
+        _query_params = {}
         if self.is_supports_paging:
             # TODO: FIX_URL_PAGING for reverse_proxy
-            query = f"count={page_count}"
+            # query = f"count={page_count}"
             # query = "count=1"
+            _query_params.update({
+                "count": page_count
+            })
         if query_params:
-            if ("select" in query_params
-                    and query_params['select'] is not None
-                    and len(query_params['select']) > 0):
-                query += ('&' if query != '' else '')
-                query += "select=" + ','.join(query_params['select'])
             if ("where" in query_params
                     and query_params['where'] is not None
                     and len(query_params['where']) > 0):
-                where_array = []
-                for _i, where_elem in enumerate(query_params['where']):
-                    where_array.append(where_elem.replace('/', '%2F'))
-                query += ('&' if query != '' else '')
-                query += "where=" + ','.join(where_array)
+                # where_array = []
+                # for _i, where_elem in enumerate(query_params['where']):
+                #     where_array.append(where_elem.replace('/', '%2F'))
+                # query += ('&' if query != '' else '')
+                # query += "where=" + ','.join(where_array)
+                _query_params.update({
+                    "where": ','.join(query_params['where'])
+                })
+            
+            logging.debug(f">>>>>> _query_params (with where)=\n{json.dumps(_query_params, indent=2)}")  
+
+            if ("select" in query_params
+                    and query_params['select'] is not None
+                    and len(query_params['select']) > 0):
+                # query += ('&' if query != '' else '')
+                # query += "select=" + ','.join(query_params['select'])
+                _query_params.update({
+                    "select": ','.join(query_params['select'])
+                })
+
+
+            # if ("select" in query_params
+            #         and query_params['select'] is not None
+            #         and len(query_params['select']) > 0):
+            #     # query += ('&' if query != '' else '')
+            #     # query += "select=" + ','.join(query_params['select'])
+            #     _query_params.update({
+            #         "select": ','.join(query_params['select'])
+            #     })
+            #     logging.debug(f">>>>>> query-select-only=\n{json.dumps(_query_params, indent=2)}")  
+
+            # if ("where" in query_params
+            #         and query_params['where'] is not None
+            #         and len(query_params['where']) > 0):
+            #     where_array = []
+            #     for _i, where_elem in enumerate(query_params['where']):
+            #         where_array.append(where_elem.replace('/', '%2F'))
+            #     # query += ('&' if query != '' else '')
+            #     # query += "where=" + ','.join(where_array)
+            #     _query_params.update({
+            #         "where": ','.join(where_array)
+            #     })
+        logging.debug(f">>>>>> _query_params=\n{json.dumps(_query_params, indent=2)}")  
 
         api_base = self.API_BASE_SEMPV2_CONFIG
         if api == 'monitor':
@@ -357,9 +435,9 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
         path_array = [api_base] + path_array
         result_list = []
         hasNextPage = True
-        self.query = query
+        # self.query = query
         while hasNextPage:
-            body = self.make_get_request(config, path_array, module_op=SolaceTaskOps.OP_READ_OBJECT_LIST)
+            body = self.make_get_request(config, path_array, module_op=SolaceTaskOps.OP_READ_OBJECT_LIST, query_params=_query_params)
             data_list = []
             # monitor api may have collections as well
             collections_list = []
@@ -374,24 +452,19 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
                 )
                 if len(collections_list) > 0:
                     result_element.update(dict(collections=collections_list[i]))
-
                 result_list.append(result_element)
-            if do_paging:
-                # cursor seems to have a bug ==> test first if any data returned
-                if len(data_list) == 0:
-                    hasNextPage = False
-                elif "meta" not in body:
-                    hasNextPage = False
-                elif "paging" not in body["meta"]:
-                    hasNextPage = False
-                elif "nextPageUri" not in body["meta"]["paging"]:
-                    hasNextPage = False
-                else:
-                    self.next_url = body["meta"]["paging"]["nextPageUri"]
-            else:
+            # check if more pages
+            if "meta" not in body:
                 hasNextPage = False
+            elif "paging" not in body["meta"]:
+                hasNextPage = False
+            elif "nextPageUri" not in body["meta"]["paging"]:
+                hasNextPage = False
+            else:
+                self.next_url = body["meta"]["paging"]["nextPageUri"]
+                _query_params = None
         self.next_url = None
-        self.query = None
+        # self.query = None
         return result_list
 
 
@@ -542,7 +615,7 @@ class SolaceCloudApi(SolaceApi):
 
     def get_data_centers(self, config: SolaceTaskSolaceCloudConfig) -> list:
         # GET /api/v0/datacenters
-        resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_DATA_CENTERS])
+        resp = self.make_get_request(config, [self.API_BASE_PATH, self.API_DATA_CENTERS], query_params=None)
         return resp
 
     def _transform_service(self, service: dict) -> dict:

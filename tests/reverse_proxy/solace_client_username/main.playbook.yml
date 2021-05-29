@@ -52,11 +52,8 @@
   - set_fact:
       sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
 
-
-# TODO: test paging: change in code to count=1
   - name: "main: get vpns"
     solace_get_vpns:
-      # count: 999
       query_params:
         select:
           - msgVpnName
@@ -94,15 +91,6 @@
       query_params:
         where:
           - "clientUsername=={{ target_list.search_pattern }}"
-       # TODO: multiple parameters do not work
-       # sempv2=2.18
-       # or it may be the reverse-proxy
-          # - "enabled==true"
-          # - "guaranteedEndpointPermissionOverrideEnabled==true"
-        # select:
-        #   - clientUsername
-        #   - enabled
-        #   - guaranteedEndpointPermissionOverrideEnabled
     register: result
   - assert:
       that:
@@ -123,6 +111,52 @@
       that:
         - result.result_list_count == 3
 
+  - name: "main: test paging"
+    solace_get_client_usernames:
+      page_count: 1
+      msg_vpn: "{{ msg_vpn }}"
+    register: result
+  - assert:
+      that:
+        - result.result_list_count >= 3
+
+  - name: "main: test query  params"
+    solace_get_client_usernames:
+      msg_vpn: "{{ msg_vpn }}"
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+        select:
+          - clientUsername
+    register: result
+  - assert:
+      that:
+        - result.result_list_count == 3
+
+  - name: "main: test query  params"
+    solace_get_client_usernames:
+      msg_vpn: "{{ msg_vpn }}"
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+          - "enabled==true"
+          - "guaranteedEndpointPermissionOverrideEnabled==false"
+        select:
+          - clientUsername
+          - enabled
+          - guaranteedEndpointPermissionOverrideEnabled
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - "'INVALID_PARAMETER' in result.msg|string"
+        - "'11' in result.msg|string"
+    when: result.rc == 1
+  - assert:
+      that:
+        - result.result_list_count == 3
+    when: result.rc == 0
+
   - name: "main: solace_client_username: remove all - end"
     solace_client_username:
       msg_vpn: "{{ msg_vpn }}"
@@ -141,7 +175,6 @@
     register: result
   - assert:
       that: result.result_list_count == 0
-
 
 ###
 # The End.

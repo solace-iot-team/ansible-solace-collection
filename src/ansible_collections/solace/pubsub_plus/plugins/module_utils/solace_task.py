@@ -98,26 +98,6 @@ class SolaceTask(object):
             if result_update:
                 self.update_result(result_update)
             self.module.exit_json(msg=e.to_list(), **self.get_result())
-
-
-# "response": {
-#           "body": {
-#               "meta": {
-#                   "error": {
-#                       "code": 72,
-#                       "description": "Problem with certAuthorityName: Command prohibited due to Authorization Access Level",
-#                       "status": "UNAUTHORIZED"
-#                   },
-#                   "request": {
-#                       "method": "GET",
-#                       "uri": "https://si0vmc2190.de.bosch.com:1082/SEMP/v2/config/certAuthorities/asct_error_handling"
-#                   },
-#                   "responseCode": 400
-#               }
-#           },
-#           "reason": "Bad Request",
-#           "status_code": 400
-
         except SolaceApiError as e:
             http_resp = e.get_http_resp()
             # check if error comes from broker
@@ -126,7 +106,8 @@ class SolaceTask(object):
             if isinstance(response, dict):
                 if ('body' in response and 'meta' in response['body']):
                     is_broker_error = True
-            if not is_broker_error and http_resp is not None and self.get_config().reverse_proxy:
+                    broker_error_code = response['body']['meta']['error']['code']
+            if self.get_config().reverse_proxy and http_resp is not None:
                 usr_msg = {
                     'details': {
                         "module": {
@@ -141,11 +122,22 @@ class SolaceTask(object):
                             },
                             "response": e.get_ansible_msg()
                         }
-                    },
-                    'hint': {
-                        "possible reason: reverse proxy/api gateway error"
                     }
                 }
+                if is_broker_error and broker_error_code == 11:
+                    usr_msg_update = {
+                        'hint': {
+                            "possible reason: reverse proxy/api gateway URL encoded the ',' (comma). the query must go through to broker unaltered."
+                        }
+                    }
+                    usr_msg.update(usr_msg_update)
+                if not is_broker_error:
+                    usr_msg_update = {
+                        'hint': {
+                            "possible reason: reverse proxy/api gateway error"
+                        }
+                    }
+                    usr_msg.update(usr_msg_update)
                 # NOTE: reverse_proxy should NOT return 404, here for historical reasons
                 if http_resp.status_code in [404, 501]:
                     usr_msg_update = {
@@ -422,9 +414,9 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
     def do_task(self):
         params = self.get_config().get_params()
         api = params['api']
-        count = params['count']
+        page_count = params['page_count']
         query_params = params['query_params']
-        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, count, self.get_path_array(params), query_params, self.get_monitor_api_base)
+        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, page_count, self.get_path_array(params), query_params, self.get_monitor_api_base)
         result = self.create_result_with_list(objects)
         return None, result
 

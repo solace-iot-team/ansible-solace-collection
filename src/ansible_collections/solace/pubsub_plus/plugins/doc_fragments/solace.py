@@ -196,21 +196,20 @@ options:
 description:
 - "Implements the config and monitor API."
 - "Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter."
-
 options:
   api:
-   description: The API the query should run against.
-   required: false
-   type: str
-   default: config
-   choices:
-     - config
-     - monitor
-  count:
-   description: "The number of results to be fetched from broker. Set to `count: -1` to fetch all available results. Allowed values: '-1, 1..999'."
-   required: false
-   type: int
-   default: -1
+    description: The API the query should run against.
+    required: false
+    type: str
+    default: config
+    choices:
+      - config
+      - monitor
+  page_count:
+    description: "The number of results to be fetched from broker in single call. Note: always returns the entire result set by following the cursor."
+    required: false
+    type: int
+    default: 100
   query_params:
     description: The query parameters.
     required: false
@@ -235,20 +234,19 @@ options:
 description:
 - "Implements the monitor API."
 - "Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter."
-
 options:
   api:
-   description: The API the query should run against.
-   required: false
-   type: str
-   default: monitor
-   choices:
-     - monitor
-count:
-   description: "The number of results to be fetched from broker. Set to `count: -1` to fetch all available results. Allowed values: '-1, 1..999'."
-   required: false
-   type: int
-   default: -1
+    description: The API the query should run against.
+    required: false
+    type: str
+    default: monitor
+    choices:
+      - monitor
+  page_count:
+    description: "The number of results to be fetched from broker in single call. Note: always returns the entire result set by following the cursor."
+    required: false
+    type: int
+    default: 100
   query_params:
     description: The query parameters.
     required: false

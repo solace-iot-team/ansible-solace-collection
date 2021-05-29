@@ -25,11 +25,19 @@
   - set_fact:
       inventory_file_exists: "{{ result.stat.exists }}"
 
+  - name: "check if env vars exist"
+    set_fact:
+      reverse_proxy_host: "{{ REVERSE_PROXY_HOST if REVERSE_PROXY_HOST!='' else omit }}"
+      reverse_proxy_api_key: "{{ REVERSE_PROXY_API_KEY if REVERSE_PROXY_API_KEY!='' else omit }}"
+      reverse_proxy_semp_base_path: "{{ REVERSE_PROXY_SEMP_BASE_PATH if REVERSE_PROXY_SEMP_BASE_PATH!='' else omit }}"
+  - set_fact:
+      env_vars_exist: "{{ reverse_proxy_host is defined and reverse_proxy_api_key is defined and reverse_proxy_semp_base_path is defined }}"
+
   - name: "copy existing inventory file"
     copy:
       src: "{{ existing_inventory_file }}"
       dest: "{{ target_inventory_file }}"
-    when: inventory_file_exists
+    when: inventory_file_exists and not env_vars_exist
 
   - name: "create inventory file"
     block:
@@ -64,7 +72,7 @@
           dest: "{{ target_inventory_file }}"
           content: "{{ inventory | to_nice_yaml }}"
 
-    when: not inventory_file_exists
+    when: env_vars_exist
 
 ###
 # The End.

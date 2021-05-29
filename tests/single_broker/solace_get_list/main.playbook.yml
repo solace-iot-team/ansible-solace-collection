@@ -44,7 +44,7 @@
 
   - name: "main: solace_get_client_usernames(config)"
     solace_get_client_usernames:
-      count: -1
+      page_count: 1
       query_params:
         where:
           - "clientUsername=={{ target_list.search_pattern }}"
@@ -55,7 +55,7 @@
 
   - name: "main: solace_get_client_usernames(config)"
     solace_get_client_usernames:
-      count: 10
+      page_count: 10
       query_params:
         where:
           - "clientUsername=={{ target_list.clientUsernames[0].name }}"
@@ -66,7 +66,22 @@
 
   - name: "main: solace_get_client_usernames(config)"
     solace_get_client_usernames:
-      count: 5
+      page_count: 5
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+        select:
+          - clientUsername
+          - aclProfileName
+          - clientProfileName
+    register: result
+  - assert:
+      that:
+        - result.result_list_count == 3
+
+  - name: "main: solace_get_client_usernames(config)"
+    solace_get_client_usernames:
+      page_count: 10
       query_params:
         where:
           - "clientUsername=={{ target_list.search_pattern }}"
@@ -77,45 +92,13 @@
 
   - name: "main: solace_get_client_usernames(config)"
     solace_get_client_usernames:
-      count: 10
-      query_params:
-        where:
-          - "clientUsername=={{ target_list.search_pattern }}"
-    register: result
-  - assert:
-      that:
-        - result.result_list_count == 3
-
-  - name: "main: solace_get_client_usernames(config)"
-    solace_get_client_usernames:
-      count: 10
-      query_params:
-        where:
-          - "clientUsername=={{ target_list.search_pattern }}"
-    register: result
-  - assert:
-      that:
-        - result.result_list_count == 3
-
-  - name: "main: solace_get_client_usernames(config)"
-    solace_get_client_usernames:
-      count: 0
+      page_count: 0
     register: result
     ignore_errors: yes
   - assert:
       that:
         - result.rc == 1
-        - "'arg \\'count=0\\': must not be zero' in result.msg|string"
-
-  - name: "main: solace_get_client_usernames(config)"
-    solace_get_client_usernames:
-      count: 1000
-    register: result
-    ignore_errors: yes
-  - assert:
-      that:
-        - result.rc == 1
-        - "'arg \\'count=1000\\': must not be be greater than 999' in result.msg|string"
+        - "'PARSE_ERROR' in result.msg|string"
 
 ###
 # The End.
