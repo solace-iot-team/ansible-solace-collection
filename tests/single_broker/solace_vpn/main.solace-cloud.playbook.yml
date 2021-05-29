@@ -1,0 +1,115 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_vpn"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_vpn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_get_vpns:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+  pre_tasks:
+  - include_vars:
+      file: "vpn.vars.yml"
+  tasks:
+    - name: "end play for != solace_cloud"
+      meta: end_play
+      when: broker_type != 'solace_cloud'
+
+    - name: "main: get vpns config"
+      solace_get_vpns:
+      register: result
+    - assert:
+        that:
+          - result.rc == 0
+          - result.result_list_count == 1
+
+    - set_fact:
+        msg_vpn_name: "{{ result.result_list[0].data.msgVpnName  }}"
+        current_settings: "{{ result.result_list[0].data }}"
+
+    - name: "main: delete vpn"
+      solace_vpn:
+        name: "{{ msg_vpn_name }}"
+        state: absent
+      ignore_errors: yes
+      register: result
+    - assert:
+        that:
+           - result.rc == 1
+           - "'cannot delete a message vpn on a Solace Cloud service' in result.msg|string"
+
+    - name: "main: update vpn with all solace cloud settings"
+      solace_vpn:
+        name: "{{ msg_vpn_name }}"
+        settings: "{{ solace_cloud_sempv2_not_allowed_vpn_settings }}"
+        state: present
+
+    - name: "main: update vpn with one solace cloud setting"
+      solace_vpn:
+        name: "{{ msg_vpn_name }}"
+        settings:
+          authenticationBasicType: internal
+        state: present
+
+    - name: "main: update vpn with some solace cloud setting"
+      solace_vpn:
+        name: "{{ msg_vpn_name }}"
+        settings:
+          authenticationBasicType: ldap
+          authenticationClientCertEnabled: true
+          authenticationOauthEnabled: true
+        state: present
+
+    - name: "main: update vpn with solace cloud & sempv2 settings"
+      solace_vpn:
+        name: "{{ msg_vpn_name }}"
+        settings: "{{ settings_solace_cloud_sempv2_mix }}"
+        state: present
+
+    - name: "main: update vpn with solace cloud setting value not valid"
+      solace_vpn:
+        name: "{{ msg_vpn_name }}"
+        settings:
+          authenticationBasicType: _invalid_
+        state: present
+      ignore_errors: yes
+      register: result
+    - assert:
+        that:
+          - result.rc == 1
+          - "'authenticationBasicType' in result.msg|string"
+
+    - name: "main: update vpn with solace cloud setting value not valid"
+      solace_vpn:
+        name: "{{ msg_vpn_name }}"
+        settings:
+          authenticationClientCertUsernameSource: _invalid_
+        state: present
+      ignore_errors: yes
+      register: result
+    - assert:
+        that:
+          - result.rc == 1
+          - "'authenticationClientCertUsernameSource' in result.msg|string"
+
+
+###
+# The End.

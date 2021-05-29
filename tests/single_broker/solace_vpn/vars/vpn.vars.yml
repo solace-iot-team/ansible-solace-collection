@@ -11,16 +11,20 @@ vpns:
 - name: asc_test_vpn_2
   settings:
     enabled: true
-    authenticationBasicType: none
+    authenticationBasicType: internal
     maxMsgSpoolUsage: 100
     serviceMqttPlainTextEnabled: true
     serviceMqttMaxConnectionCount: 10
     serviceMqttPlainTextListenPort: 1885
 solace_cloud_sempv2_not_allowed_vpn_settings:
   authenticationBasicEnabled: true
-  authenticationBasicType: "LDAP"
+  authenticationBasicType: ldap
   authenticationClientCertEnabled: false
   authenticationClientCertValidateDateEnabled: false
   authenticationOauthEnabled: false
   authenticationClientCertAllowApiProvidedUsernameEnabled: false
   authenticationClientCertUsernameSource: "COMMON_NAME"
+settings_solace_cloud_sempv2_mix:
+  authenticationBasicEnabled: true
+  authenticationBasicType: internal
+  eventLargeMsgThreshold: 100

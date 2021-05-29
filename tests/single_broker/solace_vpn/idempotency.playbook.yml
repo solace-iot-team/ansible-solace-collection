@@ -1,0 +1,56 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "idempotency"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_vpn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_get_vpns:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+  pre_tasks:
+  - include_vars:
+      file: "vpn.vars.yml"
+  tasks:
+  - name: "idempotency: get vpns config"
+    solace_get_vpns:
+    register: result
+  - assert:
+      that:
+        - result.rc == 0
+        - result.result_list_count >= 1
+
+  - set_fact:
+      msg_vpn_name: "{{ result.result_list[0].data.msgVpnName  }}"
+      current_settings: "{{ result.result_list[0].data }}"
+
+  - name: "idempotency: update vpn with existing settings"
+    solace_vpn:
+      name: "{{ msg_vpn_name }}"
+      settings: "{{ current_settings }}"
+      state: present
+    register: result
+  - assert:
+      that:
+        - result.rc == 0
+        - not result.changed
+
+###
+# The End.
