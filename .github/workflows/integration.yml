@@ -91,6 +91,11 @@ jobs:
         run: |
           python -V
 
+      - name: Print AZ Version
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          az --version
+
       - name: Install ansible and collection dependencies
         env:
           ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
@@ -147,7 +152,7 @@ jobs:
           export SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}"
           export LOG_DIR="$GITHUB_WORKSPACE/${TEST_RUNNER_LOGS_DIR}"
           export AZURE_PROJECT_NAME="asct-wf"
-          source $PROJECT_HOME/test-runner/source.env.integration.core.sh          
+          source $PROJECT_HOME/test-runner/source.env.integration.core.sh
           ./${TEST_TEST_RUNNER_SCRIPT}
 
       - name: Test Logs Directory
