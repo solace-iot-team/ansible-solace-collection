@@ -18,12 +18,12 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$ANSIBLE_SOLACE_TESTS" ]; then
     export ANSIBLE_SOLACE_TESTS=(
       "setup"
+      "solace_replay"
       "solace_get_list"
       "solace_service_auth"
       "solace_get_available"
       "solace_auth"
       "solace_oauth"
-      "solace_replay"
       "solace_facts"
       "solace_vpn"
       "solace_client_profile"

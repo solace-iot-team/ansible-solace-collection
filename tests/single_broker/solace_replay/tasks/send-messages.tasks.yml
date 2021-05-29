@@ -63,6 +63,7 @@
       msg_num: "{{ item }}"
       hello: world
     force_basic_auth: yes
+    use_proxy: false
     status_code: 200
   with_sequence: start=1 end=10
 
