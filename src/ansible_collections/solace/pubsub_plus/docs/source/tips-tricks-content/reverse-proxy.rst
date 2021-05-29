@@ -46,8 +46,8 @@ Return Codes
 The HTTP return codes of the reverse proxy should not interfere with the framework's handling of return codes:
 
   - ``502`` and ``504`` - the framework will retry the HTTP request a number of times before returning an error
-  - ``404`` - the framework interprets it as 'object not found on broker' in a response to a GET call. **Returning a ``404`` by the reverse proxy should be avoided.**
-  - ``500`` and ``501`` - the framework interprets these as an error from the reverse proxy
+  - ``404`` - the framework interprets it as 'object not found on broker' in a response to a GET call. Returning a ``404`` by the reverse proxy should be avoided.
+  - ``500`` and ``501`` - the framework interprets these as an error from the reverse proxy and aborts with a user message
 
 
 Using the Reverse Proxy

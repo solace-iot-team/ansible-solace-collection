@@ -12,7 +12,7 @@ export PROJECT_HOME=$projectHome
 
 
 ansibleSolaceTests=(
-  # "setup"
+  "setup"
   "solace_get_list"
   "solace_service_auth"
   "solace_get_available"

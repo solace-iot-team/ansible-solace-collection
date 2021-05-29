@@ -149,7 +149,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         if self.reverse_proxy:
             return self.reverse_proxy.get('semp_base_path', '')
         else:
-            return ''    
+            return ''
 
     def get_semp_url(self, path: str) -> str:
         return self.broker_url + path
@@ -211,19 +211,6 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
                 )
             )
         )
-
-# TODO: DELETEME
-    # @staticmethod
-    # def arg_spec_broker_config() -> dict:
-    #     return dict(
-    #         host=dict(type='str', default='localhost'),
-    #         port=dict(type='int', default=8080),
-    #         secure_connection=dict(type='bool', default=False),
-    #         username=dict(type='str', default='admin'),
-    #         password=dict(type='str', default='admin', no_log=True),
-    #         timeout=dict(type='int', default='10', required=False),
-    #         x_broker=dict(type='str', default=None)
-    #     )
 
     @staticmethod
     def arg_spec_solace_cloud() -> dict:

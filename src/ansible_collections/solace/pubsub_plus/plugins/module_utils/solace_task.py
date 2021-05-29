@@ -106,7 +106,8 @@ class SolaceTask(object):
             if isinstance(response, dict):
                 if ('body' in response and 'meta' in response['body']):
                     is_broker_error = True
-                    broker_error_code = response['body']['meta']['error']['code']
+                    sempv2_broker_error_code = response['body']['meta']['error']['code'] if 'error' in response['body']['meta'] else None
+                    _solace_cloud_error_code = response['body']['subCode'] if 'subCode' in response['body'] else None
             if self.get_config().reverse_proxy and http_resp is not None:
                 usr_msg = {
                     'details': {
@@ -124,7 +125,7 @@ class SolaceTask(object):
                         }
                     }
                 }
-                if is_broker_error and broker_error_code == 11:
+                if is_broker_error and sempv2_broker_error_code == 11:
                     usr_msg_update = {
                         'hint': {
                             "possible reason: reverse proxy/api gateway URL encoded the ',' (comma). the query must go through to broker unaltered."
