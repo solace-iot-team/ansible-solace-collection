@@ -43,8 +43,11 @@
       that:
         - solace_broker_service_result.rc == 1
         - "'definition' in solace_broker_service_result|string"
+  - assert:
+      that:
         - "'class' in solace_broker_service_result|string"
         - "'str' in solace_broker_service_result|string"
+    when: ansible_version.minor == 11
 
   - name: "Broker Service Up - solace_get_available failure"
     block:
