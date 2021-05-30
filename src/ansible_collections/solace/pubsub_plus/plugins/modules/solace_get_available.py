@@ -4,6 +4,17 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
+import traceback
+import uuid
+import time
+import logging
+from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceApiError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 __metaclass__ = type
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
@@ -86,20 +97,9 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetTask
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceApiError
-from ansible.module_utils.basic import AnsibleModule
-import logging
-import time
-import uuid
 
 SOLACE_GET_AVAILABLE_HAS_IMPORT_ERROR = False
 SOLACE_GET_AVAILABLE_ERR_TRACEBACK = None
-import traceback
 try:
     import requests
 except ImportError:
@@ -110,7 +110,8 @@ except ImportError:
 class SolaceGetAvailableTask(SolaceBrokerGetTask):
 
     def __init__(self, module):
-        SolaceUtils.module_fail_on_import_error(module, SOLACE_GET_AVAILABLE_HAS_IMPORT_ERROR, SOLACE_GET_AVAILABLE_ERR_TRACEBACK)
+        SolaceUtils.module_fail_on_import_error(
+            module, SOLACE_GET_AVAILABLE_HAS_IMPORT_ERROR, SOLACE_GET_AVAILABLE_ERR_TRACEBACK)
         super().__init__(module)
 
     def do_wait_semp_available(self, wait_timeout_minutes):
@@ -122,11 +123,10 @@ class SolaceGetAvailableTask(SolaceBrokerGetTask):
         while not is_available and try_count < max_tries:
             logging.debug("try number: %d", try_count)
             try:
-                self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + ["about", "api"])
+                self.sempv2_api.make_get_request(
+                    self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + ["about", "api"])
                 return True, None
-            except (requests.exceptions.SSLError) as e:
-                raise e from None
-            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.SSLError) as e:
                 self.logExceptionAsDebug(type(e), e)
                 ex = str(e)
             try_count += 1
@@ -145,13 +145,17 @@ class SolaceGetAvailableTask(SolaceBrokerGetTask):
             'msgVpnName': vpn_name,
             'queueName': queue_name
         }
-        create_path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues']
-        delete_path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues', queue_name]
+        create_path_array = [
+            SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues']
+        delete_path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                             'msgVpns', vpn_name, 'queues', queue_name]
         while not is_available and try_count < max_tries:
             logging.debug("try number: %d", try_count)
             try:
-                self.sempv2_api.make_post_request(self.get_config(), create_path_array, data)
-                self.sempv2_api.make_delete_request(self.get_config(), delete_path_array)
+                self.sempv2_api.make_post_request(
+                    self.get_config(), create_path_array, data)
+                self.sempv2_api.make_delete_request(
+                    self.get_config(), delete_path_array)
                 return True, None
             except SolaceApiError as e:
                 self.logExceptionAsDebug(type(e), e)
@@ -172,10 +176,12 @@ class SolaceGetAvailableTask(SolaceBrokerGetTask):
         is_spool_tested = False
         semp_ex = None
         spool_ex = None
-        is_semp_available, semp_ex = self.do_wait_semp_available(wait_timeout_minutes)
+        is_semp_available, semp_ex = self.do_wait_semp_available(
+            wait_timeout_minutes)
         if is_semp_available:
             is_spool_tested = True
-            is_spool_available, spool_ex = self.do_wait_spool_available(wait_timeout_minutes)
+            is_spool_available, spool_ex = self.do_wait_spool_available(
+                wait_timeout_minutes)
         self.update_result({
             'is_semp_available': is_semp_available,
             'is_available': is_semp_available and is_spool_available
