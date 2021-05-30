@@ -1,0 +1,55 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "get.solace-cloud: solace_service_authentication_ldap_profile"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_service_authentication_ldap_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_get_service_authentication_ldap_profiles:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+  vars:
+    generated_doc_sample_solace_cloud_file: "GENERATED_DOC_SAMPLE.LDAP_PROFILE.GET.SOLACE_CLOUD.yml"
+  tasks:
+  - name: "ldap-profile:main end for solace cloud"
+    meta: end_play
+    when: broker_type != 'solace_cloud'
+
+  - name: "ldap-profile:get get "
+    solace_get_service_authentication_ldap_profiles:
+    register: result
+  - assert:
+      that:
+        - result.result_list_count == 1
+        - result.result_list[0]['profileName'] == 'default'
+
+  # generate sample for doc
+  - set_fact:
+      generated_doc_sample_file: "{{ generated_doc_sample_solace_cloud_file }}"
+  - name: save
+    copy:
+      content: "{{ result.result_list | to_nice_yaml }}"
+      dest: "{{ WORKING_DIR }}/{{ generated_doc_sample_file }}"
+    delegate_to: localhost
+
+###
+# The End.

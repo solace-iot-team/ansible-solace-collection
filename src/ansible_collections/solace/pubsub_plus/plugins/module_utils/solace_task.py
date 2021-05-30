@@ -2,20 +2,20 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
+import traceback
 __metaclass__ = type
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError, SolaceSempv1VersionNotSupportedError, SolaceNoModuleSupportForSolaceCloudError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceModuleUsageError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError, SolaceSempv1VersionNotSupportedError, SolaceNoModuleSupportForSolaceCloudError, SolaceNoModuleStateSupportError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudServiceConfig, SolaceTaskSolaceCloudConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi, SolaceSempV2PagingGetApi
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceApi, SolaceSempV2Api, SolaceCloudApi, SolaceSempV2PagingGetApi
 from ansible.module_utils.basic import AnsibleModule
 import logging
 import json
 
 SOLACE_TASK_HAS_IMPORT_ERROR = False
 SOLACE_TASK_ERR_TRACEBACK = None
-import traceback
 try:
     import requests
     import certifi
@@ -35,7 +35,8 @@ if not SOLACE_TASK_HAS_IMPORT_ERROR:
 
 class SolaceTask(object):
     def __init__(self, module: AnsibleModule):
-        SolaceUtils.module_fail_on_import_error(module, SOLACE_TASK_HAS_IMPORT_ERROR, SOLACE_TASK_ERR_TRACEBACK)
+        SolaceUtils.module_fail_on_import_error(
+            module, SOLACE_TASK_HAS_IMPORT_ERROR, SOLACE_TASK_ERR_TRACEBACK)
         self.module = module
         self.changed = False
         self.result = SolaceUtils.create_result()
@@ -69,20 +70,26 @@ class SolaceTask(object):
         # return: msg(dict) and result(dict)
         raise SolaceInternalErrorAbstractMethod()
 
-    def _logException(self, logging_func, message, e) -> list:
+    def _logException(self, logging_func, message, e):
         ex = traceback.format_exc()
         ex_msg_list = [str(e)]
         log_msg = [f"{message}"] + ex_msg_list + ex.split('\n')
         logging_func("%s", json.dumps(log_msg, indent=2))
 
-    def logExceptionAsError(self, message, e) -> list:
+    def logExceptionAsError(self, message, e):
         self._logException(logging.error, message, e)
 
-    def logExceptionAsDebug(self, message, e) -> list:
+    def logExceptionAsDebug(self, message, e):
         self._logException(logging.debug, message, e)
+
+    def logExceptionAsWarning(self, message, e):
+        self._logException(logging.warn, message, e)
 
     def execute(self):
         try:
+            config = self.get_config()
+            if config:
+                config.validate_params()
             msg, result = self.do_task()
             self.module.exit_json(msg=msg, **result)
         except SolaceError as e:
@@ -93,24 +100,99 @@ class SolaceTask(object):
                 self.update_result(result_update)
             self.module.exit_json(msg=e.to_list(), **self.get_result())
         except SolaceApiError as e:
-            self.logExceptionAsError(type(e), e)
+            http_resp = e.get_http_resp()
+            # check if error comes from broker
+            is_broker_error = False
+            response = e.get_ansible_msg()
+            if isinstance(response, dict):
+                if ('body' in response and 'meta' in response['body']):
+                    is_broker_error = True
+                    sempv2_broker_error_code = response['body']['meta']['error'][
+                        'code'] if 'error' in response['body']['meta'] else None
+                    _solace_cloud_error_code = response['body']['subCode'] if 'subCode' in response['body'] else None
+            if self.get_config().get_reverse_proxy() and http_resp is not None:
+                usr_msg = {
+                    'details': {
+                        "module": {
+                            "name": f"{e.get_module_name()}",
+                            "operation": f"{e.get_module_op()}"
+                        },
+                        "http": {
+                            "request": {
+                                "method": f"{http_resp.request.method}",
+                                "resource": f"{SolaceApi.get_uri_path(http_resp.url)}",
+                                "query": f"{SolaceApi.get_uri_query(http_resp.url)}"
+                            },
+                            "response": e.get_ansible_msg()
+                        }
+                    }
+                }
+                if is_broker_error and sempv2_broker_error_code == 11:
+                    usr_msg_update = {
+                        'hint': {
+                            "possible reason: reverse proxy/api gateway URL encoded the ',' (comma). the query must go through to broker unaltered."
+                        }
+                    }
+                    usr_msg.update(usr_msg_update)
+                if not is_broker_error:
+                    usr_msg_update = {
+                        'hint': {
+                            "possible reason: reverse proxy/api gateway error"
+                        }
+                    }
+                    usr_msg.update(usr_msg_update)
+                # NOTE: reverse_proxy should NOT return 404, here for historical reasons
+                if http_resp.status_code in [404, 501]:
+                    usr_msg_update = {
+                        'hint': {
+                            "possible reason: resource not configured or blocked on the reverse proxy/api gateway"
+                        }
+                    }
+                    usr_msg.update(usr_msg_update)
+            else:
+                usr_msg = e.get_ansible_msg()
+                self.logExceptionAsError(type(e), e)
             self.update_result(dict(rc=1, changed=self.changed))
-            self.module.exit_json(msg=e.get_ansible_msg(), **self.get_result())
+            self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceInternalError as e:
             self.logExceptionAsError(type(e), e)
             ex = traceback.format_exc()
             ex_msg_list = e.to_list()
-            usr_msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
+            usr_msg = [
+                "Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceParamsValidationError as e:
             self.logExceptionAsError(type(e), e)
-            usr_msg = ["module arg validation failed", str(e)]
+            usr_msg = [
+                f"module '{self.get_module()._name}': argument validation failed", str(e)]
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceFeatureNotSupportedError as e:
             self.logExceptionAsError(type(e), e)
-            usr_msg = ["Feature currently not supported. Pls raise an new feature request if required.", str(e)]
+            usr_msg = [
+                "Feature currently not supported. Pls raise an new feature request if required.", str(e)]
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
+        except SolaceNoModuleStateSupportError as e:
+            usr_msg = [
+                "combination not supported:",
+                f" module: '{e.module_name}'",
+                f" broker_type: '{e.broker_type}'",
+                f" state: '{e.state}'"
+            ]
+            if e.msg:
+                usr_msg.append(e.msg)
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
+        except SolaceModuleUsageError as e:
+            usr_msg = [
+                "module usage error:",
+                f" module: '{e.module_name}'",
+                f" state: '{e.state}'"
+            ]
+            if e.msg:
+                usr_msg.append(e.msg)
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceSempv1VersionNotSupportedError as e:
@@ -120,13 +202,15 @@ class SolaceTask(object):
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceNoModuleSupportForSolaceCloudError as e:
             self.logExceptionAsError(type(e), e)
-            usr_msg = [str(e), "Solace Cloud not supported", "raise a feature request if required"]
+            usr_msg = [str(e), "Solace Cloud not supported",
+                       "raise a feature request if required"]
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except (requests.exceptions.SSLError) as e:
             # these paths do not seem to work
             # logging.debug("ssl verify paths: %s", SolaceUtils.get_ssl_default_verify_paths())
-            log_msg = [type(e)] + [f"certificate authority (CA) bundle used:{certifi.where()}"]
+            log_msg = [
+                type(e)] + [f"certificate authority (CA) bundle used:{certifi.where()}"]
             self.logExceptionAsError(log_msg, e)
             self.update_result(dict(rc=1, changed=self.changed))
             usr_msg = ["Check SSL configuration & certificate required for host"] + \
@@ -142,7 +226,8 @@ class SolaceTask(object):
             self.logExceptionAsError(type(e), e)
             ex = traceback.format_exc()
             ex_msg_list = [str(e)]
-            usr_msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
+            usr_msg = [
+                "Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n')
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
 
@@ -151,12 +236,16 @@ class SolaceReadFactsTask(SolaceTask):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
 
+    def get_config(self):
+        return None
+
     def validate_param_get_functions(self, valid_get_funcs: list, param_get_funcs: list) -> bool:
         if param_get_funcs and len(param_get_funcs) > 0:
             for get_func in param_get_funcs:
                 exists = (True if get_func in valid_get_funcs else False)
                 if not exists:
-                    raise SolaceParamsValidationError("unknown get_function", get_func, f"valid get functions are: {valid_get_funcs}")
+                    raise SolaceParamsValidationError(
+                        "unknown get_function", get_func, f"valid get functions are: {valid_get_funcs}")
             return True
         return False
 
@@ -164,7 +253,8 @@ class SolaceReadFactsTask(SolaceTask):
         try:
             return getattr(self, func_name)(*args)
         except AttributeError as e:
-            raise SolaceInternalError(f"function '{func_name}' not found") from e
+            raise SolaceInternalError(
+                f"function '{func_name}' not found") from e
 
 
 class SolaceBrokerActionTask(SolaceTask):
@@ -188,12 +278,16 @@ class SolaceCRUDTask(SolaceTask):
 
     def get_new_settings(self) -> dict:
         s = self.get_module().params[self.get_settings_arg_name()]
-        if s:
-            SolaceUtils.type_conversion(s, self.get_config().is_solace_cloud())
-        return s
+        return self.normalize_new_settings(s)
 
     def normalize_current_settings(self, current_settings: dict, new_settings: dict) -> dict:
         return current_settings
+
+    def normalize_new_settings(self, new_settings) -> dict:
+        if new_settings:
+            SolaceUtils.type_conversion(
+                new_settings, self.get_config().is_solace_cloud())
+        return new_settings
 
     def get_func(self, *args) -> dict:
         raise SolaceInternalErrorAbstractMethod()
@@ -208,14 +302,16 @@ class SolaceCRUDTask(SolaceTask):
         raise SolaceInternalErrorAbstractMethod()
 
     def do_task_extension(self, args, new_state, new_settings, current_settings):
-        raise SolaceInternalError(f"unhandled task-state combination, state={new_state}")
+        raise SolaceInternalError(
+            f"unhandled task-state combination, state={new_state}")
 
     def do_task(self):
         self.validate_params()
         args = self.get_args()
         new_settings = self.get_new_settings()
         _current_settings = self.get_func(*args)
-        current_settings = self.normalize_current_settings(_current_settings, new_settings)
+        current_settings = self.normalize_current_settings(
+            _current_settings, new_settings)
         new_state = self.get_module().params['state']
         # delete if exists
         if new_state == 'absent':
@@ -236,7 +332,8 @@ class SolaceCRUDTask(SolaceTask):
         if new_state == 'present' and current_settings is not None:
             update_settings = None
             if new_settings is not None:
-                update_settings = SolaceUtils.deep_dict_diff(new_settings, current_settings)
+                update_settings = SolaceUtils.deep_dict_diff(
+                    new_settings, current_settings)
             if not update_settings:
                 result = self.create_result(rc=0, changed=False)
                 result['response'] = current_settings
@@ -309,7 +406,8 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
         self.config = SolaceTaskBrokerConfig(module)
-        self.sempv2_get_paging_api = SolaceSempV2PagingGetApi(module, self.is_supports_paging())
+        self.sempv2_get_paging_api = SolaceSempV2PagingGetApi(
+            module, self.is_supports_paging())
 
     def get_config(self) -> SolaceTaskBrokerConfig:
         return self.config
@@ -332,8 +430,10 @@ class SolaceBrokerGetPagingTask(SolaceGetTask):
     def do_task(self):
         params = self.get_config().get_params()
         api = params['api']
+        page_count = params['page_count']
         query_params = params['query_params']
-        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api, self.get_path_array(params), query_params, self.get_monitor_api_base)
+        objects = self.get_sempv2_get_paging_api().get_objects(self.get_config(), api,
+                                                               page_count, self.get_path_array(params), query_params, self.get_monitor_api_base)
         result = self.create_result_with_list(objects)
         return None, result
 

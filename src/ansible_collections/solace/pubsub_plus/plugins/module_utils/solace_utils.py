@@ -95,6 +95,10 @@ class SolaceUtils(object):
         return d
 
     @staticmethod
+    def deep_copy(d: dict) -> dict:
+        return copy.deepcopy(d)
+
+    @staticmethod
     def deep_dict_diff(new: dict, old: dict, changes: dict = dict()):
         for k in new.keys():
             if not isinstance(new[k], dict):

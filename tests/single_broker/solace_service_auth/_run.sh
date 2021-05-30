@@ -23,10 +23,21 @@ INVENTORY_FILE="$WORKING_DIR/broker.inventory.yml"
 inventory=$(assertFile $scriptLogName $INVENTORY_FILE) || exit
 
 playbooks=(
+  "$scriptDir/ldap-profile.doc-example.playbook.yml"
   "$scriptDir/ldap-profile.main.playbook.yml"
-  "$scriptDir/ldap-profile.get.playbook.yml"
-  "$scriptDir/ldap-profile.ex.playbook.yml"
+  "$scriptDir/ldap-profile.get.self-hosted.playbook.yml"
+  "$scriptDir/ldap-profile.get.solace-cloud.playbook.yml"
+  "$scriptDir/ldap-profile.ex.self-hosted.playbook.yml"
+  "$scriptDir/ldap-profile.ex.solace-cloud.playbook.yml"
 )
+
+# # NOT PART OF THE AUTOMATED TEST
+# #  move to ansible-solace project
+# playbooks=(
+#   # "$scriptDir/ansible-solace/get-facts.playbook.yml"
+#   "$scriptDir/ansible-solace/ldap-search.playbook.yml"
+#   # "$scriptDir/ansible-solace/ldap-profile.jumpcloud.playbook.yml"
+# )
 
 ##############################################################################################################################
 # Run

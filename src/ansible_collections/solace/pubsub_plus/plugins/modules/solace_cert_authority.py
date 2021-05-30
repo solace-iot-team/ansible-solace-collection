@@ -107,6 +107,7 @@ rc:
 
 import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError
@@ -167,7 +168,13 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
         body.update(settings if settings else {})
         service_id = self.get_config().get_params()['solace_cloud_service_id']
         path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
-        return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)
+        return self.solace_cloud_api.make_service_post_request(
+            self.get_config(),
+            path_array,
+            service_id,
+            json_body=body,
+            module_op=SolaceTaskOps.OP_CREATE_OBJECT
+        )
 
     def create_func(self, cert_authority_name, settings=None):
         if self.get_config().is_solace_cloud():
@@ -196,7 +203,13 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
         body.update(settings if settings else {})
         service_id = self.get_config().get_params()['solace_cloud_service_id']
         path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
-        return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)
+        return self.solace_cloud_api.make_service_post_request(
+            self.get_config(),
+            path_array,
+            service_id,
+            json_body=body,
+            module_op=SolaceTaskOps.OP_UPDATE_OBJECT
+        )
 
     def update_func(self, cert_authority_name, settings=None, delta_settings=None):
         if self.get_config().is_solace_cloud():
@@ -215,7 +228,13 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
         }
         service_id = self.get_config().get_params()['solace_cloud_service_id']
         path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
-        return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, body)
+        return self.solace_cloud_api.make_service_post_request(
+            self.get_config(),
+            path_array,
+            service_id,
+            json_body=body,
+            module_op=SolaceTaskOps.OP_DELETE_OBJECT
+        )
 
     def delete_func(self, cert_authority_name):
         if self.get_config().is_solace_cloud():

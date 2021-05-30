@@ -1,6 +1,7 @@
 # Solace PubSub+ Ansible Collection
 
-![integration tests](https://github.com/solace-iot-team/ansible-solace-collection/workflows/integration%20tests/badge.svg)
+![integration tests core](https://github.com/solace-iot-team/ansible-solace-collection/workflows/integration%20tests/badge.svg)
+[![integration tests extended](https://github.com/solace-iot-team/ansible-solace-collection/actions/workflows/integration_extended.yml/badge.svg)](https://github.com/solace-iot-team/ansible-solace-collection/actions/workflows/integration_extended.yml)
 ![ansible-test](https://github.com/solace-iot-team/ansible-solace-collection/workflows/ansible-test/badge.svg)
 ![docs](https://github.com/solace-iot-team/ansible-solace-collection/workflows/docs/badge.svg)
 [![publish release](https://github.com/solace-iot-team/ansible-solace-collection/actions/workflows/publish.yml/badge.svg)](https://github.com/solace-iot-team/ansible-solace-collection/actions/workflows/publish.yml)

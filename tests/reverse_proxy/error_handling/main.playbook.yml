@@ -1,0 +1,162 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_client_username"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_get_vpns:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_client_username:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_get_client_usernames:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_cert_authority:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_service_authentication_ldap_profile:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  tasks:
+  - name: "main: get vpns"
+    solace_get_vpns:
+      # count: 999
+      query_params:
+        select:
+          - msgVpnName
+    register: result
+  - set_fact:
+      msg_vpn: "{{ result.result_list[0].data.msgVpnName }}"
+
+  - name: wrong host
+    solace_client_username:
+      msg_vpn: "{{ msg_vpn }}"
+      name: asct_error_handling
+      state: absent
+      host: wrong_host
+    ignore_errors: yes
+    register: result
+  - assert:
+      that:
+        - result.rc == 1
+
+  - name: wrong port
+    solace_client_username:
+      msg_vpn: "{{ msg_vpn }}"
+      name: asct_error_handling
+      state: absent
+      port: 111
+      timeout: 10
+    ignore_errors: yes
+    register: result
+  - assert:
+      that:
+        - result.rc == 1
+
+  - name: not secure
+    solace_client_username:
+      msg_vpn: "{{ msg_vpn }}"
+      name: asct_error_handling
+      state: absent
+      secure_connection: false
+    ignore_errors: yes
+    register: result
+  - assert:
+      that:
+        - result.rc == 1
+
+  - set_fact:
+      test_semp_reverse_proxy:
+        headers:
+          KeyId: wrong-key
+  - name: wrong key
+    solace_client_username:
+      msg_vpn: "{{ msg_vpn }}"
+      name: asct_error_handling
+      state: absent
+      reverse_proxy: "{{ semp_reverse_proxy | combine(test_semp_reverse_proxy, recursive=True) }}"
+    ignore_errors: yes
+    register: result
+  - assert:
+      that:
+        - result.rc == 1
+        - "'status_code' in result.msg|string"
+        - "'401' in result.msg|string"
+
+  - set_fact:
+      test_semp_reverse_proxy:
+        semp_base_path: wrong/base/path
+  - name: wrong base path
+    solace_client_username:
+      msg_vpn: "{{ msg_vpn }}"
+      name: asct_error_handling
+      state: absent
+      reverse_proxy: "{{ semp_reverse_proxy | combine(test_semp_reverse_proxy, recursive=True) }}"
+    ignore_errors: yes
+    register: result
+  - assert:
+      that:
+        - result.rc == 1
+        - "'status_code' in result.msg|string"
+        # TODO: should not be 404
+        - "'404' in result.msg|string"
+        - "'{{ test_semp_reverse_proxy.semp_base_path }}' in result.msg|string"
+
+  - name: not permissioned on broker
+    solace_cert_authority:
+      name: asct_error_handling
+      state: absent
+    ignore_errors: yes
+    register: result
+  - assert:
+      that:
+        - result.rc == 1
+        - "'UNAUTHORIZED' in result.msg|string"
+        - "'400' in result.msg|string"
+
+  - name: url not permissioned on proxy
+    solace_service_authentication_ldap_profile:
+      name: asct_error_handling
+      state: absent
+    ignore_errors: yes
+    register: result
+  - assert:
+      that:
+        - result.rc == 1
+        - "'MessageBlocked' in result.msg|string"
+        - "'resource not configured or blocked on the reverse proxy' in result.msg|string"
+
+###
+# The End.

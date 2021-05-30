@@ -1,0 +1,78 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "setup"
+  hosts: localhost
+  gather_facts: no
+  any_errors_fatal: true
+  tasks:
+  - name: "Check vars"
+    set_fact:
+      working_dir: "{{ WORKING_DIR }}"
+      existing_inventory_file: "{{ EXISTING_INVENTORY_FILE }}"
+      target_inventory_file: "{{ TARGET_INVENTORY_FILE }}"
+
+  - name: "Ensure {{ working_dir }} exists"
+    file:
+      path: "{{ working_dir }}"
+      state: directory
+
+  - name: "check if {{ existing_inventory_file }} exists"
+    stat:
+      path: "{{ existing_inventory_file }}"
+    register: result
+  - set_fact:
+      inventory_file_exists: "{{ result.stat.exists }}"
+
+  - name: "check if env vars exist"
+    set_fact:
+      reverse_proxy_host: "{{ REVERSE_PROXY_HOST if REVERSE_PROXY_HOST!='' else omit }}"
+      reverse_proxy_api_key: "{{ REVERSE_PROXY_API_KEY if REVERSE_PROXY_API_KEY!='' else omit }}"
+      reverse_proxy_semp_base_path: "{{ REVERSE_PROXY_SEMP_BASE_PATH if REVERSE_PROXY_SEMP_BASE_PATH!='' else omit }}"
+  - set_fact:
+      env_vars_exist: "{{ reverse_proxy_host is defined and reverse_proxy_api_key is defined and reverse_proxy_semp_base_path is defined }}"
+
+  - name: "copy existing inventory file"
+    copy:
+      src: "{{ existing_inventory_file }}"
+      dest: "{{ target_inventory_file }}"
+    when: inventory_file_exists and not env_vars_exist
+
+  - name: "create inventory file"
+    block:
+      - assert:
+          that:
+            - REVERSE_PROXY_HOST is defined and REVERSE_PROXY_HOST != ''
+            - REVERSE_PROXY_API_KEY is defined and REVERSE_PROXY_API_KEY != ''
+            - REVERSE_PROXY_SEMP_BASE_PATH is defined and REVERSE_PROXY_SEMP_BASE_PATH != ''
+      - set_fact:
+          inventory:
+            all:
+              hosts:
+                broker_service:
+                  broker_type: self_hosted
+                  ansible_connection: local
+                  semp_is_secure_connection: true
+                  semp_host: "{{ REVERSE_PROXY_HOST }}"
+                  semp_port: 443
+                  semp_username: unused
+                  semp_password: unused
+                  semp_timeout: 60
+                  semp_reverse_proxy:
+                    use_basic_auth: false
+                    headers:
+                      KeyId: "{{ REVERSE_PROXY_API_KEY }}"
+                      x-asc-module: true
+                      x-asc-module-op: true
+                    semp_base_path: "{{ REVERSE_PROXY_SEMP_BASE_PATH }}"
+
+      - name: save inventory file to working dir
+        copy:
+          dest: "{{ target_inventory_file }}"
+          content: "{{ inventory | to_nice_yaml }}"
+
+    when: env_vars_exist
+
+###
+# The End.

@@ -1,0 +1,57 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "solace_vpn example"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_vpn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace_get_vpns:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+  tasks:
+  - name: get 1 vpn config
+    solace_get_vpns:
+      page_count: 1
+    register: result
+
+  - set_fact:
+      msg_vpn_name: "{{ result.result_list[0].data.msgVpnName  }}"
+      current_settings: "{{ result.result_list[0].data }}"
+
+  - name: self-hosted broker only
+    block:
+      - name: create new vpn if not solace cloud
+        solace_vpn:
+          name: foo
+          state: present
+
+      - name: delete new vpn if not solace cloud
+        solace_vpn:
+          name: foo
+          state: absent
+    when: broker_type != 'solace_cloud'
+
+  - name: update vpn
+    solace_vpn:
+      name: "{{ msg_vpn_name }}"
+      settings:
+        authenticationBasicType: internal
+        eventLargeMsgThreshold: 100
+      state: present

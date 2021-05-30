@@ -1,0 +1,180 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_client_username"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_get_vpns:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_client_username:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_get_client_usernames:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  pre_tasks:
+  - include_vars:
+      file: "client_usernames.vars.yml"
+      name: target_list
+  tasks:
+  - name: "main: gather facts"
+    solace_gather_facts:
+    register: result
+  - set_fact:
+      sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
+
+  - name: "main: get vpns"
+    solace_get_vpns:
+      query_params:
+        select:
+          - msgVpnName
+    register: result
+  - set_fact:
+      msg_vpn: "{{ result.result_list[0].data.msgVpnName }}"
+
+  - name: "main: solace_client_username: remove all - start"
+    solace_client_username:
+      msg_vpn: "{{ msg_vpn }}"
+      name: "{{ item.name }}"
+      state: absent
+    loop: "{{ target_list.clientUsernames }}"
+
+  - name: "main: solace_client_username: creating all"
+    solace_client_username:
+      msg_vpn: "{{ msg_vpn }}"
+      name: "{{ item.name }}"
+      state: present
+    loop: "{{ target_list.clientUsernames }}"
+
+  - name: "main: solace_client_username: updating all"
+    solace_client_username:
+      msg_vpn: "{{ msg_vpn }}"
+      name: "{{ item.name }}"
+      settings:
+        enabled: true
+        guaranteedEndpointPermissionOverrideEnabled: false
+      state: present
+    loop: "{{ target_list.clientUsernames }}"
+
+  - name: "main: solace_get_client_usernames(config) - check updates ok"
+    solace_get_client_usernames:
+      msg_vpn: "{{ msg_vpn }}"
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+    register: result
+  - assert:
+      that:
+        - result.result_list_count == 3
+        - result.result_list[0].data.enabled == True and result.result_list[0].data.guaranteedEndpointPermissionOverrideEnabled == False
+        - result.result_list[1].data.enabled == True and result.result_list[1].data.guaranteedEndpointPermissionOverrideEnabled == False
+        - result.result_list[2].data.enabled == True and result.result_list[2].data.guaranteedEndpointPermissionOverrideEnabled == False
+
+  - name: "main: solace_get_client_usernames(monitor)"
+    solace_get_client_usernames:
+      msg_vpn: "{{ msg_vpn }}"
+      api: monitor
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+    register: result
+  - assert:
+      that:
+        - result.result_list_count == 3
+
+  - name: "main: test paging"
+    solace_get_client_usernames:
+      page_count: 1
+      msg_vpn: "{{ msg_vpn }}"
+    register: result
+  - assert:
+      that:
+        - result.result_list_count >= 3
+
+  - name: "main: test query  params"
+    solace_get_client_usernames:
+      msg_vpn: "{{ msg_vpn }}"
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+        select:
+          - clientUsername
+    register: result
+  - assert:
+      that:
+        - result.result_list_count == 3
+
+  - name: "main: test query  params"
+    solace_get_client_usernames:
+      msg_vpn: "{{ msg_vpn }}"
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+          - "enabled==true"
+          - "guaranteedEndpointPermissionOverrideEnabled==false"
+        select:
+          - clientUsername
+          - enabled
+          - guaranteedEndpointPermissionOverrideEnabled
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - "'INVALID_PARAMETER' in result.msg|string"
+        - "'11' in result.msg|string"
+    when: result.rc == 1
+  - assert:
+      that:
+        - result.result_list_count == 3
+    when: result.rc == 0
+
+  - name: "main: solace_client_username: remove all - end"
+    solace_client_username:
+      msg_vpn: "{{ msg_vpn }}"
+      name: "{{ item.name }}"
+      state: absent
+    loop: "{{ target_list.clientUsernames }}"
+
+  - name: "main: solace_get_client_usernames(config) - check none exist"
+    solace_get_client_usernames:
+      msg_vpn: "{{ msg_vpn }}"
+      query_params:
+        where:
+          - "clientUsername=={{ target_list.search_pattern }}"
+        select:
+          - "clientUsername"
+    register: result
+  - assert:
+      that: result.result_list_count == 0
+
+###
+# The End.

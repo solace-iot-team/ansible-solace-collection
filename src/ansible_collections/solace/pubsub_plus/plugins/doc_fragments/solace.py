@@ -54,6 +54,39 @@ options:
     description: Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
     required: false
     type: str
+  reverse_proxy:
+    description: "Use a reverse proxy / api gateway. Note: B(Experimental. Not permitted for Solace Cloud API)."
+    required: false
+    type: dict
+    suboptions:
+      semp_base_path:
+        description: "Base path prepended to all SEMP calls. Example: 'my/base/path'. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}"
+        type: str
+        required: false
+      use_basic_auth:
+        description: Flag to use basic authentication in the http(s) call or not. Uses 'username'/'password'.
+        type: bool
+        required: false
+        default: false
+      query_params:
+        description: "Additional query paramters to add to the URL. Example: 'apiCode: {my-api-code}'."
+        type: dict
+        required: false
+      headers:
+        description: "Additional headers to add to the http call. Example: 'apiKey: {my-api-key}'."
+        type: dict
+        required: false
+        suboptions:
+          x-asc-module:
+            description: "Flag for the module to add the header 'x-asc-module:{module-name}' to the http call with it's module name."
+            type: bool
+            required: false
+            default: false
+          x-asc-module-op:
+            description: "Flag for the module to add the header 'x-asc-module-op:{module operation}' to the http call with the module's operation."
+            type: bool
+            required: false
+            default: false
 '''
 
     VPN = r'''
@@ -163,16 +196,20 @@ options:
 description:
 - "Implements the config and monitor API."
 - "Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter."
-
 options:
   api:
-   description: The API the query should run against.
-   required: false
-   type: str
-   default: config
-   choices:
-     - config
-     - monitor
+    description: The API the query should run against.
+    required: false
+    type: str
+    default: config
+    choices:
+      - config
+      - monitor
+  page_count:
+    description: "The number of results to be fetched from broker in single call. Note: always returns the entire result set by following the cursor."
+    required: false
+    type: int
+    default: 100
   query_params:
     description: The query parameters.
     required: false
@@ -197,15 +234,19 @@ options:
 description:
 - "Implements the monitor API."
 - "Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter."
-
 options:
   api:
-   description: The API the query should run against.
-   required: false
-   type: str
-   default: monitor
-   choices:
-     - monitor
+    description: The API the query should run against.
+    required: false
+    type: str
+    default: monitor
+    choices:
+      - monitor
+  page_count:
+    description: "The number of results to be fetched from broker in single call. Note: always returns the entire result set by following the cursor."
+    required: false
+    type: int
+    default: 100
   query_params:
     description: The query parameters.
     required: false

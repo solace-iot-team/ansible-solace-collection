@@ -1,0 +1,144 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+name: integration_tests_extended
+on:
+  # for testing
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     feature-reverse-proxy
+  schedule:
+    # - cron: '0 5 * * THU'
+    # - cron: '0 5 * * *'
+    - cron: 0 5 */2 * *  # every two days
+  # pull_request:
+  #   branches:
+  #     - main
+env:
+  DEBUG_FLAG: ${{ true }}
+  # DEBUG_FLAG: ${{ false }}
+  TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
+  TEST_TEST_RUNNER_SCRIPT: "test-runner/run.integration.sh"
+  TEST_TEST_RUNNER_LOGS_NAME: asc-test-runner-integration-extended-logs
+  TEST_RUNNER_LOGS_DIR: integration-logs
+
+jobs:
+  integration_tests_extended:
+    runs-on: ubuntu-18.04
+    strategy:
+      max-parallel: 1
+      matrix:
+        python-version: [ '3.8' ]
+        ansible-version: [ 'ansible>=2.10.3,<2.11' ]
+    steps:
+      - name: Check Auth
+        if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
+        run: |
+          echo "not authorized"
+          echo '::set-output name=IS_AUTHORIZED::false'
+        id: auth
+      - name: Cancel Workflow
+        if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
+        uses: andymckay/cancel-action@0.2
+
+      - name: Print test env
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          env | grep TEST
+          which bash
+          bash --version
+          openssl version
+          tree --version
+          jq --version
+          # yq --version
+
+      - name: Print github env before checkout
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          pwd
+          # echo "GITHUB_SHA=$GITHUB_SHA"
+          echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          echo "GITHUB_REF=$GITHUB_REF"
+          echo "github.event=${{ toJson(github.event) }}"
+          echo "github.event_name=${{ github.event_name }}"
+
+      - name: Checkout Current Branch
+        uses: actions/checkout@master
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Print Python Version
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          python -V
+
+      - name: Install ansible and collection dependencies
+        env:
+          ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
+        run: |
+          python -m pip install --upgrade pip
+          pip install "$ANSIBLE_VERSION"
+          pip install -r "${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/requirements.txt"
+          pip install -r tests/tests.requirements.txt
+
+      - name: Test Installation
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          echo ">>>>>>>> pip show ansible"
+          pip show ansible
+          echo ">>>>>>>> ansible --version"
+          ansible --version
+          echo ">>>>>>>> ansible-galaxy --version"
+          ansible-galaxy --version
+          echo ">>>>>>>> pip show xmltodict"
+          pip show xmltodict
+          echo ">>>>>>>> ls collection dir"
+          ls -la ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
+
+      - name: Build and install collection
+        run: |
+          cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
+          ansible-galaxy collection build .
+          ansible-galaxy collection install *.gz
+
+      - name: Test Collection Installation
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          pwd
+          ls -la
+          ansible-galaxy collection list -vvv solace.pubsub_plus
+
+      - name: Run Tests
+        run: |
+          export ANSIBLE_PYTHON_INTERPRETER=$(python -c "import sys; print(sys.executable)")
+          export PROJECT_HOME="$GITHUB_WORKSPACE"
+          export LOG_DIR="$GITHUB_WORKSPACE/${TEST_RUNNER_LOGS_DIR}"
+          source $PROJECT_HOME/test-runner/source.env.integration.extended.sh
+          export REVERSE_PROXY_HOST="${{ secrets.REVERSE_PROXY_HOST }}"
+          export REVERSE_PROXY_API_KEY="${{ secrets.REVERSE_PROXY_API_KEY }}"
+          export REVERSE_PROXY_SEMP_BASE_PATH="${{ secrets.REVERSE_PROXY_SEMP_BASE_PATH }}"
+          ./${TEST_TEST_RUNNER_SCRIPT}
+
+      - name: Test Logs Directory
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          export LOG_DIR="$GITHUB_WORKSPACE/${TEST_RUNNER_LOGS_DIR}"
+          tree $LOG_DIR
+
+      - name: Archive logs
+        if: ${{ (failure() && !cancelled()) || (always() && (github.event_name=='workflow_dispatch' || env.DEBUG_FLAG=='true') ) }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.TEST_TEST_RUNNER_LOGS_NAME }}
+          path: ${{ github.workspace }}/${{ env.TEST_RUNNER_LOGS_DIR }}
+          if-no-files-found: error
+
+###
+# The End.

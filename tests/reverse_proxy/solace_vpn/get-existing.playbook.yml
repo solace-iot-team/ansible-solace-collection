@@ -1,0 +1,88 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_vpn"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    # solace_gather_facts:
+    #   host: "{{ sempv2_host }}"
+    #   port: "{{ sempv2_port }}"
+    #   secure_connection: "{{ sempv2_is_secure_connection }}"
+    #   username: "{{ sempv2_username }}"
+    #   password: "{{ sempv2_password }}"
+    #   timeout: "{{ sempv2_timeout }}"
+    #   solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+    #   solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    # solace_vpn:
+    #   secure_connection: "{{ semp_is_secure_connection }}"
+    #   host: "{{ semp_host }}"
+    #   port: "{{ semp_port }}"
+    #   username: "{{ semp_username }}"
+    #   password: "{{ semp_password }}"
+    #   timeout: "{{ semp_timeout }}"
+    #   reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_get_vpns:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  # pre_tasks:
+  # - include_vars:
+  #     file: "vpn.vars.yml"
+  tasks:
+    # - name: "Check vars"
+    #   set_fact:
+    #     working_dir: "{{ WORKING_DIR }}"
+    #
+    # - name: "main: gather facts"
+    #   solace_gather_facts:
+    # - set_fact:
+    #     is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud}}"
+
+    - name: "main: get vpns config"
+      solace_get_vpns:
+      register: result
+
+    # - name: "main: get vpns monitor"
+    #   solace_get_vpns:
+    #     api: monitor
+    #     query_params:
+    #       where:
+    #         - "msgVpnName==asc_test_vpn*"
+    #       # select:
+    #       #   - "msgVpnName"
+    #       #   - "maxEndpointCount"
+    #   register: result
+    #
+    # - name: "main: remove vpn"
+    #   solace_vpn:
+    #     name: "{{ vpn.name }}"
+    #     state: absent
+    #   loop: "{{ vpns }}"
+    #   loop_control:
+    #     loop_var: vpn
+    #   when: not is_solace_cloud
+    #
+    # - name: "main: create vpn for solace cloud"
+    #   block:
+    #     - name: "main: create vpn for solace cloud"
+    #       solace_vpn:
+    #         name: asc_test_vpn
+    #         state: present
+    #       ignore_errors: yes
+    #       register: result
+    #     - assert:
+    #         that: result.rc == 1 and 'NOT_ALLOWED' in result.msg | string
+    #   when: is_solace_cloud
+
+
+###
+# The End.

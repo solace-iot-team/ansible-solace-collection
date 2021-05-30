@@ -254,10 +254,10 @@
 
   - set_fact:
       spooled_msg_count: "{{ result.result_list[0].data.currentSpooledMsgCount }}"
-    when: sempv2_version|float <= 2.19
+    when: result.result_list[0].data.currentSpooledMsgCount is defined
   - set_fact:
       spooled_msg_count: "{{ result.result_list[0].data.spooledMsgCount }}"
-      when: sempv2_version|float > 2.19
+      when: result.result_list[0].data.spooledMsgCount is defined
   - assert:
       that:
         - spooled_msg_count|int==10

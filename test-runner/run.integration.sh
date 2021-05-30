@@ -31,11 +31,19 @@ ansibleVersion=${firstLine//" "/"_"}
 export LOG_DIR="$LOG_DIR/python_$pythonVersion/$ansibleVersion"
 mkdir -p $LOG_DIR
 
-
 FAILED=0
-# $scriptDir/_run.sh > $LOG_DIR/$scriptLogName.out 2>&1
-$scriptDir/_run.integration.sh
-code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - $scriptLogName"; FAILED=1; fi
+
+if [ -z $RUN_INTEGRATION_EXTENDED ]; then
+  echo "running core integration tests ..."
+  # $scriptDir/_run.sh > $LOG_DIR/$scriptLogName.out 2>&1
+  $scriptDir/_run.integration.sh
+  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - $scriptLogName"; FAILED=1; fi
+else
+  echo "running extended integration tests ..."
+  $scriptDir/_run.integration.extended.sh
+  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - $scriptLogName"; FAILED=1; fi
+fi
+
 
 ##############################################################################################################################
 # Check for warnings

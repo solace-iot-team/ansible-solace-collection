@@ -10,3 +10,4 @@ Tips & Tricks
   tips-tricks-content/certs
   tips-tricks-content/bastion
   tips-tricks-content/logfile
+  tips-tricks-content/reverse-proxy

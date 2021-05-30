@@ -1,0 +1,65 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_get_vpns:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_queue:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_queue_subscription:
+      secure_connection: "{{ semp_is_secure_connection }}"
+      host: "{{ semp_host }}"
+      port: "{{ semp_port }}"
+      username: "{{ semp_username }}"
+      password: "{{ semp_password }}"
+      timeout: "{{ semp_timeout }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  pre_tasks:
+  - include_vars:
+      file: "queues.vars.yml"
+      name: target_list
+  tasks:
+  - name: "main: get vpns"
+    solace_get_vpns:
+      query_params:
+        select:
+          - msgVpnName
+    register: result
+  - set_fact:
+      msg_vpn: "{{ result.result_list[0].data.msgVpnName }}"
+
+  - name: "main: call tasks: adding/updating queues"
+    include_tasks: ./tasks/queue.tasks.yml
+    loop: "{{ target_list.queues }}"
+    loop_control:
+      loop_var: queue_item
+
+  - name: "main: delete queues"
+    solace_queue:
+      name: "{{ item.name }}"
+      msg_vpn: "{{ msg_vpn }}"
+      state: absent
+    loop: "{{ target_list.queues }}"
+
+
+###
+# The End.

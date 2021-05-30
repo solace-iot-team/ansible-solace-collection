@@ -12,7 +12,7 @@ on:
   schedule:
     # - cron: '0 5 * * THU'
     # - cron: '0 5 * * *'
-    - cron: 0 5 */2 * *  # every two days
+    - cron: 0 4 */2 * *  # every two days
   pull_request:
     branches:
       - main
@@ -91,6 +91,11 @@ jobs:
         run: |
           python -V
 
+      - name: Print AZ Version
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          az --version
+
       - name: Install ansible and collection dependencies
         env:
           ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
@@ -147,6 +152,8 @@ jobs:
           export SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS="${{ secrets.SOLACE_CLOUD_API_TOKEN_RESTRICTED_PERMISSIONS }}"
           export LOG_DIR="$GITHUB_WORKSPACE/${TEST_RUNNER_LOGS_DIR}"
           export AZURE_PROJECT_NAME="asct-wf"
+          # source $PROJECT_HOME/test-runner/source.env.integration.core.sh
+          echo ">>>> running $TEST_TEST_RUNNER_SCRIPT"
           ./${TEST_TEST_RUNNER_SCRIPT}
 
       - name: Test Logs Directory

@@ -23,14 +23,26 @@ class SolaceInternalErrorAbstractMethod(SolaceInternalError):
 
 
 class SolaceApiError(Exception):
-    def __init__(self, resp):
+    def __init__(self, http_resp, resp, module_name, module_op):
+        self.http_resp = http_resp
         self.resp = resp
+        self.module_name = module_name
+        self.module_op = module_op
 
     def get_ansible_msg(self):
         return self.resp
 
     def get_resp(self):
         return self.resp
+
+    def get_http_resp(self):
+        return self.http_resp
+
+    def get_module_name(self):
+        return self.module_name
+
+    def get_module_op(self):
+        return self.module_op
 
 
 class SolaceParamsValidationError(Exception):
@@ -46,6 +58,21 @@ class SolaceFeatureNotSupportedError(Exception):
 class SolaceNoModuleSupportForSolaceCloudError(Exception):
     def __init__(self, module_name):
         super().__init__(f"module '{module_name}'")
+
+
+class SolaceNoModuleStateSupportError(Exception):
+    def __init__(self, module_name, state, broker_type, msg=None):
+        self.module_name = module_name
+        self.state = state
+        self.broker_type = broker_type
+        self.msg = msg
+
+
+class SolaceModuleUsageError(Exception):
+    def __init__(self, module_name, state, msg=None):
+        self.module_name = module_name
+        self.state = state
+        self.msg = msg
 
 
 class SolaceSempv1VersionNotSupportedError(Exception):
