@@ -29,12 +29,9 @@ jobs:
       # pre-installed: /usr/bin/python=2.7.17 and /usr/bin/python3=3.6.9
     strategy:
       matrix:
-        # python-version: [ '3.9' ]
         # 3.6 is always tested
         python-version: [ '3.8' ]
-        ansible-version: [ 'ansible>=2.10.3,<2.11' ]
-        # ansible-version: [ 'ansible>=2.9.11,<2.10.0', 'ansible>=2.10.3' ]
-        # ansible-version: [ 'ansible>=2.9.11,<2.10.0' ]
+        ansible-version: [ 'ansible>=2.11', 'ansible>=2.10.3,<2.11' ]
     steps:
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
