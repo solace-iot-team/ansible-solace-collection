@@ -41,26 +41,44 @@ Examples
        solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
        solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
    tasks:
-   - name: create ldap profile
-     solace_service_authentication_ldap_profile:
-       name: foo
-       sempv1_settings:
-         admin:
-           admin-dn: adminDN
-         search:
-           base-dn:
-             distinguished-name: baseDN
-           filter:
-             filter: searchFilter
-         ldap-server:
-           ldap-host: ldap://192.167.123.4:389
-           server-index: "1"
-       state: present
+   - name: example for self-hosted broker
+     block:
+       - name: create ldap profile
+         solace_service_authentication_ldap_profile:
+           name: foo
+           sempv1_settings:
+             admin:
+               admin-dn: adminDN
+             search:
+               base-dn:
+                 distinguished-name: baseDN
+               filter:
+                 filter: searchFilter
+             ldap-server:
+               ldap-host: ldap://192.167.123.4:389
+               server-index: "1"
+           state: present
 
-   - name: get
-     solace_get_service_authentication_ldap_profiles:
-       where_name: "foo"
-     register: result
+       - name: get
+         solace_get_service_authentication_ldap_profiles:
+           where_name: "foo"
+         register: result
+     when: broker_type != 'solace_cloud'
+
+   - name: example for Solace Cloud broker
+     block:
+       - name: create or update ldap profile
+         solace_service_authentication_ldap_profile:
+           name: default
+           solace_cloud_settings:
+             adminDn: adminDN
+             ldapServerOne: ldap://192.167.123.4:389
+             searchBaseDn: baseDN
+             searchFilter: searchFilter
+       - name: get
+         solace_get_service_authentication_ldap_profiles:
+         register: result
+     when: broker_type == 'solace_cloud'
 
    - name: print result
      debug:
@@ -75,8 +93,8 @@ Notes
 
 .. note::
    - STATUS: **EXPERIMENTAL**
-   - Does not support Solace Cloud API. If required, submit a feature request.
    - Module Sempv1: https://docs.solace.com/Configuring-and-Managing/Configuring-LDAP-Authentication.htm
+   - Module Solace Cloud: no API documentation available, reverse engineer from console.
    - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
    - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
    - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
@@ -111,6 +129,46 @@ port (optional)
 
   | **type**: int
   | **default**: 8080
+
+reverse_proxy (optional)
+  Use a reverse proxy / api gateway. Note: **Experimental. Not permitted for Solace Cloud API**.
+
+  | **type**: dict
+
+  headers (optional)
+    Additional headers to add to the http call. Example: 'apiKey: {my-api-key}'.
+
+    | **type**: dict
+
+    x-asc-module (optional)
+      Flag for the module to add the header 'x-asc-module:{module-name}' to the http call with it's module name.
+
+      | **type**: bool
+      | **default**: False
+
+    x-asc-module-op (optional)
+      Flag for the module to add the header 'x-asc-module-op:{module operation}' to the http call with the module's operation.
+
+      | **type**: bool
+      | **default**: False
+
+
+  query_params (optional)
+    Additional query paramters to add to the URL. Example: 'apiCode: {my-api-code}'.
+
+    | **type**: dict
+
+  semp_base_path (optional)
+    Base path prepended to all SEMP calls. Example: 'my/base/path'. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}
+
+    | **type**: str
+
+  use_basic_auth (optional)
+    Flag to use basic authentication in the http(s) call or not. Uses 'username'/'password'.
+
+    | **type**: bool
+    | **default**: False
+
 
 secure_connection (optional)
   If true, use https rather than http.
@@ -148,10 +206,13 @@ username (optional)
   | **type**: str
   | **default**: admin
 
-where_name (required)
+where_name (optional)
   Query for ldap profile name. Maps to 'profile-name' in the SEMP V1 API.
 
+  Has no effect for Solace Cloud, there is only 1 profile named 'default'.
+
   | **type**: str
+  | **default**: *
 
 x_broker (optional)
   Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
@@ -222,6 +283,36 @@ result_list
          "starttls": "No",
          "tls": "No",
          "unauthenticated-authentication": "Disallowed"
+       }
+     ],
+     "solace-cloud-sample": [
+       {
+         "adminDn": "adminDn",
+         "adminPassword": "adminPwd",
+         "allowUnauthenticatedAuthentication": false,
+         "enabled": true,
+         "groupMembershipSecondarySearchBaseDn": null,
+         "groupMembershipSecondarySearchDeref": "ALWAYS",
+         "groupMembershipSecondarySearchEnabled": false,
+         "groupMembershipSecondarySearchFilter": "(member=$ATTRIBUTE_VALUE_FROM_PRIMARY_SEARCH)",
+         "groupMembershipSecondarySearchFilterAttributeFromPrimarySearch": null,
+         "groupMembershipSecondarySearchFollowContinuationReferences": false,
+         "groupMembershipSecondarySearchFollowContinuationShutdown": false,
+         "groupMembershipSecondarySearchScope": "SUBTREE",
+         "groupMembershipSecondarySearchTimeout": 5,
+         "id": "default",
+         "ldapServerOne": "ldap://ldap_1.myorg.com:389",
+         "ldapServerThree": null,
+         "ldapServerTwo": "ldap://ldap_2.myorg.com:389",
+         "profileName": "default",
+         "searchBaseDn": "ou=Users,o=orgId,dc=myorg,dc=com",
+         "searchDeref": "ALWAYS",
+         "searchFilter": "(cn=$CLIENT_USERNAME)",
+         "searchFollowContinuationReferences": false,
+         "searchScope": "SUBTREE",
+         "searchTimeout": 5,
+         "startTls": false,
+         "type": "ldapAuthenticationProfile"
        }
      ]
    }

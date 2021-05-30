@@ -320,6 +320,12 @@
 <div class="line"><strong>default</strong>: localhost</div>
 </div>
 </dd>
+<dt>page_count (optional)</dt><dd><p>The number of results to be fetched from broker in single call. Note: always returns the entire result set by following the cursor.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 100</div>
+</div>
+</dd>
 <dt>password (optional)</dt><dd><p>Administrator password for Solace Broker.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: str</div>
@@ -335,7 +341,7 @@
 <dt>query_params (optional)</dt><dd><p>The query parameters.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: dict</div>
-<div class="line"><strong>default</strong>: AnsibleMapping()</div>
+<div class="line"><strong>default</strong>: {}</div>
 </div>
 <dl>
 <dt>select (optional)</dt><dd><p>Include in the response only selected attributes of the object, or exclude from the response selected attributes of the object. See the documentation for the select parameter.</p>
@@ -349,6 +355,48 @@
 <div class="line-block">
 <div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>default</strong>: []</div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt>reverse_proxy (optional)</dt><dd><p>Use a reverse proxy / api gateway. Note: <strong>Experimental. Not permitted for Solace Cloud API</strong>.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+<dl>
+<dt>headers (optional)</dt><dd><p>Additional headers to add to the http call. Example: ‘apiKey: {my-api-key}’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+<dl>
+<dt>x-asc-module (optional)</dt><dd><p>Flag for the module to add the header ‘x-asc-module:{module-name}’ to the http call with it’s module name.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
+</div>
+</dd>
+<dt>x-asc-module-op (optional)</dt><dd><p>Flag for the module to add the header ‘x-asc-module-op:{module operation}’ to the http call with the module’s operation.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt>query_params (optional)</dt><dd><p>Additional query paramters to add to the URL. Example: ‘apiCode: {my-api-code}’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+</dd>
+<dt>semp_base_path (optional)</dt><dd><p>Base path prepended to all SEMP calls. Example: ‘my/base/path’. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>use_basic_auth (optional)</dt><dd><p>Flag to use basic authentication in the http(s) call or not. Uses ‘username’/’password’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
 </div>
 </dd>
 </dl>
@@ -436,7 +484,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 20 May 2021 at 17:00.
+        Last updated on 30 May 2021 at 07:53.
       </span>
 
     </p>

@@ -233,13 +233,16 @@
   <div class="section" id="solace-service-authentication-ldap-profile-ldap-profile">
 <span id="solace-service-authentication-ldap-profile-module"></span><h1>solace_service_authentication_ldap_profile – ldap profile<a class="headerlink" href="#solace-service-authentication-ldap-profile-ldap-profile" title="Permalink to this headline">¶</a></h1>
 <p>Configure a LDAP Profile object on a Broker Service.</p>
+<p>Self-Hosted Broker Service: most operations are NOT idempotent.</p>
+<p>Solace Cloud Service: only 1 LDAP Profile object allowed, name=’default’. Once LDAP Profile is created it cannot be deleted, disable instead.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">name</span><span class="p">:</span> <span class="s">&quot;solace_service_authentication_ldap_profile</span><span class="nv"> </span><span class="s">example&quot;</span>
+<span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
 <span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
 <span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="nt">collections</span><span class="p">:</span>
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span>
 <span class="nt">module_defaults</span><span class="p">:</span>
   <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
     <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
@@ -251,52 +254,81 @@
     <span class="nt">solace_cloud_api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">SOLACE_CLOUD_API_TOKEN</span> <span class="k">if</span> <span class="nv">broker_type</span><span class="o">==</span><span class="s1">&#39;solace_cloud&#39;</span> <span class="k">else</span> <span class="nv">omit</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">solace_cloud_service_id</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">solace_cloud_service_id</span> <span class="o">|</span> <span class="nf">default</span><span class="o">(</span><span class="nv">omit</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="nt">tasks</span><span class="p">:</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">set args for ldap profile</span>
+  <span class="nt">set_fact</span><span class="p">:</span>
+    <span class="nt">ldap_profile_settings</span><span class="p">:</span>
+      <span class="nt">ldap_profile_name</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="s1">&#39;asct_ldap_profile_1&#39;</span> <span class="k">if</span> <span class="nv">broker_type</span> <span class="o">!=</span> <span class="s1">&#39;solace_cloud&#39;</span> <span class="k">else</span> <span class="s1">&#39;default&#39;</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">allow_unauthentication_authentication</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">admin_dn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">uid=solace_service,ou=Users,o=orgId,dc=myorg,dc=com</span>
+      <span class="nt">admin_pwd</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace_service_pwd</span>
+      <span class="nt">start_tls</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">ldap_server_uri_1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ldap://ldap_1.myorg.com:389</span>
+      <span class="nt">ldap_server_uri_2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ldap://ldap_2.myorg.com:389</span>
+      <span class="nt">search</span><span class="p">:</span>
+        <span class="nt">base_dn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ou=Users,o=orgId,dc=myorg,dc=com</span>
+        <span class="nt">filter</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">(cn=$CLIENT_USERNAME)</span>
+        <span class="nt">follow_continuation_references</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">deref</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">always</span>
+        <span class="nt">scope</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">subtree</span>
+        <span class="nt">timeout</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">20</span>
+
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create</span>
   <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.ldap_profile_name</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">solace_cloud_settings</span><span class="p">:</span>
+      <span class="nt">allowUnauthenticatedAuthentication</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.allow_unauthentication_authentication</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">adminDn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.admin_dn</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">adminPassword</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.admin_pwd</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">ldapServerOne</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.ldap_server_uri_1</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">searchBaseDn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.search.base_dn</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">searchFilter</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.search.filter</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">searchFollowContinuationReferences</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.search.follow_continuation_references</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">searchDeref</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.search.deref</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">searchScope</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.search.scope</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">searchTimeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.search.timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
+      <span class="nt">startTls</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.start_tls</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">sempv1_settings</span><span class="p">:</span>
       <span class="nt">admin</span><span class="p">:</span>
-        <span class="nt">admin-dn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">adminDN</span>
+        <span class="nt">admin-dn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.admin_dn</span> <span class="cp">}}</span><span class="s">&quot;</span>
+        <span class="nt">admin-password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.admin_pwd</span> <span class="cp">}}</span><span class="s">&quot;</span>
       <span class="nt">search</span><span class="p">:</span>
         <span class="nt">base-dn</span><span class="p">:</span>
-          <span class="nt">distinguished-name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">baseDN</span>
+          <span class="nt">distinguished-name</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.search.base_dn</span> <span class="cp">}}</span><span class="s">&quot;</span>
         <span class="nt">filter</span><span class="p">:</span>
-          <span class="nt">filter</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">searchFilter</span>
+          <span class="nt">filter</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.search.filter</span> <span class="cp">}}</span><span class="s">&quot;</span>
+        <span class="nt">timeout</span><span class="p">:</span>
+          <span class="nt">duration</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.search.timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
       <span class="nt">ldap-server</span><span class="p">:</span>
-        <span class="nt">ldap-host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ldap://192.167.123.4:389</span>
+        <span class="nt">ldap-host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.ldap_server_uri_1</span> <span class="cp">}}</span><span class="s">&quot;</span>
         <span class="nt">server-index</span><span class="p">:</span> <span class="s">&quot;1&quot;</span>
     <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">update</span>
   <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.ldap_profile_name</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">solace_cloud_settings</span><span class="p">:</span>
+      <span class="nt">ldapServerTwo</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.ldap_server_uri_2</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">sempv1_settings</span><span class="p">:</span>
-      <span class="nt">admin</span><span class="p">:</span>
-        <span class="nt">admin-dn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">adminDN</span>
-      <span class="nt">search</span><span class="p">:</span>
-        <span class="nt">base-dn</span><span class="p">:</span>
-          <span class="nt">distinguished-name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">DC=dev,DC=solace,DC=local</span>
-        <span class="nt">filter</span><span class="p">:</span>
-          <span class="nt">filter</span><span class="p">:</span> <span class="s">&quot;(SamAccountName=</span><span class="nv"> </span><span class="s">$CLIENT_USERNAME)&quot;</span>
       <span class="nt">ldap-server</span><span class="p">:</span>
-        <span class="nt">ldap-host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ldap://192.167.123.5:389</span>
+        <span class="nt">ldap-host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.ldap_server_uri_2</span> <span class="cp">}}</span><span class="s">&quot;</span>
         <span class="nt">server-index</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
     <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">enable</span>
   <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.ldap_profile_name</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">enabled</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">disable</span>
   <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.ldap_profile_name</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">disabled</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">delete</span>
   <span class="nt">solace_service_authentication_ldap_profile</span><span class="p">:</span>
-    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">ldap_profile_settings.ldap_profile_name</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">absent</span>
+  <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">broker_type != &#39;solace_cloud&#39;</span>
 </pre></div>
 </div>
 </div>
@@ -306,9 +338,8 @@
 <p class="admonition-title">Note</p>
 <ul class="simple">
 <li><p>STATUS: <strong>EXPERIMENTAL</strong></p></li>
-<li><p>Does not support Solace Cloud API. If required, submit a feature request.</p></li>
 <li><p>Module Sempv1 Config: <a class="reference external" href="https://docs.solace.com/Configuring-and-Managing/Configuring-LDAP-Authentication.htm">https://docs.solace.com/Configuring-and-Managing/Configuring-LDAP-Authentication.htm</a></p></li>
-<li><p>Note: Self-Hosted Broker Service: most operations are NOT idempotent.</p></li>
+<li><p>Module Solace Cloud: no API documentation available, reverse engineer from console.</p></li>
 <li><p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a></p></li>
 <li><p>Sempv2 Monitor Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/</a></p></li>
 <li><p>Sempv2 Action Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/</a></p></li>
@@ -350,6 +381,48 @@
 <div class="line"><strong>type</strong>: int</div>
 <div class="line"><strong>default</strong>: 8080</div>
 </div>
+</dd>
+<dt>reverse_proxy (optional)</dt><dd><p>Use a reverse proxy / api gateway. Note: <strong>Experimental. Not permitted for Solace Cloud API</strong>.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+<dl>
+<dt>headers (optional)</dt><dd><p>Additional headers to add to the http call. Example: ‘apiKey: {my-api-key}’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+<dl>
+<dt>x-asc-module (optional)</dt><dd><p>Flag for the module to add the header ‘x-asc-module:{module-name}’ to the http call with it’s module name.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
+</div>
+</dd>
+<dt>x-asc-module-op (optional)</dt><dd><p>Flag for the module to add the header ‘x-asc-module-op:{module operation}’ to the http call with the module’s operation.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt>query_params (optional)</dt><dd><p>Additional query paramters to add to the URL. Example: ‘apiCode: {my-api-code}’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+</dd>
+<dt>semp_base_path (optional)</dt><dd><p>Base path prepended to all SEMP calls. Example: ‘my/base/path’. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>use_basic_auth (optional)</dt><dd><p>Flag to use basic authentication in the http(s) call or not. Uses ‘username’/’password’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
+</div>
+</dd>
+</dl>
 </dd>
 <dt>secure_connection (optional)</dt><dd><p>If true, use https rather than http.</p>
 <div class="line-block">
@@ -460,7 +533,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 20 May 2021 at 17:00.
+        Last updated on 30 May 2021 at 07:53.
       </span>
 
     </p>

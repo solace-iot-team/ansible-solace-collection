@@ -122,6 +122,12 @@ host (optional)
   | **type**: str
   | **default**: localhost
 
+page_count (optional)
+  The number of results to be fetched from broker in single call. Note: always returns the entire result set by following the cursor.
+
+  | **type**: int
+  | **default**: 100
+
 password (optional)
   Administrator password for Solace Broker.
 
@@ -138,7 +144,7 @@ query_params (optional)
   The query parameters.
 
   | **type**: dict
-  | **default**: AnsibleMapping()
+  | **default**: {}
 
   select (optional)
     Include in the response only selected attributes of the object, or exclude from the response selected attributes of the object. See the documentation for the select parameter.
@@ -153,6 +159,46 @@ query_params (optional)
 
     | **type**: list
     | **default**: []
+
+
+reverse_proxy (optional)
+  Use a reverse proxy / api gateway. Note: **Experimental. Not permitted for Solace Cloud API**.
+
+  | **type**: dict
+
+  headers (optional)
+    Additional headers to add to the http call. Example: 'apiKey: {my-api-key}'.
+
+    | **type**: dict
+
+    x-asc-module (optional)
+      Flag for the module to add the header 'x-asc-module:{module-name}' to the http call with it's module name.
+
+      | **type**: bool
+      | **default**: False
+
+    x-asc-module-op (optional)
+      Flag for the module to add the header 'x-asc-module-op:{module operation}' to the http call with the module's operation.
+
+      | **type**: bool
+      | **default**: False
+
+
+  query_params (optional)
+    Additional query paramters to add to the URL. Example: 'apiCode: {my-api-code}'.
+
+    | **type**: dict
+
+  semp_base_path (optional)
+    Base path prepended to all SEMP calls. Example: 'my/base/path'. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}
+
+    | **type**: str
+
+  use_basic_auth (optional)
+    Flag to use basic authentication in the http(s) call or not. Uses 'username'/'password'.
+
+    | **type**: bool
+    | **default**: False
 
 
 secure_connection (optional)
