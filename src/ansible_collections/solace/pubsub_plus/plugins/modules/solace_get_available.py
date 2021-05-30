@@ -4,17 +4,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
-import traceback
-import uuid
-import time
-import logging
-from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceApiError
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetTask
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 __metaclass__ = type
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
@@ -97,6 +86,17 @@ rc:
             rc: 1
 '''
 
+import traceback
+import uuid
+import time
+import logging
+from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceApiError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
+import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
 
 SOLACE_GET_AVAILABLE_HAS_IMPORT_ERROR = False
 SOLACE_GET_AVAILABLE_ERR_TRACEBACK = None
