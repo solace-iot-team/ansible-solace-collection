@@ -1,5 +1,8 @@
 # Release Notes
 
+## Version: 1.4.4
+Maintenance: Support for Ansible 2.11.x
+
 ## Version: 1.4.3
 Enhancements & New Features.
 
