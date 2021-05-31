@@ -59,24 +59,44 @@
           - not result.is_spool_available
           - "'NewConnectionError' in result.msg|string"
 
-    - name: wrong http/https
-      solace_get_available:
-        secure_connection: "{{ False if sempv2_is_secure_connection else True }}"
-        wait_timeout_seconds: 1
-      register: result
-      ignore_errors: true
-    - assert:
-        that:
-          - result.rc == 0
-          - not result.is_available
-          - not result.is_semp_available
-          - not result.is_spool_available
-    - assert:
-        that: result.rc == 0 and 'SSLError' in result.msg|string
-      when: sempv2_is_secure_connection == False
-    - assert:
-        that: result.rc == 0 and 'The plain HTTP request was sent to HTTPS port' in result.msg|string
-      when: sempv2_is_secure_connection == True
+    - name: http for solace cloud
+      block:
+        - name: http for solace cloud
+          solace_get_available:
+            secure_connection: False
+            wait_timeout_seconds: 1
+          register: result
+          ignore_errors: true
+        - assert:
+            that:
+              - result.rc == 1
+              - not result.is_available
+              - not result.is_semp_available
+              - not result.is_spool_available
+              - "'The plain HTTP request was sent to HTTPS port' in result.msg|string"
+      when: broker_type == 'solace_cloud'
+
+    - name: wrong http/https self_hosted
+      block:
+        - name: wrong http/https for self-hosted
+          solace_get_available:
+            secure_connection: "{{ False if sempv2_is_secure_connection else True }}"
+            wait_timeout_seconds: 1
+          register: result
+          ignore_errors: true
+        - assert:
+            that:
+              - result.rc == 0
+              - not result.is_available
+              - not result.is_semp_available
+              - not result.is_spool_available
+        - assert:
+            that: result.rc == 0 and 'SSLError' in result.msg|string
+          when: sempv2_is_secure_connection == False
+        - assert:
+            that: result.rc == 0 and 'The plain HTTP request was sent to HTTPS port' in result.msg|string
+          when: sempv2_is_secure_connection == True
+      when: broker_type != 'solace_cloud'
 
     - name: wrong password
       solace_get_available:

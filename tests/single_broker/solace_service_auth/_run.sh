@@ -31,14 +31,6 @@ playbooks=(
   "$scriptDir/ldap-profile.ex.solace-cloud.playbook.yml"
 )
 
-# # NOT PART OF THE AUTOMATED TEST
-# #  move to ansible-solace project
-# playbooks=(
-#   # "$scriptDir/ansible-solace/get-facts.playbook.yml"
-#   "$scriptDir/ansible-solace/ldap-search.playbook.yml"
-#   # "$scriptDir/ansible-solace/ldap-profile.jumpcloud.playbook.yml"
-# )
-
 ##############################################################################################################################
 # Run
 for playbook in ${playbooks[@]}; do
