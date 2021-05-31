@@ -55,7 +55,7 @@
           name: solace.pubsub_plus.solace_broker_service
         vars:
           solace_get_available:
-            wait_timeout_minutes: 1
+            wait_timeout_seconds: 10
           generate:
             inventory_settings:
               inventory_hostname: my-host
