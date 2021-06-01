@@ -101,15 +101,6 @@ class SolaceTask(object):
             self.module.exit_json(msg=e.to_list(), **self.get_result())
         except SolaceApiError as e:
             http_resp = e.get_http_resp()
-            # check if error comes from broker
-            is_broker_error = False
-            response = e.get_ansible_msg()
-            if isinstance(response, dict):
-                if ('body' in response and 'meta' in response['body']):
-                    is_broker_error = True
-                    sempv2_broker_error_code = response['body']['meta']['error'][
-                        'code'] if 'error' in response['body']['meta'] else None
-                    _solace_cloud_error_code = response['body']['subCode'] if 'subCode' in response['body'] else None
             if self.get_config().get_reverse_proxy() and http_resp is not None:
                 usr_msg = {
                     'details': {
@@ -121,20 +112,21 @@ class SolaceTask(object):
                             "request": {
                                 "method": f"{http_resp.request.method}",
                                 "resource": f"{SolaceApi.get_uri_path(http_resp.url)}",
-                                "query": f"{SolaceApi.get_uri_query(http_resp.url)}"
+                                "query": f"{SolaceApi.get_uri_query(http_resp.url)}",
+                                "body": f"{SolaceApi.get_http_request_body(http_resp)}"
                             },
                             "response": e.get_ansible_msg()
                         }
                     }
                 }
-                if is_broker_error and sempv2_broker_error_code == 11:
+                if e.get_sempv2_error_code() == 11:
                     usr_msg_update = {
                         'hint': {
                             "possible reason: reverse proxy/api gateway URL encoded the ',' (comma). the query must go through to broker unaltered."
                         }
                     }
                     usr_msg.update(usr_msg_update)
-                if not is_broker_error:
+                if not e.is_broker_error():
                     usr_msg_update = {
                         'hint': {
                             "possible reason: reverse proxy/api gateway error"
@@ -145,7 +137,7 @@ class SolaceTask(object):
                 if http_resp.status_code in [404, 501]:
                     usr_msg_update = {
                         'hint': {
-                            "possible reason: resource not configured or blocked on the reverse proxy/api gateway"
+                            "possible reason: resource not configured or blocked on the reverse proxy/api gateway. see ansible-solace log file for HTTP call details."
                         }
                     }
                     usr_msg.update(usr_msg_update)

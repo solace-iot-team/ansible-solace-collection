@@ -21,6 +21,7 @@ source $PROJECT_HOME/.lib/functions.sh
       "solace_client_username"
       "solace_queue"
       "error_handling"
+      # "solace_facts"
     )
   fi
 

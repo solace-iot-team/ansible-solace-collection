@@ -2,7 +2,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "Check/wait until brokers available"
+  name: "solace_get_available:ex1"
   hosts: all
   gather_facts: no
   any_errors_fatal: true
@@ -33,13 +33,22 @@
       solace_gather_facts:
     # - debug:
     #     msg: "{{ ansible_facts.solace }}"
-    - set_fact:
-        sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
 
-    - name: "Wrong host"
+    - name: wrong wait_timeout_seconds value
+      solace_get_available:
+        wait_timeout_seconds: 0
+      register: result
+      ignore_errors: true
+    - assert:
+        that:
+          - result.rc == 1
+          - "'solace_get_available' in result.msg|string"
+          - "'wait_timeout_seconds' in result.msg|string"
+
+    - name: wrong host
       solace_get_available:
         host: "unknown.host.com"
-        wait_timeout_minutes: 1
+        wait_timeout_seconds: 1
       register: result
       ignore_errors: true
     - assert:
@@ -48,83 +57,74 @@
           - not result.is_available
           - not result.is_semp_available
           - not result.is_spool_available
-    - assert:
-        that: result.rc == 0 and "ConnectionPool(host='unknown.host.com'" in result.msg|string
+          - "'NewConnectionError' in result.msg|string"
 
-    - name: "Wrong SSL"
-      solace_get_available:
-        secure_connection: "{{ False if sempv2_is_secure_connection else True }}"
-        wait_timeout_minutes: 1
-      register: result
-      ignore_errors: true
-    - assert:
-        that:
-          - result.rc == 1
-          - not result.is_available
-          - not result.is_semp_available
-          - not result.is_spool_available
-    - assert:
-        that: result.rc == 1 and 'SSLError' in result.msg|string
-      when: sempv2_is_secure_connection == False
-    - assert:
-        that: result.rc == 1 and 'The plain HTTP request was sent to HTTPS port' in result.msg|string
-      when: sempv2_is_secure_connection == True
+    - name: http for solace cloud
+      block:
+        - name: http for solace cloud
+          solace_get_available:
+            secure_connection: False
+            wait_timeout_seconds: 1
+          register: result
+          ignore_errors: true
+        - assert:
+            that:
+              - result.rc == 1
+              - not result.is_available
+              - not result.is_semp_available
+              - not result.is_spool_available
+              - "'The plain HTTP request was sent to HTTPS port' in result.msg|string"
+      when: broker_type == 'solace_cloud'
 
-    - name: "Wrong password"
+    - name: wrong http/https self_hosted
+      block:
+        - name: wrong http/https for self-hosted
+          solace_get_available:
+            secure_connection: "{{ False if sempv2_is_secure_connection else True }}"
+            wait_timeout_seconds: 1
+          register: result
+          ignore_errors: true
+        - assert:
+            that:
+              - result.rc == 0
+              - not result.is_available
+              - not result.is_semp_available
+              - not result.is_spool_available
+        - assert:
+            that: result.rc == 0 and 'SSLError' in result.msg|string
+          when: sempv2_is_secure_connection == False
+        - assert:
+            that: result.rc == 0 and 'The plain HTTP request was sent to HTTPS port' in result.msg|string
+          when: sempv2_is_secure_connection == True
+      when: broker_type != 'solace_cloud'
+
+    - name: wrong password
       solace_get_available:
         password: "unknown_password"
-        wait_timeout_minutes: 1
+        wait_timeout_seconds: 1
       register: result
       ignore_errors: true
-
-    - debug:
-        msg: "sempv2 version greater 2.19"
-      when: sempv2_version|float > 2.19
-
-    - debug:
-        msg: "sempv2 version less or equal 2.19"
-      when: sempv2_version|float <= 2.19
-
-      # from SEMP version=2.21 returns rc=1 (response code=401), before rc=0 (response code=200)
-    - assert:
-        that:
-          - result.rc == 0
-          - not result.is_available
-          - result.is_semp_available
-          - not result.is_spool_available
-      when: sempv2_version|float <= 2.19
     - assert:
         that:
           - result.rc == 1
           - not result.is_available
           - not result.is_semp_available
           - not result.is_spool_available
-      when: sempv2_version|float > 2.19
-    - assert:
-        that: "'UNAUTHORIZED' in result.msg|string"
+          - "'UNAUTHORIZED' in result.msg|string"
 
-    - name: "Wrong username"
+    - name: wrong username
       solace_get_available:
         username: "unknown_username"
-        wait_timeout_minutes: 1
+        wait_timeout_seconds: 60
       register: result
       ignore_errors: true
-    - assert:
-        that:
-          - result.rc == 0
-          - not result.is_available
-          - result.is_semp_available
-          - not result.is_spool_available
-      when: sempv2_version|float <= 2.19
     - assert:
         that:
           - result.rc == 1
           - not result.is_available
           - not result.is_semp_available
           - not result.is_spool_available
-      when: sempv2_version|float > 2.19
-    - assert:
-        that: "'UNAUTHORIZED' in result.msg|string"
+          - "'UNAUTHORIZED' in result.msg|string"
 
 
 ###

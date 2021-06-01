@@ -118,7 +118,8 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
         if len(path_array) > 1:
             if path_array[0] not in dictionary.keys():
                 dictionary[path_array[0]] = {}
-            self.add_path_value(dictionary[path_array[0]], path_array[1:], value)
+            self.add_path_value(
+                dictionary[path_array[0]], path_array[1:], value)
         else:
             if(path_array[0] == ''):
                 dictionary['broker'] = value
@@ -135,7 +136,8 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
             ["about", "api"]
         ]
         for path_array in path_array_list:
-            resp = self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + path_array)
+            resp = self.sempv2_api.make_get_request(
+                self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG] + path_array)
             self.add_path_value(about_info, path_array, resp)
         about_info['isSolaceCloud'] = self.get_config().is_solace_cloud()
         return about_info
@@ -144,16 +146,20 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
         resp = dict(
             vpns=dict()
         )
-        msg_vpns = self.sempv2_api.make_get_request(self.get_config(), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, "about", "user", "msgVpns"])
+        msg_vpns = self.sempv2_api.make_get_request(self.get_config(
+        ), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, "about", "user", "msgVpns"])
         for msg_vpn in msg_vpns:
             # GET /msgVpns/{msgVpnName}
             vpn_name = msg_vpn['msgVpnName']
-            path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name]
-            msg_vpn_info = self.sempv2_api.get_object_settings(self.get_config(), path_array)
+            path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                          'msgVpns', vpn_name]
+            msg_vpn_info = self.sempv2_api.get_object_settings(
+                self.get_config(), path_array)
             resp['vpns'].update({vpn_name: msg_vpn_info})
 
         if self.get_config().is_solace_cloud():
-            resp['service'] = self.solace_cloud_api.get_service(self.get_config(), self.get_module().params['solace_cloud_service_id'])
+            resp['service'] = self.solace_cloud_api.get_service(
+                self.get_config(), self.get_module().params['solace_cloud_service_id'])
             resp['virtualRouterName'] = "n/a"
             # is this the potential virutal router?
             # 'primaryRouterName'
@@ -161,16 +167,19 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
             # get service
             xml_post_cmd = "<rpc><show><service></service></show></rpc>"
             try:
-                resp_service = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd, SolaceTaskOps.OP_READ_OBJECT)
+                resp_service = self.sempv1_api.make_post_request(
+                    self.get_config(), xml_post_cmd, SolaceTaskOps.OP_READ_OBJECT)
             except SolaceApiError as e:
                 if self.get_config().reverse_proxy:
-                    self.logExceptionAsWarning(f"using reverse-proxy, failed to execute SEMP V1 call: {xml_post_cmd}", e)
-                    return resp
+                    self.logExceptionAsError(
+                        f"using reverse-proxy, failed to execute SEMP V1 call: {xml_post_cmd}", e)
+                    # return resp
                 raise e
             resp['service'] = resp_service['rpc-reply']['rpc']['show']['service']['services']
             # get virtual router
             xml_post_cmd = "<rpc><show><router-name></router-name></show></rpc>"
-            resp_virtual_router = self.sempv1_api.make_post_request(self.get_config(), xml_post_cmd, SolaceTaskOps.OP_READ_OBJECT)
+            resp_virtual_router = self.sempv1_api.make_post_request(
+                self.get_config(), xml_post_cmd, SolaceTaskOps.OP_READ_OBJECT)
             resp['virtualRouterName'] = resp_virtual_router['rpc-reply']['rpc']['show']['router-name']['router-name']
 
         return resp

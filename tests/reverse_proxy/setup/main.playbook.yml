@@ -25,13 +25,15 @@
   - set_fact:
       inventory_file_exists: "{{ result.stat.exists }}"
 
+  - set_fact:
+      empty_env_var_value: "__EMPTY__"
   - name: "check if env vars exist"
     set_fact:
-      reverse_proxy_host: "{{ REVERSE_PROXY_HOST if REVERSE_PROXY_HOST!='' else omit }}"
-      reverse_proxy_api_key: "{{ REVERSE_PROXY_API_KEY if REVERSE_PROXY_API_KEY!='' else omit }}"
-      reverse_proxy_semp_base_path: "{{ REVERSE_PROXY_SEMP_BASE_PATH if REVERSE_PROXY_SEMP_BASE_PATH!='' else omit }}"
+      reverse_proxy_host: "{{ REVERSE_PROXY_HOST if REVERSE_PROXY_HOST!='' else empty_env_var_value }}"
+      reverse_proxy_api_key: "{{ REVERSE_PROXY_API_KEY if REVERSE_PROXY_API_KEY!='' else empty_env_var_value }}"
+      reverse_proxy_semp_base_path: "{{ REVERSE_PROXY_SEMP_BASE_PATH if REVERSE_PROXY_SEMP_BASE_PATH!='' else empty_env_var_value }}"
   - set_fact:
-      env_vars_exist: "{{ reverse_proxy_host is defined and reverse_proxy_api_key is defined and reverse_proxy_semp_base_path is defined }}"
+      env_vars_exist: "{{ reverse_proxy_host!=empty_env_var_value and reverse_proxy_api_key!=empty_env_var_value and reverse_proxy_semp_base_path!=empty_env_var_value }}"
 
   - name: "copy existing inventory file"
     copy:

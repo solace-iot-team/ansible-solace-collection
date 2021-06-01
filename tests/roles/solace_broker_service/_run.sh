@@ -40,7 +40,7 @@ source $PROJECT_HOME/.lib/functions.sh
   localInventory=$(assertFile $scriptLogName "$scriptDir/files/inventory.yml") || exit
   playbooks=(
     "$scriptDir/delete.single-node.service.playbook.yml"
-    # "$scriptDir/create.single-node.plain+secure.playbook.yml"
+    "$scriptDir/create.single-node.plain+secure.playbook.yml"
     "$scriptDir/delete.single-node.service.playbook.yml"
     "$scriptDir/create.single-node.default.playbook.yml"
     "$scriptDir/delete.single-node.service.playbook.yml"

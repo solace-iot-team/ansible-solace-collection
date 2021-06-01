@@ -12,7 +12,7 @@ on:
   schedule:
     # - cron: '0 5 * * THU'
     # - cron: '0 5 * * *'
-    - cron: 0 4 */2 * *  # every two days
+    - cron: 0 22 */2 * *  # every two days
   pull_request:
     branches:
       - main
@@ -30,12 +30,8 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        # python-version: [ '3.6' ]
         python-version: [ '3.8' ]
-        # python-version: [ '3.8', '3.9' ]
-        ansible-version: [ 'ansible>=2.10.3,<2.11' ]
-        # ansible-version: [ 'ansible>=3' ]
-        # ansible-version: [ 'ansible>=2.10.3', 'ansible>=3' ]
+        ansible-version: [ 'ansible>=2.11', 'ansible>=2.10.3,<2.11' ]
     steps:
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'

@@ -97,6 +97,7 @@ from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task imp
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
+import urllib
 
 
 class SolaceAuthorizationGroupTask(SolaceBrokerCRUDTask):
@@ -106,6 +107,9 @@ class SolaceAuthorizationGroupTask(SolaceBrokerCRUDTask):
     def __init__(self, module):
         super().__init__(module)
         self.sempv2_api = SolaceSempV2Api(module)
+        # authorization group names contain ',' and '='
+        # '=' must not be encoded, ',' instead must be encoded
+        self.sempv2_api.set_safe_for_path_array('=')
 
     def get_args(self):
         params = self.get_module().params
@@ -113,8 +117,9 @@ class SolaceAuthorizationGroupTask(SolaceBrokerCRUDTask):
 
     def get_func(self, vpn_name, authorization_group_name):
         # GET /msgVpns/{msgVpnName}/authorizationGroups/{authorizationGroupName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'authorizationGroups', authorization_group_name]
-        return self.sempv2_api.get_object_settings(self.get_config(), path_array)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'authorizationGroups', authorization_group_name]
+        return self.sempv2_api.get_object_settings(self.get_config(), path_array, )
 
     def create_func(self, vpn_name, authorization_group_name, settings=None):
         # POST /msgVpns/{msgVpnName}/authorizationGroups
@@ -123,23 +128,27 @@ class SolaceAuthorizationGroupTask(SolaceBrokerCRUDTask):
             self.OBJECT_KEY: authorization_group_name
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'authorizationGroups']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'authorizationGroups']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def update_func(self, vpn_name, authorization_group_name, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/authorizationGroups/{authorizationGroupName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'authorizationGroups', authorization_group_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'authorizationGroups', authorization_group_name]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
     def delete_func(self, vpn_name, authorization_group_name):
         # DELETE /msgVpns/{msgVpnName}/authorizationGroups/{authorizationGroupName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'authorizationGroups', authorization_group_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'authorizationGroups', authorization_group_name]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True, aliases=['authorization_group', 'authorization_group_name'])
+        name=dict(type='str', required=True, aliases=[
+                  'authorization_group', 'authorization_group_name'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())

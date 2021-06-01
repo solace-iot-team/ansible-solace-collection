@@ -26,6 +26,7 @@ playbooks=(
   "$scriptDir/main.playbook.yml"
   "$scriptDir/ex1.playbook.yml"
   "$scriptDir/get.playbook.yml"
+  "$scriptDir/idempotency.playbook.yml"
 )
 
 ##############################################################################################################################

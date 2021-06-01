@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 scriptDir=$(cd $(dirname "$0") && pwd);
@@ -23,12 +23,7 @@ INVENTORY_FILE="$WORKING_DIR/broker.inventory.yml"
 inventory=$(assertFile $scriptLogName $INVENTORY_FILE) || exit
 
 playbooks=(
-  "$scriptDir/ldap-profile.doc-example.playbook.yml"
-  "$scriptDir/ldap-profile.main.playbook.yml"
-  "$scriptDir/ldap-profile.get.self-hosted.playbook.yml"
-  "$scriptDir/ldap-profile.get.solace-cloud.playbook.yml"
-  "$scriptDir/ldap-profile.ex.self-hosted.playbook.yml"
-  "$scriptDir/ldap-profile.ex.solace-cloud.playbook.yml"
+  "$scriptDir/main.playbook.yml"
 )
 
 ##############################################################################################################################
@@ -39,8 +34,7 @@ for playbook in ${playbooks[@]}; do
   ansible-playbook \
                   -i $inventory \
                   $playbook \
-                  --extra-vars "WORKING_DIR=$WORKING_DIR" \
-                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN"
+                  --extra-vars "WORKING_DIR=$WORKING_DIR"
   code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
 done

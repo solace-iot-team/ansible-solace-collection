@@ -1,5 +1,9 @@
 ---
+search_pattern: cn=asct_auth_group*
 authorization_groups:
-- name: asct_auth_group_1
-- name: asct_auth_group_2
-- name: asct_auth_group_3
+- name: cn=asct_auth_group_1,ou=Users,o=orgId,dc=jumpcloud,dc=com
+- name: cn=asct_auth_group_2,ou=Users,o=orgId,dc=jumpcloud,dc=com
+- name: cn=asct_auth_group_3,ou=Users,o=orgId,dc=jumpcloud,dc=com
+settings:
+  enabled: true
+  aclProfileName: default

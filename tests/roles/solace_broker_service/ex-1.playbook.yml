@@ -42,8 +42,12 @@
   - assert:
       that:
         - solace_broker_service_result.rc == 1
-        - "'exception' in solace_broker_service_result|string"
-        - "'argument definition' in solace_broker_service_result|string"
+        - "'definition' in solace_broker_service_result|string"
+  - assert:
+      that:
+        - "'class' in solace_broker_service_result|string"
+        - "'str' in solace_broker_service_result|string"
+    when: ansible_version.minor == 11
 
   - name: "Broker Service Up - solace_get_available failure"
     block:
@@ -51,7 +55,7 @@
           name: solace.pubsub_plus.solace_broker_service
         vars:
           solace_get_available:
-            wait_timeout_minutes: 1
+            wait_timeout_seconds: 10
           generate:
             inventory_settings:
               inventory_hostname: my-host

@@ -44,6 +44,33 @@ class SolaceApiError(Exception):
     def get_module_op(self):
         return self.module_op
 
+    def is_broker_error(self):
+        if not self.resp or not isinstance(self.resp, dict):
+            return False
+        try:
+            _meta = self.resp['body']['meta']
+            return True
+        except KeyError:
+            return False
+
+    def get_sempv2_error_code(self):
+        if not self.resp or not isinstance(self.resp, dict):
+            return None
+        try:
+            sempv2_error_code = self.resp['body']['meta']['error']['code']
+            return sempv2_error_code
+        except KeyError:
+            return None
+
+    def get_solace_cloud_error_code(self):
+        if not self.resp or not isinstance(self.resp, dict):
+            return None
+        try:
+            solace_cloud_error_code = self.resp['body']['subCode']
+            return solace_cloud_error_code
+        except KeyError:
+            return None
+
 
 class SolaceParamsValidationError(Exception):
     def __init__(self, param, value, msg):
@@ -77,7 +104,8 @@ class SolaceModuleUsageError(Exception):
 
 class SolaceSempv1VersionNotSupportedError(Exception):
     def __init__(self, module_name, sempv1_version_float, min_sempv1_version_float):
-        super().__init__(f"module '{module_name}': service SEMP V1 version: {sempv1_version_float}; minimum version required: {min_sempv1_version_float}")
+        super().__init__(
+            f"module '{module_name}': service SEMP V1 version: {sempv1_version_float}; minimum version required: {min_sempv1_version_float}")
 
 
 class SolaceError(Exception):

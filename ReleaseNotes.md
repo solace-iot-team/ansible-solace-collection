@@ -1,5 +1,12 @@
 # Release Notes
 
+## Version: 1.4.4
+Maintenance: Support for Ansible 2.11.x
+
+**Fixes**
+* **[solace_get_available](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_available.html)**
+  - fixed using SSL with python >3.8
+
 ## Version: 1.4.3
 Enhancements & New Features.
 

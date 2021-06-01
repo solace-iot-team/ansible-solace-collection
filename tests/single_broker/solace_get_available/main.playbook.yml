@@ -2,7 +2,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "Check/wait until brokers available"
+  name: "solace_get_available:main"
   hosts: all
   gather_facts: no
   any_errors_fatal: true

@@ -16,6 +16,7 @@ ansibleSolaceTests=(
   "solace_client_username"
   "solace_queue"
   "error_handling"
+  "solace_facts"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 

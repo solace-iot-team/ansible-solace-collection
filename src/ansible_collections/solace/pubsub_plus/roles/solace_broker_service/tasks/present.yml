@@ -9,7 +9,7 @@
     username: "{{ combined_generate.inventory_settings.sempv2_username }}"
     password: "{{ combined_generate.inventory_settings.sempv2_password }}"
     msg_vpn: "{{ combined_generate.inventory_settings.vpn }}"
-    wait_timeout_minutes: "{{ solace_get_available.wait_timeout_minutes | default(omit) }}"
+    wait_timeout_seconds: "{{ solace_get_available.wait_timeout_seconds | default(omit) }}"
   delegate_to: localhost
   register: available_result
   ignore_errors: yes
