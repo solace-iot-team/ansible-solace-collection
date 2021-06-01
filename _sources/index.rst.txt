@@ -4,6 +4,8 @@ Solace PubSub+ Ansible Collection
 
 The collection is available on `Ansible Galaxy`_.
 
+.. literalinclude:: ../../meta/runtime.yml
+
 .. toctree::
   :maxdepth: 1
   :caption: Using Solace PubSub+ Ansible Collection

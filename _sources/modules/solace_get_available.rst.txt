@@ -7,6 +7,8 @@ solace_get_available -- check if broker semp & spool is available
 
 Check if broker service is reachable via SEMP and if the spool is ready. Calls "GET /about/api" and creates/deletes a test queue.
 
+To check, evaluate the return ``is_available``. ``rc==1`` is only set in case of a module or API error.
+
 
 
 
@@ -139,11 +141,13 @@ username (optional)
   | **type**: str
   | **default**: admin
 
-wait_timeout_minutes (optional)
-  Minutes to run tests for SEMP and spool. Polls every 15 seconds for `wait_timeout_minutes` until service is available.
+wait_timeout_seconds (optional)
+  Number of seconds to run tests for SEMP and spool availability. Polls every 5 seconds for `wait_timeout_seconds` until service is available.
+
+  Value must be `> 0`.
 
   | **type**: int
-  | **default**: 10
+  | **default**: 600
 
 x_broker (optional)
   Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.

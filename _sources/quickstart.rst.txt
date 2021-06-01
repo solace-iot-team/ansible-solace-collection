@@ -4,9 +4,7 @@ Quickstart for Solace PubSub+ Ansible Collection
 Installation & Dependencies
 ---------------------------
 
-.. important::
-  Supported ansible versions: 'ansible>=2.10.3,<2.11'
-
+.. literalinclude:: ../../meta/runtime.yml
 
 Prerequisites:
   - install python >=3.8

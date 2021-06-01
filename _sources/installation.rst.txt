@@ -1,8 +1,7 @@
 Installation
 ============
 
-.. important::
-  Supported ansible versions: 'ansible>=2.10.3,<2.11'
+.. literalinclude:: ../../meta/runtime.yml
 
 Installation & Dependencies
 ---------------------------

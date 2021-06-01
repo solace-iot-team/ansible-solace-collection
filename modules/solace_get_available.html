@@ -233,6 +233,7 @@
   <div class="section" id="solace-get-available-check-if-broker-semp-spool-is-available">
 <span id="solace-get-available-module"></span><h1>solace_get_available – check if broker semp &amp; spool is available<a class="headerlink" href="#solace-get-available-check-if-broker-semp-spool-is-available" title="Permalink to this headline">¶</a></h1>
 <p>Check if broker service is reachable via SEMP and if the spool is ready. Calls “GET /about/api” and creates/deletes a test queue.</p>
+<p>To check, evaluate the return <code class="docutils literal notranslate"><span class="pre">is_available</span></code>. <code class="docutils literal notranslate"><span class="pre">rc==1</span></code> is only set in case of a module or API error.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
@@ -359,10 +360,11 @@
 <div class="line"><strong>default</strong>: admin</div>
 </div>
 </dd>
-<dt>wait_timeout_minutes (optional)</dt><dd><p>Minutes to run tests for SEMP and spool. Polls every 15 seconds for <cite>wait_timeout_minutes</cite> until service is available.</p>
+<dt>wait_timeout_seconds (optional)</dt><dd><p>Number of seconds to run tests for SEMP and spool availability. Polls every 5 seconds for <cite>wait_timeout_seconds</cite> until service is available.</p>
+<p>Value must be <cite>&gt; 0</cite>.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: int</div>
-<div class="line"><strong>default</strong>: 10</div>
+<div class="line"><strong>default</strong>: 600</div>
 </div>
 </dd>
 <dt>x_broker (optional)</dt><dd><p>Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.</p>
@@ -436,7 +438,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 30 May 2021 at 07:53.
+        Last updated on 01 Jun 2021 at 05:57.
       </span>
 
     </p>
