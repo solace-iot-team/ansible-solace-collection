@@ -36,13 +36,19 @@ source venv3.6.12/bin/activate
 ````bash
 (venv3.6.12) ...$ python3 -m pip install --upgrade pip
 ````
+### Install Ansible Version Required
+````bash
+# install the devel version required
+(venv3.6.12) ...$ pip install 'ansible>=2.10.3,<2.11'
+# check
+(venv3.6.12) ...$ ansible --version
+````
+
 ### Install Devel Requirements in Python Virtual Env
 ````bash
 (venv3.6.12) ...$ cd devel
 (venv3.6.12) ...$ pip install -r devel.requirements.txt
 (venv3.6.12) ...$ pip install -r ../src/ansible_collections/solace/pubsub_plus/requirements.txt
-# check
-(venv3.6.12) ...$ ansible --version
 ````
 
 ### Activate Ansible-Solace Collection Devel Env
