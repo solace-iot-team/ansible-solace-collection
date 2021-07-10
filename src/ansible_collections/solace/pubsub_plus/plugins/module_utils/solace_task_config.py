@@ -264,8 +264,21 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         )
 
     @staticmethod
+    def arg_spec_names():
+        return dict(
+            names=dict(type='str', required=True)
+        )
+
+    @staticmethod
     def arg_spec_crud():
         arg_spec = SolaceTaskBrokerConfig.arg_spec_name()
+        arg_spec.update(SolaceTaskBrokerConfig.arg_spec_sempv2_settings())
+        arg_spec.update(SolaceTaskBrokerConfig.arg_spec_state())
+        return arg_spec
+
+    @staticmethod
+    def arg_spec_crud_list():
+        arg_spec = SolaceTaskBrokerConfig.arg_spec_names()
         arg_spec.update(SolaceTaskBrokerConfig.arg_spec_sempv2_settings())
         arg_spec.update(SolaceTaskBrokerConfig.arg_spec_state())
         return arg_spec

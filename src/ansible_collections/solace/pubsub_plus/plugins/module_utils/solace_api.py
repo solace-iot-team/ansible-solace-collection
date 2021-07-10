@@ -8,7 +8,7 @@ import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalErrorAbstractMethod, SolaceApiError
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceParamsValidationError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudConfig
 from ansible.module_utils.basic import AnsibleModule
 import json
@@ -359,6 +359,9 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
         self.next_url = None
         return result_list
 
+    def get_all_objects_from_config_api(self, config: SolaceTaskBrokerConfig, path_array: list) -> list:
+        return self.get_objects(config, self.API_BASE_SEMPV2_CONFIG, 100, path_array)
+
 
 class SolaceSempV1Api(SolaceApi):
 
@@ -367,7 +370,6 @@ class SolaceSempV1Api(SolaceApi):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
         self.call_num = -1
-        return
 
     def get_sempv1_version(self, config: SolaceTaskBrokerConfig):
         rpc_xml = "<rpc><show><service></service></show></rpc>"
