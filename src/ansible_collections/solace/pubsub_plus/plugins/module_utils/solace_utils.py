@@ -37,9 +37,11 @@ class SolaceUtils(object):
             if import_error_traceback is not None:
                 exceptiondata = import_error_traceback.splitlines()
                 exceptionarray = [exceptiondata[-1]] + exceptiondata[1:-1]
-                module.fail_json(msg="Missing module: %s" % exceptionarray[0], rc=solace_sys._SC_SYSTEM_ERR_RC, exception=import_error_traceback)
+                module.fail_json(msg="Missing module: %s" %
+                                 exceptionarray[0], rc=solace_sys._SC_SYSTEM_ERR_RC, exception=import_error_traceback)
             else:
-                module.fail_json(msg="Missing module: unknown", rc=solace_sys._SC_SYSTEM_ERR_RC)
+                module.fail_json(msg="Missing module: unknown",
+                                 rc=solace_sys._SC_SYSTEM_ERR_RC)
         return
 
     @staticmethod
@@ -55,7 +57,8 @@ class SolaceUtils(object):
         try:
             return d[k]
         except KeyError as e:
-            raise SolaceInternalError(f"KeyError: dict has no key '{k}'") from e
+            raise SolaceInternalError(
+                f"KeyError: dict has no key '{k}'") from e
 
     @staticmethod
     def type_conversion(d, is_solace_cloud):
@@ -165,6 +168,10 @@ class SolaceUtils(object):
     @staticmethod
     def stringContainsAnyChars(str: str, set: str) -> bool:
         return 1 in [c in str for c in set]
+
+    @staticmethod
+    def doesStringContainAnyWhitespaces(string: str) -> bool:
+        return " " in string
 
     @staticmethod
     def create_version(s: str):

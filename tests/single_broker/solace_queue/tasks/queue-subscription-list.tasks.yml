@@ -132,30 +132,30 @@
       - result.rc == 0
       - result.response|length == 0
 
-# test present_only
+# test exactly
 - set_fact:
     present_subscription_list_name: present_subscriptions_1
-    present_only_subscription_list_name: present_only_subscriptions_1
+    exactly_subscription_list_name: exactly_subscriptions_1
 - set_fact:
-    target_response_list_length: "{{ queue_item[present_subscription_list_name]|length - queue_item[present_only_subscription_list_name]|length }}"
-    target_subscription_list_length: "{{ queue_item[present_only_subscription_list_name]|length }}"
+    target_response_list_length: "{{ queue_item[present_subscription_list_name]|length - queue_item[exactly_subscription_list_name]|length }}"
+    target_subscription_list_length: "{{ queue_item[exactly_subscription_list_name]|length }}"
 - name: "present: {{ present_subscription_list_name }}"
   solace_queue_subscriptions:
     queue_name: "{{ queue_item.name }}"
     subscription_topics: "{{ queue_item[present_subscription_list_name] }}"
     state: present
-- name: "present_only: {{ present_only_subscription_list_name }}"
+- name: "exactly: {{ exactly_subscription_list_name }}"
   solace_queue_subscriptions:
     queue_name: "{{ queue_item.name }}"
-    subscription_topics: "{{ queue_item[present_only_subscription_list_name] }}"
-    state: present_only
+    subscription_topics: "{{ queue_item[exactly_subscription_list_name] }}"
+    state: exactly
   register: result
 - assert:
     that:
       - result.changed == True
       - result.rc == 0
       - result.response|length == target_response_list_length|int
-- name: "check:present_only:{{ present_only_subscription_list_name }}"
+- name: "check:exactly:{{ exactly_subscription_list_name }}"
   solace_get_queue_subscriptions:
     queue_name: "{{ queue_item.name }}"
   register: result
@@ -164,12 +164,12 @@
       - result.rc == 0
       - result.result_list|length == target_subscription_list_length|int
       - result.result_list_count == target_subscription_list_length|int
-# test present_only:idempotency
-- name: "present_only: idempotency {{ present_only_subscription_list_name }}"
+# test exactly:idempotency
+- name: "exactly: idempotency {{ exactly_subscription_list_name }}"
   solace_queue_subscriptions:
     queue_name: "{{ queue_item.name }}"
-    subscription_topics: "{{ queue_item[present_only_subscription_list_name] }}"
-    state: present_only
+    subscription_topics: "{{ queue_item[exactly_subscription_list_name] }}"
+    state: exactly
   register: result
 - assert:
     that:
@@ -177,7 +177,7 @@
       - result.rc == 0
       - result.response|length == 0
 
-# test present_only with empty list
+# test exactly with empty list
 - set_fact:
     present_subscription_list_name: present_subscriptions_1
 - set_fact:
@@ -187,12 +187,12 @@
     queue_name: "{{ queue_item.name }}"
     subscription_topics: "{{ queue_item[present_subscription_list_name] }}"
     state: present
-- name: "present_only: []"
+- name: "exactly: []"
   solace_queue_subscriptions:
     queue_name: "{{ queue_item.name }}"
     subscription_topics: "{{ [] }}"
-    state: present_only
-- name: "check:present_only:[]"
+    state: exactly
+- name: "check:exactly:[]"
   solace_get_queue_subscriptions:
     queue_name: "{{ queue_item.name }}"
   register: result
@@ -201,12 +201,12 @@
       - result.rc == 0
       - result.result_list|length == target_subscription_list_length|int
       - result.result_list_count == target_subscription_list_length|int
-# test present_only [] idempotency
-- name: "present_only: idempotency []"
+# test exactly [] idempotency
+- name: "exactly: idempotency []"
   solace_queue_subscriptions:
     queue_name: "{{ queue_item.name }}"
     subscription_topics: "{{ [] }}"
-    state: present_only
+    state: exactly
   register: result
 - assert:
     that:

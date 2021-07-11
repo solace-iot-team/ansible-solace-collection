@@ -1,0 +1,252 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "solace_queue_subscription_list_exceptions"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_queue:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    # solace_queue_subscription:
+    #   host: "{{ sempv2_host }}"
+    #   port: "{{ sempv2_port }}"
+    #   secure_connection: "{{ sempv2_is_secure_connection }}"
+    #   username: "{{ sempv2_username }}"
+    #   password: "{{ sempv2_password }}"
+    #   timeout: "{{ sempv2_timeout }}"
+    #   msg_vpn: "{{ vpn }}"
+    #   reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_queue_subscriptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_get_queue_subscriptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  pre_tasks:
+  - include_vars:
+      file: "queue-subscription-list.vars.yml"
+      name: target_list
+  tasks:
+  - set_fact:
+      target: "{{ target_list.exceptions }}"
+
+  - name: "queue: absent"
+    solace_queue:
+      name: "{{ target.queue_name }}"
+      state: absent
+
+  - name: "queue: present"
+    solace_queue:
+      name: "{{ target.queue_name }}"
+      state: present
+
+# present with duplicates
+  - set_fact:
+      subscription_list_name: duplicate_topics
+  - set_fact:
+      subscription_list_length: "{{ target[subscription_list_name]|length }}"
+  - name: "present: {{ subscription_list_name }}"
+    solace_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+      subscription_topics: "{{ target[subscription_list_name] }}"
+      state: exactly
+    register: result
+  - assert:
+      that:
+        - result.changed == True
+        - result.rc == 0
+        - result.response|length == 2
+        - "'duplicate' in result.response|string"
+
+# exactly with empty list
+  - set_fact:
+      subscription_list_name: present_good
+  - set_fact:
+      subscription_list_length: "{{ target[subscription_list_name]|length }}"
+  - name: "present: {{ subscription_list_name }}"
+    solace_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+      subscription_topics: "{{ target[subscription_list_name] }}"
+      state: exactly
+  - name: "exactly: none"
+    solace_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+      subscription_topics: null
+      state: exactly
+    register: result
+  - assert:
+      that:
+        - result.changed == True
+        - result.rc == 0
+        - result.response|length == subscription_list_length|int
+
+# present with bad topic
+  - set_fact:
+      subscription_list_name: present_bad_topcis_whitespace_1
+  - set_fact:
+      subscription_list_length: "{{ target[subscription_list_name]|length }}"
+  - name: "present: check disabled: {{ subscription_list_name }}"
+    solace_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+      subscription_topics: "{{ target[subscription_list_name] }}"
+      state: present
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.changed == False
+        - result.rc == 1
+        - "'must not contain any whitespace' in result.msg|string"
+
+  - set_fact:
+      subscription_list_name: present_bad_topcis_whitespace_2
+  - set_fact:
+      subscription_list_length: "{{ target[subscription_list_name]|length }}"
+  - name: "present: check disabled: {{ subscription_list_name }}"
+    solace_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+      subscription_topics: "{{ target[subscription_list_name] }}"
+      state: present
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.changed == False
+        - result.rc == 1
+        - "'must not contain any whitespace' in result.msg|string"
+
+# bad topic semp error
+  - name: "present: []"
+    solace_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+      subscription_topics: null
+      state: exactly
+  - set_fact:
+      subscription_list_name: present_bad_topcis_semp_err_1
+  - set_fact:
+      subscription_list_length: "{{ target[subscription_list_name]|length }}"
+  - name: "present: {{ subscription_list_name }}"
+    solace_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+      subscription_topics: "{{ target[subscription_list_name] }}"
+      state: present
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.changed == False
+        - result.rc == 1
+        - "'INVALID_PARAMETER' in result.msg|string"
+  - name: "check: queue is empty"
+    solace_get_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+    register: result
+  - assert:
+      that:
+        - result.rc == 0
+        - result.result_list|length == 0
+        - result.result_list_count == 0
+
+# bad topic with rollback on empty list
+  - name: "present: []"
+    solace_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+      subscription_topics: null
+      state: exactly
+  - set_fact:
+      subscription_list_name: present_bad_topcis_with_rollback
+  - set_fact:
+      subscription_list_length: "{{ target[subscription_list_name]|length }}"
+  - name: "present: {{ subscription_list_name }}"
+    solace_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+      subscription_topics: "{{ target[subscription_list_name] }}"
+      state: exactly
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.changed == False
+        - result.rc == 1
+        - "'INVALID_PARAMETER' in result.msg|string"
+        - result.response|length == 1
+        - "'error' in result.response|string"
+  - name: "check: queue is empty"
+    solace_get_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+    register: result
+  - assert:
+      that:
+        - result.rc == 0
+        - result.result_list|length == 0
+        - result.result_list_count == 0
+
+# bad topic with rollback on existing list
+  - set_fact:
+      good_subscription_list_name: present_good
+      bad_subscription_list_name: present_bad_topcis_with_rollback
+  - set_fact:
+      good_subscription_list_length: "{{ target[good_subscription_list_name]|length }}"
+      bad_subscription_list_length: "{{ target[bad_subscription_list_name]|length }}"
+  - name: "present: {{ good_subscription_list_name }}"
+    solace_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+      subscription_topics: "{{ target[good_subscription_list_name] }}"
+      state: exactly
+  - name: "present: {{ bad_subscription_list_name }}"
+    solace_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+      subscription_topics: "{{ target[bad_subscription_list_name] }}"
+      state: exactly
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.changed == False
+        - result.rc == 1
+        - "'INVALID_PARAMETER' in result.msg|string"
+        - result.response|length == 1
+        - "'error' in result.response|string"
+  - name: "check: queue is restored"
+    solace_get_queue_subscriptions:
+      queue_name: "{{ target.queue_name }}"
+    register: result
+  - assert:
+      that:
+        - result.rc == 0
+        - result.result_list|length == good_subscription_list_length|int
+        - result.result_list_count == good_subscription_list_length|int
+
+# missing test: sempv2 error on delete
+# should be impossible to trigger
+
+  - name: "queue: absent"
+    solace_queue:
+      name: "{{ target.queue_name }}"
+      state: absent
+
+###
+# The End.

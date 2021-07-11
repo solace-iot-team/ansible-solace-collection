@@ -47,6 +47,7 @@ plugins/modules/solace_get_mqtt_session_subscriptions.py pep8:E501
 plugins/modules/solace_get_magic_queues.py compile-2.7!skip
 plugins/modules/solace_get_magic_queues.py pep8:E501
 plugins/modules/solace_queue_subscription.py compile-2.7!skip
+plugins/modules/solace_queue_subscriptions.py compile-2.7!skip
 plugins/modules/solace_queue_cancel_replay.py compile-2.7!skip
 plugins/modules/solace_queue_start_replay.py compile-2.7!skip
 plugins/modules/solace_get_client_profiles.py compile-2.7!skip
