@@ -91,7 +91,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -113,7 +113,8 @@ class SolaceMqttSessionTask(SolaceBrokerCRUDTask):
     def get_func(self, vpn_name, virtual_router, mqtt_session_client_id):
         # GET /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}
         uri_ext = ','.join([mqtt_session_client_id, virtual_router])
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions', uri_ext]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'mqttSessions', uri_ext]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, virtual_router, mqtt_session_client_id, settings=None):
@@ -123,25 +124,29 @@ class SolaceMqttSessionTask(SolaceBrokerCRUDTask):
             'mqttSessionVirtualRouter': virtual_router
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'mqttSessions']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def update_func(self, vpn_name, virtual_router, mqtt_session_client_id, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}
         uri_ext = ','.join([mqtt_session_client_id, virtual_router])
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions', uri_ext]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'mqttSessions', uri_ext]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
     def delete_func(self, vpn_name, virtual_router, mqtt_session_client_id):
         # DELETE /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}
         uri_ext = ','.join([mqtt_session_client_id, virtual_router])
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions', uri_ext]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'mqttSessions', uri_ext]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True, aliases=['mqtt_session_client_id'])
+        name=dict(type='str', required=True,
+                  aliases=['mqtt_session_client_id'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())

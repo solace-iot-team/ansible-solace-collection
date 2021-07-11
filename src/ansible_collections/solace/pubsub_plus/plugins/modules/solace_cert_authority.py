@@ -105,7 +105,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi
@@ -133,7 +133,8 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
         params = self.get_module().params
         name = params['name']
         if '-' in name:
-            raise SolaceParamsValidationError('name', name, "must not contain '-'")
+            raise SolaceParamsValidationError(
+                'name', name, "must not contain '-'")
 
     def get_args(self):
         params = self.get_module().params
@@ -142,14 +143,16 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
     def _get_func_solace_cloud(self, cert_authority_name):
         # GET services/{serviceId}/serviceCertificateAuthorities/{certAuthorityName}
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, 'serviceCertificateAuthorities', cert_authority_name]
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+                      service_id, 'serviceCertificateAuthorities', cert_authority_name]
         return self.solace_cloud_api.get_object_settings(self.get_config(), path_array)
 
     def get_func(self, cert_authority_name):
         if self.get_config().is_solace_cloud():
             return self._get_func_solace_cloud(cert_authority_name)
         # GET /certAuthorities/{certAuthorityName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'certAuthorities', cert_authority_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'certAuthorities', cert_authority_name]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def _create_func_solace_cloud(self, cert_authority_name, settings):
@@ -167,7 +170,8 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
         body.update(self.SOLACE_CLOUD_DEFAULTS)
         body.update(settings if settings else {})
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+                      service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
         return self.solace_cloud_api.make_service_post_request(
             self.get_config(),
             path_array,
@@ -184,7 +188,8 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
             self.OBJECT_KEY: cert_authority_name
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'certAuthorities']
+        path_array = [
+            SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'certAuthorities']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def _update_func_solace_cloud(self, cert_authority_name, settings, delta_settings):
@@ -202,7 +207,8 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
             body['certificate'].update({'content': cert_content})
         body.update(settings if settings else {})
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+                      service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
         return self.solace_cloud_api.make_service_post_request(
             self.get_config(),
             path_array,
@@ -215,7 +221,8 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
         if self.get_config().is_solace_cloud():
             return self._update_func_solace_cloud(cert_authority_name, settings, delta_settings)
         # PATCH /certAuthorities/{certAuthorityName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'certAuthorities', cert_authority_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'certAuthorities', cert_authority_name]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
     def _delete_func_solace_cloud(self, cert_authority_name):
@@ -227,7 +234,8 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
             }
         }
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+                      service_id, SolaceCloudApi.API_REQUESTS, 'serviceCertificateAuthorityRequests']
         return self.solace_cloud_api.make_service_post_request(
             self.get_config(),
             path_array,
@@ -240,7 +248,8 @@ class SolaceCertAuthorityTask(SolaceBrokerCRUDTask):
         if self.get_config().is_solace_cloud():
             return self._delete_func_solace_cloud(cert_authority_name)
         # DELETE /certAuthorities/{certAuthorityName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'certAuthorities', cert_authority_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'certAuthorities', cert_authority_name]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 

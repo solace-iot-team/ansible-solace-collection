@@ -89,7 +89,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -110,7 +110,8 @@ class SolaceRdpTask(SolaceBrokerCRUDTask):
 
     def get_func(self, vpn_name, rdp_name):
         # GET /msgVpns/{msgVpnName}/restDeliveryPoints/{restDeliveryPointName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, rdp_name, settings=None):
@@ -120,23 +121,27 @@ class SolaceRdpTask(SolaceBrokerCRUDTask):
             self.OBJECT_KEY: rdp_name
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'restDeliveryPoints']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def update_func(self, vpn_name, rdp_name, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/restDeliveryPoints/{restDeliveryPointName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
     def delete_func(self, vpn_name, rdp_name):
         # DELETE /msgVpns/{msgVpnName}/restDeliveryPoints/{restDeliveryPointName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True, aliases=['rdp_name', 'rest_delivery_point_name'])
+        name=dict(type='str', required=True, aliases=[
+                  'rdp_name', 'rest_delivery_point_name'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())

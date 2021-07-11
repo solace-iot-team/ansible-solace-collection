@@ -98,7 +98,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -121,7 +121,8 @@ class SolaceReplayLogTask(SolaceBrokerCRUDTask):
 
     def get_func(self, vpn_name, replay_log_name):
         # GET /msgVpns/{msgVpnName}/replayLogs/{replayLogName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'replayLogs', replay_log_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'replayLogs', replay_log_name]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def _create_func_solace_cloud(self, vpn_name, replay_log_name, settings=None):
@@ -136,14 +137,17 @@ class SolaceReplayLogTask(SolaceBrokerCRUDTask):
             self.OBJECT_KEY: replay_log_name
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'replayLogs']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'replayLogs']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def update_func(self, vpn_name, replay_log_name, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/replayLogs/{replayLogName}
         # solace cloud complains about using the exact types
-        converted_settings = SolaceUtils.deep_dict_convert_strs_to_types(settings)
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'replayLogs', replay_log_name]
+        converted_settings = SolaceUtils.deep_dict_convert_strs_to_types(
+            settings)
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'replayLogs', replay_log_name]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, converted_settings)
 
     def _delete_func_solace_cloud(self, vpn_name, replay_log_name):
@@ -153,7 +157,8 @@ class SolaceReplayLogTask(SolaceBrokerCRUDTask):
         if self.get_config().is_solace_cloud():
             return self._delete_func_solace_cloud(vpn_name, replay_log_name)
         # DELETE /msgVpns/{msgVpnName}/replayLogs/{replayLogName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'replayLogs', replay_log_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'replayLogs', replay_log_name]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 

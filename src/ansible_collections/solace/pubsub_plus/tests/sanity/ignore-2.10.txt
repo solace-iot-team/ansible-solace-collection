@@ -11,12 +11,10 @@ plugins/doc_fragments/solace.py pep8:E501
 plugins/module_utils/solace_api.py compile-2.7!skip
 plugins/modules/solace_gather_facts.py compile-2.7!skip
 plugins/modules/solace_get_facts.py compile-2.7!skip
-plugins/modules/solace_get_facts.py pep8:E501
 plugins/modules/solace_cloud_service.py compile-2.7!skip
 plugins/modules/solace_cloud_service.py pep8:E501
 plugins/modules/solace_cloud_get_service.py compile-2.7!skip
 plugins/modules/solace_cloud_get_facts.py compile-2.7!skip
-plugins/modules/solace_cloud_get_facts.py pep8:E501
 plugins/modules/solace_cloud_account_gather_facts.py compile-2.7!skip
 plugins/modules/solace_acl_profile.py compile-2.7!skip
 plugins/modules/solace_get_acl_profiles.py compile-2.7!skip
@@ -59,7 +57,6 @@ plugins/modules/solace_topic_endpoint.py compile-2.7!skip
 plugins/modules/solace_get_topic_endpoints.py compile-2.7!skip
 plugins/modules/solace_cert_authority.py compile-2.7!skip
 plugins/modules/solace_get_cert_authorities.py compile-2.7!skip
-plugins/modules/solace_get_cert_authorities.py pep8:E501
 plugins/modules/solace_bridge.py compile-2.7!skip
 plugins/modules/solace_get_bridges.py compile-2.7!skip
 plugins/modules/solace_bridge_remote_vpn.py compile-2.7!skip

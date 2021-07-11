@@ -164,7 +164,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError, SolaceNoModuleStateSupportError, SolaceSempv1VersionNotSupportedError, SolaceModuleUsageError
@@ -185,10 +185,13 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
         self.current_settings = None
 
     def check_min_sempv1_supported_version(self):
-        min_sempv1_version = SolaceUtils.create_version(self.MIN_SEMP_V1_VERSION)
-        raw_api_version, version = self.sempv1_api.get_sempv1_version(self.get_config())
+        min_sempv1_version = SolaceUtils.create_version(
+            self.MIN_SEMP_V1_VERSION)
+        raw_api_version, version = self.sempv1_api.get_sempv1_version(
+            self.get_config())
         if version < min_sempv1_version:
-            raise SolaceSempv1VersionNotSupportedError(self.get_module()._name, f"{version}({raw_api_version})", min_sempv1_version)
+            raise SolaceSempv1VersionNotSupportedError(
+                self.get_module()._name, f"{version}({raw_api_version})", min_sempv1_version)
 
     def normalize_current_settings(self, current_settings: dict, new_settings: dict) -> dict:
         if self.get_config().is_solace_cloud():
@@ -205,7 +208,8 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
         if not current_settings:
             name = self.get_module().params['name']
             usr_msg = f"ldap profile '{name}' does not exist; cannot enable/disable"
-            raise SolaceModuleUsageError(self.get_module()._name, new_state, usr_msg)
+            raise SolaceModuleUsageError(
+                self.get_module()._name, new_state, usr_msg)
         if self.get_config().is_solace_cloud():
             is_enabled = current_settings['enabled']
         else:
@@ -230,10 +234,12 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
         params = self.get_module().params
         name = params.get('name', None)
         if self.get_config().is_solace_cloud() and name != 'default':
-            raise SolaceParamsValidationError('name', name, "ldap profile name for Solace Cloud must be 'default'.")
+            raise SolaceParamsValidationError(
+                'name', name, "ldap profile name for Solace Cloud must be 'default'.")
         invalid_chars = '-'
         if SolaceUtils.stringContainsAnyChars(name, invalid_chars):
-            raise SolaceParamsValidationError('name', name, f"contains 1 or more invalid chars from set: '{invalid_chars}'")
+            raise SolaceParamsValidationError(
+                'name', name, f"contains 1 or more invalid chars from set: '{invalid_chars}'")
 
     def get_args(self):
         params = self.get_module().params
@@ -248,7 +254,8 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
     def _get_func_solace_cloud(self, ldap_profile_name):
         # GET services/{service-id}/requests/ldapAuthenticationProfile/default
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, 'ldapAuthenticationProfile', ldap_profile_name]
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+                      service_id, 'ldapAuthenticationProfile', ldap_profile_name]
         return self.solace_cloud_api.get_object_settings(self.get_config(), path_array)
 
     def get_func(self, ldap_profile_name):
@@ -264,7 +271,8 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 }
             }
         }
-        _resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), SolaceTaskOps.OP_READ_OBJECT)
+        _resp = self.sempv1_api.make_post_request(self.get_config(
+        ), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), SolaceTaskOps.OP_READ_OBJECT)
         _resp_ldap_profile = _resp['rpc-reply']['rpc']['show']['ldap-profile']
         if _resp_ldap_profile:
             return _resp_ldap_profile['ldap-profile']
@@ -289,7 +297,8 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 }
             }
         }
-        _resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), SolaceTaskOps.OP_UPDATE_OBJECT)
+        _resp = self.sempv1_api.make_post_request(self.get_config(
+        ), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), SolaceTaskOps.OP_UPDATE_OBJECT)
         _call_log = {
             self.sempv1_api.getNextCallKey(): {
                 'enable': {
@@ -320,7 +329,8 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 }
             }
         }
-        _resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), SolaceTaskOps.OP_UPDATE_OBJECT)
+        _resp = self.sempv1_api.make_post_request(self.get_config(
+        ), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), SolaceTaskOps.OP_UPDATE_OBJECT)
         _call_log = {
             self.sempv1_api.getNextCallKey(): {
                 'enable': {
@@ -342,9 +352,11 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
         # POST services/{service-id}/requests/ldapAuthenticationProfileRequests
         data = self.current_settings if self.current_settings else {}
         data.update(settings if settings else {})
-        body = self._compose_solace_cloud_request_body(operation='update', settings=data)
+        body = self._compose_solace_cloud_request_body(
+            operation='update', settings=data)
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'ldapAuthenticationProfileRequests']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+                      service_id, SolaceCloudApi.API_REQUESTS, 'ldapAuthenticationProfileRequests']
         return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, json_body=body, module_op=module_op)
 
     def _create_func_solace_cloud(self, ldap_profile_name, settings):
@@ -375,9 +387,11 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 }
             }
         }
-        resp = self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(create_rpc_dict), SolaceTaskOps.OP_CREATE_OBJECT)
+        resp = self.sempv1_api.make_post_request(self.get_config(
+        ), self.sempv1_api.convertDict2Sempv1RpcXmlString(create_rpc_dict), SolaceTaskOps.OP_CREATE_OBJECT)
         if settings:
-            resp = self._update_func_sempv1(ldap_profile_name, settings, settings, SolaceTaskOps.OP_CREATE_OBJECT)
+            resp = self._update_func_sempv1(
+                ldap_profile_name, settings, settings, SolaceTaskOps.OP_CREATE_OBJECT)
         return resp
 
     def _update_func_solace_cloud(self, ldap_profile_name, settings, delta_settings):
@@ -398,7 +412,8 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 }
             }
         }
-        rpc_dict = SolaceUtils.merge_dicts_recursive(_rpc_dict, _rpc_update_dict)
+        rpc_dict = SolaceUtils.merge_dicts_recursive(
+            _rpc_dict, _rpc_update_dict)
         return self.sempv1_api.make_post_request(self.get_config(), self.sempv1_api.convertDict2Sempv1RpcXmlString(rpc_dict), op)
 
     def _update_func_sempv1(self, ldap_profile_name, settings, delta_settings, op):
@@ -411,7 +426,8 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                 if key == 'search' and isinstance(val, dict):
                     # iterate through sarch
                     for skey, sval in val.items():
-                        _resp = self._send_sempv1_update(ldap_profile_name, key, {skey: sval}, op)
+                        _resp = self._send_sempv1_update(
+                            ldap_profile_name, key, {skey: sval}, op)
                         _call_log = {
                             self.sempv1_api.getNextCallKey(): {
                                 key: {
@@ -420,16 +436,19 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
                                 }
                             }
                         }
-                        combined_resps = SolaceUtils.merge_dicts_recursive(combined_resps, _call_log)
+                        combined_resps = SolaceUtils.merge_dicts_recursive(
+                            combined_resps, _call_log)
                 else:
-                    _resp = self._send_sempv1_update(ldap_profile_name, key, val, op)
+                    _resp = self._send_sempv1_update(
+                        ldap_profile_name, key, val, op)
                     _call_log = {
                         self.sempv1_api.getNextCallKey(): {
                             key: val,
                             'response': _resp
                         }
                     }
-                    combined_resps = SolaceUtils.merge_dicts_recursive(combined_resps, _call_log)
+                    combined_resps = SolaceUtils.merge_dicts_recursive(
+                        combined_resps, _call_log)
         return combined_resps
 
     def update_func(self, ldap_profile_name, settings=None, delta_settings=None):
@@ -438,7 +457,8 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
         return self._update_func_sempv1(ldap_profile_name, settings, delta_settings, SolaceTaskOps.OP_UPDATE_OBJECT)
 
     def _delete_func_solace_cloud(self, ldap_profile_name):
-        raise SolaceNoModuleStateSupportError(self.get_module()._name, self.get_module().params['state'], 'Solace Cloud', 'disable profile instead')
+        raise SolaceNoModuleStateSupportError(self.get_module()._name, self.get_module(
+        ).params['state'], 'Solace Cloud', 'disable profile instead')
 
     def delete_func(self, ldap_profile_name):
         if self.get_config().is_solace_cloud():
@@ -458,8 +478,10 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True, aliases=['ldap_profile', 'ldap_profile_name']),
-        state=dict(type='str', default='present', choices=['absent', 'present', 'enabled', 'disabled'])
+        name=dict(type='str', required=True, aliases=[
+                  'ldap_profile', 'ldap_profile_name']),
+        state=dict(type='str', default='present', choices=[
+                   'absent', 'present', 'enabled', 'disabled'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_solace_cloud())

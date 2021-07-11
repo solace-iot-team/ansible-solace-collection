@@ -88,7 +88,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -109,7 +109,8 @@ class SolaceDMRClusterTask(SolaceBrokerCRUDTask):
 
     def get_func(self, dmr_cluster_name):
         # GET /dmrClusters/{dmrClusterName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'dmrClusters', dmr_cluster_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'dmrClusters', dmr_cluster_name]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, dmr_cluster_name, settings=None):
@@ -123,12 +124,14 @@ class SolaceDMRClusterTask(SolaceBrokerCRUDTask):
 
     def update_func(self, dmr_cluster_name, settings=None, delta_settings=None):
         # PATCH /dmrClusters/{dmrClusterName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'dmrClusters', dmr_cluster_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'dmrClusters', dmr_cluster_name]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
     def delete_func(self, dmr_cluster_name):
         # DELETE /dmrClusters/{dmrClusterName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'dmrClusters', dmr_cluster_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'dmrClusters', dmr_cluster_name]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 

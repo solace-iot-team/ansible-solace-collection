@@ -92,7 +92,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -113,7 +113,8 @@ class SolaceDmrClusterLinkTask(SolaceBrokerCRUDTask):
 
     def get_func(self, dmr_cluster_name, remote_node_name):
         # GET /dmrClusters/{dmrClusterName}/links/{remoteNodeName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'dmrClusters', dmr_cluster_name, 'links', remote_node_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'dmrClusters', dmr_cluster_name, 'links', remote_node_name]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, dmr_cluster_name, remote_node_name, settings=None):
@@ -123,17 +124,20 @@ class SolaceDmrClusterLinkTask(SolaceBrokerCRUDTask):
             self.OBJECT_KEY: remote_node_name
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'dmrClusters', dmr_cluster_name, 'links']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'dmrClusters', dmr_cluster_name, 'links']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def update_func(self, dmr_cluster_name, remote_node_name, settings=None, delta_settings=None):
         # PATCH /dmrClusters/{dmrClusterName}/links/{remoteNodeName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'dmrClusters', dmr_cluster_name, 'links', remote_node_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'dmrClusters', dmr_cluster_name, 'links', remote_node_name]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
     def delete_func(self, dmr_cluster_name, remote_node_name):
         #  DELETE /dmrClusters/{dmrClusterName}/links/{remoteNodeName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'dmrClusters', dmr_cluster_name, 'links', remote_node_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'dmrClusters', dmr_cluster_name, 'links', remote_node_name]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 

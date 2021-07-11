@@ -107,7 +107,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -128,7 +128,8 @@ class SolaceACLClientConnectExceptionTask(SolaceBrokerCRUDTask):
 
     def get_func(self, vpn_name, acl_profile_name, client_connect_exception_address):
         # GET /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/clientConnectExceptions/{clientConnectExceptionAddress}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, 'clientConnectExceptions', client_connect_exception_address]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles',
+                      acl_profile_name, 'clientConnectExceptions', client_connect_exception_address]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, acl_profile_name, client_connect_exception_address, settings=None):
@@ -139,12 +140,14 @@ class SolaceACLClientConnectExceptionTask(SolaceBrokerCRUDTask):
             self.OBJECT_KEY: client_connect_exception_address
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, 'clientConnectExceptions']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'aclProfiles', acl_profile_name, 'clientConnectExceptions']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def delete_func(self, vpn_name, acl_profile_name, client_connect_exception_address):
         # DELETE /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/clientConnectExceptions/{clientConnectExceptionAddress}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, 'clientConnectExceptions', client_connect_exception_address]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles',
+                      acl_profile_name, 'clientConnectExceptions', client_connect_exception_address]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 

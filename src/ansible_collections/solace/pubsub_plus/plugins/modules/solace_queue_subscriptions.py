@@ -153,12 +153,20 @@ response:
     type: dict
     returned: always
     sample:
-      response:
-      - added: duplicate-topic
-      - deleted: new-topic-1
-      - deleted: new-topic-2
-      - duplicate: duplicate-topic
-      - error: /error-topic
+      success:
+        response:
+          -   added: topic-6
+          -   added: topic-7
+          -   added: duplicate-topic
+          -   deleted: topic-1
+          -   deleted: topic-2
+          -   deleted: topic-3
+          -   deleted: topic-4
+          -   deleted: topic-5
+          -   duplicate: duplicate-topic
+      error:
+        response:
+          -   error: /invalid-topic
 msg:
     description: The response from the HTTP call in case of error.
     type: dict

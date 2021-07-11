@@ -6,7 +6,7 @@ import traceback
 __metaclass__ = type
 
 from ansible.module_utils.basic import AnsibleModule
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalErrorAbstractMethod, SolaceInternalError, SolaceParamsValidationError
 import urllib.parse

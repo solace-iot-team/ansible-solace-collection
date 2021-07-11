@@ -123,7 +123,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -144,7 +144,8 @@ class SolaceRdpRestConsumerTrustedCommonNameTask(SolaceBrokerCRUDTask):
 
     def get_func(self, vpn_name, rdp_name, rest_consumer_name, tls_trusted_cn):
         # GET /msgVpns/{msgVpnName}/restDeliveryPoints/{restDeliveryPointName}/restConsumers/{restConsumerName}/tlsTrustedCommonNames/{tlsTrustedCommonName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name, 'restConsumers', rest_consumer_name, 'tlsTrustedCommonNames', tls_trusted_cn]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints',
+                      rdp_name, 'restConsumers', rest_consumer_name, 'tlsTrustedCommonNames', tls_trusted_cn]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, rdp_name, rest_consumer_name, tls_trusted_cn, settings=None):
@@ -156,18 +157,21 @@ class SolaceRdpRestConsumerTrustedCommonNameTask(SolaceBrokerCRUDTask):
             self.OBJECT_KEY: tls_trusted_cn
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name, 'restConsumers', rest_consumer_name, 'tlsTrustedCommonNames']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name,
+                      'restDeliveryPoints', rdp_name, 'restConsumers', rest_consumer_name, 'tlsTrustedCommonNames']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def delete_func(self, vpn_name, rdp_name, rest_consumer_name, tls_trusted_cn):
         # DELETE /msgVpns/{msgVpnName}/restDeliveryPoints/{restDeliveryPointName}/restConsumers/{restConsumerName}/tlsTrustedCommonNames/{tlsTrustedCommonName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints', rdp_name, 'restConsumers', rest_consumer_name, 'tlsTrustedCommonNames', tls_trusted_cn]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'restDeliveryPoints',
+                      rdp_name, 'restConsumers', rest_consumer_name, 'tlsTrustedCommonNames', tls_trusted_cn]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True, aliases=['tls_trusted_common_name']),
+        name=dict(type='str', required=True, aliases=[
+                  'tls_trusted_common_name']),
         rdp_name=dict(type='str', required=True),
         rest_consumer_name=dict(type='str', required=True)
     )

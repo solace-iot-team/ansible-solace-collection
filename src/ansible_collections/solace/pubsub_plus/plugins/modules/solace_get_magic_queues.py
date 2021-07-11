@@ -116,7 +116,7 @@ msg:
   returned: error
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceGetTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV1PagingGetApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -149,7 +149,8 @@ class SolaceGetMagicQueuesTask(SolaceGetTask):
                 }
             }
         }
-        response_list_path_array = ['rpc-reply', 'rpc', 'show', 'queue', 'queues', 'queue']
+        response_list_path_array = ['rpc-reply',
+                                    'rpc', 'show', 'queue', 'queues', 'queue']
         return self.sempv1_get_paging_api.get_objects(self.get_config(), self.sempv1_get_paging_api.convertDict2Sempv1RpcXmlString(rpc_dict), response_list_path_array)
 
     def do_task(self):

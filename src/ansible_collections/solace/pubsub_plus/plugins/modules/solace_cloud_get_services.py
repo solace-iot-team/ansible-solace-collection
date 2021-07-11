@@ -76,9 +76,8 @@ msg:
   returned: error
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceCloudGetTask
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceCloudApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudConfig
 from ansible.module_utils.basic import AnsibleModule
 

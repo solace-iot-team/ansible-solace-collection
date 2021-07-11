@@ -98,7 +98,7 @@ from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api impo
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 
 SOLACE_GET_AVAILABLE_HAS_IMPORT_ERROR = False
 SOLACE_GET_AVAILABLE_ERR_TRACEBACK = None

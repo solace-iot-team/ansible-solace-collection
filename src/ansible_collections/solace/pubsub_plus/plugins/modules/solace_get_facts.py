@@ -443,7 +443,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceReadFactsTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_facts import SolaceBrokerFacts, SolaceCloudBrokerFacts, SolaceSelfHostedBrokerFacts
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError, SolaceInternalError
@@ -477,15 +477,20 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         param_get_functions = params['get_functions']
         # check hostvars
         if hostvars_inventory_hostname not in hostvars:
-            raise SolaceParamsValidationError("hostvars, hostvars_inventory_hostname", hostvars_inventory_hostname, f"cannot find host={hostvars_inventory_hostname} in hostvars - cross check spelling with inventory file")
+            raise SolaceParamsValidationError("hostvars, hostvars_inventory_hostname", hostvars_inventory_hostname,
+                                              f"cannot find host={hostvars_inventory_hostname} in hostvars - cross check spelling with inventory file")
         if 'ansible_facts' not in hostvars[hostvars_inventory_hostname]:
-            raise SolaceParamsValidationError(f"hostvars[{hostvars_inventory_hostname}]", hostvars[hostvars_inventory_hostname], "cannot find 'ansible_facts'")
+            raise SolaceParamsValidationError(
+                f"hostvars[{hostvars_inventory_hostname}]", hostvars[hostvars_inventory_hostname], "cannot find 'ansible_facts'")
         if 'solace' not in hostvars[hostvars_inventory_hostname]['ansible_facts']:
-            raise SolaceParamsValidationError(f"hostvars[{hostvars_inventory_hostname}]['ansible_facts']", hostvars[hostvars_inventory_hostname]['ansible_facts'], "cannot find 'solace'")
+            raise SolaceParamsValidationError(f"hostvars[{hostvars_inventory_hostname}]['ansible_facts']",
+                                              hostvars[hostvars_inventory_hostname]['ansible_facts'], "cannot find 'solace'")
         # get funcs
-        has_get_funcs = self.validate_param_get_functions(self.GET_FUNCTIONS, param_get_functions)
+        has_get_funcs = self.validate_param_get_functions(
+            self.GET_FUNCTIONS, param_get_functions)
         if not has_get_funcs:
-            raise SolaceParamsValidationError("get_functions", param_get_functions, "empty. specify at least one")
+            raise SolaceParamsValidationError(
+                "get_functions", param_get_functions, "empty. specify at least one")
         # check vpn exists
         search_dict = hostvars[hostvars_inventory_hostname]['ansible_facts']['solace']
         vpns = self.get_vpns(search_dict)
@@ -494,13 +499,15 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
             vpn_name = vpns[0]
         # check for wrong vpn
         if vpn_name and vpn_name not in vpns:
-            raise SolaceParamsValidationError("msg_vpn", params['msg_vpn'], f"vpn does not exist - select one of {vpns}")
+            raise SolaceParamsValidationError(
+                "msg_vpn", params['msg_vpn'], f"vpn does not exist - select one of {vpns}")
         self.vpn_name = vpn_name
         get_functions = params['get_functions']
         if get_functions and len(get_functions) > 0:
             for get_func in get_functions:
                 if get_func in self.REQUIRES_VPN and not self.vpn_name:
-                    raise SolaceParamsValidationError("msg_vpn", params['msg_vpn'], f"required for get_function={get_func}. vpns found: {vpns}")
+                    raise SolaceParamsValidationError(
+                        "msg_vpn", params['msg_vpn'], f"required for get_function={get_func}. vpns found: {vpns}")
 
     def do_task(self):
         self.validate_params()
@@ -512,13 +519,16 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         facts = dict()
 
         if search_dict['isSolaceCloud']:
-            solaceBrokerFacts = SolaceCloudBrokerFacts(search_dict, self.vpn_name)
+            solaceBrokerFacts = SolaceCloudBrokerFacts(
+                search_dict, self.vpn_name)
         else:
-            solaceBrokerFacts = SolaceSelfHostedBrokerFacts(search_dict, self.vpn_name)
+            solaceBrokerFacts = SolaceSelfHostedBrokerFacts(
+                search_dict, self.vpn_name)
 
         if get_functions and len(get_functions) > 0:
             for get_func in get_functions:
-                field, value = self.call_dynamic_func(get_func, solaceBrokerFacts)
+                field, value = self.call_dynamic_func(
+                    get_func, solaceBrokerFacts)
                 facts[field] = value
 
         result = self.create_result(rc=0, changed=False)
@@ -551,7 +561,8 @@ def run_module():
     module_args = dict(
         hostvars=dict(type='dict', required=True),
         hostvars_inventory_hostname=dict(type='str', required=True),
-        get_functions=dict(type='list', required=False, default=[], elements='str'),
+        get_functions=dict(type='list', required=False,
+                           default=[], elements='str'),
         msg_vpn=dict(type='str', required=False)
     )
     arg_spec = dict()

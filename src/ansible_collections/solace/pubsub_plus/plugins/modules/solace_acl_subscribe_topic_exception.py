@@ -117,7 +117,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
@@ -144,8 +144,10 @@ class SolaceACLSubscribeTopicExceptionTask(SolaceBrokerCRUDTask):
     def __init__(self, module):
         super().__init__(module)
         self.sempv2_api = SolaceSempV2Api(module)
-        _raw_api_version, self.sempv2_version = self.sempv2_api.get_sempv2_version(self.get_config())
-        self.sempv2_version_map_key = self.get_sempv2_version_map_key(self.sempv2_version)
+        _raw_api_version, self.sempv2_version = self.sempv2_api.get_sempv2_version(
+            self.get_config())
+        self.sempv2_version_map_key = self.get_sempv2_version_map_key(
+            self.sempv2_version)
 
     def get_args(self):
         params = self.get_module().params
@@ -156,14 +158,16 @@ class SolaceACLSubscribeTopicExceptionTask(SolaceBrokerCRUDTask):
             return '<=2.13'
         elif semp_version >= SolaceUtils.create_version("2.14"):
             return '>=2.14'
-        raise SolaceInternalError(f"sempv2_version: {semp_version} not supported")
+        raise SolaceInternalError(
+            f"sempv2_version: {semp_version} not supported")
 
     def get_func(self, vpn_name, acl_profile_name, topic_syntax, subscribe_topic_exception):
         # sempVersion <= "2.13" : GET /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeExceptions/{topicSyntax},{subscribeExceptionTopic}
         # sempVersion >= "2.14": GET /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions/{subscribeTopicExceptionSyntax},{subscribeTopicException}
         uri_subscr_ex = self.SEMP_VERSION_KEY_MAP[self.sempv2_version_map_key]['URI_SUBSCR_EX']
         ex_uri = ','.join([topic_syntax, subscribe_topic_exception])
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, uri_subscr_ex, ex_uri]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'aclProfiles', acl_profile_name, uri_subscr_ex, ex_uri]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, acl_profile_name, topic_syntax, subscribe_topic_exception, settings=None):
@@ -177,7 +181,8 @@ class SolaceACLSubscribeTopicExceptionTask(SolaceBrokerCRUDTask):
         }
         data.update(settings if settings else {})
         uri_subscr_ex = self.SEMP_VERSION_KEY_MAP[self.sempv2_version_map_key]['URI_SUBSCR_EX']
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, uri_subscr_ex]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'aclProfiles', acl_profile_name, uri_subscr_ex]
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def delete_func(self, vpn_name, acl_profile_name, topic_syntax, subscribe_topic_exception):
@@ -185,7 +190,8 @@ class SolaceACLSubscribeTopicExceptionTask(SolaceBrokerCRUDTask):
         # sempVersion: >=2.14: DELETE /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions/{subscribeTopicExceptionSyntax},{subscribeTopicException}
         uri_subscr_ex = self.SEMP_VERSION_KEY_MAP[self.sempv2_version_map_key]['URI_SUBSCR_EX']
         ex_uri = ','.join([topic_syntax, subscribe_topic_exception])
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, uri_subscr_ex, ex_uri]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'aclProfiles', acl_profile_name, uri_subscr_ex, ex_uri]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 

@@ -197,8 +197,7 @@ msg:
   returned: error
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceNoModuleSupportForSolaceCloudError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceGetTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV1PagingGetApi, SolaceCloudApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -220,7 +219,8 @@ class SolaceGetServiceAuthenticationLdapProfilesTask(SolaceGetTask):
         # GET services/{service-id}/requests/ldapAuthenticationProfile/default
         # only 1 exists, name=default
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, 'ldapAuthenticationProfile', 'default']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+                      service_id, 'ldapAuthenticationProfile', 'default']
         return [self.solace_cloud_api.get_object_settings(self.get_config(), path_array)]
 
     def get_list(self):
@@ -238,7 +238,8 @@ class SolaceGetServiceAuthenticationLdapProfilesTask(SolaceGetTask):
         # test: paging
         # 'count': '',
         # 'num-elements': 1
-        response_list_path_array = ['rpc-reply', 'rpc', 'show', 'ldap-profile', 'ldap-profile']
+        response_list_path_array = [
+            'rpc-reply', 'rpc', 'show', 'ldap-profile', 'ldap-profile']
         return self.sempv1_get_paging_api.get_objects(self.get_config(), self.sempv1_get_paging_api.convertDict2Sempv1RpcXmlString(rpc_dict), response_list_path_array)
 
     def do_task(self):
