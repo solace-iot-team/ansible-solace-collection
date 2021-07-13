@@ -1,0 +1,126 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "no-sempv1.playbook"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  tasks:
+  - name: "check vars"
+    set_fact:
+      working_dir: "{{ WORKING_DIR }}"
+
+  - name: "ensure working_dir exists"
+    file:
+      path: "{{ working_dir }}"
+      state: directory
+    delegate_to: localhost
+
+  - name: "solace_gather_facts"
+    solace_gather_facts:
+      use_sempv1_also: false
+  - copy:
+      content: "{{ ansible_facts.solace | to_nice_json }}"
+      dest: "{{ working_dir }}/solace_gather_facts.{{ broker_type }}.no_sempv1.json"
+    delegate_to: localhost
+
+# work without sempv1
+  - name: "solace_get_facts:{{ vpn }}:good ones"
+    solace_get_facts:
+      hostvars: "{{ hostvars }}"
+      hostvars_inventory_hostname: "{{ inventory_hostname }}"
+      msg_vpn: "{{ vpn }}"
+      get_functions:
+        - get_vpnClientConnectionDetails
+        - get_vpnAttributes
+        - get_serviceTrustStoreDetails
+    register: result
+  # - debug:
+  #     msg:
+  #        - "result.facts = "
+  #        - "{{ result.facts }}"
+  - assert:
+      that:
+        - result.facts.vpnClientConnectionDetails is defined
+        - result.facts.vpnClientConnectionDetails.msgVpn is defined
+        - result.facts.vpnClientConnectionDetails.msgVpn == "{{ vpn }}"
+        - result.facts.vpnClientConnectionDetails.brokerMgmtType is defined
+        - result.facts.vpnClientConnectionDetails.AMQP is defined
+        - result.facts.vpnClientConnectionDetails.JMS is defined
+        - result.facts.vpnClientConnectionDetails.MQTT is defined
+        - result.facts.vpnClientConnectionDetails.REST is defined
+        - result.facts.vpnClientConnectionDetails.SMF is defined
+        - result.facts.vpnClientConnectionDetails.trustStore is defined
+        - result.facts.serviceTrustStoreDetails is defined
+        - result.facts.vpnAttributes is defined
+
+# do NOT work without sempv1
+  - name: "solace_get_facts:{{ vpn }}:error ones"
+    solace_get_facts:
+      hostvars: "{{ hostvars }}"
+      hostvars_inventory_hostname: "{{ inventory_hostname }}"
+      msg_vpn: "{{ vpn }}"
+      get_functions:
+        - get_serviceDmrClusterConnectionDetails
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.rc == 0
+        - result.facts.serviceDmrClusterConnectionDetails is defined
+        - result.facts.serviceDmrClusterConnectionDetails.clusterName is defined
+        - result.facts.serviceDmrClusterConnectionDetails.password is defined
+        - result.facts.serviceDmrClusterConnectionDetails.remoteAddress is defined
+        - result.facts.serviceDmrClusterConnectionDetails.primaryRouterName is defined
+    when: broker_type == 'solace_cloud'
+  - assert:
+      that:
+        - result.rc == 1
+    when: broker_type != 'solace_cloud'
+
+  - name: "solace_get_facts:{{ vpn }}:error ones"
+    solace_get_facts:
+      hostvars: "{{ hostvars }}"
+      hostvars_inventory_hostname: "{{ inventory_hostname }}"
+      msg_vpn: "{{ vpn }}"
+      get_functions:
+        - get_serviceVirtualRouterName
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.rc == 1
+        - "'virtualRouterName' in result.msg|string"
+    when: broker_type != 'solace_cloud'
+
+  - name: "solace_get_facts:{{ vpn }}:error ones"
+    solace_get_facts:
+      hostvars: "{{ hostvars }}"
+      hostvars_inventory_hostname: "{{ inventory_hostname }}"
+      msg_vpn: "{{ vpn }}"
+      get_functions:
+        - get_vpnBridgeRemoteMsgVpnLocations
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.rc == 1
+        - "'virtualRouterName' in result.msg|string"
+    when: broker_type != 'solace_cloud'
+
+###
+# The End.

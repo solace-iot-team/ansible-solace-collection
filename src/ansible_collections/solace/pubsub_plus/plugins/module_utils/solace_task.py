@@ -163,7 +163,10 @@ class SolaceTask(object):
         except SolaceFeatureNotSupportedError as e:
             self.logExceptionAsError(type(e), e)
             usr_msg = [
-                "Feature currently not supported. Pls raise an new feature request if required.", str(e)]
+                f"module '{self.get_module()._name}'",
+                "Feature currently not supported. Pls raise an new feature request if required.",
+                str(e)
+            ]
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceNoModuleStateSupportError as e:
@@ -277,8 +280,8 @@ class SolaceCRUDTask(SolaceTask):
 
     def normalize_new_settings(self, new_settings) -> dict:
         if new_settings:
-            SolaceUtils.type_conversion(
-                new_settings, self.get_config().is_solace_cloud())
+            SolaceUtils.type_conversion(new_settings,
+                                        self.get_config().is_solace_cloud())
         return new_settings
 
     def get_func(self, *args) -> dict:

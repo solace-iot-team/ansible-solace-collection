@@ -62,7 +62,7 @@ class SolaceUtils(object):
 
     @staticmethod
     def type_conversion(d, is_solace_cloud):
-        # solace cloud: cast everything to string
+        # solace cloud: cast everything int and float to string
         # broker: cast strings to ints & floats, string booleans to boolean
         for k, i in d.items():
             t = type(i)

@@ -60,3 +60,6 @@ In order to log the REST calls made by ``ansible-solace``, set the following env
      - the full path & name of the log file to write to. ``ansible-solace`` will create the directory/ies if they don't exist. appends log entries to an existing log file or creates a new one.
 
 See also :ref:`tips-tricks-content-logfile` for a further discussion of logging.
+
+.. note::
+  The `ansible-solace` modules do NOT support check mode.

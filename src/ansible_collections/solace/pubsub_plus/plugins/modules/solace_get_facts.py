@@ -446,7 +446,7 @@ rc:
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceReadFactsTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_facts import SolaceBrokerFacts, SolaceCloudBrokerFacts, SolaceSelfHostedBrokerFacts
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError, SolaceInternalError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -519,11 +519,11 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         facts = dict()
 
         if search_dict['isSolaceCloud']:
-            solaceBrokerFacts = SolaceCloudBrokerFacts(
-                search_dict, self.vpn_name)
+            solaceBrokerFacts = SolaceCloudBrokerFacts(self.get_module()._name,
+                                                       search_dict, self.vpn_name)
         else:
-            solaceBrokerFacts = SolaceSelfHostedBrokerFacts(
-                search_dict, self.vpn_name)
+            solaceBrokerFacts = SolaceSelfHostedBrokerFacts(self.get_module()._name,
+                                                            search_dict, self.vpn_name)
 
         if get_functions and len(get_functions) > 0:
             for get_func in get_functions:
@@ -570,7 +570,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceGetFactsTask(module)

@@ -55,7 +55,6 @@
       dest: "{{ working_dir }}/facts.{{ broker_type }}.{{ vpn }}.raw.json"
     delegate_to: localhost
 
-
   - name: "main: include clientConnectionDetails tasks"
     include_tasks: ./tasks/clientConnectionDetails.tasks.yml
 

@@ -26,7 +26,8 @@ playbooks=(
   "$scriptDir/main.playbook.yml"
   "$scriptDir/two-vpns.playbook.yml"
   "$scriptDir/ex_1.playbook.yml"
-  "$scriptDir/generate-doc-samples.playbook.yml"  
+  "$scriptDir/no-sempv1.playbook.yml"
+  "$scriptDir/generate-doc-samples.playbook.yml"
 )
 
 ##############################################################################################################################

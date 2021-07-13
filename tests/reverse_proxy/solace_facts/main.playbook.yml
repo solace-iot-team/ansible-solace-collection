@@ -49,6 +49,7 @@
 
   - name: "main:solace_gather_facts"
     solace_gather_facts:
+      # use_sempv1_also: false
     register: result
   - set_fact:
       sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"

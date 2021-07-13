@@ -35,12 +35,17 @@
       solace_client_profile:
         name: "test_ansible_solace"
         settings:
-          allowGuaranteedMsgSendEnabled: true
-          allowGuaranteedMsgReceiveEnabled: true
+          # same
+          # allowGuaranteedMsgReceiveEnabled: true
           allowGuaranteedEndpointCreateEnabled: true
-          #compressionEnabled: false
-          #tlsAllowDowngradeToPlainTextEnabled: false
+          # changed
+          allowGuaranteedMsgSendEnabled: false
+          # allowUseCompression: false
+          # replicationAllowClientConnectWhenStandbyEnabled: false
         state: present
+
+    - fail:
+         msg: continue here
 
     - name: "main: Delete Client Profile 1"
       solace_client_profile:

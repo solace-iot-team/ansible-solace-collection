@@ -99,6 +99,7 @@ rc:
 '''
 
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api, SolaceCloudApi
@@ -110,20 +111,97 @@ class SolaceClientProfileTask(SolaceBrokerCRUDTask):
 
     OBJECT_KEY = 'clientProfileName'
     OPERATION = 'clientProfile'
+
+    # TODO: check these defaults
+    # and are they bools or strings?
+
+    # # similar settings to solace cloud console
+    # SOLACE_CLOUD_DEFAULTS = {
+    #     'allowBridgeConnectionsEnabled': True,
+    #     'allowGuaranteedEndpointCreateEnabled': True,
+    #     'allowGuaranteedMsgReceiveEnabled': True,
+    #     'allowGuaranteedMsgSendEnabled': True,
+    #     'allowSharedSubscriptionsEnabled': True,
+    #     'allowTransactedSessionsEnabled': True,
+    #     'allowUseCompression': True,
+    #     'elidingEnabled': True,
+    #     'replicationAllowClientConnectWhenStandbyEnabled': False,
+    #     # 'tlsAllowDowngradeToPlainTextEnabled': True
+    # }
+
     SOLACE_CLOUD_DEFAULTS = {
-        'allowTransactedSessionsEnabled': False,
-        'allowBridgeConnectionsEnabled': False,
-        'allowGuaranteedEndpointCreateEnabled': False,
-        'allowSharedSubscriptionsEnabled': False,
-        'allowGuaranteedMsgSendEnabled': False,
-        'allowGuaranteedMsgReceiveEnabled': False,
-        'elidingEnabled': False
+        "allowGuaranteedMsgSendEnabled": "true",
+        "allowGuaranteedMsgReceiveEnabled": "true",
+        "allowUseCompression": "true",
+        "replicationAllowClientConnectWhenStandbyEnabled": "false",
+        "allowTransactedSessionsEnabled": "true",
+        "allowBridgeConnectionsEnabled": "true",
+        "allowGuaranteedEndpointCreateEnabled": "true",
+        "allowSharedSubscriptionsEnabled": True,
+        "apiQueueManagementCopyFromOnCreateName": "",
+        "apiTopicEndpointManagementCopyFromOnCreateName": "",
+        "serviceWebInactiveTimeout": "30",
+        "serviceWebMaxPayload": "1000000",
+        "maxConnectionCountPerClientUsername": "100",
+        "serviceSmfMaxConnectionCountPerClientUsername": "1000",
+        "serviceWebMaxConnectionCountPerClientUsername": "1000",
+        "maxEndpointCountPerClientUsername": "100",
+        "maxEgressFlowCount": "100",
+        "maxIngressFlowCount": "100",
+        "maxSubscriptionCount": "1000",
+        "maxTransactedSessionCount": "100",
+        "maxTransactionCount": "500",
+        "queueGuaranteed1MaxDepth": "20000",
+        "queueGuaranteed1MinMsgBurst": 66000,
+        "queueDirect1MaxDepth": "20000",
+        "queueDirect1MinMsgBurst": "4",
+        "queueDirect2MaxDepth": "20000",
+        "queueDirect2MinMsgBurst": "4",
+        "queueDirect3MaxDepth": "20000",
+        "queueDirect3MinMsgBurst": "4",
+        "queueControl1MaxDepth": "20000",
+        "queueControl1MinMsgBurst": "4",
+        "tcpCongestionWindowSize": "2",
+        "tcpKeepaliveCount": "5",
+        "tcpKeepaliveIdleTime": "3",
+        "tcpKeepaliveInterval": "1",
+        "tcpMaxSegmentSize": "1460",
+        "tcpMaxWindowSize": "256",
+        "elidingDelay": 0,
+        "elidingEnabled": True,
+        "elidingMaxTopicCount": 256,
+        "rejectMsgToSenderOnNoSubscriptionMatchEnabled": False,
+        "tlsAllowDowngradeToPlainTextEnabled": True,
+        "eventClientProvisionedEndpointSpoolUsageThreshold": {
+            "setPercent": "80",
+            "clearPercent": "60"
+        }
     }
 
     def __init__(self, module):
         super().__init__(module)
         self.sempv2_api = SolaceSempV2Api(module)
         self.solace_cloud_api = SolaceCloudApi(module)
+
+    def _type_conversion(self, d):
+        for k, i in d.items():
+            t = type(i)
+            if t == int or t == float:
+                d[k] = str(i)
+            elif t == bool:
+                # False is not a string, only True
+                if not i:
+                    pass
+                # if k == 'allowSharedSubscriptionsEnabled' or k == 'elidingEnabled':
+                #     pass
+                else:
+                    d[k] = str(i).lower()
+        return d
+
+    def normalize_new_settings(self, new_settings) -> dict:
+        if new_settings:
+            self._type_conversion(new_settings)
+        return new_settings
 
     def get_args(self):
         params = self.get_module().params
@@ -158,8 +236,18 @@ class SolaceClientProfileTask(SolaceBrokerCRUDTask):
         }
         data.update(self.SOLACE_CLOUD_DEFAULTS)
         data.update(settings if settings else {})
-        body = self._compose_request_body(
-            operation='create', operation_type=self.OPERATION, settings=data)
+
+        # import logging
+        # import json
+        # logging.debug(f">>>>>data=\n{json.dumps(data, indent=2)}")
+
+        # data = {
+        #     self.OBJECT_KEY: client_profile_name
+        # }
+        # data.update(self.TEST_SETTINGS)
+
+        body = self._compose_request_body(operation='create',
+                                          operation_type=self.OPERATION, settings=data)
         service_id = self.get_config().get_params()['solace_cloud_service_id']
         path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
                       service_id, SolaceCloudApi.API_REQUESTS, 'clientProfileRequests']
@@ -181,8 +269,8 @@ class SolaceClientProfileTask(SolaceBrokerCRUDTask):
         module_op = SolaceTaskOps.OP_UPDATE_OBJECT
         # POST services/{paste-your-serviceId-here}/requests/clientProfileRequests
         # for POST: add the current_settings, override with delta_settings
-        current_settings = self._get_func_solace_cloud(
-            vpn_name, client_profile_name)
+        current_settings = self._get_func_solace_cloud(vpn_name,
+                                                       client_profile_name)
         # inconsistency in Solace Cloud API:
         # boolean values:
         #   create: must be provided as boolean (true or false)
@@ -197,8 +285,8 @@ class SolaceClientProfileTask(SolaceBrokerCRUDTask):
         data = current_settings
         data.update(mandatory)
         data.update(settings if settings else {})
-        body = self._compose_request_body(
-            operation='update', operation_type=self.OPERATION, settings=data)
+        body = self._compose_request_body(operation='update',
+                                          operation_type=self.OPERATION, settings=data)
         service_id = self.get_config().get_params()['solace_cloud_service_id']
         path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
                       service_id, SolaceCloudApi.API_REQUESTS, 'clientProfileRequests']
@@ -218,8 +306,8 @@ class SolaceClientProfileTask(SolaceBrokerCRUDTask):
         data = {
             self.OBJECT_KEY: client_profile_name
         }
-        body = self._compose_request_body(
-            operation='delete', operation_type=self.OPERATION, settings=data)
+        body = self._compose_request_body(operation='delete',
+                                          operation_type=self.OPERATION, settings=data)
         service_id = self.get_config().get_params()['solace_cloud_service_id']
         path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
                       service_id, SolaceCloudApi.API_REQUESTS, 'clientProfileRequests']
@@ -247,7 +335,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceClientProfileTask(module)

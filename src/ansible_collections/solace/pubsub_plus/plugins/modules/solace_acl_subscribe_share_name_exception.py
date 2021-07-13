@@ -173,7 +173,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceACLSubscribeShareNameExceptionTask(module)

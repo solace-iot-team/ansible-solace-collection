@@ -24,6 +24,12 @@ notes:
 - "Module Sempv2 Config - about: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/about"
 - "Module Sempv2 Config - broker: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/all/getBroker"
 - "Module Solace Cloud Api - get service: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm"
+options:
+  use_sempv1_also:
+    description: Use the SEMPV1 API to extract the virtual router name. If set to False, functions that require the virtual router name will throw an Error.
+    required: false
+    type: bool
+    default: true
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.broker_config_solace_cloud
@@ -143,11 +149,29 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
         return about_info
 
     def get_service_info(self) -> dict:
+        use_sempv1_also = self.get_config().get_params()['use_sempv1_also']
         resp = dict(
             vpns=dict()
         )
-        msg_vpns = self.sempv2_api.make_get_request(self.get_config(
-        ), [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, "about", "user", "msgVpns"])
+        # get service info
+        if self.get_config().is_solace_cloud():
+            resp['solace_cloud_service'] = self.solace_cloud_api.get_service(
+                self.get_config(), self.get_module().params['solace_cloud_service_id'])
+            resp['virtualRouterName'] = "n/a"
+        else:
+            path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG]
+            resp['sempv2_service'] = self.sempv2_api.get_object_settings(
+                self.get_config(), path_array)
+            if use_sempv1_also:
+                # get virtual router
+                xml_post_cmd = "<rpc><show><router-name></router-name></show></rpc>"
+                resp_virtual_router = self.sempv1_api.make_post_request(
+                    self.get_config(), xml_post_cmd, SolaceTaskOps.OP_READ_OBJECT)
+                resp['virtualRouterName'] = resp_virtual_router['rpc-reply']['rpc']['show']['router-name']['router-name']
+
+        # get vpns info
+        msg_vpns = self.sempv2_api.make_get_request(self.get_config(),
+                                                    [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, "about", "user", "msgVpns"])
         for msg_vpn in msg_vpns:
             # GET /msgVpns/{msgVpnName}
             vpn_name = msg_vpn['msgVpnName']
@@ -156,31 +180,6 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
             msg_vpn_info = self.sempv2_api.get_object_settings(
                 self.get_config(), path_array)
             resp['vpns'].update({vpn_name: msg_vpn_info})
-
-        if self.get_config().is_solace_cloud():
-            resp['service'] = self.solace_cloud_api.get_service(
-                self.get_config(), self.get_module().params['solace_cloud_service_id'])
-            resp['virtualRouterName'] = "n/a"
-            # is this the potential virutal router?
-            # 'primaryRouterName'
-        else:
-            # get service
-            xml_post_cmd = "<rpc><show><service></service></show></rpc>"
-            try:
-                resp_service = self.sempv1_api.make_post_request(
-                    self.get_config(), xml_post_cmd, SolaceTaskOps.OP_READ_OBJECT)
-            except SolaceApiError as e:
-                if self.get_config().reverse_proxy:
-                    self.logExceptionAsError(
-                        f"using reverse-proxy, failed to execute SEMP V1 call: {xml_post_cmd}", e)
-                    # return resp
-                raise e
-            resp['service'] = resp_service['rpc-reply']['rpc']['show']['service']['services']
-            # get virtual router
-            xml_post_cmd = "<rpc><show><router-name></router-name></show></rpc>"
-            resp_virtual_router = self.sempv1_api.make_post_request(
-                self.get_config(), xml_post_cmd, SolaceTaskOps.OP_READ_OBJECT)
-            resp['virtualRouterName'] = resp_virtual_router['rpc-reply']['rpc']['show']['router-name']['router-name']
 
         return resp
 
@@ -203,6 +202,7 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
 
 def run_module():
     module_args = dict(
+        use_sempv1_also=dict(type='bool', required=False, default=True)
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_solace_cloud())
@@ -210,7 +210,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceGatherFactsTask(module)

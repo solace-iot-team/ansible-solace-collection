@@ -327,7 +327,8 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
         self.validate_params()
         params = self.get_module().params
         search_dict = params['from_dict']
-        solaceCloudServiceFacts = SolaceCloudBrokerFacts(search_dict, None)
+        solaceCloudServiceFacts = SolaceCloudBrokerFacts(self.get_module()._name,
+                                                         search_dict, vpn=None)
         facts = dict()
         usr_msg = None
         try:
@@ -471,7 +472,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceCloudGetFactsTask(module)

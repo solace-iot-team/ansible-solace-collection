@@ -3,3 +3,4 @@
 gh-pages
 *.tar.gz
 old*
+.devel-stash
