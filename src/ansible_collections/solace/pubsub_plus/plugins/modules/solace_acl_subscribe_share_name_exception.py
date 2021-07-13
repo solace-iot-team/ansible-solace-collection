@@ -24,6 +24,7 @@ options:
     description: Name of the subscribe share name exception topic. Maps to 'subscribeShareNameException' in the API.
     required: true
     type: str
+    aliases: [topic]
   acl_profile_name:
     description: The ACL Profile.
     required: true
@@ -41,6 +42,10 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.state
 - solace.pubsub_plus.solace.sempv2_settings
+seealso:
+- module: solace_acl_profile
+- module: solace_acl_subscribe_share_name_exceptions
+- module: solace_get_acl_subscribe_share_name_exceptions
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -115,6 +120,8 @@ rc:
 '''
 
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -128,6 +135,13 @@ class SolaceACLSubscribeShareNameExceptionTask(SolaceBrokerCRUDTask):
     def __init__(self, module):
         super().__init__(module)
         self.sempv2_api = SolaceSempV2Api(module)
+
+    def validate_params(self):
+        topic = self.get_module().params['name']
+        if SolaceUtils.doesStringContainAnyWhitespaces(topic):
+            raise SolaceParamsValidationError('topic',
+                                              topic, "must not contain any whitespace")
+        return super().validate_params()
 
     def get_args(self):
         params = self.get_module().params
@@ -164,7 +178,8 @@ class SolaceACLSubscribeShareNameExceptionTask(SolaceBrokerCRUDTask):
 def run_module():
     module_args = dict(
         acl_profile_name=dict(type='str', required=True),
-        topic_syntax=dict(type='str', default='smf', choices=['smf', 'mqtt'])
+        topic_syntax=dict(type='str', default='smf', choices=['smf', 'mqtt']),
+        name=dict(type='str', required=True, aliases=['topic'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())

@@ -25,6 +25,7 @@ options:
     description: The name (topic) of the publish topic exception. Maps to 'publishTopicException' in the SEMP v2 API.
     required: true
     type: str
+    aliases: [topic]
   acl_profile_name:
     description: The ACL Profile.
     required: true
@@ -44,6 +45,8 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.sempv2_settings
 seealso:
 - module: solace_acl_profile
+- module: solace_acl_publish_topic_exceptions
+- module: solace_get_acl_publish_topic_exceptions
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -124,7 +127,7 @@ from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils im
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceParamsValidationError
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -150,6 +153,13 @@ class SolaceACLPublishTopicExceptionTask(SolaceBrokerCRUDTask):
             self.get_config())
         self.sempv2_version_map_key = self.get_sempv2_version_map_key(
             self.sempv2_version)
+
+    def validate_params(self):
+        topic = self.get_module().params['name']
+        if SolaceUtils.doesStringContainAnyWhitespaces(topic):
+            raise SolaceParamsValidationError('topic',
+                                              topic, "must not contain any whitespace")
+        return super().validate_params()
 
     def get_args(self):
         params = self.get_module().params
@@ -200,7 +210,8 @@ class SolaceACLPublishTopicExceptionTask(SolaceBrokerCRUDTask):
 def run_module():
     module_args = dict(
         acl_profile_name=dict(type='str', required=True),
-        topic_syntax=dict(type='str', default='smf', choices=['smf', 'mqtt'])
+        topic_syntax=dict(type='str', default='smf', choices=['smf', 'mqtt']),
+        name=dict(type='str', required=True, aliases=['topic'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())

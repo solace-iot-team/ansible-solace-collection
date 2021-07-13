@@ -18,8 +18,6 @@ description:
 - "Configure an ACL Profile on a message vpn. Allows addition, removal and configuration of ACL Profile(s) on Solace Brokers in an idempotent manner."
 notes:
 - "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile"
-seealso:
-- module: solace_get_acl_profiles
 options:
     name:
         description: Name of the ACL Profile. Maps to 'aclProfileName' in the API.
@@ -30,6 +28,20 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.sempv2_settings
 - solace.pubsub_plus.solace.state
+seealso:
+- module: solace_get_acl_profiles
+- module: solace_acl_subscribe_topic_exception
+- module: solace_acl_subscribe_topic_exceptions
+- module: solace_get_acl_subscribe_topic_exceptions
+- module: solace_acl_client_connect_exception
+- module: solace_acl_client_connect_exceptions
+- module: solace_get_acl_client_connect_exceptions
+- module: solace_acl_publish_topic_exception
+- module: solace_acl_publish_topic_exceptions
+- module: solace_get_acl_publish_topic_exceptions
+- module: solace_acl_subscribe_share_name_exception
+- module: solace_acl_subscribe_share_name_exceptions
+- module: solace_get_acl_subscribe_share_name_exceptions
 author:
   - Mark Street (@mkst)
   - Swen-Helge Huber (@ssh)

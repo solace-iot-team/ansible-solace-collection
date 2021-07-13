@@ -12,41 +12,37 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-
-TODO
-
-module: solace_queue_subscriptions
-short_description: list of subscriptions on a queue
+module: solace_acl_client_connect_exceptions
+short_description: list of client connect address exceptions on an acl profile
 description:
-- "Configure a list of Subscription objects on a Queue in a single transaction."
-- "Allows addition and removal of a list of Subscription objects as well as replacement of all existing Subscription objects on a queue."
+- "Configure a list of Client Connect Address Exception objects on an ACL Profile in a single transaction."
+- "Allows addition and removal of a list of Client Connect Address Exception objects as well as replacement of all existing Client Connect Address Exception objects on an ACL Profile."
 - "Supports 'transactional' behavior with rollback to original list in case of error."
-- "De-duplicates Subscription object list."
-- "Reports which topics were added, deleted and omitted (duplicates). In case of an error, reports the invalid Subscription object."
-- "To delete all Subscription objects, use state='exactly' with an empty/null list (see examples)."
+- "De-duplicates Client Connect Address Exception object list."
+- "Reports which addresses were added, deleted and omitted (duplicates). In case of an error, reports the invalid Client Connect Address Exception object."
+- "To delete all Client Connect Address Exception objects, use state='exactly' with an empty/null list (see examples)."
 notes:
-- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/createMsgVpnQueueSubscription"
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileClientConnectException"
 options:
   names:
-    description: The subscription topic. Maps to 'subscriptionTopic' in the API.
+    description: The client addresses. Maps to 'clientConnectExceptionAddress' in the SEMP v2 API.
     required: true
     type: list
-    aliases: [topics, subscription_topics]
+    aliases: [addresses]
     elements: str
-  queue:
-    description: The queue. Maps to 'queueName' in the API.
+  acl_profile_name:
+    description: The ACL Profile. Maps to 'aclProfileName' in the SEMP v2 API.
     required: true
     type: str
-    aliases: [queue_name]
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.sempv2_settings
 - solace.pubsub_plus.solace.state_crud_list
 seealso:
-- module: solace_queue
-- module: solace_queue_subscription
-- module: solace_get_queue_subscriptions
+- module: solace_acl_profile
+- module: solace_acl_client_connect_exception
+- module: solace_get_acl_client_connect_exceptions
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -58,7 +54,7 @@ EXAMPLES = '''
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_queue:
+    solace_acl_profile:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -67,7 +63,7 @@ EXAMPLES = '''
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_queue_subscriptions:
+    solace_acl_client_connect_exceptions:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -76,7 +72,7 @@ EXAMPLES = '''
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_get_queue_subscriptions:
+    solace_get_acl_client_connect_exceptions:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -86,68 +82,61 @@ EXAMPLES = '''
       msg_vpn: "{{ vpn }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
   tasks:
-  - name: create queue
-    solace_queue:
-      name: q/foo
-      state: present
+    - name: create acl profile
+      solace_acl_profile:
+        name: foo
+        state: present
 
-  - name: add list of subscriptions
-    solace_queue_subscriptions:
-      queue_name: q/foo
-      subscription_topics:
-        - topic-1
-        - topic-2
-      state: present
+    - name: add list of exceptions
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: foo
+        addresses:
+        - 10.2.3.11/1
+        - 10.2.3.11/2
+        state: present
 
-  - name: get subscriptions
-    solace_get_queue_subscriptions:
-      queue_name: q/foo
+    - name: get list of exceptions
+      solace_get_acl_client_connect_exceptions:
+        acl_profile_name: foo
 
-  - name: add second list of subscriptions
-    solace_queue_subscriptions:
-      queue_name: q/foo
-      subscription_topics:
-        - topic-3
-        - topic-4
-      state: present
+    - name: add second list of exceptions
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: foo
+        addresses:
+        - 10.2.3.11/3
+        - 10.2.3.11/4
+        state: present
 
-  - name: get subscriptions
-    solace_get_queue_subscriptions:
-      queue_name: q/foo
+    - name: get list of exceptions
+      solace_get_acl_client_connect_exceptions:
+        acl_profile_name: foo
 
-  - name: replace subscriptions
-    solace_queue_subscriptions:
-      queue_name: q/foo
-      subscription_topics:
-        - new-topic-1
-        - new-topic-2
-      state: exactly
+    - name: replace list of exceptions
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: foo
+        addresses:
+        - 10.2.3.11/5
+        - 10.2.3.11/6
+        state: exactly
 
-  - name: get subscriptions
-    solace_get_queue_subscriptions:
-      queue_name: q/foo
+    - name: get list of exceptions
+      solace_get_acl_client_connect_exceptions:
+        acl_profile_name: foo
 
-  - name: handle duplicate subscriptions
-    solace_queue_subscriptions:
-      queue_name: q/foo
-      subscription_topics:
-        - duplicate-topic
-        - duplicate-topic
-      state: exactly
+    - name: delete all exceptions
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: foo
+        addresses: null
+        state: exactly
 
-  - name: get subscriptions
-    solace_get_queue_subscriptions:
-      queue_name: q/foo
+    - name: get list of exceptions
+      solace_get_acl_client_connect_exceptions:
+        acl_profile_name: foo
 
-  - name: delete all subscriptions
-    solace_queue_subscriptions:
-      queue_name: q/foo
-      subscription_topics: null
-      state: exactly
-
-  - name: get subscriptions
-    solace_get_queue_subscriptions:
-      queue_name: q/foo
+    - name: delete acl profile
+      solace_acl_profile:
+        name: foo
+        state: absent
 '''
 
 RETURN = '''

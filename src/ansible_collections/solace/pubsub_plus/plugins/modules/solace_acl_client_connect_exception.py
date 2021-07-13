@@ -33,6 +33,10 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.state
 - solace.pubsub_plus.solace.sempv2_settings
+seealso:
+- module: solace_acl_profile
+- module: solace_acl_client_connect_exceptions
+- module: solace_get_acl_client_connect_exceptions
 author:
   - Mark Street (@mkst)
   - Swen-Helge Huber (@ssh)

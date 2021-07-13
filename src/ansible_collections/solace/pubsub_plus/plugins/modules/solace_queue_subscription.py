@@ -105,9 +105,11 @@ rc:
 '''
 
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -118,6 +120,13 @@ class SolaceSubscriptionTask(SolaceBrokerCRUDTask):
     def __init__(self, module):
         super().__init__(module)
         self.sempv2_api = SolaceSempV2Api(module)
+
+    def validate_params(self):
+        topic = self.get_module().params['name']
+        if SolaceUtils.doesStringContainAnyWhitespaces(topic):
+            raise SolaceParamsValidationError('topic',
+                                              topic, "must not contain any whitespace")
+        return super().validate_params()
 
     def get_args(self):
         params = self.get_module().params

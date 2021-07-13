@@ -12,19 +12,16 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-
-TODO
-
-module: solace_get_queue_subscriptions
-short_description: get list of subscriptions on a queue
+module: solace_get_acl_subscribe_topic_exceptions
+short_description: get list of subscribe topic exceptions on an acl profile
 description:
-- "Get a list of Subscription objects configured on a Queue."
+- "Get a list of Subscribe Topic Exception objects configured on an ACL Profile."
 notes:
-- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/getMsgVpnQueueSubscriptions"
-- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/queue/getMsgVpnQueueSubscriptions"
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfileSubscribeTopicExceptions"
+- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/aclProfile/getMsgVpnAclProfileSubscribeTopicExceptions"
 options:
-  queue_name:
-    description: The name of the queue. Maps to 'queueName' in the API.
+  acl_profile_name:
+    description: The name of the ACL Profile. Maps to 'aclProfileName' in the SEMP v2 API.
     type: str
     required: true
 extends_documentation_fragment:
@@ -32,82 +29,103 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
 seealso:
-- module: solace_queue
-- module: solace_queue_subscription
+- module: solace_acl_subscribe_topic_exception
+- module: solace_acl_subscribe_topic_exceptions
+- module: solace_acl_profile
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
-hosts: all
-gather_facts: no
-any_errors_fatal: true
-collections:
-- solace.pubsub_plus
-module_defaults:
-  solace_queue:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
-  solace_queue_subscription:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
-  solace_get_queue_subscriptions:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
-tasks:
-- name: create queue
-  solace_queue:
-    name: foo
-    state: present
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_acl_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_acl_subscribe_topic_exceptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_get_acl_subscribe_topic_exceptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  tasks:
+    - name: create acl profile
+      solace_acl_profile:
+        name: foo
+        state: present
 
-- name: create queue subscription
-  solace_queue_subscription:
-    name: "foo/bar"
-    state: present
+    - name: add list of exceptions
+      solace_acl_subscribe_topic_exceptions:
+        acl_profile_name: foo
+        topics:
+          - topic_1
+          - topic_2
+        state: present
 
-- name: get list config
-  solace_get_queue_subscriptions:
-    queue_name: foo
-    query_params:
-      where:
-      - "subscriptionTopic==foo*"
-  register: result
+    - name: get list of exceptions
+      solace_get_acl_subscribe_topic_exceptions:
+        acl_profile_name: foo
 
-- name: print result
-  debug:
-    msg:
-    - "{{ result.result_list }}"
-    - "{{ result.result_list_count }}"
+    - name: add second list of exceptions
+      solace_acl_subscribe_topic_exceptions:
+        acl_profile_name: foo
+        topics:
+          - topic_3
+          - topic_4
+        state: present
 
-- name: get list monitor
-  solace_get_queue_subscriptions:
-    api: monitor
-    queue_name: foo
-    query_params:
-      where:
-      - "subscriptionTopic==foo*"
-  register: result
+    - name: get list of exceptions
+      solace_get_acl_subscribe_topic_exceptions:
+        acl_profile_name: foo
 
-- name: print result
-  debug:
-    msg:
-    - "{{ result.result_list }}"
-    - "{{ result.result_list_count }}"
+    - name: replace list of exceptions
+      solace_acl_subscribe_topic_exceptions:
+        acl_profile_name: foo
+        topics:
+          - new_topic_1
+          - new_topic_2
+        state: exactly
+
+    - name: get list of exceptions
+      solace_get_acl_subscribe_topic_exceptions:
+        acl_profile_name: foo
+
+    - name: delete all exceptions
+      solace_acl_subscribe_topic_exceptions:
+        acl_profile_name: foo
+        topics: null
+        state: exactly
+
+    - name: get list of exceptions
+      solace_get_acl_subscribe_topic_exceptions:
+        acl_profile_name: foo
+
+    - name: delete acl profile
+      solace_acl_profile:
+        name: foo
+        state: absent
 '''
 
 RETURN = '''
