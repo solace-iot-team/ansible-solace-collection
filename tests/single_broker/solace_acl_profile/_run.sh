@@ -23,13 +23,13 @@ INVENTORY_FILE="$WORKING_DIR/broker.inventory.yml"
 inventory=$(assertFile $scriptLogName $INVENTORY_FILE) || exit
 
 playbooks=(
-  # "$scriptDir/main.playbook.yml"
-  # "$scriptDir/ex_1.playbook.yml"
-  # "$scriptDir/get.playbook.yml"
-  # "$scriptDir/publish_topic_list.playbook.yml"
-  # "$scriptDir/subscribe_topic_list.playbook.yml"
-  # "$scriptDir/subscribe_share_name_list.playbook.yml"
-  "$scriptDir/client_connect_name_list.playbook.yml"  
+  "$scriptDir/main.playbook.yml"
+  "$scriptDir/ex_1.playbook.yml"
+  "$scriptDir/get.playbook.yml"
+  "$scriptDir/publish_topic_list.playbook.yml"
+  "$scriptDir/subscribe_topic_list.playbook.yml"
+  "$scriptDir/subscribe_share_name_list.playbook.yml"
+  "$scriptDir/client_connect_address_list.playbook.yml"  
 )
 
 ##############################################################################################################################

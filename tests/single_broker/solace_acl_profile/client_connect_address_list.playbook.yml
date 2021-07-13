@@ -54,21 +54,17 @@
         name: "{{ target.acl_profile_name }}"
         state: present
 
-
-    - fail:
-        msg: continue here
-
     # test present
     - set_fact:
-        list_name: present_share_name
+        list_name: present_client_connect_address
     - set_fact:
         list_name_length: "{{ target[list_name]|length }}"
     - name: "present: {{ list_name }}"
-      solace_acl_subscribe_share_name_exceptions:
+      solace_acl_client_connect_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[list_name] }}"
+        addresses: "{{ target[list_name] }}"
         state: present
-    - solace_get_acl_subscribe_share_name_exceptions:
+    - solace_get_acl_client_connect_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
       register: result
     - assert:
@@ -78,9 +74,9 @@
 
     # test present idempotency
     - name: "present:idempotency {{ list_name }}"
-      solace_acl_subscribe_share_name_exceptions:
+      solace_acl_client_connect_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[list_name] }}"
+        addresses: "{{ target[list_name] }}"
         state: present
       register: result
     - assert:
@@ -90,9 +86,9 @@
 
     # test absent
     - name: "absent: {{ list_name }}"
-      solace_acl_subscribe_share_name_exceptions:
+      solace_acl_client_connect_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[list_name] }}"
+        addresses: "{{ target[list_name] }}"
         state: absent
       register: result
     - assert:
@@ -101,9 +97,9 @@
           - result.response|length == list_name_length|int
     # test absent idempotency
     - name: "absent:idempotency: {{ list_name }}"
-      solace_acl_subscribe_share_name_exceptions:
+      solace_acl_client_connect_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[list_name] }}"
+        addresses: "{{ target[list_name] }}"
         state: absent
       register: result
     - assert:
@@ -113,13 +109,13 @@
 
     # test exactly on empty
     - set_fact:
-        list_name: exactly_share_name
+        list_name: exactly_client_connect_address
     - set_fact:
         list_name_length: "{{ target[list_name]|length }}"
     - name: "exactly:on-empty:{{ list_name }}"
-      solace_acl_subscribe_share_name_exceptions:
+      solace_acl_client_connect_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[list_name] }}"
+        addresses: "{{ target[list_name] }}"
         state: exactly
       register: result
     - assert:
@@ -128,13 +124,13 @@
           - result.response|length == list_name_length|int
     # test exactly idempotency
     - set_fact:
-        list_name: exactly_share_name
+        list_name: exactly_client_connect_address
     - set_fact:
         list_name_length: "{{ target[list_name]|length }}"
     - name: "exactly:idempotency:{{ list_name }}"
-      solace_acl_subscribe_share_name_exceptions:
+      solace_acl_client_connect_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[list_name] }}"
+        addresses: "{{ target[list_name] }}"
         state: exactly
       register: result
     - assert:
@@ -143,26 +139,26 @@
           - result.response|length == 0
     # test exactly on full
     - set_fact:
-        present_list_name: present_share_name
-        exactly_list_name: exactly_share_name
+        present_list_name: present_client_connect_address
+        exactly_list_name: exactly_client_connect_address
     - set_fact:
         present_list_name_length: "{{ target[present_list_name]|length }}"
         exactly_list_name_length: "{{ target[exactly_list_name]|length }}"
     - name: "present: {{ present_list_name }}"
-      solace_acl_subscribe_share_name_exceptions:
+      solace_acl_client_connect_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[present_list_name] }}"
+        addresses: "{{ target[present_list_name] }}"
         state: present
     - name: "exactly:on-full:{{ exactly_list_name }}"
-      solace_acl_subscribe_share_name_exceptions:
+      solace_acl_client_connect_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[exactly_list_name] }}"
+        addresses: "{{ target[exactly_list_name] }}"
         state: exactly
       register: result
     - assert:
         that:
           - result.changed == True
-    - solace_get_acl_subscribe_share_name_exceptions:
+    - solace_get_acl_client_connect_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
       register: result
     - assert:

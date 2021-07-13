@@ -33,22 +33,22 @@ good:
   - share_name_1
   - share_name_2
   - share_name_3
-  present_connect_address:
-  - share_name_1
-  - share_name_2
-  - share_name_3
-  - share_name_4
-  - share_name_5
-  - share_name_6
-  - share_name_7
-  absent_connect_address:
-  - share_name_4
-  - share_name_5
-  - share_name_6
-  exactly_connect_address:
-  - share_name_1
-  - share_name_2
-  - share_name_3
+  present_client_connect_address:
+  - 10.2.3.11/1
+  - 10.2.3.11/2
+  - 10.2.3.11/3
+  - 10.2.3.11/4
+  - 10.2.3.11/5
+  - 10.2.3.11/6
+  - 10.2.3.11/7
+  absent_client_connect_address:
+  - 10.2.3.11/4
+  - 10.2.3.11/5
+  - 10.2.3.11/6
+  exactly_client_connect_address:
+  - 10.2.3.11/1
+  - 10.2.3.11/2
+  - 10.2.3.11/3
 
 # exceptions:
 #   acl_profile_name: asc-test-profile-exceptions
