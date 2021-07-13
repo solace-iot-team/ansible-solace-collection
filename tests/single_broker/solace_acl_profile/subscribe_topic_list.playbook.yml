@@ -38,7 +38,7 @@
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
   pre_tasks:
   - include_vars:
-      file: "acl-topic-list.vars.yml"
+      file: "acl-lists.vars.yml"
       name: target_vars
   tasks:
     - set_fact:

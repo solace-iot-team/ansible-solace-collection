@@ -17,6 +17,39 @@ good:
   - topic_1
   - topic_2
   - topic_3
+  present_share_name:
+  - share_name_1
+  - share_name_2
+  - share_name_3
+  - share_name_4
+  - share_name_5
+  - share_name_6
+  - share_name_7
+  absent_share_name:
+  - share_name_4
+  - share_name_5
+  - share_name_6
+  exactly_share_name:
+  - share_name_1
+  - share_name_2
+  - share_name_3
+  present_connect_address:
+  - share_name_1
+  - share_name_2
+  - share_name_3
+  - share_name_4
+  - share_name_5
+  - share_name_6
+  - share_name_7
+  absent_connect_address:
+  - share_name_4
+  - share_name_5
+  - share_name_6
+  exactly_connect_address:
+  - share_name_1
+  - share_name_2
+  - share_name_3
+
 # exceptions:
 #   acl_profile_name: asc-test-profile-exceptions
 #   present_good:

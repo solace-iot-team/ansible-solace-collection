@@ -27,7 +27,9 @@ playbooks=(
   # "$scriptDir/ex_1.playbook.yml"
   # "$scriptDir/get.playbook.yml"
   # "$scriptDir/publish_topic_list.playbook.yml"
-  "$scriptDir/subscribe_topic_list.playbook.yml"
+  # "$scriptDir/subscribe_topic_list.playbook.yml"
+  # "$scriptDir/subscribe_share_name_list.playbook.yml"
+  "$scriptDir/client_connect_name_list.playbook.yml"  
 )
 
 ##############################################################################################################################

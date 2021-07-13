@@ -2,7 +2,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "publish_topic_list"
+  name: "client_connect_address_list"
   hosts: all
   gather_facts: no
   any_errors_fatal: true
@@ -18,7 +18,7 @@
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_acl_publish_topic_exceptions:
+    solace_acl_client_connect_exceptions:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -27,7 +27,7 @@
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_get_acl_publish_topic_exceptions:
+    solace_get_acl_client_connect_exceptions:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -54,28 +54,33 @@
         name: "{{ target.acl_profile_name }}"
         state: present
 
+
+    - fail:
+        msg: continue here
+
     # test present
     - set_fact:
-        topic_list_name: present_topics_1
+        list_name: present_share_name
     - set_fact:
-        topic_list_name_length: "{{ target[topic_list_name]|length }}"
-    - name: "present: {{ topic_list_name }}"
-      solace_acl_publish_topic_exceptions:
+        list_name_length: "{{ target[list_name]|length }}"
+    - name: "present: {{ list_name }}"
+      solace_acl_subscribe_share_name_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[topic_list_name] }}"
+        topics: "{{ target[list_name] }}"
         state: present
-    - solace_get_acl_publish_topic_exceptions:
+    - solace_get_acl_subscribe_share_name_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
       register: result
     - assert:
         that:
-          - result.result_list|length == topic_list_name_length|int
-          - result.result_list_count == topic_list_name_length|int
+          - result.result_list|length == list_name_length|int
+          - result.result_list_count == list_name_length|int
+
     # test present idempotency
-    - name: "present:idempotency {{ topic_list_name }}"
-      solace_acl_publish_topic_exceptions:
+    - name: "present:idempotency {{ list_name }}"
+      solace_acl_subscribe_share_name_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[topic_list_name] }}"
+        topics: "{{ target[list_name] }}"
         state: present
       register: result
     - assert:
@@ -84,21 +89,21 @@
           - result.response|length == 0
 
     # test absent
-    - name: "absent: {{ topic_list_name }}"
-      solace_acl_publish_topic_exceptions:
+    - name: "absent: {{ list_name }}"
+      solace_acl_subscribe_share_name_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[topic_list_name] }}"
+        topics: "{{ target[list_name] }}"
         state: absent
       register: result
     - assert:
         that:
           - result.changed == True
-          - result.response|length == topic_list_name_length|int
+          - result.response|length == list_name_length|int
     # test absent idempotency
-    - name: "absent:idempotency: {{ topic_list_name }}"
-      solace_acl_publish_topic_exceptions:
+    - name: "absent:idempotency: {{ list_name }}"
+      solace_acl_subscribe_share_name_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[topic_list_name] }}"
+        topics: "{{ target[list_name] }}"
         state: absent
       register: result
     - assert:
@@ -108,28 +113,28 @@
 
     # test exactly on empty
     - set_fact:
-        topic_list_name: exactly_topics_1
+        list_name: exactly_share_name
     - set_fact:
-        topic_list_name_length: "{{ target[topic_list_name]|length }}"
-    - name: "exactly:on-empty:{{ topic_list_name }}"
-      solace_acl_publish_topic_exceptions:
+        list_name_length: "{{ target[list_name]|length }}"
+    - name: "exactly:on-empty:{{ list_name }}"
+      solace_acl_subscribe_share_name_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[topic_list_name] }}"
+        topics: "{{ target[list_name] }}"
         state: exactly
       register: result
     - assert:
         that:
           - result.changed == True
-          - result.response|length == topic_list_name_length|int
+          - result.response|length == list_name_length|int
     # test exactly idempotency
     - set_fact:
-        topic_list_name: exactly_topics_1
+        list_name: exactly_share_name
     - set_fact:
-        topic_list_name_length: "{{ target[topic_list_name]|length }}"
-    - name: "exactly:idempotency:{{ topic_list_name }}"
-      solace_acl_publish_topic_exceptions:
+        list_name_length: "{{ target[list_name]|length }}"
+    - name: "exactly:idempotency:{{ list_name }}"
+      solace_acl_subscribe_share_name_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[topic_list_name] }}"
+        topics: "{{ target[list_name] }}"
         state: exactly
       register: result
     - assert:
@@ -138,32 +143,32 @@
           - result.response|length == 0
     # test exactly on full
     - set_fact:
-        present_topic_list_name: present_topics_1
-        exactly_topic_list_name: exactly_topics_1
+        present_list_name: present_share_name
+        exactly_list_name: exactly_share_name
     - set_fact:
-        present_topic_list_name_length: "{{ target[present_topic_list_name]|length }}"
-        exactly_topic_list_name_length: "{{ target[exactly_topic_list_name]|length }}"
-    - name: "present: {{ present_topic_list_name }}"
-      solace_acl_publish_topic_exceptions:
+        present_list_name_length: "{{ target[present_list_name]|length }}"
+        exactly_list_name_length: "{{ target[exactly_list_name]|length }}"
+    - name: "present: {{ present_list_name }}"
+      solace_acl_subscribe_share_name_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[present_topic_list_name] }}"
+        topics: "{{ target[present_list_name] }}"
         state: present
-    - name: "exactly:on-full:{{ exactly_topic_list_name }}"
-      solace_acl_publish_topic_exceptions:
+    - name: "exactly:on-full:{{ exactly_list_name }}"
+      solace_acl_subscribe_share_name_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
-        topics: "{{ target[exactly_topic_list_name] }}"
+        topics: "{{ target[exactly_list_name] }}"
         state: exactly
       register: result
     - assert:
         that:
           - result.changed == True
-    - solace_get_acl_publish_topic_exceptions:
+    - solace_get_acl_subscribe_share_name_exceptions:
         acl_profile_name: "{{ target.acl_profile_name }}"
       register: result
     - assert:
         that:
-          - result.result_list|length == exactly_topic_list_name_length|int
-          - result.result_list_count == exactly_topic_list_name_length|int
+          - result.result_list|length == exactly_list_name_length|int
+          - result.result_list_count == exactly_list_name_length|int
 
     - name: delete acl profile
       solace_acl_profile:
