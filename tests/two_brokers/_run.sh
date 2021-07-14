@@ -20,6 +20,7 @@ source $PROJECT_HOME/.lib/functions.sh
       "setup"
       "solace_facts"
       "solace_bridges"
+      "apim"
       "teardown"
     )
   fi

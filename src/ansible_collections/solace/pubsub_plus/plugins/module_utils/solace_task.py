@@ -305,8 +305,8 @@ class SolaceCRUDTask(SolaceTask):
         args = self.get_args()
         new_settings = self.get_new_settings()
         _current_settings = self.get_func(*args)
-        current_settings = self.normalize_current_settings(
-            _current_settings, new_settings)
+        current_settings = self.normalize_current_settings(_current_settings,
+                                                           new_settings)
         new_state = self.get_module().params['state']
         # delete if exists
         if new_state == 'absent':
@@ -387,6 +387,10 @@ class SolaceBrokerCRUDListTask(SolaceBrokerCRUDTask):
     def get_objects_result_data_object_key(self) -> str:
         raise SolaceInternalErrorAbstractMethod()
 
+    def get_new_settings(self) -> dict:
+        s = self.get_module().params[self.get_settings_arg_name()]
+        return self.normalize_new_settings(s)
+
     def get_crud_args(self, object_key) -> list:
         raise SolaceInternalErrorAbstractMethod()
 
@@ -454,6 +458,7 @@ class SolaceBrokerCRUDListTask(SolaceBrokerCRUDTask):
         self.set_result(self.create_result(rc=0, changed=False))
         state_object_combination_error = False
         new_state = params['state']
+        new_settings = self.get_new_settings()
         for target_key in target_key_list:
             crud_args = self.get_crud_args(target_key)
             target_key_exists = target_key in self.existing_key_list
@@ -461,7 +466,7 @@ class SolaceBrokerCRUDListTask(SolaceBrokerCRUDTask):
                 self.changed = True
                 if not is_check_mode:
                     try:
-                        _response = self.create_func(*crud_args)
+                        _response = self.create_func(*crud_args, new_settings)
                         self.created_key_list.append(target_key)
                     except Exception as ex:
                         self.do_rollback_on_error(target_key, ex)

@@ -25,7 +25,7 @@ notes:
 - "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/queue/createMsgVpnQueueSubscription"
 options:
   names:
-    description: The subscription topic. Maps to 'subscriptionTopic' in the API.
+    description: The subscription topic. Maps to 'subscriptionTopic' in the SEMP v2 API.
     required: true
     type: list
     aliases: [topics, subscription_topics]

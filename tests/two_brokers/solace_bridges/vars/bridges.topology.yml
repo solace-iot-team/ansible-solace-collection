@@ -12,14 +12,14 @@
         remote_host: local_broker
         remote_vpn: default
 
-    # unused
-    another_bridge:
-      host_3:
-        remote_host: host_4
-        remote_vpn: vpn-name
-      host_4:
-        remote_host: host_3
-        remote_vpn: vpn-name
+    # for doc example
+    bridge_1:
+      local_broker:
+        remote_host: asct_two_brokers
+        remote_vpn: asct_two_brokers
+      asct_two_brokers:
+        remote_host: local_broker
+        remote_vpn: default
 
 ###
 # The End.

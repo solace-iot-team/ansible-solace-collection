@@ -81,6 +81,10 @@ plugins/modules/solace_bridge_remote_vpn.py compile-2.7!skip
 plugins/modules/solace_bridge_remote_vpn.py pep8:E501
 plugins/modules/solace_bridge_remote_subscription.py compile-2.7!skip
 plugins/modules/solace_bridge_remote_subscription.py pep8:E501
+plugins/modules/solace_bridge_remote_subscriptions.py compile-2.7!skip
+plugins/modules/solace_bridge_remote_subscriptions.py pep8:E501
+plugins/modules/solace_get_bridge_remote_subscriptions.py compile-2.7!skip
+plugins/modules/solace_get_bridge_remote_subscriptions.py pep8:E501
 plugins/modules/solace_get_bridge_remote_vpns.py compile-2.7!skip
 plugins/modules/solace_bridge_trusted_cn.py compile-2.7!skip
 plugins/modules/solace_bridge_trusted_cn.py pep8:E501
