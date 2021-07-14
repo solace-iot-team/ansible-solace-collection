@@ -26,7 +26,7 @@ source $PROJECT_HOME/.lib/functions.sh
       "solace_oauth"
       "solace_facts"
       "solace_vpn"
-      # "solace_client_profile"
+      # "solace_client_profile" - broken solace cloud api: 14/July/2021
       "solace_acl_profile"
       "solace_rdp"
       "solace_cert_authority"
