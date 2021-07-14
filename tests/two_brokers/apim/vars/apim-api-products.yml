@@ -1,0 +1,32 @@
+---
+bridge_name: apim_bridge
+queue_name: apim_bridge
+provider_inventory_hostname: local_broker
+api_gw_inventory_hostname: asct_two_brokers
+api_products:
+  - name: api_product_1
+      # on provider broker
+    publish_guaranteed_topics:
+      - guaranteed/apim/api-product-1/fr/notifcation/>
+      - guaranteed/apim/api-product-1/de/notifcation/>
+    publish_direct_topics:
+      - direct/apim/api-product-1/fr/notifcation/>
+      - direct/apim/api-product-1/de/notifcation/>
+  - name: api_product_2
+      # on provider broker
+    publish_guaranteed_topics:
+      - guaranteed/apim/api-product-2/fr/update/>
+      - guaranteed/apim/api-product-2/de/update/>
+    publish_direct_topics:
+      - direct/apim/api-product-2/fr/update/>
+      - direct/apim/api-product-2/de/update/>
+      # on gw broker
+    subscribe_guaranteed_topics:
+      - guaranteed/apim/api-product-2/fr/status/>
+      - guaranteed/apim/api-product-2/de/status/>
+    subscribe_direct_topics:
+      - direct/apim/api-product-2/fr/status/>
+      - direct/apim/api-product-2/de/status/>
+
+###
+# The End.

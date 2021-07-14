@@ -1,0 +1,92 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "provision-apim-api-products"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_queue_subscriptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_bridge_remote_subscriptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  pre_tasks:
+  - include_vars:
+      file: "apim-api-products.yml"
+      name: apim_api_products
+  tasks:
+
+    - name: "remove all guaranteed topics from bridge queue"
+      solace_queue_subscriptions:
+        queue_name: "{{ apim_api_products.queue_name }}"
+        topics: null
+        state: exactly
+
+    - name: "remove all direct topics from bridge"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ apim_api_products.bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: null
+        state: exactly
+
+        # guaranteed topics go onto bridge queue on broker
+        # both sides for pub or sub
+    - name: "add publish guaranteed topics to provider bridge queue"
+      solace_queue_subscriptions:
+        queue_name: "{{ apim_api_products.queue_name }}"
+        topics: "{{ item.publish_guaranteed_topics | default([]) }}"
+        state: present
+      loop: "{{ apim_api_products.api_products }}"
+      when: inventory_hostname != apim_api_products.provider_inventory_hostname
+
+    - name: "add subscribe guaranteed topics to api-gw bridge queue"
+      solace_queue_subscriptions:
+        queue_name: "{{ apim_api_products.queue_name }}"
+        topics: "{{ item.subscribe_guaranteed_topics | default([]) }}"
+        state: present
+      loop: "{{ apim_api_products.api_products }}"
+      when: inventory_hostname != apim_api_products.api_gw_inventory_hostname
+
+        # reliable topics go onto bridge as remoteSubscriptions
+        # both sides for pub or sub
+    - name: "add subscribe direct topics to provider bridge queue"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ apim_api_products.bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: "{{ item.publish_direct_topics | default([]) }}"
+        settings:
+          deliverAlwaysEnabled: true
+        state: present
+      loop: "{{ apim_api_products.api_products }}"
+      when: inventory_hostname != apim_api_products.provider_inventory_hostname
+
+    - name: "add publish direct topics to api-gw bridge queue"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ apim_api_products.bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: "{{ item.subscribe_direct_topics | default([]) }}"
+        settings:
+          deliverAlwaysEnabled: true
+        state: present
+      loop: "{{ apim_api_products.api_products }}"
+      when: inventory_hostname != apim_api_products.api_gw_inventory_hostname
+
+###
+# The End.
