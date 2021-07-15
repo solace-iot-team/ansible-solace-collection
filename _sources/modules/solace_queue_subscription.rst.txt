@@ -75,6 +75,7 @@ See Also
 
    - :ref:`solace_queue_module`
    - :ref:`solace_get_queue_subscriptions_module`
+   - :ref:`solace_queue_subscriptions_module`
 
 
 

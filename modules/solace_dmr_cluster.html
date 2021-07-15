@@ -89,19 +89,19 @@
               
             
             
-              <p class="caption"><span class="caption-text">Using Solace PubSub+ Ansible Collection</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Using Solace PubSub+ Ansible Collection</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Solace PubSub+ Ansible Collection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Guides</span></p>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../basics.html">The Basics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../inventory-files.html">Best Practices for Ansible-Solace Inventory Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tips-tricks.html">Tips &amp; Tricks</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Modules &amp; Roles</span></p>
+<p class="caption" role="heading"><span class="caption-text">Modules &amp; Roles</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
@@ -110,14 +110,19 @@
 <li class="toctree-l2"><a class="reference internal" href="../solace_config_modules.html#idempotency">Idempotency</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../solace_config_modules.html#module-reference">Module Reference</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_client_connect_exception.html">solace_acl_client_connect_exception – client connect exception for acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_client_connect_exceptions.html">solace_acl_client_connect_exceptions – list of client connect address exceptions on an acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_profile.html">solace_acl_profile – configure acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_publish_topic_exception.html">solace_acl_publish_topic_exception – publish topic exception for acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_publish_topic_exceptions.html">solace_acl_publish_topic_exceptions – list of publish topic exceptions on an acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_share_name_exception.html">solace_acl_subscribe_share_name_exception – subscribe share name exception for acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_share_name_exceptions.html">solace_acl_subscribe_share_name_exceptions – list of subscribe share name exceptions on an acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_topic_exception.html">solace_acl_subscribe_topic_exception – subscribe topic exception for acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_topic_exceptions.html">solace_acl_subscribe_topic_exceptions – list of subscribe topic exceptions on an acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_authentication_oauth_provider.html">solace_authentication_oauth_provider – oauth provider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_authorization_group.html">solace_authorization_group – authorization group</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge.html">solace_bridge – bridge</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_subscription.html">solace_bridge_remote_subscription – remote subscription on a bridge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_subscriptions.html">solace_bridge_remote_subscriptions – list of remote subscriptions on a bridge</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_vpn.html">solace_bridge_remote_vpn – bridge remote vpn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge_trusted_cn.html">solace_bridge_trusted_cn – trusted common name for bridge</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_cert_authority.html">solace_cert_authority – certificate authority</a></li>
@@ -141,6 +146,7 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_queue_cancel_replay.html">solace_queue_cancel_replay – cancel replay on queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_queue_start_replay.html">solace_queue_start_replay – start replay on queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_queue_subscription.html">solace_queue_subscription – subscription on a queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_queue_subscriptions.html">solace_queue_subscriptions – list of subscriptions on a queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp.html">solace_rdp – rest delivery point</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_queue_binding.html">solace_rdp_queue_binding – queue bindining on rdp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer.html">solace_rdp_rest_consumer – rest consumer on rdp</a></li>
@@ -449,7 +455,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 01 Jun 2021 at 05:57.
+        Last updated on 15 Jul 2021 at 06:52.
       </span>
 
     </p>

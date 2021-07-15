@@ -1,0 +1,336 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_acl_client_connect_exceptions.py
+
+.. _solace_acl_client_connect_exceptions_module:
+
+solace_acl_client_connect_exceptions -- list of client connect address exceptions on an acl profile
+===================================================================================================
+
+Configure a list of Client Connect Address Exception objects on an ACL Profile in a single transaction.
+
+Allows addition and removal of a list of Client Connect Address Exception objects as well as replacement of all existing Client Connect Address Exception objects on an ACL Profile.
+
+Supports 'transactional' behavior with rollback to original list in case of error.
+
+De-duplicates Client Connect Address Exception object list.
+
+Reports which addresses were added, deleted and omitted (duplicates). In case of an error, reports the invalid Client Connect Address Exception object.
+
+To delete all Client Connect Address Exception objects, use state='exactly' with an empty/null list (see examples).
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+     hosts: all
+     gather_facts: no
+     any_errors_fatal: true
+     collections:
+       - solace.pubsub_plus
+     module_defaults:
+       solace_acl_profile:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         msg_vpn: "{{ vpn }}"
+         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+       solace_acl_client_connect_exceptions:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         msg_vpn: "{{ vpn }}"
+         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+       solace_get_acl_client_connect_exceptions:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         msg_vpn: "{{ vpn }}"
+         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+     tasks:
+       - name: create acl profile
+         solace_acl_profile:
+           name: foo
+           state: present
+
+       - name: add list of exceptions
+         solace_acl_client_connect_exceptions:
+           acl_profile_name: foo
+           addresses:
+           - 10.2.3.11/1
+           - 10.2.3.11/2
+           state: present
+
+       - name: get list of exceptions
+         solace_get_acl_client_connect_exceptions:
+           acl_profile_name: foo
+
+       - name: add second list of exceptions
+         solace_acl_client_connect_exceptions:
+           acl_profile_name: foo
+           addresses:
+           - 10.2.3.11/3
+           - 10.2.3.11/4
+           state: present
+
+       - name: get list of exceptions
+         solace_get_acl_client_connect_exceptions:
+           acl_profile_name: foo
+
+       - name: replace list of exceptions
+         solace_acl_client_connect_exceptions:
+           acl_profile_name: foo
+           addresses:
+           - 10.2.3.11/5
+           - 10.2.3.11/6
+           state: exactly
+
+       - name: get list of exceptions
+         solace_get_acl_client_connect_exceptions:
+           acl_profile_name: foo
+
+       - name: delete all exceptions
+         solace_acl_client_connect_exceptions:
+           acl_profile_name: foo
+           addresses: null
+           state: exactly
+
+       - name: get list of exceptions
+         solace_get_acl_client_connect_exceptions:
+           acl_profile_name: foo
+
+       - name: delete acl profile
+         solace_acl_profile:
+           name: foo
+           state: absent
+
+
+
+Notes
+-----
+
+.. note::
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/createMsgVpnAclProfileClientConnectException
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
+   - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_acl_profile_module`
+   - :ref:`solace_acl_client_connect_exception_module`
+   - :ref:`solace_get_acl_client_connect_exceptions_module`
+
+
+
+Parameters
+----------
+
+acl_profile_name (required)
+  The ACL Profile. Maps to 'aclProfileName' in the SEMP v2 API.
+
+  | **type**: str
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+msg_vpn (required)
+  The message vpn.
+
+  | **type**: str
+
+names (required)
+  The client addresses. Maps to 'clientConnectExceptionAddress' in the SEMP v2 API.
+
+  | **type**: list
+  | **aliases**: addresses
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+reverse_proxy (optional)
+  Use a reverse proxy / api gateway. Note: **Experimental. Not permitted for Solace Cloud API**.
+
+  | **type**: dict
+
+  headers (optional)
+    Additional headers to add to the http call. Example: 'apiKey: {my-api-key}'.
+
+    | **type**: dict
+
+    x-asc-module (optional)
+      Flag for the module to add the header 'x-asc-module:{module-name}' to the http call with it's module name.
+
+      | **type**: bool
+      | **default**: False
+
+    x-asc-module-op (optional)
+      Flag for the module to add the header 'x-asc-module-op:{module operation}' to the http call with the module's operation.
+
+      | **type**: bool
+      | **default**: False
+
+
+  query_params (optional)
+    Additional query paramters to add to the URL. Example: 'apiCode: {my-api-code}'.
+
+    | **type**: dict
+
+  semp_base_path (optional)
+    Base path prepended to all SEMP calls. Example: 'my/base/path'. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}
+
+    | **type**: str
+
+  use_basic_auth (optional)
+    Flag to use basic authentication in the http(s) call or not. Uses 'username'/'password'.
+
+    | **type**: bool
+    | **default**: False
+
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+  | **default**: False
+
+sempv2_settings (optional)
+  JSON dictionary of additional configuration for the SEMP V2 API. See Reference documentation.
+
+  | **type**: dict
+  | **aliases**: settings
+
+state (optional)
+  Target state for CRUD list operation.
+
+  | **type**: str
+  | **default**: present
+  | **choices**: present, absent, exactly
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+response
+  The response of the operation.
+
+  | **returned**: always
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "response": [
+         {
+           "error": "/invalid-topic"
+         }
+       ]
+     },
+     "success": {
+       "response": [
+         {
+           "added": "topic-6"
+         },
+         {
+           "added": "topic-7"
+         },
+         {
+           "added": "duplicate-topic"
+         },
+         {
+           "deleted": "topic-1"
+         },
+         {
+           "deleted": "topic-2"
+         },
+         {
+           "deleted": "topic-3"
+         },
+         {
+           "deleted": "topic-4"
+         },
+         {
+           "deleted": "topic-5"
+         },
+         {
+           "duplicate": "duplicate-topic"
+         }
+       ]
+     }
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+

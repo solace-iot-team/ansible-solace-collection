@@ -67,6 +67,7 @@ See Also
 
    - :ref:`solace_get_queues_module`
    - :ref:`solace_queue_subscription_module`
+   - :ref:`solace_queue_subscriptions_module`
    - :ref:`solace_queue_start_replay_module`
    - :ref:`solace_queue_cancel_replay_module`
 

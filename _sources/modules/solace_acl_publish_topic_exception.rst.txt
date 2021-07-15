@@ -81,6 +81,8 @@ See Also
 .. seealso::
 
    - :ref:`solace_acl_profile_module`
+   - :ref:`solace_acl_publish_topic_exceptions_module`
+   - :ref:`solace_get_acl_publish_topic_exceptions_module`
 
 
 
@@ -107,6 +109,7 @@ name (required)
   The name (topic) of the publish topic exception. Maps to 'publishTopicException' in the SEMP v2 API.
 
   | **type**: str
+  | **aliases**: topic
 
 password (optional)
   Administrator password for Solace Broker.

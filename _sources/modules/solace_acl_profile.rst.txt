@@ -66,6 +66,18 @@ See Also
 .. seealso::
 
    - :ref:`solace_get_acl_profiles_module`
+   - :ref:`solace_acl_subscribe_topic_exception_module`
+   - :ref:`solace_acl_subscribe_topic_exceptions_module`
+   - :ref:`solace_get_acl_subscribe_topic_exceptions_module`
+   - :ref:`solace_acl_client_connect_exception_module`
+   - :ref:`solace_acl_client_connect_exceptions_module`
+   - :ref:`solace_get_acl_client_connect_exceptions_module`
+   - :ref:`solace_acl_publish_topic_exception_module`
+   - :ref:`solace_acl_publish_topic_exceptions_module`
+   - :ref:`solace_get_acl_publish_topic_exceptions_module`
+   - :ref:`solace_acl_subscribe_share_name_exception_module`
+   - :ref:`solace_acl_subscribe_share_name_exceptions_module`
+   - :ref:`solace_get_acl_subscribe_share_name_exceptions_module`
 
 
 

@@ -1,0 +1,413 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_bridge_remote_subscriptions.py
+
+.. _solace_bridge_remote_subscriptions_module:
+
+solace_bridge_remote_subscriptions -- list of remote subscriptions on a bridge
+==============================================================================
+
+Configure a list of Remote Subscription objects on a Bridge in a single transaction.
+
+Allows addition and removal of a list of Remote Subscription objects as well as replacement of all existing Remote Subscription objects on a bridge.
+
+Supports 'transactional' behavior with rollback to original list in case of error.
+
+De-duplicates Remote Subscription object list.
+
+Reports which topics were added, deleted and omitted (duplicates). In case of an error, reports the invalid Remote Subscription object.
+
+To delete all Remote Subscription objects, use state='exactly' with an empty/null list (see examples).
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+     # ##########################################################################################
+     # sample_topology_file: bridges.topology.yml
+     #   bridges:
+     #     bridge_1:
+     #       # Notes:
+     #       # - the hosts and remote_hosts
+     #       #   must be the same name as in the main inventory
+     #       # - bridges always come in pairs and reference each other
+     #       broker_1:
+     #         remote_host: broker_2
+     #         remote_vpn: broker_2_vpn
+     #       broker_2:
+     #         remote_host: broker_1
+     #         remote_vpn: broker_1_vpn
+
+     hosts: all
+     gather_facts: no
+     any_errors_fatal: true
+     collections:
+       - solace.pubsub_plus
+     module_defaults:
+       solace_gather_facts:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+       solace_bridge:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         msg_vpn: "{{ vpn }}"
+         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+       solace_bridge_remote_vpn:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         msg_vpn: "{{ vpn }}"
+         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+       solace_bridge_remote_subscriptions:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         msg_vpn: "{{ vpn }}"
+         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+       solace_get_bridge_remote_subscriptions:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         msg_vpn: "{{ vpn }}"
+         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+     pre_tasks:
+     - include_vars:
+         file: "bridges.topology.yml"
+         name: bridges_topology
+     vars:
+         bridge_name: "bridge_1"
+     tasks:
+       - name: "main: solace_gather_facts"
+         solace_gather_facts:
+
+       - name: create bridge
+         solace_bridge:
+           name: "{{ bridge_name }}"
+           state: present
+
+       - name: extract correct parameters based on inventory_hostname
+         set_fact:
+           remote_inventory_hostname: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_host }}"
+           remote_vpn: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+
+       - name: get the remote bridge details from gathered facts
+         solace_get_facts:
+           hostvars: "{{ hostvars }}"
+           hostvars_inventory_hostname: "{{ remote_inventory_hostname }}"
+           msg_vpn: "{{ remote_vpn }}"
+           get_functions:
+             - get_vpnBridgeRemoteMsgVpnLocations
+         register: remote_host_bridge
+
+       - name: add the remove vpn
+         solace_bridge_remote_vpn:
+           name: "{{ remote_vpn }}"
+           bridge_name: "{{ bridge_name }}"
+           bridge_virtual_router: auto
+           # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
+           remote_vpn_location: "{{ remote_host_bridge.facts.vpnBridgeRemoteMsgVpnLocations.plain }}"
+           settings:
+             enabled: false
+             tlsEnabled: false
+             compressedDataEnabled: false
+           state: present
+
+       - name: delete all remote subscriptions
+         solace_bridge_remote_subscriptions:
+           bridge_name: "{{ bridge_name }}"
+           bridge_virtual_router: auto
+           remote_subscription_topics: null
+           state: exactly
+
+       - name: add remote subscriptions
+         solace_bridge_remote_subscriptions:
+           bridge_name: "{{ bridge_name }}"
+           bridge_virtual_router: auto
+           remote_subscription_topics:
+             - topic_1
+             - topic_2
+             - topic_3
+           settings:
+             deliverAlwaysEnabled: true
+           state: present
+
+       - name: delete remote subscriptions
+         solace_bridge_remote_subscriptions:
+           bridge_name: "{{ bridge_name }}"
+           bridge_virtual_router: auto
+           remote_subscription_topics:
+             - topic_3
+           state: absent
+
+       - name: set exactly remote subscriptions
+         solace_bridge_remote_subscriptions:
+           bridge_name: "{{ bridge_name }}"
+           bridge_virtual_router: auto
+           remote_subscription_topics:
+             - topic_4
+             - topic_5
+             - topic_6
+           settings:
+             deliverAlwaysEnabled: true
+           state: exactly
+
+       - name: get list of remote subscriptions
+         solace_get_bridge_remote_subscriptions:
+           bridge_name: "{{ bridge_name }}"
+           bridge_virtual_router: auto
+
+       - name: delete bridge
+         solace_bridge:
+           name: "{{ bridge_name }}"
+           virtual_router: auto
+           state: absent
+
+
+
+Notes
+-----
+
+.. note::
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/bridge/createMsgVpnBridgeRemoteSubscription
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
+   - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_bridge_module`
+   - :ref:`solace_bridge_remote_subscription_module`
+   - :ref:`solace_get_bridge_remote_subscriptions_module`
+
+
+
+Parameters
+----------
+
+bridge_name (required)
+  The bridge. Maps to 'bridgeName' in the API.
+
+  | **type**: str
+
+bridge_virtual_router (optional)
+  The bridge virtual router. Maps to 'bridgeVirtualRouter' in the API.
+
+  | **type**: str
+  | **default**: auto
+  | **choices**: primary, backup, auto
+  | **aliases**: virtual_router
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+msg_vpn (required)
+  The message vpn.
+
+  | **type**: str
+
+names (required)
+  The remote subscription topic. Maps to 'remoteSubscriptionTopic' in the SEMP v2 API.
+
+  | **type**: list
+  | **aliases**: topics, remote_subscription_topics
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+reverse_proxy (optional)
+  Use a reverse proxy / api gateway. Note: **Experimental. Not permitted for Solace Cloud API**.
+
+  | **type**: dict
+
+  headers (optional)
+    Additional headers to add to the http call. Example: 'apiKey: {my-api-key}'.
+
+    | **type**: dict
+
+    x-asc-module (optional)
+      Flag for the module to add the header 'x-asc-module:{module-name}' to the http call with it's module name.
+
+      | **type**: bool
+      | **default**: False
+
+    x-asc-module-op (optional)
+      Flag for the module to add the header 'x-asc-module-op:{module operation}' to the http call with the module's operation.
+
+      | **type**: bool
+      | **default**: False
+
+
+  query_params (optional)
+    Additional query paramters to add to the URL. Example: 'apiCode: {my-api-code}'.
+
+    | **type**: dict
+
+  semp_base_path (optional)
+    Base path prepended to all SEMP calls. Example: 'my/base/path'. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}
+
+    | **type**: str
+
+  use_basic_auth (optional)
+    Flag to use basic authentication in the http(s) call or not. Uses 'username'/'password'.
+
+    | **type**: bool
+    | **default**: False
+
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+  | **default**: False
+
+sempv2_settings (optional)
+  JSON dictionary of additional configuration for the SEMP V2 API. See Reference documentation.
+
+  | **type**: dict
+  | **aliases**: settings
+
+state (optional)
+  Target state for CRUD list operation.
+
+  | **type**: str
+  | **default**: present
+  | **choices**: present, absent, exactly
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+response
+  The response of the operation.
+
+  | **returned**: always
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "response": [
+         {
+           "error": "/invalid-topic"
+         }
+       ]
+     },
+     "success": {
+       "response": [
+         {
+           "added": "topic-6"
+         },
+         {
+           "added": "topic-7"
+         },
+         {
+           "added": "duplicate-topic"
+         },
+         {
+           "deleted": "topic-1"
+         },
+         {
+           "deleted": "topic-2"
+         },
+         {
+           "deleted": "topic-3"
+         },
+         {
+           "deleted": "topic-4"
+         },
+         {
+           "deleted": "topic-5"
+         },
+         {
+           "duplicate": "duplicate-topic"
+         }
+       ]
+     }
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+

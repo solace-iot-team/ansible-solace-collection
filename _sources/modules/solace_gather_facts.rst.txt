@@ -158,6 +158,12 @@ timeout (optional)
   | **type**: int
   | **default**: 10
 
+use_sempv1_also (optional)
+  Use the SEMPV1 API to extract the virtual router name. If set to False, functions that require the virtual router name will throw an Error.
+
+  | **type**: bool
+  | **default**: True
+
 username (optional)
   Administrator username for Solace Broker.
 

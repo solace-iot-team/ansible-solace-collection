@@ -1,0 +1,308 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_acl_subscribe_topic_exceptions.py
+
+.. _solace_get_acl_subscribe_topic_exceptions_module:
+
+solace_get_acl_subscribe_topic_exceptions -- get list of subscribe topic exceptions on an acl profile
+=====================================================================================================
+
+Get a list of Subscribe Topic Exception objects configured on an ACL Profile.
+
+Implements the config and monitor API.
+
+Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+     hosts: all
+     gather_facts: no
+     any_errors_fatal: true
+     collections:
+       - solace.pubsub_plus
+     module_defaults:
+       solace_acl_profile:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         msg_vpn: "{{ vpn }}"
+         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+       solace_acl_subscribe_topic_exceptions:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         msg_vpn: "{{ vpn }}"
+         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+       solace_get_acl_subscribe_topic_exceptions:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         msg_vpn: "{{ vpn }}"
+         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+     tasks:
+       - name: create acl profile
+         solace_acl_profile:
+           name: foo
+           state: present
+
+       - name: add list of exceptions
+         solace_acl_subscribe_topic_exceptions:
+           acl_profile_name: foo
+           topics:
+             - topic_1
+             - topic_2
+           state: present
+
+       - name: get list of exceptions
+         solace_get_acl_subscribe_topic_exceptions:
+           acl_profile_name: foo
+
+       - name: add second list of exceptions
+         solace_acl_subscribe_topic_exceptions:
+           acl_profile_name: foo
+           topics:
+             - topic_3
+             - topic_4
+           state: present
+
+       - name: get list of exceptions
+         solace_get_acl_subscribe_topic_exceptions:
+           acl_profile_name: foo
+
+       - name: replace list of exceptions
+         solace_acl_subscribe_topic_exceptions:
+           acl_profile_name: foo
+           topics:
+             - new_topic_1
+             - new_topic_2
+           state: exactly
+
+       - name: get list of exceptions
+         solace_get_acl_subscribe_topic_exceptions:
+           acl_profile_name: foo
+
+       - name: delete all exceptions
+         solace_acl_subscribe_topic_exceptions:
+           acl_profile_name: foo
+           topics: null
+           state: exactly
+
+       - name: get list of exceptions
+         solace_get_acl_subscribe_topic_exceptions:
+           acl_profile_name: foo
+
+       - name: delete acl profile
+         solace_acl_profile:
+           name: foo
+           state: absent
+
+
+
+Notes
+-----
+
+.. note::
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfileSubscribeTopicExceptions
+   - Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/aclProfile/getMsgVpnAclProfileSubscribeTopicExceptions
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
+   - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_acl_subscribe_topic_exception_module`
+   - :ref:`solace_acl_subscribe_topic_exceptions_module`
+   - :ref:`solace_acl_profile_module`
+
+
+
+Parameters
+----------
+
+acl_profile_name (required)
+  The name of the ACL Profile. Maps to 'aclProfileName' in the SEMP v2 API.
+
+  | **type**: str
+
+api (optional)
+  The API the query should run against.
+
+  | **type**: str
+  | **default**: config
+  | **choices**: config, monitor
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+msg_vpn (required)
+  The message vpn.
+
+  | **type**: str
+
+page_count (optional)
+  The number of results to be fetched from broker in single call. Note: always returns the entire result set by following the cursor.
+
+  | **type**: int
+  | **default**: 100
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+query_params (optional)
+  The query parameters.
+
+  | **type**: dict
+  | **default**: {}
+
+  select (optional)
+    Include in the response only selected attributes of the object, or exclude from the response selected attributes of the object. See the documentation for the select parameter.
+
+    | **type**: list
+    | **default**: []
+
+  where (optional)
+    Include in the response only objects where certain conditions are true. See the the documentation for the where parameter.
+
+    Note: URL encoded automatically, you can safely use '/, <, <=, >, >=, != .. '
+
+    | **type**: list
+    | **default**: []
+
+
+reverse_proxy (optional)
+  Use a reverse proxy / api gateway. Note: **Experimental. Not permitted for Solace Cloud API**.
+
+  | **type**: dict
+
+  headers (optional)
+    Additional headers to add to the http call. Example: 'apiKey: {my-api-key}'.
+
+    | **type**: dict
+
+    x-asc-module (optional)
+      Flag for the module to add the header 'x-asc-module:{module-name}' to the http call with it's module name.
+
+      | **type**: bool
+      | **default**: False
+
+    x-asc-module-op (optional)
+      Flag for the module to add the header 'x-asc-module-op:{module operation}' to the http call with the module's operation.
+
+      | **type**: bool
+      | **default**: False
+
+
+  query_params (optional)
+    Additional query paramters to add to the URL. Example: 'apiCode: {my-api-code}'.
+
+    | **type**: dict
+
+  semp_base_path (optional)
+    Base path prepended to all SEMP calls. Example: 'my/base/path'. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}
+
+    | **type**: str
+
+  use_basic_auth (optional)
+    Flag to use basic authentication in the http(s) call or not. Uses 'username'/'password'.
+
+    | **type**: bool
+    | **default**: False
+
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+  | **default**: False
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+result_list
+  The list of objects found containing requested fields. Payload depends on API called.
+
+  | **returned**: success
+  | **type**: list
+
+result_list_count
+  Number of items in result_list.
+
+  | **returned**: success
+  | **type**: int
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+
