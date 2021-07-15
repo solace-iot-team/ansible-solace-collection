@@ -1,0 +1,97 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "publish_topic_list.doc-example"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_acl_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_acl_publish_topic_exceptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_get_acl_publish_topic_exceptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  tasks:
+    - name: create acl profile
+      solace_acl_profile:
+        name: foo
+        state: present
+
+    - name: add list of exceptions
+      solace_acl_publish_topic_exceptions:
+        acl_profile_name: foo
+        topics:
+          - topic_1
+          - topic_2
+        state: present
+
+    - name: get list of exceptions
+      solace_get_acl_publish_topic_exceptions:
+        acl_profile_name: foo
+
+    - name: add second list of exceptions
+      solace_acl_publish_topic_exceptions:
+        acl_profile_name: foo
+        topics:
+          - topic_3
+          - topic_4
+        state: present
+
+    - name: get list of exceptions
+      solace_get_acl_publish_topic_exceptions:
+        acl_profile_name: foo
+
+    - name: replace list of exceptions
+      solace_acl_publish_topic_exceptions:
+        acl_profile_name: foo
+        topics:
+          - new_topic_1
+          - new_topic_2
+        state: exactly
+
+    - name: get list of exceptions
+      solace_get_acl_publish_topic_exceptions:
+        acl_profile_name: foo
+
+    - name: delete all exceptions
+      solace_acl_publish_topic_exceptions:
+        acl_profile_name: foo
+        topics: null
+        state: exactly
+
+    - name: get list of exceptions
+      solace_get_acl_publish_topic_exceptions:
+        acl_profile_name: foo
+
+    - name: delete acl profile
+      solace_acl_profile:
+        name: foo
+        state: absent
+
+###
+# The End.

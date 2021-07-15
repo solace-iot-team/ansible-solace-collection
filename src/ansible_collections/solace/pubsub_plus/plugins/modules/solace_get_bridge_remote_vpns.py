@@ -152,7 +152,7 @@ msg:
   returned: error
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerGetPagingTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
@@ -168,23 +168,26 @@ class SolaceGetBridgeRemoteVpnsTask(SolaceBrokerGetPagingTask):
 
     def get_path_array(self, params: dict) -> list:
         # GET /msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteMsgVpns
-        bridge_uri = ','.join([params['bridge_name'], params['bridge_virtual_router']])
+        bridge_uri = ','.join(
+            [params['bridge_name'], params['bridge_virtual_router']])
         return ['msgVpns', params['msg_vpn'], 'bridges', bridge_uri, 'remoteMsgVpns']
 
 
 def run_module():
     module_args = dict(
         bridge_name=dict(type='str', required=True),
-        bridge_virtual_router=dict(type='str', default='auto', choices=['primary', 'backup', 'auto'])
+        bridge_virtual_router=dict(type='str', default='auto', choices=[
+                                   'primary', 'backup', 'auto'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
-    arg_spec.update(SolaceTaskBrokerConfig.arg_spec_get_object_list_config_montor())
+    arg_spec.update(
+        SolaceTaskBrokerConfig.arg_spec_get_object_list_config_montor())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
     solace_task = SolaceGetBridgeRemoteVpnsTask(module)
     solace_task.execute()

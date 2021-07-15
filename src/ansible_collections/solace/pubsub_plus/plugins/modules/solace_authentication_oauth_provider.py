@@ -92,7 +92,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -113,7 +113,8 @@ class SolaceAuthenticationOAuthProviderTask(SolaceBrokerCRUDTask):
 
     def get_func(self, vpn_name, oauth_provider_name):
         # GET /msgVpns/{msgVpnName}/authenticationOauthProviders/{oauthProviderName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'authenticationOauthProviders', oauth_provider_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'authenticationOauthProviders', oauth_provider_name]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, oauth_provider_name, settings=None):
@@ -123,23 +124,27 @@ class SolaceAuthenticationOAuthProviderTask(SolaceBrokerCRUDTask):
             self.OBJECT_KEY: oauth_provider_name
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'authenticationOauthProviders']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'authenticationOauthProviders']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def update_func(self, vpn_name, oauth_provider_name, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/authenticationOauthProviders/{oauthProviderName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'authenticationOauthProviders', oauth_provider_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'authenticationOauthProviders', oauth_provider_name]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
     def delete_func(self, vpn_name, oauth_provider_name):
         # DELETE /msgVpns/{msgVpnName}/authenticationOauthProviders/{oauthProviderName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'authenticationOauthProviders', oauth_provider_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'authenticationOauthProviders', oauth_provider_name]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True, aliases=['oauth_provider', 'oauth_provider_name'])
+        name=dict(type='str', required=True, aliases=[
+                  'oauth_provider', 'oauth_provider_name'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
@@ -148,7 +153,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
     solace_task = SolaceAuthenticationOAuthProviderTask(module)
     solace_task.execute()

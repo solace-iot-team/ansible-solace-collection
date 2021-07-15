@@ -1,5 +1,40 @@
 # Release Notes
 
+## Version: 1.5.0
+Framework Enhancements & New Modules
+
+**New Modules**
+* **[solace_queue_subscriptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_queue_subscriptions.html)**
+* **[solace_get_acl_publish_topic_exceptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_acl_publish_topic_exceptions.html)**
+* **[solace_acl_publish_topic_exceptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_acl_publish_topic_exceptions.html)**
+* **[solace_get_acl_subscribe_topic_exceptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_acl_subscribe_topic_exceptions.html)**
+* **[solace_acl_subscribe_topic_exceptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_acl_subscribe_topic_exceptions.html)**
+* **[solace_get_acl_subscribe_share_name_exceptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_acl_subscribe_share_name_exceptions.html)**
+* **[solace_acl_subscribe_share_name_exceptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_acl_subscribe_share_name_exceptions.html)**
+* **[solace_get_acl_client_connect_exceptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_acl_client_connect_exceptions.html)**
+* **[solace_acl_client_connect_exceptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_acl_client_connect_exceptions.html)**
+* **[solace_get_bridge_remote_subscriptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_bridge_remote_subscriptions.html)**
+* **[solace_bridge_remote_subscriptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_bridge_remote_subscriptions.html)**
+
+**Updated Modules**
+* **[solace_gather_facts](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_gather_facts.html)**
+  - added an argument: `use_sempv1_also: [true|false]`. defaults to `true`. if `true`, module uses sempv1 to get the virtual router name for a self-hosted service.
+
+**Framework**
+* **new: SolaceBrokerCRUDListTask**
+  - manage lists of names (topics) as a 'transaction'
+
+**Devel**
+* **README, devel.requirements.txt**
+  - remove install of ansible to allow for choice of version
+
+**Misc**
+* adapted import statements for new pylint version throughout
+
+**Documentation**
+- added a note that modules do not support check-mode
+
+
 ## Version: 1.4.4
 Maintenance: Support for Ansible 2.11.x
 

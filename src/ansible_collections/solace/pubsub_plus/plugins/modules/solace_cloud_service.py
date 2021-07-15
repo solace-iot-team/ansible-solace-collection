@@ -196,7 +196,7 @@ msg:
     returned: error
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceCloudCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudServiceConfig
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceCloudApi
@@ -223,9 +223,11 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
         service_id = params.get(self.get_config().PARAM_SERVICE_ID, None)
         state = params['state']
         if state == 'present' and not name:
-            raise SolaceParamsValidationError('name', name, "required for state='present'")
+            raise SolaceParamsValidationError(
+                'name', name, "required for state='present'")
         if state == 'absent' and not name and not service_id:
-            raise SolaceParamsValidationError(f"name, {self.get_config().PARAM_SERVICE_ID}", name, "at least one is required for state='absent'")
+            raise SolaceParamsValidationError(
+                f"name, {self.get_config().PARAM_SERVICE_ID}", name, "at least one is required for state='absent'")
 
     def get_args(self):
         params = self.get_module().params
@@ -238,7 +240,8 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
     def get_func(self, key, value):
         if key == self.KEY_NAME:
             services = self.solace_cloud_api.get_services(self.get_config())
-            service = self.solace_cloud_api.find_service_by_name_in_services(services, value)
+            service = self.solace_cloud_api.find_service_by_name_in_services(
+                services, value)
             if not service:
                 return None
             service_id = service[self.KEY_SERVICE_ID]
@@ -246,22 +249,28 @@ class SolaceCloudServiceTask(SolaceCloudCRUDTask):
             service_id = value
         # save service_id
         self._service_id = service_id
-        service = self.solace_cloud_api.get_service(self.get_config(), self._service_id)
+        service = self.solace_cloud_api.get_service(
+            self.get_config(), self._service_id)
         if not service:
             return None
         if service['creationState'] == 'failed':
-            logging.debug("solace cloud service '%s' in failed state - deleting ...", value)
-            _resp = self.solace_cloud_api.delete_service(self.get_config(), self._service_id)
+            logging.debug(
+                "solace cloud service '%s' in failed state - deleting ...", value)
+            _resp = self.solace_cloud_api.delete_service(
+                self.get_config(), self._service_id)
             return None
         wait_timeout_minutes = self.get_module().params['wait_timeout_minutes']
         if service['creationState'] != 'completed' and wait_timeout_minutes > 0:
-            logging.debug("solace cloud service creationState not completed (creationState=%s) - waiting to complete ...", service['creationState'])
-            service = self.solace_cloud_api.wait_for_service_create_completion(self.get_config(), wait_timeout_minutes, self._service_id)
+            logging.debug(
+                "solace cloud service creationState not completed (creationState=%s) - waiting to complete ...", service['creationState'])
+            service = self.solace_cloud_api.wait_for_service_create_completion(
+                self.get_config(), wait_timeout_minutes, self._service_id)
         return service
 
     def create_func(self, key, name, settings=None):
         if not settings:
-            raise SolaceParamsValidationError('settings', settings, "required for creating a service")
+            raise SolaceParamsValidationError(
+                'settings', settings, "required for creating a service")
         data = {
             'adminState': 'start',
             'partitionId': 'default',
@@ -300,14 +309,16 @@ def run_module():
         wait_timeout_minutes=dict(type='int', required=False, default=30)
     )
     arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud()
-    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service_id())
+    arg_spec.update(
+        SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service_id())
     arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_state())
-    arg_spec.update(SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_settings())
+    arg_spec.update(
+        SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_settings())
     arg_spec.update(module_args)
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceCloudServiceTask(module)

@@ -24,6 +24,7 @@ options:
     description: Name of the subscribe share name exception topic. Maps to 'subscribeShareNameException' in the API.
     required: true
     type: str
+    aliases: [topic]
   acl_profile_name:
     description: The ACL Profile.
     required: true
@@ -41,6 +42,10 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.state
 - solace.pubsub_plus.solace.sempv2_settings
+seealso:
+- module: solace_acl_profile
+- module: solace_acl_subscribe_share_name_exceptions
+- module: solace_get_acl_subscribe_share_name_exceptions
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -114,7 +119,9 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -129,6 +136,13 @@ class SolaceACLSubscribeShareNameExceptionTask(SolaceBrokerCRUDTask):
         super().__init__(module)
         self.sempv2_api = SolaceSempV2Api(module)
 
+    def validate_params(self):
+        topic = self.get_module().params['name']
+        if SolaceUtils.doesStringContainAnyWhitespaces(topic):
+            raise SolaceParamsValidationError('topic',
+                                              topic, "must not contain any whitespace")
+        return super().validate_params()
+
     def get_args(self):
         params = self.get_module().params
         return [params['msg_vpn'], params['acl_profile_name'], params['topic_syntax'], params['name']]
@@ -136,7 +150,8 @@ class SolaceACLSubscribeShareNameExceptionTask(SolaceBrokerCRUDTask):
     def get_func(self, vpn_name, acl_profile_name, topic_syntax, subscribe_share_name_exception):
         # GET /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeShareNameExceptions/{subscribeShareNameExceptionSyntax},{subscribeShareNameException}
         ex_uri = ','.join([topic_syntax, subscribe_share_name_exception])
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, 'subscribeShareNameExceptions', ex_uri]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name,
+                      'aclProfiles', acl_profile_name, 'subscribeShareNameExceptions', ex_uri]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, acl_profile_name, topic_syntax, subscribe_share_name_exception, settings=None):
@@ -148,20 +163,23 @@ class SolaceACLSubscribeShareNameExceptionTask(SolaceBrokerCRUDTask):
             'subscribeShareNameExceptionSyntax': topic_syntax
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, 'subscribeShareNameExceptions']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name,
+                      'aclProfiles', acl_profile_name, 'subscribeShareNameExceptions']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def delete_func(self, vpn_name, acl_profile_name, topic_syntax, subscribe_share_name_exception):
         # DELETE /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeShareNameExceptions/{subscribeShareNameExceptionSyntax},{subscribeShareNameException}
         ex_uri = ','.join([topic_syntax, subscribe_share_name_exception])
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'aclProfiles', acl_profile_name, 'subscribeShareNameExceptions', ex_uri]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name,
+                      'aclProfiles', acl_profile_name, 'subscribeShareNameExceptions', ex_uri]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
         acl_profile_name=dict(type='str', required=True),
-        topic_syntax=dict(type='str', default='smf', choices=['smf', 'mqtt'])
+        topic_syntax=dict(type='str', default='smf', choices=['smf', 'mqtt']),
+        name=dict(type='str', required=True, aliases=['topic'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
@@ -170,7 +188,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceACLSubscribeShareNameExceptionTask(module)

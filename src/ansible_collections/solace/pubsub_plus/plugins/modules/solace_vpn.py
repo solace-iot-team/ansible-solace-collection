@@ -114,7 +114,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
@@ -192,14 +192,16 @@ class SolaceVpnTask(SolaceBrokerCRUDTask):
         if new_settings:
             SolaceUtils.type_conversion(new_settings, False)
             if self.get_config().is_solace_cloud():
-                new_settings = self._normalize_new_settings_solace_cloud(new_settings)
+                new_settings = self._normalize_new_settings_solace_cloud(
+                    new_settings)
         return new_settings
 
     def get_func(self, vpn_name):
         # notes:
         # - solace-cloud: could get the settings via: GET the service: msgVpnAttributes. but looks like they are the same
         # GET /msgVpns/{msgVpnName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, settings=None):
@@ -225,11 +227,13 @@ class SolaceVpnTask(SolaceBrokerCRUDTask):
             _solace_cloud_api_settings.update({
                 key: settings[key] if key in settings else self.current_settings[key]
             })
-        _solace_cloud_api_settings = self._convert_new_settings_to_solace_cloud_api(_solace_cloud_api_settings)
+        _solace_cloud_api_settings = self._convert_new_settings_to_solace_cloud_api(
+            _solace_cloud_api_settings)
         # POST: services/{service-id}}/requests/updateAuthenticationRequests
         module_op = SolaceTaskOps.OP_UPDATE_OBJECT
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES, service_id, SolaceCloudApi.API_REQUESTS, 'updateAuthenticationRequests']
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+                      service_id, SolaceCloudApi.API_REQUESTS, 'updateAuthenticationRequests']
         solace_cloud_resp = self.solace_cloud_api.make_service_post_request(
             self.get_config(),
             path_array,
@@ -241,7 +245,8 @@ class SolaceVpnTask(SolaceBrokerCRUDTask):
         _sempv2_api_settings = self._remove_solace_cloud_keys(settings)
         sempv2_resp = {}
         if _sempv2_api_settings:
-            sempv2_resp = self._update_func_sempv2(vpn_name, _sempv2_api_settings)
+            sempv2_resp = self._update_func_sempv2(
+                vpn_name, _sempv2_api_settings)
         resp = {
             'solace-cloud': solace_cloud_resp,
             'semp-v2': sempv2_resp
@@ -250,7 +255,8 @@ class SolaceVpnTask(SolaceBrokerCRUDTask):
 
     def _update_func_sempv2(self, vpn_name, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
     def update_func(self, vpn_name, settings=None, delta_settings=None):
@@ -260,9 +266,11 @@ class SolaceVpnTask(SolaceBrokerCRUDTask):
 
     def delete_func(self, vpn_name):
         if self.get_config().is_solace_cloud():
-            raise SolaceModuleUsageError(self.get_module()._name, self.get_module().params['state'], "cannot delete a message vpn on a Solace Cloud service")
+            raise SolaceModuleUsageError(self.get_module()._name, self.get_module(
+            ).params['state'], "cannot delete a message vpn on a Solace Cloud service")
         # DELETE /msgVpns/{msgVpnName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
@@ -277,7 +285,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceVpnTask(module)

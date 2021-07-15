@@ -1,0 +1,248 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "remote_subscription_list"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_bridge:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_bridge_remote_vpn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_bridge_remote_subscriptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_get_bridge_remote_subscriptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  pre_tasks:
+  - include_vars:
+      file: "bridges.topology.yml"
+      name: bridges_topology
+  - include_vars:
+      file: "bridge-remote-subscription-list.yml"
+      name: target
+  vars:
+      bridge_name: "asct_test_bridge"
+  tasks:
+    - name: "main: solace_gather_facts"
+      solace_gather_facts:
+
+    - name: "solace_bridge: delete"
+      solace_bridge:
+        name: "{{ bridge_name }}"
+        virtual_router: auto
+        state: absent
+
+    - name: "solace_bridge: create"
+      solace_bridge:
+        name: "{{ bridge_name }}"
+        state: present
+
+    - set_fact:
+        remote_inventory_hostname: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_host }}"
+        remote_vpn: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+
+    - name: "solace_get_facts: get_bridge_remoteMsgVpnLocations"
+      solace_get_facts:
+        hostvars: "{{ hostvars }}"
+        hostvars_inventory_hostname: "{{ remote_inventory_hostname }}"
+        msg_vpn: "{{ remote_vpn }}"
+        get_functions:
+          - get_vpnBridgeRemoteMsgVpnLocations
+      register: remote_host_bridge
+
+    - name: "solace_bridge_remote_vpn: add"
+      solace_bridge_remote_vpn:
+        name: "{{ remote_vpn }}"
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
+        remote_vpn_location: "{{ remote_host_bridge.facts.vpnBridgeRemoteMsgVpnLocations.plain }}"
+        settings:
+          enabled: false
+          tlsEnabled: false
+          compressedDataEnabled: false
+        state: present
+
+    - name: "delete: all"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: null
+        state: exactly
+
+    # test present
+    - set_fact:
+        topic_list_name: present_subscriptions_1
+    - set_fact:
+        topic_list_name_length: "{{ target[topic_list_name]|length }}"
+    - name: "present: {{ topic_list_name }}"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: "{{ target[topic_list_name] }}"
+        settings:
+          deliverAlwaysEnabled: true
+        state: present
+    - solace_get_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+      register: result
+    - assert:
+        that:
+          - result.result_list|length == topic_list_name_length|int
+          - result.result_list_count == topic_list_name_length|int
+    - name: "present:idempotency {{ topic_list_name }}"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: "{{ target[topic_list_name] }}"
+        settings:
+          deliverAlwaysEnabled: true
+        state: present
+      register: result
+    - assert:
+        that:
+          - result.changed == False
+          - result.response|length == 0
+
+    # test absent
+    - name: "absent: {{ topic_list_name }}"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: "{{ target[topic_list_name] }}"
+        state: absent
+      register: result
+    - assert:
+        that:
+          - result.changed == True
+          - result.response|length == topic_list_name_length|int
+    # test absent idempotency
+    - name: "absent:idempotency: {{ topic_list_name }}"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: "{{ target[topic_list_name] }}"
+        state: absent
+      register: result
+    - assert:
+        that:
+          - result.changed == False
+          - result.response|length == 0
+
+    # test exactly on empty
+    - set_fact:
+        topic_list_name: exactly_subscriptions_1
+    - set_fact:
+        topic_list_name_length: "{{ target[topic_list_name]|length }}"
+    - name: "exactly:on-empty:{{ topic_list_name }}"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: "{{ target[topic_list_name] }}"
+        settings:
+          deliverAlwaysEnabled: true
+        state: exactly
+      register: result
+    - assert:
+        that:
+          - result.changed == True
+          - result.response|length == topic_list_name_length|int
+
+    # test exactly idempotency
+    - name: "exactly:idempotency:{{ topic_list_name }}"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: "{{ target[topic_list_name] }}"
+        state: exactly
+      register: result
+    - assert:
+        that:
+          - result.changed == False
+          - result.response|length == 0
+
+    # test exactly on full
+    - set_fact:
+        present_topic_list_name: present_subscriptions_1
+        exactly_topic_list_name: exactly_subscriptions_1
+    - set_fact:
+        present_topic_list_name_length: "{{ target[present_topic_list_name]|length }}"
+        exactly_topic_list_name_length: "{{ target[exactly_topic_list_name]|length }}"
+    - name: "present: {{ present_topic_list_name }}"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: "{{ target[present_topic_list_name] }}"
+        settings:
+          deliverAlwaysEnabled: true
+        state: present
+    - name: "exactly:on-full:{{ exactly_topic_list_name }}"
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: "{{ target[exactly_topic_list_name] }}"
+        state: exactly
+      register: result
+    - assert:
+        that:
+          - result.changed == True
+    - solace_get_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+      register: result
+    - assert:
+        that:
+          - result.result_list|length == exactly_topic_list_name_length|int
+          - result.result_list_count == exactly_topic_list_name_length|int
+
+    - name: "solace_bridge: delete"
+      solace_bridge:
+        name: "{{ bridge_name }}"
+        virtual_router: auto
+        state: absent
+
+###
+# The End.

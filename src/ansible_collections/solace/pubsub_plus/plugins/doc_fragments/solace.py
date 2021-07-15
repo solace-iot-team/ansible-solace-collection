@@ -192,6 +192,19 @@ options:
       - absent
 '''
 
+    STATE_CRUD_LIST = r'''
+options:
+  state:
+    description: Target state for CRUD list operation.
+    required: false
+    default: present
+    type: str
+    choices:
+      - present
+      - absent
+      - exactly
+'''
+
     GET_LIST = r'''
 description:
 - "Implements the config and monitor API."

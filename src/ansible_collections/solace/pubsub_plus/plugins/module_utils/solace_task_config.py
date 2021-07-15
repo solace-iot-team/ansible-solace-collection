@@ -6,7 +6,7 @@ import traceback
 __metaclass__ = type
 
 from ansible.module_utils.basic import AnsibleModule
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalErrorAbstractMethod, SolaceInternalError, SolaceParamsValidationError
 import urllib.parse
@@ -62,24 +62,34 @@ class SolaceTaskConfig(object):
     def arg_spec_state():
         return dict(
             state=dict(
-                type='str', default='present',
+                type='str',
+                default='present',
                 choices=['absent', 'present'])
         )
 
     @staticmethod
+    def arg_spec_state_crud_list():
+        return dict(
+            state=dict(
+                type='str',
+                default='present',
+                choices=['absent', 'present', 'exactly'])
+        )
+
+    @ staticmethod
     def arg_spec_sempv2_settings():
         return dict(
             sempv2_settings=dict(
                 type='dict', required=False, aliases=['settings'])
         )
 
-    @staticmethod
+    @ staticmethod
     def arg_spec_sempv1_settings():
         return dict(
             sempv1_settings=dict(type='dict', required=False)
         )
 
-    @staticmethod
+    @ staticmethod
     def arg_spec_solace_cloud_settings():
         return dict(
             solace_cloud_settings=dict(
@@ -211,7 +221,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             _headers.update(_reverse_proxy_headers)
         return _headers
 
-    @staticmethod
+    @ staticmethod
     def arg_spec_broker_config() -> dict:
         return dict(
             host=dict(type='str', default='localhost'),
@@ -235,7 +245,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             )
         )
 
-    @staticmethod
+    @ staticmethod
     def arg_spec_solace_cloud() -> dict:
         return dict(
             solace_cloud_api_token=dict(
@@ -244,33 +254,49 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
                 type='str', required=False, default=None)
         )
 
-    @staticmethod
+    @ staticmethod
     def arg_spec_vpn() -> dict:
         return dict(
             msg_vpn=dict(type='str', required=True)
         )
 
-    @staticmethod
+    @ staticmethod
     def arg_spec_virtual_router():
         return dict(
             virtual_router=dict(type='str', default='primary',
                                 choices=['primary', 'backup'])
         )
 
-    @staticmethod
+    @ staticmethod
     def arg_spec_name():
         return dict(
             name=dict(type='str', required=True)
         )
 
-    @staticmethod
+    @ staticmethod
+    def arg_spec_names():
+        return dict(
+            names=dict(type='list',
+                       required=True,
+                       elements='str'
+                       )
+        )
+
+    @ staticmethod
     def arg_spec_crud():
         arg_spec = SolaceTaskBrokerConfig.arg_spec_name()
         arg_spec.update(SolaceTaskBrokerConfig.arg_spec_sempv2_settings())
         arg_spec.update(SolaceTaskBrokerConfig.arg_spec_state())
         return arg_spec
 
-    @staticmethod
+    @ staticmethod
+    def arg_spec_crud_list():
+        arg_spec = SolaceTaskBrokerConfig.arg_spec_names()
+        arg_spec.update(SolaceTaskBrokerConfig.arg_spec_sempv2_settings())
+        arg_spec.update(SolaceTaskBrokerConfig.arg_spec_state_crud_list())
+        return arg_spec
+
+    @ staticmethod
     def _arg_spec_get_query_params():
         return dict(
             query_params=dict(
@@ -283,13 +309,13 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             )
         )
 
-    @staticmethod
+    @ staticmethod
     def _arg_spec_get_object_list_page_count():
         return dict(
             page_count=dict(type='int', default=100, required=False)
         )
 
-    @staticmethod
+    @ staticmethod
     def arg_spec_get_object_list_config_montor():
         d = dict(
             api=dict(type='str', default='config',
@@ -299,7 +325,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         d.update(SolaceTaskBrokerConfig._arg_spec_get_query_params())
         return d
 
-    @staticmethod
+    @ staticmethod
     def arg_spec_get_object_list_monitor():
         d = dict(
             api=dict(type='str', default='monitor', choices=['monitor'])
@@ -334,7 +360,7 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
     def get_headers(self, op) -> dict:
         return dict()
 
-    @staticmethod
+    @ staticmethod
     def arg_spec_solace_cloud() -> dict:
         return dict(
             solace_cloud_api_token=dict(
@@ -352,7 +378,7 @@ class SolaceTaskSolaceCloudServiceConfig(SolaceTaskSolaceCloudConfig):
         self.solace_cloud_service_id = module.params.get(
             self.PARAM_SERVICE_ID, None)
 
-    @staticmethod
+    @ staticmethod
     def arg_spec_solace_cloud_service_id() -> dict:
         return dict(
             solace_cloud_service_id=dict(

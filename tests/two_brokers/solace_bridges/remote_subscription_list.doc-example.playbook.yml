@@ -1,0 +1,167 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  # ##########################################################################################
+  # sample_topology_file: bridges.topology.yml
+  #   bridges:
+  #     bridge_1:
+  #       # Notes:
+  #       # - the hosts and remote_hosts
+  #       #   must be the same name as in the main inventory
+  #       # - bridges always come in pairs and reference each other
+  #       broker_1:
+  #         remote_host: broker_2
+  #         remote_vpn: broker_2_vpn
+  #       broker_2:
+  #         remote_host: broker_1
+  #         remote_vpn: broker_1_vpn
+
+  name: "remote_subscription_list.doc-example"
+
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_bridge:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_bridge_remote_vpn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_bridge_remote_subscriptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_get_bridge_remote_subscriptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  pre_tasks:
+  - include_vars:
+      file: "bridges.topology.yml"
+      name: bridges_topology
+  vars:
+      bridge_name: "bridge_1"
+  tasks:
+    - name: "main: solace_gather_facts"
+      solace_gather_facts:
+
+    - name: create bridge
+      solace_bridge:
+        name: "{{ bridge_name }}"
+        state: present
+
+    - name: extract correct parameters based on inventory_hostname
+      set_fact:
+        remote_inventory_hostname: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_host }}"
+        remote_vpn: "{{ bridges_topology.bridges[bridge_name][inventory_hostname].remote_vpn }}"
+
+    - name: get the remote bridge details from gathered facts
+      solace_get_facts:
+        hostvars: "{{ hostvars }}"
+        hostvars_inventory_hostname: "{{ remote_inventory_hostname }}"
+        msg_vpn: "{{ remote_vpn }}"
+        get_functions:
+          - get_vpnBridgeRemoteMsgVpnLocations
+      register: remote_host_bridge
+
+    - name: add the remove vpn
+      solace_bridge_remote_vpn:
+        name: "{{ remote_vpn }}"
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
+        remote_vpn_location: "{{ remote_host_bridge.facts.vpnBridgeRemoteMsgVpnLocations.plain }}"
+        settings:
+          enabled: false
+          tlsEnabled: false
+          compressedDataEnabled: false
+        state: present
+
+    - name: delete all remote subscriptions
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics: null
+        state: exactly
+
+    - name: add remote subscriptions
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics:
+          - topic_1
+          - topic_2
+          - topic_3
+        settings:
+          deliverAlwaysEnabled: true
+        state: present
+
+    - name: delete remote subscriptions
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics:
+          - topic_3
+        state: absent
+
+    - name: set exactly remote subscriptions
+      solace_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        remote_subscription_topics:
+          - topic_4
+          - topic_5
+          - topic_6
+        settings:
+          deliverAlwaysEnabled: true
+        state: exactly
+
+    - name: get list of remote subscriptions
+      solace_get_bridge_remote_subscriptions:
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+
+    - name: delete bridge
+      solace_bridge:
+        name: "{{ bridge_name }}"
+        virtual_router: auto
+        state: absent
+
+###
+# The End.

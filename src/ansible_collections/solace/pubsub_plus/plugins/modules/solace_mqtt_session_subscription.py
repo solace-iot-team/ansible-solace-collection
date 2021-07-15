@@ -112,7 +112,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -134,7 +134,8 @@ class SolaceMqttSessionSubscriptionTask(SolaceBrokerCRUDTask):
     def get_func(self, vpn_name, virtual_router, mqtt_session_client_id, subscription_topic):
         # GET /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}/subscriptions/{subscriptionTopic}
         uri_ext = ','.join([mqtt_session_client_id, virtual_router])
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions', uri_ext, 'subscriptions', subscription_topic]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'mqttSessions', uri_ext, 'subscriptions', subscription_topic]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, virtual_router, mqtt_session_client_id, subscription_topic, settings=None):
@@ -146,26 +147,31 @@ class SolaceMqttSessionSubscriptionTask(SolaceBrokerCRUDTask):
         }
         data.update(settings if settings else {})
         uri_ext = ','.join([mqtt_session_client_id, virtual_router])
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions', uri_ext, 'subscriptions']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'mqttSessions', uri_ext, 'subscriptions']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def update_func(self, vpn_name, virtual_router, mqtt_session_client_id, subscription_topic, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}/subscriptions/{subscriptionTopic}
         uri_ext = ','.join([mqtt_session_client_id, virtual_router])
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions', uri_ext, 'subscriptions', subscription_topic]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'mqttSessions', uri_ext, 'subscriptions', subscription_topic]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
     def delete_func(self, vpn_name, virtual_router, mqtt_session_client_id, subscription_topic):
         # DELETE /msgVpns/{msgVpnName}/mqttSessions/{mqttSessionClientId},{mqttSessionVirtualRouter}/subscriptions/{subscriptionTopic}
         uri_ext = ','.join([mqtt_session_client_id, virtual_router])
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'mqttSessions', uri_ext, 'subscriptions', subscription_topic]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'mqttSessions', uri_ext, 'subscriptions', subscription_topic]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', aliases=['subscription_topic', 'topic'], required=True),
-        mqtt_session_client_id=dict(type='str', aliases=['client_id'], required=True),
+        name=dict(type='str', aliases=[
+                  'subscription_topic', 'topic'], required=True),
+        mqtt_session_client_id=dict(
+            type='str', aliases=['client_id'], required=True),
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_vpn())
@@ -175,7 +181,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceMqttSessionSubscriptionTask(module)

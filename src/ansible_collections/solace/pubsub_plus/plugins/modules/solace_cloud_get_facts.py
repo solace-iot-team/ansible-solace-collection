@@ -293,7 +293,7 @@ facts:
                     vpn: asc_test_1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceReadFactsTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_facts import SolaceCloudBrokerFacts
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError, SolaceParamsValidationError
@@ -311,7 +311,8 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
 
         from_dict = params['from_dict']
         if not isinstance(from_dict, dict):
-            raise SolaceParamsValidationError("from_dict", type(from_dict), "invalid type, must be a dict")
+            raise SolaceParamsValidationError("from_dict", type(
+                from_dict), "invalid type, must be a dict")
 
         has_get_funcs = False
         if params.get('get_formattedHostInventory', None):
@@ -326,14 +327,17 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
         self.validate_params()
         params = self.get_module().params
         search_dict = params['from_dict']
-        solaceCloudServiceFacts = SolaceCloudBrokerFacts(search_dict, None)
+        solaceCloudServiceFacts = SolaceCloudBrokerFacts(self.get_module()._name,
+                                                         search_dict, vpn=None)
         facts = dict()
         usr_msg = None
         try:
-            field, value = self.get_serviceState(solaceCloudServiceFacts, search_dict)
+            field, value = self.get_serviceState(
+                solaceCloudServiceFacts, search_dict)
             facts[field] = value
             if value != 'completed':
-                raise SolaceParamsValidationError("service.creationState", value, "is not 'completed'")
+                raise SolaceParamsValidationError(
+                    "service.creationState", value, "is not 'completed'")
             param_get_formattedHostInventory = params['get_formattedHostInventory']
             if param_get_formattedHostInventory:
                 field, value = self.get_formattedHostInventory(solaceCloudServiceFacts,
@@ -346,16 +350,21 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
             if param_get_remoteFormattedHostInventory:
                 field, value = self.get_remoteFormattedHostInventory(solaceCloudServiceFacts,
                                                                      search_dict,
-                                                                     param_get_remoteFormattedHostInventory['remote_host_inventory'],
-                                                                     param_get_remoteFormattedHostInventory['remote_host_inventory_hostname'],
-                                                                     param_get_remoteFormattedHostInventory['host_entry'],
-                                                                     param_get_remoteFormattedHostInventory['api_token'],
+                                                                     param_get_remoteFormattedHostInventory[
+                                                                         'remote_host_inventory'],
+                                                                     param_get_remoteFormattedHostInventory[
+                                                                         'remote_host_inventory_hostname'],
+                                                                     param_get_remoteFormattedHostInventory[
+                                                                         'host_entry'],
+                                                                     param_get_remoteFormattedHostInventory[
+                                                                         'api_token'],
                                                                      param_get_remoteFormattedHostInventory['meta'])
                 facts[field] = value
         except Exception as e:
             self.logExceptionAsDebug(type(e), e)
             ex_msg_list = [f"Error: {str(e)}"]
-            usr_msg = ["Cannot get requested facts from 'from_dict'"] + ex_msg_list
+            usr_msg = [
+                "Cannot get requested facts from 'from_dict'"] + ex_msg_list
             self.update_result(dict(rc=1, changed=self.changed))
 
         self.update_result(dict(facts=facts))
@@ -408,10 +417,13 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
                                          host_entry: str,
                                          api_token: str = None,
                                          meta: dict = None):
-        remote_host_inventory_params = solace_cloud_service_facts.get_field(remote_host_inventory, remote_host_inventory_hostname)
+        remote_host_inventory_params = solace_cloud_service_facts.get_field(
+            remote_host_inventory, remote_host_inventory_hostname)
         if not remote_host_inventory_params:
-            raise SolaceParamsValidationError("remote_host_inventory_hostname", remote_host_inventory_hostname, f"not found in remote_host_inventory: {remote_host_inventory}")
-        _field, broker_inventory = self.get_formattedHostInventory(solace_cloud_service_facts, search_dict, host_entry, api_token, meta)
+            raise SolaceParamsValidationError("remote_host_inventory_hostname", remote_host_inventory_hostname,
+                                              f"not found in remote_host_inventory: {remote_host_inventory}")
+        _field, broker_inventory = self.get_formattedHostInventory(
+            solace_cloud_service_facts, search_dict, host_entry, api_token, meta)
         del broker_inventory['all']['hosts'][host_entry]['ansible_connection']
         remote_inventory = {
             'all': {
@@ -420,7 +432,8 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
                 }
             }
         }
-        inventory = SolaceUtils.merge_dicts_recursive(remote_inventory, broker_inventory)
+        inventory = SolaceUtils.merge_dicts_recursive(
+            remote_inventory, broker_inventory)
         return 'remoteFormattedHostInventory', inventory
 
 
@@ -431,19 +444,27 @@ def run_module():
                                         required=False,
                                         default=None,
                                         options=dict(
-                                            host_entry=dict(type='str', required=True),
-                                            api_token=dict(type='str', required=False, no_log=True),
-                                            meta=dict(type='dict', required=True)
+                                            host_entry=dict(
+                                                type='str', required=True),
+                                            api_token=dict(
+                                                type='str', required=False, no_log=True),
+                                            meta=dict(
+                                                type='dict', required=True)
                                         )),
         get_remoteFormattedHostInventory=dict(type='dict',
                                               required=False,
                                               default=None,
                                               options=dict(
-                                                  remote_host_inventory=dict(type='dict', required=True),
-                                                  remote_host_inventory_hostname=dict(type='str', required=True),
-                                                  host_entry=dict(type='str', required=True),
-                                                  api_token=dict(type='str', required=False, no_log=True),
-                                                  meta=dict(type='dict', required=True)
+                                                  remote_host_inventory=dict(
+                                                      type='dict', required=True),
+                                                  remote_host_inventory_hostname=dict(
+                                                      type='str', required=True),
+                                                  host_entry=dict(
+                                                      type='str', required=True),
+                                                  api_token=dict(
+                                                      type='str', required=False, no_log=True),
+                                                  meta=dict(
+                                                      type='dict', required=True)
                                               ))
     )
     arg_spec = dict()
@@ -451,7 +472,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceCloudGetFactsTask(module)

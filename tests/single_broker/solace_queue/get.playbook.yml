@@ -46,6 +46,16 @@
       name: target_list
   tasks:
 
+    - name: "get all queues"
+      solace_get_queues:
+      register: result
+
+    - name: "delete all queues"
+      solace_queue:
+        name: "{{ item.data.queueName }}"
+        state: absent
+      loop: "{{ result.result_list }}"
+
     - name: "get: solace_queue: remove all queues"
       solace_queue:
         name: "{{ item.name }}"

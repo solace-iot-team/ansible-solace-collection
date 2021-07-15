@@ -1,0 +1,17 @@
+---
+present_subscriptions_1:
+- topic_1
+- topic_2
+- topic_3
+- topic_4
+- topic_5
+- topic_6
+- topic_7
+absent_subscriptions_1:
+- topic_4
+- topic_5
+- topic_6
+exactly_subscriptions_1:
+- topic_1
+- topic_2
+- topic_3

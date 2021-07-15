@@ -1,0 +1,171 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "create-apim-bridge"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_get_bridges:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_client_username:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_queue:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_bridge:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_bridge_remote_vpn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  pre_tasks:
+  - include_vars:
+      file: "bridges.topology.yml"
+      name: bridges_topology
+  vars:
+      bridge_name: "apim_bridge"
+  tasks:
+    - set_fact:
+        bridge_topology: "{{ bridges_topology.bridges[bridge_name] }}"
+    - set_fact:
+        remote_inventory_hostname: "{{ bridge_topology[inventory_hostname].remote_inventory_hostname }}"
+        remote_vpn: "{{ bridge_topology[inventory_hostname].remote_vpn }}"
+
+    - name: "solace_gather_facts"
+      solace_gather_facts:
+
+    - name: "solace_bridge: delete"
+      solace_bridge:
+        name: "{{ bridge_name }}"
+        virtual_router: auto
+        state: absent
+
+    - name: "solace_client_username: create"
+      solace_client_username:
+        name: "{{ bridge_name }}"
+        settings:
+          enabled: true
+          password: "{{ bridge_name }}"
+        state: present
+
+    - name: "solace_queue: create"
+      solace_queue:
+        name: "{{ bridge_name }}"
+        settings:
+          owner: "{{ bridge_name }}"
+          permission: consume
+          egressEnabled: true
+          ingressEnabled: true
+        state: present
+
+    - name: "solace_bridge: create"
+      solace_bridge:
+        name: "{{ bridge_name }}"
+        settings:
+          enabled: true
+          remoteAuthenticationBasicClientUsername: "{{ bridge_name }}"
+          remoteAuthenticationBasicPassword: "{{ bridge_name }}"
+          remoteAuthenticationScheme: basic
+        state: present
+
+    - name: "solace_get_facts: get_vpnBridgeRemoteMsgVpnLocations"
+      solace_get_facts:
+        hostvars: "{{ hostvars }}"
+        hostvars_inventory_hostname: "{{ remote_inventory_hostname }}"
+        msg_vpn: "{{ remote_vpn }}"
+        get_functions:
+          - get_vpnBridgeRemoteMsgVpnLocations
+      register: remote_host_vpn_bridge_remote_msg_vpn_locations
+    - debug:
+        msg:
+          - "remote_host_vpn_bridge_remote_msg_vpn_locations:"
+          - "{{ remote_host_vpn_bridge_remote_msg_vpn_locations.facts }}"
+
+    - name: "solace_bridge_remote_vpn: add"
+      solace_bridge_remote_vpn:
+        name: "{{ remote_vpn }}"
+        bridge_name: "{{ bridge_name }}"
+        bridge_virtual_router: auto
+        # choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled
+        remote_vpn_location: "{{ remote_host_vpn_bridge_remote_msg_vpn_locations.facts.vpnBridgeRemoteMsgVpnLocations.plain }}"
+        settings:
+          enabled: true
+          clientUsername: "{{ bridge_name }}"
+          password: "{{ bridge_name }}"
+          tlsEnabled: false
+          compressedDataEnabled: false
+          queueBinding: "{{ bridge_name }}"
+        state: present
+
+    - name: "solace_get_bridges: until bridge is up"
+      solace_get_bridges:
+        api: monitor
+        query_params:
+          where:
+            - "bridgeName=={{ bridge_name }}"
+          select:
+            - inboundState
+            - inboundFailureReason
+            - outboundState
+      register: bridge_list_result
+      until:
+        - bridge_list_result.result_list[0].data.inboundState == 'ready-in-sync'
+        - bridge_list_result.result_list[0].data.outboundState == 'ready'
+      retries: 5
+      delay: 5
+    - assert:
+        that:
+          - bridge_list_result.rc==0
+          - bridge_list_result.result_list | length == 1
+          - bridge_list_result.result_list_count==1
+          - bridge_list_result.result_list[0].data.inboundState == 'ready-in-sync'
+          - bridge_list_result.result_list[0].data.outboundState == 'ready'
+
+###
+# The End.

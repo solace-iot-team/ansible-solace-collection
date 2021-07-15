@@ -33,6 +33,14 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
+    solace_acl_subscribe_share_name_exception:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
     solace_acl_client_connect_exception:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
@@ -101,6 +109,55 @@
       ignore_errors: true
     - assert:
         that: result.rc == 1 and result.msg.reason == 'Unauthorized'
+
+    - name: "EX_1: bad subscribe topic"
+      solace_acl_subscribe_topic_exception:
+        acl_profile_name: "{{ acl_profile_name }}"
+        topic: "with whitespace/x"
+      register: result
+      ignore_errors: yes
+    - assert:
+        that:
+          - result.rc == 1
+          - "'whitespace' in result.msg|string"
+
+    - name: "EX_1: bad subscribe topic"
+      solace_acl_subscribe_topic_exception:
+        acl_profile_name: "{{ acl_profile_name }}"
+        topic: "with whitespace/x"
+      register: result
+      ignore_errors: yes
+    - assert:
+        that:
+          - result.rc == 1
+          - "'whitespace' in result.msg|string"
+
+    - name: "EX_1: bad publish topic"
+      solace_acl_publish_topic_exception:
+        acl_profile_name: "{{ acl_profile_name }}"
+        topic: "with whitespace/x"
+      register: result
+      ignore_errors: yes
+    - assert:
+        that:
+          - result.rc == 1
+          - "'whitespace' in result.msg|string"
+
+    - name: "EX_1: bad share name topic"
+      solace_acl_subscribe_share_name_exception:
+        acl_profile_name: "{{ acl_profile_name }}"
+        topic: "with whitespace/x"
+      register: result
+      ignore_errors: yes
+    - assert:
+        that:
+          - result.rc == 1
+          - "'whitespace' in result.msg|string"
+
+    - name: "EX_1: delete ACL Profile"
+      solace_acl_profile:
+        name: "{{ acl_profile_name }}"
+        state: absent
 
 ###
 # The End.

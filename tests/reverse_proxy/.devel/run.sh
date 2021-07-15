@@ -13,9 +13,9 @@ export PROJECT_HOME=$projectHome
 # "solace_vpn" -- this does not work, don't switch on
 ansibleSolaceTests=(
   "setup"
-  "solace_client_username"
-  "solace_queue"
-  "error_handling"
+  # "solace_client_username"
+  # "solace_queue"
+  # "error_handling"
   "solace_facts"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"

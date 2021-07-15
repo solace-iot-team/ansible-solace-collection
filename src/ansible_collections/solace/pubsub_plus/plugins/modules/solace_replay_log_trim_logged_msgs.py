@@ -85,7 +85,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerActionTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -116,7 +116,8 @@ class SolaceReplayLogTrimLoggedMsgsTask(SolaceBrokerActionTask):
             "olderThanTime": int(time.time())
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_PRIVATE_ACTION, 'msgVpns', vpn_name, 'replayLogs', replay_log_name, 'trimLoggedMsgs']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_PRIVATE_ACTION,
+                      'msgVpns', vpn_name, 'replayLogs', replay_log_name, 'trimLoggedMsgs']
         return self.sempv2_api.make_put_request(self.get_config(), path_array, data)
 
 

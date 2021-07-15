@@ -37,6 +37,7 @@ extends_documentation_fragment:
 seealso:
 - module: solace_queue
 - module: solace_get_queue_subscriptions
+- module: solace_queue_subscriptions
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -103,10 +104,12 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -118,13 +121,21 @@ class SolaceSubscriptionTask(SolaceBrokerCRUDTask):
         super().__init__(module)
         self.sempv2_api = SolaceSempV2Api(module)
 
+    def validate_params(self):
+        topic = self.get_module().params['name']
+        if SolaceUtils.doesStringContainAnyWhitespaces(topic):
+            raise SolaceParamsValidationError('topic',
+                                              topic, "must not contain any whitespace")
+        return super().validate_params()
+
     def get_args(self):
         params = self.get_module().params
         return [params['msg_vpn'], params['queue_name'], params['name']]
 
     def get_func(self, vpn_name, queue_name, subscription_topic):
         # GET /msgVpns/{msgVpnName}/queues/{queueName}/subscriptions/{subscriptionTopic}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues', queue_name, 'subscriptions', subscription_topic]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'queues', queue_name, 'subscriptions', subscription_topic]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, queue_name, subscription_topic, settings=None):
@@ -133,18 +144,21 @@ class SolaceSubscriptionTask(SolaceBrokerCRUDTask):
             self.OBJECT_KEY: subscription_topic
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues', queue_name, 'subscriptions']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'queues', queue_name, 'subscriptions']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def delete_func(self, vpn_name, queue_name, subscription_topic):
         # DELETE /msgVpns/{msgVpnName}/queues/{queueName}/subscriptions/{subscriptionTopic}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues', queue_name, 'subscriptions', subscription_topic]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',
+                      vpn_name, 'queues', queue_name, 'subscriptions', subscription_topic]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
 def run_module():
     module_args = dict(
-        name=dict(type='str', required=True, aliases=['topic', 'subscription_topic']),
+        name=dict(type='str', required=True, aliases=[
+                  'topic', 'subscription_topic']),
         queue_name=dict(type='str', required=True, aliases=['queue'])
     )
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
@@ -154,7 +168,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceSubscriptionTask(module)

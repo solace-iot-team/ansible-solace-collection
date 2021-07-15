@@ -8,10 +8,10 @@ on:
   # push:
   #   branches:
   #     feature-reverse-proxy
-  schedule:
+  # schedule:
     # - cron: '0 5 * * THU'
     # - cron: '0 5 * * *'
-    - cron: 0 5 */2 * *  # every two days
+    # - cron: 0 5 */2 * *  # every two days
   # pull_request:
   #   branches:
   #     - main

@@ -31,6 +31,8 @@ source $PROJECT_HOME/.lib/functions.sh
 
   playbooks=(
     "$scriptDir/main.playbook.yml"
+    "$scriptDir/remote_subscription_list.playbook.yml"
+    "$scriptDir/remote_subscription_list.doc-example.playbook.yml"
   )
 
   for playbook in ${playbooks[@]}; do
@@ -43,7 +45,7 @@ source $PROJECT_HOME/.lib/functions.sh
                   -i $solaceCloudInventory \
                   $playbook \
                   --extra-vars "WORKING_DIR=$WORKING_DIR" \
-                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN"                  
+                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN"
     code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
   done

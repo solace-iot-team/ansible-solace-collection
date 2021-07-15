@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 import traceback
 __metaclass__ = type
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceModuleUsageError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError, SolaceSempv1VersionNotSupportedError, SolaceNoModuleSupportForSolaceCloudError, SolaceNoModuleStateSupportError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudServiceConfig, SolaceTaskSolaceCloudConfig
@@ -64,7 +64,7 @@ class SolaceTask(object):
         return SolaceUtils.create_result(rc, changed)
 
     def validate_params(self):
-        return
+        pass
 
     def do_task(self):
         # return: msg(dict) and result(dict)
@@ -163,7 +163,10 @@ class SolaceTask(object):
         except SolaceFeatureNotSupportedError as e:
             self.logExceptionAsError(type(e), e)
             usr_msg = [
-                "Feature currently not supported. Pls raise an new feature request if required.", str(e)]
+                f"module '{self.get_module()._name}'",
+                "Feature currently not supported. Pls raise an new feature request if required.",
+                str(e)
+            ]
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceNoModuleStateSupportError as e:
@@ -277,8 +280,8 @@ class SolaceCRUDTask(SolaceTask):
 
     def normalize_new_settings(self, new_settings) -> dict:
         if new_settings:
-            SolaceUtils.type_conversion(
-                new_settings, self.get_config().is_solace_cloud())
+            SolaceUtils.type_conversion(new_settings,
+                                        self.get_config().is_solace_cloud())
         return new_settings
 
     def get_func(self, *args) -> dict:
@@ -302,8 +305,8 @@ class SolaceCRUDTask(SolaceTask):
         args = self.get_args()
         new_settings = self.get_new_settings()
         _current_settings = self.get_func(*args)
-        current_settings = self.normalize_current_settings(
-            _current_settings, new_settings)
+        current_settings = self.normalize_current_settings(_current_settings,
+                                                           new_settings)
         new_state = self.get_module().params['state']
         # delete if exists
         if new_state == 'absent':
@@ -363,6 +366,167 @@ class SolaceCloudCRUDTask(SolaceCRUDTask):
 
     def get_config(self) -> SolaceTaskSolaceCloudServiceConfig:
         return self.config
+
+
+class SolaceBrokerCRUDListTask(SolaceBrokerCRUDTask):
+    def __init__(self, module: AnsibleModule):
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
+        self.sempv2_get_paging_api = SolaceSempV2PagingGetApi(
+            module, self.is_supports_paging())
+        self.existing_key_list = None
+        self.created_key_list = []
+        self.deleted_key_list = []
+        self.duplicate_key_list = []
+        self.error_key_list = []
+        self.changed = False
+
+    def get_objects_path_array(self) -> list:
+        raise SolaceInternalErrorAbstractMethod()
+
+    def get_objects_result_data_object_key(self) -> str:
+        raise SolaceInternalErrorAbstractMethod()
+
+    def get_new_settings(self) -> dict:
+        s = self.get_module().params[self.get_settings_arg_name()]
+        return self.normalize_new_settings(s)
+
+    def get_crud_args(self, object_key) -> list:
+        raise SolaceInternalErrorAbstractMethod()
+
+    def is_supports_paging(self):
+        return True
+
+    def get_param_names(self) -> list:
+        names = self.get_config().get_params()['names']
+        return names if isinstance(names, list) else []
+
+    def deduplicate_keys(self, key_list) -> list:
+        seen = {}
+        dupes = []
+        for key in key_list:
+            if key not in seen:
+                seen[key] = 1
+            else:
+                if seen[key] == 1:
+                    dupes.append(key)
+                    seen[key] += 1
+        self.duplicate_key_list = dupes
+        return list(dict.fromkeys(key_list))
+
+    def validate_key(self, key):
+        if SolaceUtils.doesStringContainAnyWhitespaces(key):
+            raise SolaceParamsValidationError(
+                'name', key, "must not contain any whitespace")
+
+    def validate_params(self):
+        names = self.get_param_names()
+        for name in names:
+            self.validate_key(name)
+        super().validate_params()
+
+    def get_objects(self) -> list:
+        objects = self.sempv2_get_paging_api.get_all_objects_from_config_api(
+            self.get_config(),
+            self.get_objects_path_array())
+        return objects
+
+    def get_object_key_list(self, object_key) -> list:
+        objects = self.get_objects()
+        object_key_list = [d['data'][object_key] for d in objects]
+        return object_key_list
+
+    def do_rollback_on_error(self, error_key, ex):
+        self.error_key_list.append({'error': error_key})
+        for created_key in self.created_key_list:
+            crud_args = self.get_crud_args(created_key)
+            _response = self.delete_func(*crud_args)
+        for deleted_key in self.deleted_key_list:
+            crud_args = self.get_crud_args(deleted_key)
+            _response = self.create_func(*crud_args)
+        self.changed = False
+        self.update_result({'response': self.error_key_list})
+        raise ex
+
+    def do_task(self):
+        self.validate_params()
+        params = self.get_config().get_params()
+        is_check_mode = self.get_module().check_mode
+        self.existing_key_list = self.get_object_key_list(
+            self.get_objects_result_data_object_key())
+        target_key_list = self.deduplicate_keys(self.get_param_names())
+        self.set_result(self.create_result(rc=0, changed=False))
+        state_object_combination_error = False
+        new_state = params['state']
+        new_settings = self.get_new_settings()
+        for target_key in target_key_list:
+            crud_args = self.get_crud_args(target_key)
+            target_key_exists = target_key in self.existing_key_list
+            if (new_state == 'present' or new_state == 'exactly') and not target_key_exists:
+                self.changed = True
+                if not is_check_mode:
+                    try:
+                        _response = self.create_func(*crud_args, new_settings)
+                        self.created_key_list.append(target_key)
+                    except Exception as ex:
+                        self.do_rollback_on_error(target_key, ex)
+
+            elif new_state == 'present' and target_key_exists:
+                pass
+            elif new_state == 'absent' and target_key_exists:
+                if not is_check_mode:
+                    try:
+                        _response = self.delete_func(*crud_args)
+                        self.deleted_key_list.append(target_key)
+                    except Exception as ex:
+                        self.do_rollback_on_error(target_key, ex)
+            elif new_state == 'absent' and not target_key_exists:
+                pass
+            elif new_state == 'exactly' and target_key_exists:
+                pass
+            elif new_state == 'exactly':
+                pass
+            else:
+                state_object_combination_error = True
+
+        if new_state == 'exactly':
+            for existing_key in self.existing_key_list:
+                crud_args = self.get_crud_args(existing_key)
+                if new_state == 'exactly' and existing_key not in target_key_list:
+                    if not is_check_mode:
+                        try:
+                            _response = self.delete_func(*crud_args)
+                            self.deleted_key_list.append(existing_key)
+                        except Exception as ex:
+                            self.do_rollback_on_error(existing_key, ex)
+                elif new_state == 'exactly' and existing_key in target_key_list:
+                    pass
+                else:
+                    state_object_combination_error = True
+
+        if state_object_combination_error:
+            raise SolaceInternalError([
+                "unsupported state / object combination",
+                f"state={new_state}",
+                f"target_key_list={target_key_list}",
+                f"existing_key_list={self.existing_key_list}"
+            ])
+
+        response_list = []
+        for k in self.created_key_list:
+            response_list.append({'added': k})
+        for k in self.deleted_key_list:
+            response_list.append({'deleted': k})
+        for k in self.duplicate_key_list:
+            response_list.append({'duplicate': k})
+        if len(response_list) > 0:
+            self.changed = True
+        self.update_result(
+            {
+                'changed': self.changed,
+                'response': response_list
+            })
+        return None, self.get_result()
 
 
 class SolaceGetTask(SolaceTask):

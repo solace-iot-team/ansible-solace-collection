@@ -1,0 +1,175 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "client_connect_address_list"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_acl_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_acl_client_connect_exceptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+    solace_get_acl_client_connect_exceptions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  pre_tasks:
+  - include_vars:
+      file: "acl-lists.vars.yml"
+      name: target_vars
+  tasks:
+    - set_fact:
+        target: "{{ target_vars.good }}"
+
+    - name: delete acl profile
+      solace_acl_profile:
+        name: "{{ target.acl_profile_name }}"
+        state: absent
+
+    - name: create acl profile
+      solace_acl_profile:
+        name: "{{ target.acl_profile_name }}"
+        state: present
+
+    # test present
+    - set_fact:
+        list_name: present_client_connect_address
+    - set_fact:
+        list_name_length: "{{ target[list_name]|length }}"
+    - name: "present: {{ list_name }}"
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        addresses: "{{ target[list_name] }}"
+        state: present
+    - solace_get_acl_client_connect_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+      register: result
+    - assert:
+        that:
+          - result.result_list|length == list_name_length|int
+          - result.result_list_count == list_name_length|int
+
+    # test present idempotency
+    - name: "present:idempotency {{ list_name }}"
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        addresses: "{{ target[list_name] }}"
+        state: present
+      register: result
+    - assert:
+        that:
+          - result.changed == False
+          - result.response|length == 0
+
+    # test absent
+    - name: "absent: {{ list_name }}"
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        addresses: "{{ target[list_name] }}"
+        state: absent
+      register: result
+    - assert:
+        that:
+          - result.changed == True
+          - result.response|length == list_name_length|int
+    # test absent idempotency
+    - name: "absent:idempotency: {{ list_name }}"
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        addresses: "{{ target[list_name] }}"
+        state: absent
+      register: result
+    - assert:
+        that:
+          - result.changed == False
+          - result.response|length == 0
+
+    # test exactly on empty
+    - set_fact:
+        list_name: exactly_client_connect_address
+    - set_fact:
+        list_name_length: "{{ target[list_name]|length }}"
+    - name: "exactly:on-empty:{{ list_name }}"
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        addresses: "{{ target[list_name] }}"
+        state: exactly
+      register: result
+    - assert:
+        that:
+          - result.changed == True
+          - result.response|length == list_name_length|int
+    # test exactly idempotency
+    - set_fact:
+        list_name: exactly_client_connect_address
+    - set_fact:
+        list_name_length: "{{ target[list_name]|length }}"
+    - name: "exactly:idempotency:{{ list_name }}"
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        addresses: "{{ target[list_name] }}"
+        state: exactly
+      register: result
+    - assert:
+        that:
+          - result.changed == False
+          - result.response|length == 0
+    # test exactly on full
+    - set_fact:
+        present_list_name: present_client_connect_address
+        exactly_list_name: exactly_client_connect_address
+    - set_fact:
+        present_list_name_length: "{{ target[present_list_name]|length }}"
+        exactly_list_name_length: "{{ target[exactly_list_name]|length }}"
+    - name: "present: {{ present_list_name }}"
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        addresses: "{{ target[present_list_name] }}"
+        state: present
+    - name: "exactly:on-full:{{ exactly_list_name }}"
+      solace_acl_client_connect_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        addresses: "{{ target[exactly_list_name] }}"
+        state: exactly
+      register: result
+    - assert:
+        that:
+          - result.changed == True
+    - solace_get_acl_client_connect_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+      register: result
+    - assert:
+        that:
+          - result.result_list|length == exactly_list_name_length|int
+          - result.result_list_count == exactly_list_name_length|int
+
+    - name: delete acl profile
+      solace_acl_profile:
+        name: "{{ target.acl_profile_name }}"
+        state: absent
+
+###
+# The End.

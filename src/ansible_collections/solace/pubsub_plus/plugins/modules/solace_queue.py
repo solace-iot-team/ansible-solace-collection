@@ -32,6 +32,7 @@ extends_documentation_fragment:
 seealso:
 - module: solace_get_queues
 - module: solace_queue_subscription
+- module: solace_queue_subscriptions
 - module: solace_queue_start_replay
 - module: solace_queue_cancel_replay
 author:
@@ -92,7 +93,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -113,7 +114,8 @@ class SolaceQueueTask(SolaceBrokerCRUDTask):
 
     def get_func(self, vpn_name, queue_name):
         # GET /msgVpns/{msgVpnName}/queues/{queueName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues', queue_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'queues', queue_name]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, queue_name, settings=None):
@@ -123,17 +125,20 @@ class SolaceQueueTask(SolaceBrokerCRUDTask):
             self.OBJECT_KEY: queue_name
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'queues']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def update_func(self, vpn_name, queue_name, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/queues/{queueName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues', queue_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'queues', queue_name]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
     def delete_func(self, vpn_name, queue_name):
         # DELETE /msgVpns/{msgVpnName}/queues/{queueName}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'queues', queue_name]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'queues', queue_name]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
@@ -148,7 +153,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
     solace_task = SolaceQueueTask(module)
     solace_task.execute()

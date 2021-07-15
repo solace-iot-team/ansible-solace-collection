@@ -1,0 +1,76 @@
+---
+good:
+  acl_profile_name: asc-test-profile-1
+  present_topics_1:
+  - topic_1
+  - topic_2
+  - topic_3
+  - topic_4
+  - topic_5
+  - topic_6
+  - topic_7
+  absent_topics_1:
+  - topic_4
+  - topic_5
+  - topic_6
+  exactly_topics_1:
+  - topic_1
+  - topic_2
+  - topic_3
+  present_share_name:
+  - share_name_1
+  - share_name_2
+  - share_name_3
+  - share_name_4
+  - share_name_5
+  - share_name_6
+  - share_name_7
+  absent_share_name:
+  - share_name_4
+  - share_name_5
+  - share_name_6
+  exactly_share_name:
+  - share_name_1
+  - share_name_2
+  - share_name_3
+  present_client_connect_address:
+  - 10.2.3.11/1
+  - 10.2.3.11/2
+  - 10.2.3.11/3
+  - 10.2.3.11/4
+  - 10.2.3.11/5
+  - 10.2.3.11/6
+  - 10.2.3.11/7
+  absent_client_connect_address:
+  - 10.2.3.11/4
+  - 10.2.3.11/5
+  - 10.2.3.11/6
+  exactly_client_connect_address:
+  - 10.2.3.11/1
+  - 10.2.3.11/2
+  - 10.2.3.11/3
+
+# exceptions:
+#   acl_profile_name: asc-test-profile-exceptions
+#   present_good:
+#   - topic_1/*
+#   - topic_1/*/2.3
+#   - Topic-2/*/>
+#   - T-1/*/2.3/t-2/?R?
+#   - topic_1/*/2.3/t-2/?R/>
+#   - topic_3
+#   present_bad_topcis_whitespace_1:
+#   - "bad_topic_1 / >"
+#   present_bad_topcis_whitespace_2:
+#   - "bad_topic_1 />"
+#   present_bad_topcis_semp_err_1:
+#   - "/bad_topic_1"
+#   present_bad_topcis_with_rollback:
+#   - rollback_topic_1
+#   - rollback_topic_2
+#   - rollback_topic_3
+#   - "bad_topic_1/"
+#   duplicate_topics:
+#   - topic_1
+#   - topic_1
+#   - topic_1

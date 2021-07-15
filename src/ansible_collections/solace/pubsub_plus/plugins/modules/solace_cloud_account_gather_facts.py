@@ -124,11 +124,10 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceCloudGetTask
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceCloudApi
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError, SolaceInternalError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -156,7 +155,8 @@ class SolaceCloudAccountGatherFactsTask(SolaceCloudGetTask):
                 services=[]
             )
         else:
-            raise SolaceInternalError(f"arg 'return_format={return_format}' invalid")
+            raise SolaceInternalError(
+                f"arg 'return_format={return_format}' invalid")
 
         services = self.get_solace_cloud_api().get_services_with_details(self.get_config())
         data_centers = self.get_solace_cloud_api().get_data_centers(self.get_config())
@@ -189,7 +189,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     solace_task = SolaceCloudAccountGatherFactsTask(module)

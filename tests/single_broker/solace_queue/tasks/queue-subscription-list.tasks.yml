@@ -1,0 +1,219 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "queue: absent"
+  solace_queue:
+    name: "{{ queue_item.name }}"
+    state: absent
+
+- name: "queue: create"
+  solace_queue:
+    name: "{{ queue_item.name }}"
+    settings:
+      egressEnabled: false
+      ingressEnabled: false
+    state: present
+
+# test present
+- set_fact:
+    subscription_list_name: present_subscriptions_1
+- name: "present: {{ subscription_list_name }}"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ queue_item[subscription_list_name] }}"
+    state: present
+  register: result
+- assert:
+    that:
+      - result.changed == True
+      - result.rc == 0
+      - result.response|length == queue_item[subscription_list_name]|length
+- name: "check:present:{{ subscription_list_name }}"
+  solace_get_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+  register: result
+- assert:
+    that:
+      - result.rc == 0
+      - result.result_list|length == queue_item[subscription_list_name]|length
+      - result.result_list_count == queue_item[subscription_list_name]|length
+
+# test present idempotency
+- name: "present:idempotency {{ subscription_list_name }}"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ queue_item[subscription_list_name] }}"
+    state: present
+  register: result
+- assert:
+    that:
+      - result.changed == False
+      - result.rc == 0
+      - result.response|length == 0
+
+# test absent
+- set_fact:
+    subscription_list_name: present_subscriptions_1
+- name: "absent: {{ subscription_list_name }}"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ queue_item[subscription_list_name] }}"
+    state: absent
+  register: result
+- assert:
+    that:
+      - result.changed == True
+      - result.rc == 0
+      - result.response|length == queue_item[subscription_list_name]|length
+- name: "check:absent:{{ subscription_list_name }}"
+  solace_get_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+  register: result
+- assert:
+    that:
+      - result.rc == 0
+      - result.result_list|length == 0
+      - result.result_list_count == 0
+# test absent idempotency
+- name: "absent:idempotency {{ subscription_list_name }}"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ queue_item[subscription_list_name] }}"
+    state: absent
+  register: result
+- assert:
+    that:
+      - result.changed == False
+      - result.rc == 0
+      - result.response|length == 0
+
+# test partial absent
+- set_fact:
+    present_subscription_list_name: present_subscriptions_1
+    absent_subscription_list_name: absent_subscriptions_1
+- set_fact:
+    target_subscription_list_length: "{{ (queue_item[present_subscription_list_name]|length - queue_item[absent_subscription_list_name]|length) }}"
+- name: "present: {{ present_subscription_list_name }}"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ queue_item[present_subscription_list_name] }}"
+    state: present
+- name: "absent: {{ absent_subscription_list_name }}"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ queue_item[absent_subscription_list_name] }}"
+    state: absent
+  register: result
+- assert:
+    that:
+      - result.changed == True
+      - result.rc == 0
+      - result.response|length == queue_item[absent_subscription_list_name]|length
+- name: "check:absent:partial{{ present_subscription_list_name }} - {{ absent_subscription_list_name }}"
+  solace_get_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+  register: result
+- assert:
+    that:
+      - result.rc == 0
+      - result.result_list|length == target_subscription_list_length|int
+      - result.result_list_count == target_subscription_list_length|int
+# partial absent idempotency
+- name: "absent: idempotency {{ absent_subscription_list_name }}"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ queue_item[absent_subscription_list_name] }}"
+    state: absent
+  register: result
+- assert:
+    that:
+      - result.changed == False
+      - result.rc == 0
+      - result.response|length == 0
+
+# test exactly
+- set_fact:
+    present_subscription_list_name: present_subscriptions_1
+    exactly_subscription_list_name: exactly_subscriptions_1
+- set_fact:
+    target_response_list_length: "{{ queue_item[present_subscription_list_name]|length - queue_item[exactly_subscription_list_name]|length }}"
+    target_subscription_list_length: "{{ queue_item[exactly_subscription_list_name]|length }}"
+- name: "present: {{ present_subscription_list_name }}"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ queue_item[present_subscription_list_name] }}"
+    state: present
+- name: "exactly: {{ exactly_subscription_list_name }}"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ queue_item[exactly_subscription_list_name] }}"
+    state: exactly
+  register: result
+- assert:
+    that:
+      - result.changed == True
+      - result.rc == 0
+      - result.response|length == target_response_list_length|int
+- name: "check:exactly:{{ exactly_subscription_list_name }}"
+  solace_get_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+  register: result
+- assert:
+    that:
+      - result.rc == 0
+      - result.result_list|length == target_subscription_list_length|int
+      - result.result_list_count == target_subscription_list_length|int
+# test exactly:idempotency
+- name: "exactly: idempotency {{ exactly_subscription_list_name }}"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ queue_item[exactly_subscription_list_name] }}"
+    state: exactly
+  register: result
+- assert:
+    that:
+      - result.changed == False
+      - result.rc == 0
+      - result.response|length == 0
+
+# test exactly with empty list
+- set_fact:
+    present_subscription_list_name: present_subscriptions_1
+- set_fact:
+    target_subscription_list_length: 0
+- name: "present: {{ present_subscription_list_name }}"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ queue_item[present_subscription_list_name] }}"
+    state: present
+- name: "exactly: []"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ [] }}"
+    state: exactly
+- name: "check:exactly:[]"
+  solace_get_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+  register: result
+- assert:
+    that:
+      - result.rc == 0
+      - result.result_list|length == target_subscription_list_length|int
+      - result.result_list_count == target_subscription_list_length|int
+# test exactly [] idempotency
+- name: "exactly: idempotency []"
+  solace_queue_subscriptions:
+    queue_name: "{{ queue_item.name }}"
+    subscription_topics: "{{ [] }}"
+    state: exactly
+  register: result
+- assert:
+    that:
+      - result.changed == False
+      - result.rc == 0
+      - result.response|length == 0
+
+
+###
+# The End.

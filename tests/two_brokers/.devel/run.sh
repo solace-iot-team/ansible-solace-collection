@@ -15,6 +15,7 @@ ansibleSolaceTests=(
   "setup"
   "solace_facts"
   "solace_bridges"
+  "apim"
   "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"

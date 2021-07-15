@@ -119,7 +119,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerActionTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -147,7 +147,8 @@ class SolaceQueueCancelReplayTask(SolaceBrokerActionTask):
         data = {
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_ACTION, 'msgVpns', vpn_name, 'queues', queue_name, 'cancelReplay']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_ACTION,
+                      'msgVpns', vpn_name, 'queues', queue_name, 'cancelReplay']
         return self.sempv2_api.make_put_request(self.get_config(), path_array, data)
 
 

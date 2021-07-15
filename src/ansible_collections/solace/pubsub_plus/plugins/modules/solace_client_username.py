@@ -88,7 +88,7 @@ rc:
             rc: 1
 '''
 
-import ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_sys as solace_sys
+from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
@@ -109,7 +109,8 @@ class SolaceClientUsernameTask(SolaceBrokerCRUDTask):
 
     def get_func(self, vpn_name, client_username):
         # GET /msgVpns/{msgVpnName}/clientUsernames/{clientUsername}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientUsernames', client_username]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'clientUsernames', client_username]
         return self.sempv2_api.get_object_settings(self.get_config(), path_array)
 
     def create_func(self, vpn_name, client_username, settings=None):
@@ -118,17 +119,20 @@ class SolaceClientUsernameTask(SolaceBrokerCRUDTask):
             self.OBJECT_KEY: client_username
         }
         data.update(settings if settings else {})
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientUsernames']
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'clientUsernames']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
     def update_func(self, vpn_name, client_username, settings=None, delta_settings=None):
         # PATCH /msgVpns/{msgVpnName}/clientUsernames/{clientUsername}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientUsernames', client_username]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'clientUsernames', client_username]
         return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
 
     def delete_func(self, vpn_name, client_username):
         # DELETE /msgVpns/{msgVpnName}/clientUsernames/{clientUsername}
-        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns', vpn_name, 'clientUsernames', client_username]
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'clientUsernames', client_username]
         return self.sempv2_api.make_delete_request(self.get_config(), path_array)
 
 
@@ -142,7 +146,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=arg_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
     solace_task = SolaceClientUsernameTask(module)
     solace_task.execute()
