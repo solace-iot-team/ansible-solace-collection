@@ -199,9 +199,11 @@ class SolaceClientProfileTask(SolaceBrokerCRUDTask):
         return d
 
     def normalize_new_settings(self, new_settings) -> dict:
-        if new_settings:
+        if new_settings and self.get_config().is_solace_cloud():
             self._type_conversion(new_settings)
-        return new_settings
+            return new_settings
+        else:
+            return super().normalize_new_settings(new_settings)
 
     def get_args(self):
         params = self.get_module().params
