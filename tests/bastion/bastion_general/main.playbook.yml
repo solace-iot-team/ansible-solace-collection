@@ -8,14 +8,13 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_client_profile:
+    solace_cloud_client_profile:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-      msg_vpn: "{{ vpn }}"
       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ meta.sc_service_id if broker_type=='solace_cloud' else omit }}"
     solace_acl_profile:
@@ -84,7 +83,7 @@
   - name: Block
     block:
     - name: Create Client Profile
-      solace_client_profile:
+      solace_cloud_client_profile:
         name: "{{ client_profile_name }}"
         state: present
 
@@ -130,7 +129,7 @@
         state: absent
 
     - name: Delete Client Profile
-      solace_client_profile:
+      solace_cloud_client_profile:
         name: "{{ client_profile_name }}"
         state: absent
     environment:

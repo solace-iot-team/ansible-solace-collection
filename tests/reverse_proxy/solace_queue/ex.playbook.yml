@@ -17,7 +17,7 @@
       password: "{{ semp_password }}"
       timeout: "{{ semp_timeout }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_client_profile:
+    solace_cloud_client_profile:
       secure_connection: "{{ semp_is_secure_connection }}"
       host: "{{ semp_host }}"
       port: "{{ semp_port }}"
@@ -37,7 +37,7 @@
   - set_fact:
       msg_vpn: "{{ result.result_list[0].data.msgVpnName }}"
   - name: "ex: Delete Client Profile"
-    solace_client_profile:
+    solace_cloud_client_profile:
       msg_vpn: "{{ msg_vpn }}"
       name: "asct-client-profile"
       state: absent

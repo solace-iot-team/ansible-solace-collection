@@ -115,8 +115,12 @@ class SolaceApi(object):
         max_tries = 20
         do_retry = True
         while do_retry and try_count < max_tries:
-            resp = self._make_request(
-                config, request_func, path_array, json_body, query_params, module_op)
+            resp = self._make_request(config,
+                                      request_func,
+                                      path_array,
+                                      json_body,
+                                      query_params,
+                                      module_op)
             if resp.status_code in [502, 504]:
                 logging.warning("resp.status_code: %d, resp.reason: '%s', try number: %d",
                                 resp.status_code, resp.reason, try_count)
@@ -717,8 +721,9 @@ class SolaceCloudApi(SolaceApi):
         # wait 1 cycle before start polling
         time.sleep(delay)
         while not is_completed and not is_failed and try_count < max_retries:
-            resp = self.get_service_request_status(
-                config, service_id, request_id)
+            resp = self.get_service_request_status(config,
+                                                   service_id,
+                                                   request_id)
             # import logging, json
             # logging.debug(f"resp (get_service_request_status)= \n{json.dumps(resp, indent=2)}")
             is_completed = (resp['adminProgress'] == 'completed')

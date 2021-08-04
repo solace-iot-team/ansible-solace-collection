@@ -1,0 +1,173 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "solace_cloud_client_profile: Create / Update / Delete Client Profile"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_cloud_client_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+  tasks:
+
+    - name: exit if not solace cloud
+      meta: end_play
+      when: broker_type != 'solace_cloud'
+
+    - set_fact:
+        client_profiles:
+          - name: "default_client_profile"
+          - name: "complete_client_profile"
+        default_client_profile:
+          name: "default_client_profile"
+        complete_client_profile:
+          name: "complete_client_profile"
+
+    - name: "Delete Client Profiles"
+      solace_cloud_client_profile:
+        name: "{{ item.name }}"
+        state: absent
+      loop: "{{ client_profiles }}"
+
+    - name: "Create Default Client Profile"
+      solace_cloud_client_profile:
+        name: "{{ default_client_profile.name }}"
+        state: present
+
+    # test idempotency
+    - name: "present:idempotency: Default Client Profile"
+      solace_cloud_client_profile:
+        name: "{{ default_client_profile.name }}"
+        state: present
+      register: result
+    - assert:
+        that:
+          - result.changed == False
+          - result.rc == 0
+
+    # test update
+    - name: "Update Default Client Profile"
+      solace_cloud_client_profile:
+        name: "{{ default_client_profile.name }}"
+        settings:
+          allowBridgeConnectionsEnabled: false
+          allowGuaranteedEndpointCreateEnabled: true
+        state: present
+
+    - name: "Update Default Client Profile"
+      solace_cloud_client_profile:
+        name: "{{ default_client_profile.name }}"
+        settings:
+          allowBridgeConnectionsEnabled: true
+          eventClientProvisionedEndpointSpoolUsageThreshold:
+            clearPercent: 50
+            setPercent: 60
+        state: present
+
+    # test idempotency
+    - name: "present:idempotency"
+      solace_cloud_client_profile:
+        name: "{{ default_client_profile.name }}"
+        settings:
+          allowBridgeConnectionsEnabled: false
+        state: present
+    - name: "present:idempotency"
+      solace_cloud_client_profile:
+        name: "{{ default_client_profile.name }}"
+        settings:
+          allowBridgeConnectionsEnabled: false
+        state: present
+      register: result
+    - assert:
+        that:
+          - result.changed == False
+          - result.rc == 0
+
+# test all of the settings with new profile
+
+    - name: "Create complete client profile"
+      solace_cloud_client_profile:
+        name: "{{ complete_client_profile.name }}"
+        settings:
+          allowBridgeConnectionsEnabled: true
+          allowCutThroughForwardingEnabled: true
+          allowGuaranteedEndpointCreateDurability: all
+          allowGuaranteedEndpointCreateEnabled: true
+          allowGuaranteedMsgReceiveEnabled: true
+          allowGuaranteedMsgSendEnabled: true
+          allowSharedSubscriptionsEnabled: true
+          allowTransactedSessionsEnabled: true
+          # apiQueueManagementCopyFromOnCreateName: "client_profile_queue"
+          # apiQueueManagementCopyFromOnCreateTemplateName: "client_profile_queue_template"
+          # apiTopicEndpointManagementCopyFromOnCreateName: "client_profile_topic_endpoint"
+          # apiTopicEndpointManagementCopyFromOnCreateTemplateName: "client_profile_topic_endpoint_template"
+          compressionEnabled: true
+          elidingDelay: 10
+          elidingEnabled: true
+          elidingMaxTopicCount: 10
+          eventClientProvisionedEndpointSpoolUsageThreshold:
+            clearPercent: 10
+            setPercent: 30
+          # eventConnectionCountPerClientUsernameThreshold:
+          # eventEgressFlowCountThreshold
+          # eventEndpointCountPerClientUsernameThreshold
+          # eventIngressFlowCountThreshold
+          # eventServiceSmfConnectionCountPerClientUsernameThreshold
+          # eventServiceWebConnectionCountPerClientUsernameThreshold
+          # eventSubscriptionCountThreshold
+          # eventTransactedSessionCountThreshold
+          # eventTransactionCountThreshold
+          maxConnectionCountPerClientUsername: 10
+          maxEgressFlowCount: 1200
+          maxEndpointCountPerClientUsername: 10
+          maxIngressFlowCount: 1200
+          maxMsgsPerTransaction: 3
+          maxSubscriptionCount: 10
+          maxTransactedSessionCount: 10
+          maxTransactionCount: 10
+          # msgVpnName
+          queueControl1MaxDepth: 10
+          queueControl1MinMsgBurst: 10
+          queueDirect1MaxDepth: 10
+          queueDirect1MinMsgBurst: 10
+          queueDirect2MaxDepth: 10
+          queueDirect2MinMsgBurst: 10
+          queueDirect3MaxDepth: 10
+          queueDirect3MinMsgBurst: 10
+          queueGuaranteed1MaxDepth: 10
+          queueGuaranteed1MinMsgBurst: 10
+          rejectMsgToSenderOnNoSubscriptionMatchEnabled: true
+          replicationAllowClientConnectWhenStandbyEnabled: true
+          serviceMinKeepaliveTimeout: 10
+          serviceSmfMaxConnectionCountPerClientUsername: 10
+          serviceSmfMinKeepaliveEnabled: 10
+          serviceWebInactiveTimeout: 10
+          serviceWebMaxConnectionCountPerClientUsername: 10
+          serviceWebMaxPayload: 310
+          tcpCongestionWindowSize: 10
+          tcpKeepaliveCount: 3
+          tcpKeepaliveIdleTime: 10
+          tcpKeepaliveInterval: 10
+          tcpMaxSegmentSize: 258
+          tcpMaxWindowSize: 258
+          tlsAllowDowngradeToPlainTextEnabled: true
+        state: present
+
+    - name: "Delete Client Profiles"
+      solace_cloud_client_profile:
+        name: "{{ item.name }}"
+        state: absent
+      loop: "{{ client_profiles }}"
+
+###
+# The End.

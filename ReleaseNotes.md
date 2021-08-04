@@ -1,5 +1,22 @@
 # Release Notes
 
+## Version: 1.5.1
+Client Profile & Bug Fixes
+
+**New Modules**
+* **[solace_cloud_client_profile](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_cloud_client_profile.html)**
+  - separated client profile management into Solace Cloud API and SempV2 API
+
+**Updated Modules**
+* **[solace_client_profile](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_client_profile.html)**
+  - removed support for Solace Cloud
+
+**Bug Fixes**
+* **[solace_client_profile](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_client_profile.html)**
+  - settings value conversion from ansible to SEMP v2 API fixed
+* **[solace_service_authentication_ldap_profile](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_service_authentication_ldap_profile.html)**
+  - set min sempv1 version to 9.1
+
 ## Version: 1.5.0
 Framework Enhancements & New Modules
 

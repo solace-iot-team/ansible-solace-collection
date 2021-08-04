@@ -17,48 +17,46 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
-      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
   tasks:
+  - name: exit if solace cloud
+    meta: end_play
+    when: broker_type == 'solace_cloud'
 
-    - name: "main: Delete Client Profile"
-      solace_client_profile:
-        name: "test_ansible_solace"
-        state: absent
+  - name: "main: Delete Client Profile"
+    solace_client_profile:
+      name: "test_ansible_solace"
+      state: absent
 
-    - name: "main: Create Client Profile"
-      solace_client_profile:
-        name: "test_ansible_solace"
-        state: present
+  - name: "main: Create Client Profile"
+    solace_client_profile:
+      name: "test_ansible_solace"
+      state: present
 
-    - name: "main: Update Client Profile"
-      solace_client_profile:
-        name: "test_ansible_solace"
-        settings:
-          # same
-          # allowGuaranteedMsgReceiveEnabled: true
-          allowGuaranteedEndpointCreateEnabled: true
-          # changed
-          allowGuaranteedMsgSendEnabled: false
-          # allowUseCompression: false
-          # replicationAllowClientConnectWhenStandbyEnabled: false
-        state: present
+  - name: "main: Update Client Profile"
+    solace_client_profile:
+      name: "test_ansible_solace"
+      settings:
+        # same
+        # allowGuaranteedMsgReceiveEnabled: true
+        allowGuaranteedEndpointCreateEnabled: true
+        # changed
+        allowGuaranteedMsgSendEnabled: false
+        # allowUseCompression: false
+        # replicationAllowClientConnectWhenStandbyEnabled: false
+      state: present
 
-    - fail:
-         msg: continue here
+  - name: "main: Delete Client Profile 1"
+    solace_client_profile:
+      name: "test_ansible_solace"
+      state: absent
 
-    - name: "main: Delete Client Profile 1"
-      solace_client_profile:
-        name: "test_ansible_solace"
-        state: absent
-
-    - name: "main: Delete Client Profile 2"
-      solace_client_profile:
-        name: "test_ansible_solace"
-        state: absent
-      register: result
-    - assert:
-        that: not result.changed
+  - name: "main: Delete Client Profile 2"
+    solace_client_profile:
+      name: "test_ansible_solace"
+      state: absent
+    register: result
+  - assert:
+      that: not result.changed
 
 ###
 # The End.
