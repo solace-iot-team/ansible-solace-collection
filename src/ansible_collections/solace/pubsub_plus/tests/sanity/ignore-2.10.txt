@@ -43,6 +43,9 @@ plugins/modules/solace_acl_subscribe_share_name_exceptions.py pep8:E501
 plugins/modules/solace_get_acl_subscribe_share_name_exceptions.py compile-2.7!skip
 plugins/modules/solace_get_acl_subscribe_share_name_exceptions.py pep8:E501
 plugins/modules/solace_client_profile.py compile-2.7!skip
+plugins/modules/solace_client_profile.py pep8:E501
+plugins/modules/solace_cloud_client_profile.py compile-2.7!skip
+plugins/modules/solace_cloud_client_profile.py pep8:E501
 plugins/modules/solace_queue.py compile-2.7!skip
 plugins/modules/solace_rdp.py compile-2.7!skip
 plugins/modules/solace_rdp_queue_binding.py compile-2.7!skip

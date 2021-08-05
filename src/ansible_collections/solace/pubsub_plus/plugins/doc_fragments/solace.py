@@ -115,6 +115,24 @@ options:
     required: false
 '''
 
+    BROKER_CONFIG_SOLACE_CLOUD_MANDATORY = r'''
+options:
+  solace_cloud_api_token:
+    description:
+      - The API Token.
+      - Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+      - Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+    type: str
+    required: true
+  solace_cloud_service_id:
+    description:
+      - The service id in Solace Cloud.
+      - Click on the service in Solace Cloud - the service id is in the URL.
+      - Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+    type: str
+    required: true
+'''
+
     SOLACE_CLOUD_CONFIG_SOLACE_CLOUD = r'''
 options:
   solace_cloud_api_token:

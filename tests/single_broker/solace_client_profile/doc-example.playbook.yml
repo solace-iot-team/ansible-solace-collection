@@ -1,0 +1,46 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "solace_client_profile.doc-example"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_client_profile:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+      reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
+  tasks:
+
+  - name: exit if solace cloud
+    meta: end_play
+    when: broker_type == 'solace_cloud'
+
+  - name: create default profile
+    solace_client_profile:
+      name: foo
+      state: present
+
+  - name: update
+    solace_client_profile:
+      name: foo
+      settings:
+        allowGuaranteedEndpointCreateEnabled: false
+        allowGuaranteedMsgSendEnabled: false
+      state: present
+
+  - name: delete
+    solace_client_profile:
+      name: foo
+      state: absent
+
+###
+# The End.

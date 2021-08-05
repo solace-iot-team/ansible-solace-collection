@@ -176,7 +176,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
 
-    MIN_SEMP_V1_VERSION = "9.3"
+    MIN_SEMP_V1_VERSION = "9.1"
 
     def __init__(self, module):
         super().__init__(module)

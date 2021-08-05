@@ -3,7 +3,6 @@
 Setup the development environment.
 
 ## MacOS
-
 ### Install Python Version(s)
 
 ````bash

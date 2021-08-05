@@ -255,6 +255,16 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         )
 
     @ staticmethod
+    def arg_spec_solace_cloud_mandatory() -> dict:
+        return dict(
+            solace_cloud_api_token=dict(type='str',
+                                        required=True,
+                                        no_log=True),
+            solace_cloud_service_id=dict(type='str',
+                                         required=True)
+        )
+
+    @ staticmethod
     def arg_spec_vpn() -> dict:
         return dict(
             msg_vpn=dict(type='str', required=True)
