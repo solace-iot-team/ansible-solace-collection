@@ -221,7 +221,7 @@ Example Installation: Centos7
   $ sudo yum install python3
   $ sudo yum install libselinux-python3
 
-  $ sudo python -m pip install --upgrade pip
+  $ sudo python3 -m pip install --upgrade pip
   $ pip -V
 
 **Ansible & Solace Collection**

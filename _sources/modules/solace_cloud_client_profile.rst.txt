@@ -1,13 +1,13 @@
-:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_client_profile.py
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_cloud_client_profile.py
 
-.. _solace_client_profile_module:
+.. _solace_cloud_client_profile_module:
 
-solace_client_profile -- client profile for sempv2
-==================================================
+solace_cloud_client_profile -- client profile for Solace Cloud
+==============================================================
 
-Configure a Client Profile object using the SEMPV2 API. Allows addition, removal and configuration of Client Profile objects on Solace Brokers in an idempotent manner.
+Configure a Client Profile object in Solace Cloud. Allows addition, removal and configuration of Client Profile objects in an idempotent manner.
 
-Supports only Solace Standalone Brokers - i.e. the SEMPV2 API.
+The settings for the Solace Cloud API are the same as for the SEMPV2 API.
 
 
 
@@ -18,44 +18,60 @@ Examples
 .. code-block:: yaml+jinja
 
    
-     hosts: all
-     gather_facts: no
-     any_errors_fatal: true
-     collections:
-       - solace.pubsub_plus
-     module_defaults:
-       solace_client_profile:
-         host: "{{ sempv2_host }}"
-         port: "{{ sempv2_port }}"
-         secure_connection: "{{ sempv2_is_secure_connection }}"
-         username: "{{ sempv2_username }}"
-         password: "{{ sempv2_password }}"
-         timeout: "{{ sempv2_timeout }}"
-         msg_vpn: "{{ vpn }}"
-         reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-     tasks:
+   hosts: all
+   gather_facts: no
+   any_errors_fatal: true
+   collections:
+     - solace.pubsub_plus
+   module_defaults:
+     solace_cloud_client_profile:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+     solace_get_client_profiles:
+       host: "{{ sempv2_host }}"
+       port: "{{ sempv2_port }}"
+       secure_connection: "{{ sempv2_is_secure_connection }}"
+       username: "{{ sempv2_username }}"
+       password: "{{ sempv2_password }}"
+       timeout: "{{ sempv2_timeout }}"
+       msg_vpn: "{{ vpn }}"
+   tasks:
 
-     - name: exit if solace cloud
-       meta: end_play
-       when: broker_type == 'solace_cloud'
+   - name: exit if not solace cloud
+     meta: end_play
+     when: broker_type != 'solace_cloud'
 
-     - name: create default profile
-       solace_client_profile:
-         name: foo
-         state: present
+   - name: create default profile
+     solace_cloud_client_profile:
+       name: foo
+       state: present
 
-     - name: update
-       solace_client_profile:
-         name: foo
-         settings:
-           allowGuaranteedEndpointCreateEnabled: false
-           allowGuaranteedMsgSendEnabled: false
-         state: present
+   - name: update
+     solace_cloud_client_profile:
+       name: foo
+       settings:
+         allowGuaranteedEndpointCreateEnabled: false
+         allowGuaranteedMsgSendEnabled: false
+       state: present
 
-     - name: delete
-       solace_client_profile:
-         name: foo
-         state: absent
+   - name: get profiles
+     solace_get_client_profiles:
+       query_params:
+         where:
+           - "clientProfileName==foo"
+         select:
+           - "clientProfileName"
+
+   - name: delete
+     solace_cloud_client_profile:
+       name: foo
+       state: absent
 
 
 
@@ -64,6 +80,8 @@ Notes
 
 .. note::
    - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile
+   - Module Solace Cloud API: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_client_profiles.htm
+   - Known Issue: Solace Cloud API does not return values for 'eventClientProvisionedEndpointSpoolUsageThreshold'. To ensure correct settings, add them to the `settings` dict.
    - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
    - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
    - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
@@ -74,8 +92,8 @@ See Also
 
 .. seealso::
 
+   - :ref:`solace_client_profile_module`
    - :ref:`solace_get_client_profiles_module`
-   - :ref:`solace_cloud_client_profile_module`
 
 
 
@@ -87,11 +105,6 @@ host (optional)
 
   | **type**: str
   | **default**: localhost
-
-msg_vpn (required)
-  The message vpn.
-
-  | **type**: str
 
 name (required)
   Name of the client profile. Maps to 'clientProfileName' in the API.
@@ -157,8 +170,26 @@ secure_connection (optional)
   | **type**: bool
   | **default**: False
 
-sempv2_settings (optional)
-  JSON dictionary of additional configuration for the SEMP V2 API. See Reference documentation.
+solace_cloud_api_token (required)
+  The API Token.
+
+  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
+  | **type**: str
+
+solace_cloud_service_id (required)
+  The service id in Solace Cloud.
+
+  Click on the service in Solace Cloud - the service id is in the URL.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
+  | **type**: str
+
+solace_cloud_settings (optional)
+  JSON dictionary of additional configuration for the Solace Cloud API. See Reference documentation.
 
   | **type**: dict
   | **aliases**: settings
@@ -195,7 +226,7 @@ Return Values
 -------------
 
 response
-  The response from the Solace Sempv2 request.
+  The response from the Solace Cloud API request.
 
   | **returned**: success
   | **type**: dict

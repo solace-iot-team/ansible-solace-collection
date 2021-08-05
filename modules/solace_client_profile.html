@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>solace_client_profile – client profile &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  <title>solace_client_profile – client profile for sempv2 &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
   
 
   
@@ -126,7 +126,7 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_vpn.html">solace_bridge_remote_vpn – bridge remote vpn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_bridge_trusted_cn.html">solace_bridge_trusted_cn – trusted common name for bridge</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_cert_authority.html">solace_cert_authority – certificate authority</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_client_profile – client profile</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_client_profile – client profile for sempv2</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
@@ -214,7 +214,7 @@
         
           <li><a href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a> &raquo;</li>
         
-      <li>solace_client_profile – client profile</li>
+      <li>solace_client_profile – client profile for sempv2</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -236,18 +236,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="solace-client-profile-client-profile">
-<span id="solace-client-profile-module"></span><h1>solace_client_profile – client profile<a class="headerlink" href="#solace-client-profile-client-profile" title="Permalink to this headline">¶</a></h1>
-<p>Configure a Client Profile object. Allows addition, removal and configuration of Client Profile objects on Solace Brokers in an idempotent manner.</p>
-<p>Supports Solace Cloud Brokers as well as Solace Standalone Brokers.</p>
-<p>Solace Cloud: Polls periodically until Client Profile created and only then returns.</p>
+  <div class="section" id="solace-client-profile-client-profile-for-sempv2">
+<span id="solace-client-profile-module"></span><h1>solace_client_profile – client profile for sempv2<a class="headerlink" href="#solace-client-profile-client-profile-for-sempv2" title="Permalink to this headline">¶</a></h1>
+<p>Configure a Client Profile object using the SEMPV2 API. Allows addition, removal and configuration of Client Profile objects on Solace Brokers in an idempotent manner.</p>
+<p>Supports only Solace Standalone Brokers - i.e. the SEMPV2 API.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
 <span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
 <span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="nt">collections</span><span class="p">:</span>
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span>
 <span class="nt">module_defaults</span><span class="p">:</span>
   <span class="nt">solace_client_profile</span><span class="p">:</span>
     <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
@@ -257,27 +256,30 @@
     <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
     <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">solace_cloud_api_token</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">SOLACE_CLOUD_API_TOKEN</span> <span class="k">if</span> <span class="nv">broker_type</span><span class="o">==</span><span class="s1">&#39;solace_cloud&#39;</span> <span class="k">else</span> <span class="nv">omit</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">solace_cloud_service_id</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">solace_cloud_service_id</span> <span class="o">|</span> <span class="nf">default</span><span class="o">(</span><span class="nv">omit</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
+    <span class="nt">reverse_proxy</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">semp_reverse_proxy</span> <span class="o">|</span> <span class="nf">default</span><span class="o">(</span><span class="nv">omit</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span>
 <span class="nt">tasks</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Delete Client Profile</span>
-    <span class="nt">solace_client_profile</span><span class="p">:</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
-        <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">absent</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Create Client Profile</span>
-    <span class="nt">solace_client_profile</span><span class="p">:</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
-        <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">exit if solace cloud</span>
+  <span class="nt">meta</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">end_play</span>
+  <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">broker_type == &#39;solace_cloud&#39;</span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Update Client Profile</span>
-    <span class="nt">solace_client_profile</span><span class="p">:</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
-        <span class="nt">settings</span><span class="p">:</span>
-          <span class="nt">allowGuaranteedMsgSendEnabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-          <span class="nt">allowGuaranteedMsgReceiveEnabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-          <span class="nt">allowGuaranteedEndpointCreateEnabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-        <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create default profile</span>
+  <span class="nt">solace_client_profile</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">update</span>
+  <span class="nt">solace_client_profile</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">settings</span><span class="p">:</span>
+      <span class="nt">allowGuaranteedEndpointCreateEnabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">allowGuaranteedMsgSendEnabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">delete</span>
+  <span class="nt">solace_client_profile</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">absent</span>
 </pre></div>
 </div>
 </div>
@@ -287,7 +289,6 @@
 <p class="admonition-title">Note</p>
 <ul class="simple">
 <li><p>Module Sempv2 Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientProfile</a></p></li>
-<li><p>Module Solace Cloud API: <a class="reference external" href="https://docs.solace.com/Solace-Cloud/ght_use_rest_api_client_profiles.htm">https://docs.solace.com/Solace-Cloud/ght_use_rest_api_client_profiles.htm</a></p></li>
 <li><p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a></p></li>
 <li><p>Sempv2 Monitor Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/</a></p></li>
 <li><p>Sempv2 Action Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/</a></p></li>
@@ -300,6 +301,7 @@
 <p class="admonition-title">See also</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="solace_get_client_profiles.html#solace-get-client-profiles-module"><span class="std std-ref">solace_get_client_profiles – get list of client profiles</span></a></p></li>
+<li><p><a class="reference internal" href="solace_cloud_client_profile.html#solace-cloud-client-profile-module"><span class="std std-ref">solace_cloud_client_profile – client profile for Solace Cloud</span></a></p></li>
 </ul>
 </div>
 </div>
@@ -389,20 +391,6 @@
 <div class="line"><strong>aliases</strong>: settings</div>
 </div>
 </dd>
-<dt>solace_cloud_api_token (optional)</dt><dd><p>The API Token.</p>
-<p>Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.</p>
-<p>Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>solace_cloud_service_id (optional)</dt><dd><p>The service id in Solace Cloud.</p>
-<p>Click on the service in Solace Cloud - the service id is in the URL.</p>
-<p>Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.</p>
-<div class="line-block">
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
 <dt>state (optional)</dt><dd><p>Target state.</p>
 <div class="line-block">
 <div class="line"><strong>type</strong>: str</div>
@@ -481,7 +469,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 15 Jul 2021 at 06:52.
+        Last updated on 05 Aug 2021 at 07:38.
       </span>
 
     </p>
