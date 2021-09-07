@@ -18,11 +18,13 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
   if [ -z "$AZURE_BROKER_PROJECT_NAME" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_BROKER_PROJECT_NAME"; exit 1; fi
   if [ -z "$AZURE_LOCATION" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_LOCATION"; exit 1; fi
-  if [ -z "$AZURE_VM_IMAGE_URN" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_IMAGE_URN"; exit 1; fi
   if [ -z "$AZURE_VM_SEMP_PLAIN_PORT" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_PLAIN_PORT"; exit 1; fi
   if [ -z "$AZURE_VM_SEMP_SECURE_PORT" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_SECURE_PORT"; exit 1; fi
   if [ -z "$AZURE_VM_ADMIN_USER" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_ADMIN_USER"; exit 1; fi
   if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE"; exit 1; fi
+
+# defaults
+  if [ -z "$AZURE_VM_IMAGE_URN" ]; then export AZURE_VM_IMAGE_URN="Canonical:0001-com-ubuntu-server-focal:20_04-lts:latest"; fi
 
 ############################################################################################################################
 # Prepare

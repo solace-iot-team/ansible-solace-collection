@@ -16,12 +16,13 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$WORKING_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: WORKING_DIR"; exit 1; fi
   if [ -z "$LOG_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: LOG_DIR"; exit 1; fi
   if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
-
   if [ -z "$AZURE_BASTION_PROJECT_NAME" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_BASTION_PROJECT_NAME"; exit 1; fi
   if [ -z "$AZURE_LOCATION" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_LOCATION"; exit 1; fi
-  if [ -z "$AZURE_VM_IMAGE_URN" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_IMAGE_URN"; exit 1; fi
   if [ -z "$SSH_PUBLIC_KEY_FILE" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: SSH_PUBLIC_KEY_FILE"; exit 1; fi
   if [ -z "$SSH_PRIVATE_KEY_FILE" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: SSH_PRIVATE_KEY_FILE"; exit 1; fi
+
+# defaults
+  if [ -z "$AZURE_VM_IMAGE_URN" ]; then export AZURE_VM_IMAGE_URN="Canonical:0001-com-ubuntu-server-focal:20_04-lts:latest"; fi
 
 ############################################################################################################################
 # Prepare

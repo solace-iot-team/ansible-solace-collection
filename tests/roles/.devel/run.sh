@@ -21,6 +21,7 @@ export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
 # local broker
   export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
+  export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.10.0.15"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.7.0.29"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.6.0.46"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.3.1.28"
