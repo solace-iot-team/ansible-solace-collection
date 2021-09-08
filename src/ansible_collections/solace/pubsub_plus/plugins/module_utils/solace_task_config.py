@@ -46,6 +46,9 @@ class SolaceTaskConfig(object):
     def get_timeout(self) -> float:
         raise SolaceInternalErrorAbstractMethod()
 
+    def get_validate_certs(self) -> bool:
+        raise SolaceInternalErrorAbstractMethod()
+
     def get_headers(self, op: str) -> dict:
         raise SolaceInternalErrorAbstractMethod()
 
@@ -358,6 +361,7 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
         super().__init__(module)
         self.solace_cloud_api_token = module.params[self.PARAM_API_TOKEN]
         self.timeout = float(module.params['timeout'])
+        self.validate_certs = bool(module.params['validate_certs'])
         self.auth = BearerAuth(self.solace_cloud_api_token)
 
     def is_solace_cloud(self) -> bool:
@@ -372,6 +376,9 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
     def get_timeout(self) -> float:
         return self.timeout
 
+    def get_validate_certs(self) -> bool:
+        return self.validate_certs
+
     def get_headers(self, op) -> dict:
         return {}
 
@@ -380,7 +387,8 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
         return dict(
             solace_cloud_api_token=dict(
                 type='str', required=True, no_log=True, aliases=['api_token']),
-            timeout=dict(type='int', default='60', required=False)
+            timeout=dict(type='int', default='60', required=False),
+            validate_certs=dict(type='bool', default=True)
         )
 
 

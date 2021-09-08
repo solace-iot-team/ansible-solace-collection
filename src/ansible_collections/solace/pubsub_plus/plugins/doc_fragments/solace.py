@@ -152,6 +152,11 @@ options:
     required: false
     default: 60
     type: int
+  validate_certs:
+    description: Flag to switch validation of client certificates on/off when using a secure connection.
+    required: false
+    default: true
+    type: bool
 '''
 
     SOLACE_CLOUD_SERVICE_CONFIG_SERVICE_ID = r'''
