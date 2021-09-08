@@ -35,6 +35,11 @@ options:
     required: false
     default: false
     type: bool
+  validate_certs:
+    description: Flag to switch validation of client certificates on/off when using a secure connection.
+    required: false
+    default: true
+    type: bool
   username:
     description: Administrator username for Solace Broker.
     required: false

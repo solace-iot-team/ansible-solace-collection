@@ -1,0 +1,107 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "Single Broker Setup"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_vpn:
+      host: "{{ sempv2_host }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+  tasks:
+  - name: "Check vars"
+    assert:
+      that:
+        - BROKER_INVENTORY_FILE is defined
+        - BROKER_DOCKER_IMAGE is defined
+        - BROKER_DOCKER_COMPOSE_FILE is defined
+        - HOST_MOUNT_PATH_SECRETS_DIR is defined
+        - CERT_FILE is defined
+      fail_msg: "one or more variables not defined"
+
+  - name: "Set facts"
+    set_fact:
+      docker_compose_path: "{{ BROKER_DOCKER_COMPOSE_FILE | dirname }}"
+      docker_compose_file: "{{ BROKER_DOCKER_COMPOSE_FILE | basename }}"
+      secretsMountPathDir: "{{ HOST_MOUNT_PATH_SECRETS_DIR }}"
+      cert_file: "{{ CERT_FILE | basename }}"
+      plain_broker_url: "http://{{ sempv2_host }}:{{ sempv2_port_plain }}"
+      secure_broker_url: "http://{{ sempv2_host }}:{{ sempv2_port_secure }}"
+
+  - name: "Docker Compose up"
+    community.general.docker_compose:
+      project_src: "{{ docker_compose_path }}"
+      files:
+        - "{{ docker_compose_file }}"
+      state: present
+      restarted: yes
+    environment:
+      BROKER_DOCKER_IMAGE: "{{ BROKER_DOCKER_IMAGE }}"
+      HOST_MOUNT_PATH_SECRETS_DIR: "{{ secretsMountPathDir }}"
+      CERT_FILE: "{{ cert_file }}"
+
+  - name: "Wait for Broker Up"
+    uri:
+      url: "{{ plain_broker_url }}"
+      return_content: yes
+      status_code: [200, -1]
+    register: result
+    until: result.status == 200
+    retries: 20
+    delay: 5
+
+  - assert:
+      that: result.status == 200
+      fail_msg: "cannot reach local broker on {{ plain_broker_url }}"
+
+  - name: create msg vpn using SEMP plain
+    solace_vpn:
+      port: "{{ sempv2_port_plain }}"
+      secure_connection: false
+      name: plain-vpn
+      state: present
+
+      # returns error
+  - name: create msg vpn using SEMP secure with certs validation
+    solace_vpn:
+      secure_connection: true
+      port: "{{ sempv2_port_secure }}"
+      # validate_certs: true
+      name: secure-vpn
+      state: present
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.rc == 1
+        - "'CERTIFICATE_VERIFY_FAILED' in result.msg | string"
+
+      # no error
+  - name: create msg vpn using SEMP secure no certs validation
+    solace_vpn:
+      secure_connection: true
+      port: "{{ sempv2_port_secure }}"
+      validate_certs: false
+      name: secure-vpn
+      state: present
+    register: result
+
+  - name: "Docker Compose down"
+    community.general.docker_compose:
+      project_src: "{{ docker_compose_path }}"
+      files:
+        - "{{ docker_compose_file }}"
+      state: absent
+    environment:
+      BROKER_DOCKER_IMAGE: "{{ BROKER_DOCKER_IMAGE }}"
+      HOST_MOUNT_PATH_SECRETS_DIR: "{{ secretsMountPathDir }}"
+      CERT_FILE: "{{ cert_file }}"
+
+###
+# The End.

@@ -105,9 +105,7 @@ class SolaceApi(object):
             auth=self.get_auth(config),
             timeout=config.get_timeout(),
             headers=_headers,
-
-            # here: how to test it?
-            # verify=False,
+            verify=config.get_validate_certs(),
             params=_query_params_str)
         SolaceApi.log_http_roundtrip(resp)
         return resp

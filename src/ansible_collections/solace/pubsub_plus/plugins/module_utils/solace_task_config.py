@@ -106,6 +106,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         self.broker_url = ('https' if is_secure else 'http') + \
             '://' + host + ':' + str(port)
         self.timeout = float(module.params['timeout'])
+        self.validate_certs = bool(module.params['validate_certs'])
         self.x_broker = module.params.get('x_broker', None)
         solace_cloud_api_token = module.params.get(
             'solace_cloud_api_token', None)
@@ -212,6 +213,9 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
     def get_timeout(self) -> float:
         return self.timeout
 
+    def get_validate_certs(self) -> bool:
+        return self.validate_certs
+
     def get_headers(self, op) -> dict:
         _headers = {
             'x-broker-name': self.x_broker
@@ -227,6 +231,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             host=dict(type='str', default='localhost'),
             port=dict(type='int', default=8080),
             secure_connection=dict(type='bool', default=False),
+            validate_certs=dict(type='bool', default=True),
             username=dict(type='str', default='admin'),
             password=dict(type='str', default='admin', no_log=True),
             timeout=dict(type='int', default='10', required=False),
