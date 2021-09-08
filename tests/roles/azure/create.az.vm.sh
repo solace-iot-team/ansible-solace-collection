@@ -6,22 +6,22 @@ scriptDir=$(cd $(dirname "$0") && pwd);
 scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
 testTarget=${scriptDir##*/}
 scriptLogName="$testTargetGroup.$testTarget.$scriptName"
-if [ -z "$PROJECT_HOME" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
+if [ -z "$PROJECT_HOME" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
 source $PROJECT_HOME/.lib/functions.sh
 
 
 ############################################################################################################################
 # Environment Variables
 
-  if [ -z "$WORKING_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: WORKING_DIR"; exit 1; fi
-  if [ -z "$LOG_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: LOG_DIR"; exit 1; fi
-  if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
-  if [ -z "$AZURE_BROKER_PROJECT_NAME" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_BROKER_PROJECT_NAME"; exit 1; fi
-  if [ -z "$AZURE_LOCATION" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_LOCATION"; exit 1; fi
-  if [ -z "$AZURE_VM_SEMP_PLAIN_PORT" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_PLAIN_PORT"; exit 1; fi
-  if [ -z "$AZURE_VM_SEMP_SECURE_PORT" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_SECURE_PORT"; exit 1; fi
-  if [ -z "$AZURE_VM_ADMIN_USER" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_ADMIN_USER"; exit 1; fi
-  if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE"; exit 1; fi
+  if [ -z "$WORKING_DIR" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: WORKING_DIR"; exit 1; fi
+  if [ -z "$LOG_DIR" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: LOG_DIR"; exit 1; fi
+  if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
+  if [ -z "$AZURE_BROKER_PROJECT_NAME" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: AZURE_BROKER_PROJECT_NAME"; exit 1; fi
+  if [ -z "$AZURE_LOCATION" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: AZURE_LOCATION"; exit 1; fi
+  if [ -z "$AZURE_VM_SEMP_PLAIN_PORT" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_PLAIN_PORT"; exit 1; fi
+  if [ -z "$AZURE_VM_SEMP_SECURE_PORT" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: AZURE_VM_SEMP_SECURE_PORT"; exit 1; fi
+  if [ -z "$AZURE_VM_ADMIN_USER" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: AZURE_VM_ADMIN_USER"; exit 1; fi
+  if [ -z "$AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: AZURE_VM_REMOTE_HOST_INVENTORY_TEMPLATE"; exit 1; fi
 
 # defaults
   if [ -z "$AZURE_VM_IMAGE_URN" ]; then export AZURE_VM_IMAGE_URN="Canonical:0001-com-ubuntu-server-focal:20_04-lts:latest"; fi
@@ -45,16 +45,16 @@ source $PROJECT_HOME/.lib/functions.sh
 
 ############################################################################################################################
 # Run
-echo " >>> Creating Resource Group $resourceGroupName ..."
+echo " >>> $scriptName: Creating Resource Group $resourceGroupName ..."
   az group create \
     --name $resourceGroupName \
     --location "$azLocation" \
     --tags projectName=$azureProjectName \
     --verbose
-  if [[ $? != 0 ]]; then echo " >>> XT_ERROR: creating resource group"; exit 1; fi
-echo " >>> Success."
+  if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: creating resource group"; exit 1; fi
+echo " >>> $scriptName: Success."
 
-echo " >>> Creating azure vm ..."
+echo " >>> $scriptName: Creating azure vm ..."
   az vm create \
     --resource-group $resourceGroupName \
     --name "$vmName" \
@@ -64,34 +64,34 @@ echo " >>> Creating azure vm ..."
     --public-ip-address-dns-name $vmName \
     --verbose \
     > $outputInfoFile
-  if [[ $? != 0 ]]; then echo " >>> XT_ERROR: creating azure vm"; exit 1; fi
+  if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: creating azure vm"; exit 1; fi
   cat $outputInfoFile | jq .
   ls -la ~/.ssh/id_rsa*
-  # cat ~/.ssh/id_rsa; if [[ $? != 0 ]]; then echo " >>> XT_ERROR: vm private key"; exit 1; fi
-  # cat ~/.ssh/id_rsa.pub; echo ""; if [[ $? != 0 ]]; then echo " >>> XT_ERROR: vm pub key"; exit 1; fi
-echo " >>> Success."
+  # cat ~/.ssh/id_rsa; if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: vm private key"; exit 1; fi
+  # cat ~/.ssh/id_rsa.pub; echo ""; if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: vm pub key"; exit 1; fi
+echo " >>> $scriptName: Success."
 
-echo " >>> Opening plain semp port on azure vm ..."
+echo " >>> $scriptName: Opening plain semp port on azure vm ..."
   az vm open-port \
     --port $vmSempPlainPort \
     --priority 101 \
     --resource-group $resourceGroupName \
     --name "$vmName" \
     --verbose
-  if [[ $? != 0 ]]; then echo " >>> XT_ERROR: opening semp plain port $vmSempPlainPort on azure vm"; exit 1; fi
-echo " >>> Success."
+  if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: opening semp plain port $vmSempPlainPort on azure vm"; exit 1; fi
+echo " >>> $scriptName: Success."
 
-echo " >>> Opening secure semp port on azure vm ..."
+echo " >>> $scriptName: Opening secure semp port on azure vm ..."
   az vm open-port \
     --port $vmSempSecurePort \
     --priority 100 \
     --resource-group $resourceGroupName \
     --name "$vmName" \
     --verbose
-  if [[ $? != 0 ]]; then echo " >>> XT_ERROR: opening semp secure port $vmSempSecurePort on azure vm"; exit 1; fi
-echo " >>> Success."
+  if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: opening semp secure port $vmSempSecurePort on azure vm"; exit 1; fi
+echo " >>> $scriptName: Success."
 
-echo " >>> Test ssh to vm ..."
+echo " >>> $scriptName: Test ssh to vm ..."
   vmPublicIpAddress=$(cat $outputInfoFile | jq -r '.publicIpAddress')
   tries=0; max=10; code=1;
   while [[ $tries -lt $max && $code -gt 0 ]]; do
@@ -101,25 +101,25 @@ echo " >>> Test ssh to vm ..."
     echo "tries=$tries, ssh_test=$ssh_test"
     if [[ $code != 0 ]]; then echo "code=$code && tries=$tries, sleep 1m"; sleep 1m; fi
   done
-  if [[ $code != 0 || -z "$ssh_test" ]]; then echo " >>> XT_ERROR: ssh into vm"; exit 1; fi
-echo " >>> Success."
+  if [[ $code != 0 || -z "$ssh_test" ]]; then echo " >>> $scriptName:XT_ERROR: ssh into vm"; exit 1; fi
+echo " >>> $scriptName: Success."
 
-echo " >>> Calling Bootstrap vm ..."
+echo " >>> $scriptName: Calling Bootstrap vm ..."
   vmPublicIpAddress=$(cat $outputInfoFile | jq -r '.publicIpAddress')
   export vmPublicIpAddress
   export vmAdminUsr
   runScript="$scriptDir/../azure/bootstrap.Ubuntu-18.vm.sh"
   $runScript
-  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
-echo " >>> Success."
+  code=$?; if [[ $code != 0 ]]; then echo ">>> $scriptName:XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+echo " >>> $scriptName: Success."
 
-echo " >>> Get python path ..."
+echo " >>> $scriptName: Get python path ..."
   vmPublicIpAddress=$(cat $outputInfoFile | jq -r '.publicIpAddress')
   vmPythonPath=$(ssh "$vmAdminUsr@$vmPublicIpAddress" "which python3")
-  if [[ $? != 0 ]]; then echo " >>> XT_ERROR: get python path"; exit 1; fi
-echo " >>> Success."
+  if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: get python path"; exit 1; fi
+echo " >>> $scriptName: Success."
 
-echo " >>> Adding info ..."
+echo " >>> $scriptName: Adding info ..."
   vmInfo=$(cat $outputInfoFile | jq .)
   export vmAdminUsr
   export vmSempPlainPort
@@ -131,10 +131,12 @@ echo " >>> Adding info ..."
   vmInfo=$(echo $vmInfo | jq ".python_path=env.vmPythonPath")
   echo $vmInfo | jq . > "$outputInfoFile"
   cat $outputInfoFile | jq .
-echo " >>> Success."
+echo " >>> $scriptName: Success."
 
-echo " >>> Creating inventory file ..."
-  inventory=$(cat $inventoryTemplateFile | yq .)
+echo " >>> $scriptName: Creating inventory file ..."
+  yq --version
+  inventory=$(cat $inventoryTemplateFile | yq e -j - )
+  if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: get inventory with yq"; exit 1; fi
   export vmPublicIpAddress=$(cat $outputInfoFile | jq -r '.publicIpAddress')
   export vmFQDNS=$(cat $outputInfoFile | jq -r '.fqdns')
   export vmAdminUsr
@@ -149,7 +151,7 @@ echo " >>> Creating inventory file ..."
   inventory=$(echo $inventory | jq ".all.hosts.remotehost.solace_broker_service.semp_port_secure=env.vmSempSecurePort")
   echo $inventory | jq . > "$outputInventoryFile"
   cat "$outputInventoryFile" | jq .
-echo " >>> Success."
+echo " >>> $scriptName: Success."
 
 ###
 # The End.

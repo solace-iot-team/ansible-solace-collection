@@ -6,20 +6,20 @@ scriptDir=$(cd $(dirname "$0") && pwd);
 scriptName=$(basename $(test -L "$0" && readlink "$0" || echo "$0"));
 testTarget=${scriptDir##*/}
 scriptLogName="$testTargetGroup.$testTarget.$scriptName"
-if [ -z "$PROJECT_HOME" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
+if [ -z "$PROJECT_HOME" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptLogName - missing env var: PROJECT_HOME"; exit 1; fi
 source $PROJECT_HOME/.lib/functions.sh
 
 
 ############################################################################################################################
 # Environment Variables
 
-  if [ -z "$WORKING_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: WORKING_DIR"; exit 1; fi
-  if [ -z "$LOG_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: LOG_DIR"; exit 1; fi
-  if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
-  if [ -z "$AZURE_BASTION_PROJECT_NAME" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_BASTION_PROJECT_NAME"; exit 1; fi
-  if [ -z "$AZURE_LOCATION" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: AZURE_LOCATION"; exit 1; fi
-  if [ -z "$SSH_PUBLIC_KEY_FILE" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: SSH_PUBLIC_KEY_FILE"; exit 1; fi
-  if [ -z "$SSH_PRIVATE_KEY_FILE" ]; then echo ">>> XT_ERROR: - $scriptName - missing env var: SSH_PRIVATE_KEY_FILE"; exit 1; fi
+  if [ -z "$WORKING_DIR" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: WORKING_DIR"; exit 1; fi
+  if [ -z "$LOG_DIR" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: LOG_DIR"; exit 1; fi
+  if [ -z "$CONFIG_DB_DIR" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: CONFIG_DB_DIR"; exit 1; fi
+  if [ -z "$AZURE_BASTION_PROJECT_NAME" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: AZURE_BASTION_PROJECT_NAME"; exit 1; fi
+  if [ -z "$AZURE_LOCATION" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: AZURE_LOCATION"; exit 1; fi
+  if [ -z "$SSH_PUBLIC_KEY_FILE" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: SSH_PUBLIC_KEY_FILE"; exit 1; fi
+  if [ -z "$SSH_PRIVATE_KEY_FILE" ]; then echo ">>> $scriptName:XT_ERROR: - $scriptName - missing env var: SSH_PRIVATE_KEY_FILE"; exit 1; fi
 
 # defaults
   if [ -z "$AZURE_VM_IMAGE_URN" ]; then export AZURE_VM_IMAGE_URN="Canonical:0001-com-ubuntu-server-focal:20_04-lts:latest"; fi
@@ -47,7 +47,7 @@ echo " >>> Creating Resource Group ..."
     --location "$azLocation" \
     --tags projectName=$azureProjectName \
     --verbose
-  if [[ $? != 0 ]]; then echo " >>> XT_ERROR: creating resource group"; exit 1; fi
+  if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: creating resource group"; exit 1; fi
 echo " >>> Success."
 
 echo " >>> Creating azure vm ..."
@@ -62,7 +62,7 @@ echo " >>> Creating azure vm ..."
     --public-ip-address-dns-name $vmName \
     --verbose \
     > $outputInfoFile
-  if [[ $? != 0 ]]; then echo " >>> XT_ERROR: creating azure vm"; exit 1; fi
+  if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: creating azure vm"; exit 1; fi
   # cat $outputInfoFile | jq .
 echo " >>> Success."
 
@@ -81,7 +81,7 @@ echo " >>> Test ssh to vm ..."
     fi
     if [[ $code != 0 ]]; then echo "code=$code && tries=$tries, sleep 1m"; sleep 1m; fi
   done
-  if [[ $code != 0 || -z "$ssh_test" ]]; then echo " >>> XT_ERROR: ssh into vm"; exit 1; fi
+  if [[ $code != 0 || -z "$ssh_test" ]]; then echo " >>> $scriptName:XT_ERROR: ssh into vm"; exit 1; fi
 echo " >>> Success."
 
 echo " >>> Calling Bootstrap vm ..."
@@ -91,13 +91,13 @@ echo " >>> Calling Bootstrap vm ..."
   export vmPrivateKeyFile
   runScript="$scriptDir/bootstrap.Ubuntu-18.vm.sh"
   $runScript
-  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+  code=$?; if [[ $code != 0 ]]; then echo ">>> $scriptName:XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
 echo " >>> Success."
 
 echo " >>> Get python path ..."
   vmPublicIpAddress=$(cat $outputInfoFile | jq -r '.publicIpAddress')
   vmPythonPath=$(ssh -i $vmPrivateKeyFile "$vmAdminUsr@$vmPublicIpAddress" "which python3")
-  if [[ $? != 0 ]]; then echo " >>> XT_ERROR: get python path"; exit 1; fi
+  if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: get python path"; exit 1; fi
 echo " >>> Success."
 
 echo " >>> Vm info ..."
@@ -112,7 +112,7 @@ echo " >>> Success."
 
 echo " >>> Creating ansible inventory file ..."
   inventory=$(cat $inventoryTemplateFile | jq . )
-  if [[ $? != 0 ]]; then echo " >>> XT_ERROR: reading inventoryTemplateFile with jq"; exit 1; fi
+  if [[ $? != 0 ]]; then echo " >>> $scriptName:XT_ERROR: reading inventoryTemplateFile with jq"; exit 1; fi
   export vmPublicIpAddress=$(cat $outputInfoFile | jq -r '.publicIpAddress')
   export vmAdminUsr
   export vmPythonPath
