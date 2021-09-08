@@ -373,7 +373,7 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
         return self.timeout
 
     def get_headers(self, op) -> dict:
-        return dict()
+        return {}
 
     @ staticmethod
     def arg_spec_solace_cloud() -> dict:

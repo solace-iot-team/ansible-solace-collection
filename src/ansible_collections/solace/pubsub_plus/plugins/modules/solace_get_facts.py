@@ -516,7 +516,7 @@ class SolaceGetFactsTask(SolaceReadFactsTask):
         hostvars_inventory_hostname = params['hostvars_inventory_hostname']
         search_dict = hostvars[hostvars_inventory_hostname]['ansible_facts']['solace']
         get_functions = params['get_functions']
-        facts = dict()
+        facts = {}
 
         if search_dict['isSolaceCloud']:
             solaceBrokerFacts = SolaceCloudBrokerFacts(self.get_module()._name,
@@ -565,7 +565,7 @@ def run_module():
                            default=[], elements='str'),
         msg_vpn=dict(type='str', required=False)
     )
-    arg_spec = dict()
+    arg_spec = {}
     arg_spec.update(module_args)
 
     module = AnsibleModule(

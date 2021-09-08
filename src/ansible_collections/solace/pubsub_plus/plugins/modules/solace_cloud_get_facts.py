@@ -329,7 +329,7 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
         search_dict = params['from_dict']
         solaceCloudServiceFacts = SolaceCloudBrokerFacts(self.get_module()._name,
                                                          search_dict, vpn=None)
-        facts = dict()
+        facts = {}
         usr_msg = None
         try:
             field, value = self.get_serviceState(
@@ -382,9 +382,9 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
                                    api_token: str = None,
                                    meta: dict = None):
         inv = dict(
-            all=dict()
+            all={}
         )
-        hosts = dict()
+        hosts = {}
         secured_semp_details = solace_cloud_service_facts.get_semp_client_connection_details()
         msg_vpn_attributes = solace_cloud_service_facts.get_msg_vpn_attributes()
         # import logging, json
@@ -468,7 +468,7 @@ def run_module():
                                                       type='dict', required=True)
                                               ))
     )
-    arg_spec = dict()
+    arg_spec = {}
     arg_spec.update(module_args)
 
     module = AnsibleModule(

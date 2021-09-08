@@ -226,8 +226,7 @@ class SolaceGetCertAuthoritiesTask(SolaceTask):
 
 
 def run_module():
-    module_args = dict(
-    )
+    module_args = {}
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(SolaceTaskBrokerConfig.arg_spec_solace_cloud())
     arg_spec.update(

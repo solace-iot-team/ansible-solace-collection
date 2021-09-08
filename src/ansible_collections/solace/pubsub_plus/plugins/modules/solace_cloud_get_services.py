@@ -95,8 +95,7 @@ class SolaceCloudGetServiceTask(SolaceCloudGetTask):
 
 def run_module():
 
-    module_args = dict(
-    )
+    module_args = {}
     arg_spec = SolaceTaskSolaceCloudConfig.arg_spec_solace_cloud()
     arg_spec.update(module_args)
 
