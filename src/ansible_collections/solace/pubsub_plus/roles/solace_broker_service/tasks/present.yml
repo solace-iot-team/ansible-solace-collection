@@ -6,6 +6,7 @@
     host: "{{ combined_generate.inventory_settings.sempv2_host }}"
     port: "{{ combined_generate.inventory_settings.sempv2_port }}"
     secure_connection: "{{ combined_generate.inventory_settings.sempv2_is_secure_connection }}"
+    validate_certs: "{{ combined_generate.inventory_settings.sempv2_validate_certs }}"
     username: "{{ combined_generate.inventory_settings.sempv2_username }}"
     password: "{{ combined_generate.inventory_settings.sempv2_password }}"
     msg_vpn: "{{ combined_generate.inventory_settings.vpn }}"

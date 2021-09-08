@@ -398,6 +398,7 @@ class SolaceCloudGetFactsTask(SolaceReadFactsTask):
             'sempv2_host': secured_semp_details['secured']['uri_components']['host'],
             "sempv2_port": secured_semp_details['secured']['uri_components']['port'],
             "sempv2_is_secure_connection": True,
+            "sempv2_validate_certs": True,
             "sempv2_username": secured_semp_details['authentication']['username'],
             "sempv2_password": secured_semp_details['authentication']['password'],
             "sempv2_timeout": "60",

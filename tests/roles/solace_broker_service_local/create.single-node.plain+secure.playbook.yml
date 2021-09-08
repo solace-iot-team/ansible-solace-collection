@@ -72,7 +72,8 @@
         inventory_hostname: "{{ ansible_hostname }}"
         sempv2_host: "{{ settings.broker_host }}"
         sempv2_port: 1943
-        sempv2_is_secure_connection: True
+        sempv2_is_secure_connection: true
+        sempv2_validate_certs: false
         sempv2_username: admin
         sempv2_password: admin
         vpn: default

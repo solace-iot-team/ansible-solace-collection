@@ -16,8 +16,6 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$WORKING_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
   if [ -z "$RUN_FG" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: RUN_FG"; exit 1; fi
   if [ -z "$BROKER_DOCKER_IMAGE" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: BROKER_DOCKER_IMAGE"; exit 1; fi
-  if [ -z "$SSL_CERT_FILE" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: SSL_CERT_FILE"; exit 1; fi
-  if [ -z "$REQUESTS_CA_BUNDLE" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: REQUESTS_CA_BUNDLE"; exit 1; fi
 
 ##############################################################################################################################
 # Prepare
@@ -35,7 +33,10 @@ source $PROJECT_HOME/.lib/functions.sh
 
   playbooks=(
     "$scriptDir/delete.single-node.service.playbook.yml"
-    # "$scriptDir/create.single-node.default.playbook.yml"
+    "$scriptDir/create.single-node.default.playbook.yml"
+    "$scriptDir/delete.single-node.service.playbook.yml"
+    "$scriptDir/create.single-node.plain+secure.playbook.yml"
+    "$scriptDir/delete.single-node.service.playbook.yml"
   )
   sslCertFile="$scriptDir/files/secrets/dummy.pem"
 
