@@ -19,7 +19,8 @@ source $PROJECT_HOME/.lib/functions.sh
     export ANSIBLE_SOLACE_TESTS=(
       "teardown"
       "setup"
-      "solace_broker_service"
+      "solace_broker_service_local"
+      "solace_broker_service_remote"
       "teardown"
     )
   fi

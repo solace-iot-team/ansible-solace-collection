@@ -1,0 +1,166 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "create: broker service:single-node:plain+secure"
+  hosts: all
+  gather_facts: yes
+  any_errors_fatal: true
+  pre_tasks:
+  - include_vars:
+      file: "env.vars.yml"
+      name: env
+  tasks:
+  - include_tasks: ./tasks/settings.yml
+  - name: "Check vars"
+    assert:
+      that:
+        - SSL_CERT_FILE is defined
+      fail_msg: "one or more variables not defined"
+  - name: "Check cert file exists"
+    block:
+    - stat:
+        path: "{{ SSL_CERT_FILE }}"
+      register: cert_file_stat
+    - fail:
+        msg: "SSL_CERT_FILE does not exist - {{ SSL_CERT_FILE }}"
+      when: not cert_file_stat.stat.exists
+    - set_fact:
+        ssl_cert_file: "{{ SSL_CERT_FILE }}"
+    delegate_to: localhost
+
+  - block:
+    # mac is localhost
+    - set_fact:
+        docker_os_user: "{{ ansible_user_id if settings.broker_host=='localhost' else env.remote.docker_os_user }}"
+        docker_os_user_id: "{{ ansible_user_id if settings.broker_host=='localhost' else env.remote.docker_os_user_id }}"
+      when: ansible_os_family|lower == 'darwin'
+    # ubuntu remote
+    - set_fact:
+        docker_os_user: "{{ env.remote.docker_os_user }}"
+        docker_os_user_id: "{{ env.remote.docker_os_user_id }}"
+      when: ansible_os_family|lower == 'debian' and settings.broker_host!='localhost'
+    # ubuntu is localhost
+    - getent:
+        database: passwd
+        key: "{{ ansible_user_id }}"
+      when: ansible_os_family|lower == 'debian' and settings.broker_host=='localhost'
+    - set_fact:
+        docker_os_user: "{{ ansible_user_id }}"
+        docker_os_user_id: "{{ getent_passwd[ansible_user_id][1] }}"
+      when: ansible_os_family|lower == 'debian' and settings.broker_host=='localhost'
+
+    - name: "Create docker user"
+      user:
+        name: "{{ docker_os_user }}"
+        uid: "{{ docker_os_user_id|int }}"
+      register: user_result
+    - set_fact:
+        docker_os_user: "{{ user_result.name }}"
+        docker_os_user_id: "{{ user_result.uid }}"
+
+  - name: "Set Service Vars"
+    set_fact:
+      _docker_project_name: "{{ settings.docker_project_name }}"
+      _container_name: "{{ settings.docker_container_name }}"
+      _host_mount_path_data: "{{ settings.broker_service.run_time.mount_path_data }}"
+      _host_mount_path_secrets: "{{ settings.broker_service.run_time.mount_path_secrets }}"
+      _image: "{{ BROKER_DOCKER_IMAGE }}"
+      _ssl_cert_filename: "{{ SSL_CERT_FILE | basename }}"
+      _user:  "{{ docker_os_user_id }}"
+      _generated_inventory_settings:
+        inventory_hostname: "{{ ansible_hostname }}"
+        sempv2_host: "{{ settings.broker_host }}"
+        sempv2_port: 1943
+        sempv2_is_secure_connection: True
+        sempv2_username: admin
+        sempv2_password: admin
+        vpn: default
+        virtual_router: primary
+
+  - name: "Create host mount path secrets"
+    file:
+      path: "{{ _host_mount_path_secrets }}"
+      owner: "{{ _user }}"
+      state: directory
+
+  - name: "Create host mount path data"
+    file:
+      path: "{{ item }}"
+      owner: "{{ _user }}"
+      state: directory
+    with_items:
+      - "{{ _host_mount_path_data }}"
+      - "{{ _host_mount_path_data }}/spool"
+      - "{{ _host_mount_path_data }}/spool/softAdb"
+      - "{{ _host_mount_path_data }}/jail"
+      - "{{ _host_mount_path_data }}/diagnostics"
+      - "{{ _host_mount_path_data }}/adbBackup"
+      - "{{ _host_mount_path_data }}/var"
+
+  - name: "Copy cert to mount path secrets"
+    copy:
+      src: "{{ ssl_cert_file }}"
+      dest: "{{ _host_mount_path_secrets }}"
+      owner: "{{ _user }}"
+
+  - name: "Set the Docker Compose Definition"
+    set_fact:
+      _docker_compose_definition:
+        version: '3.3'
+        services:
+          primary:
+            container_name: "{{ _container_name }}"
+            image: "{{ _image }}"
+            restart: unless-stopped
+            shm_size: 1g
+            user: "{{ _user }}"
+            ulimits:
+              core: 2
+              nofile:
+                soft: 2448
+                hard: 38048
+            volumes:
+              - "{{ _host_mount_path_secrets }}:/run/secrets"
+              - "{{ _host_mount_path_data }}/spool/softAdb:/usr/sw/internalSpool/softAdb:Z"
+              - "{{ _host_mount_path_data }}/spool:/usr/sw/internalSpool:Z"
+              - "{{ _host_mount_path_data }}/jail:/usr/sw/jail:Z"
+              - "{{ _host_mount_path_data }}/diagnostics:/var/lib/solace/diags:Z"
+              - "{{ _host_mount_path_data }}/adbBackup:/usr/sw/adb:Z"
+              - "{{ _host_mount_path_data }}/var:/usr/sw/var:Z"
+            ports:
+              - "{{ _generated_inventory_settings.sempv2_port }}:1943"
+              - "8080:8080"
+            environment:
+              - "username_admin_globalaccesslevel={{ _generated_inventory_settings.sempv2_username }}"
+              - "username_admin_password={{ _generated_inventory_settings.sempv2_password }}"
+              - system_scaling_maxconnectioncount=100
+              - "tls_servercertificate_filepath=/run/secrets/{{ _ssl_cert_filename }}"
+
+  - name: "Broker Service Up"
+    include_role:
+      name: solace.pubsub_plus.solace_broker_service
+    vars:
+      generate:
+        inventory_settings: "{{ _generated_inventory_settings }}"
+      docker_compose_settings:
+        project_name: "{{ _docker_project_name }}"
+        services:
+          - primary
+        definition: "{{ _docker_compose_definition }}"
+        recreate: always
+        restarted: yes
+        debug: yes
+        state: present
+  - assert:
+      that:
+        - solace_broker_service_result.rc == 0
+
+  - include_tasks: ./tasks/config_db.write.yml
+
+  - name: "Output docker logs"
+    debug:
+      msg: "{{ solace_broker_service_result.broker_service.docker_logs }}"
+
+###
+# The End.

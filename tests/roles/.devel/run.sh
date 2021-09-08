@@ -12,16 +12,17 @@ export PROJECT_HOME=$projectHome
 
 export AZURE_BROKER_PROJECT_NAME="asct-devel-broker"
 ansibleSolaceTests=(
-  "teardown"
-  "setup"
-  "solace_broker_service"
-  "teardown"
+  # "teardown"
+  # "setup"
+  "solace_broker_service_local"
+  # "solace_broker_service_remote"
+  # "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
 # local broker
   export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
-  export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.10.0.15"
+  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.10.0.15"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.7.0.29"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.6.0.46"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.3.1.28"
