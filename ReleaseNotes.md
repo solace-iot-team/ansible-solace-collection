@@ -1,5 +1,27 @@
 # Release Notes
 
+## Version 1.6.0
+Maintenance & Misc Enhancements
+
+**Modules**
+* **role:solace_broker_service**
+  - added support for validate_certs option
+
+**Framework**
+* New optional flag for each module configuration: **validate_certs**
+  - ability to switch off certification validation when using secure SEMP
+  - usage: `validate_certs: [true|false], default=true`
+  - test: `tests/single_broker/broker-cert`
+
+**Maintenance**
+* Upgrade to Ubuntu 20.04 for tests in Azure (bastion & roles)
+* Fixed linting errors for pylint version 2.10.2
+* Fixed tests for new version of yq
+
+**Known Issues**
+* None.
+
+
 ## Version: 1.5.1
 Client Profile & Bug Fixes
 
