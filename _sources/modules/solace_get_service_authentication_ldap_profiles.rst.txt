@@ -206,6 +206,12 @@ username (optional)
   | **type**: str
   | **default**: admin
 
+validate_certs (optional)
+  Flag to switch validation of client certificates on/off when using a secure connection.
+
+  | **type**: bool
+  | **default**: True
+
 where_name (optional)
   Query for ldap profile name. Maps to 'profile-name' in the SEMP V1 API.
 

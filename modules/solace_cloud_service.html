@@ -347,6 +347,12 @@
 <div class="line"><strong>default</strong>: 60</div>
 </div>
 </dd>
+<dt>validate_certs (optional)</dt><dd><p>Flag to switch validation of client certificates on/off when using a secure connection.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: True</div>
+</div>
+</dd>
 <dt>wait_timeout_minutes (optional)</dt><dd><p>Minutes to wait until service is created. Module polls every 30 seconds to check on service state.</p>
 <p>wait_timeout_minutes == 0 ==&gt; no waiting, module returns immediately.</p>
 <p>wait_timeout_minutes &gt; 0 ==&gt; waits, polls every 30 seconds until service request completed.</p>
@@ -457,7 +463,7 @@
     <p>
         &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
       <span class="lastupdated">
-        Last updated on 05 Aug 2021 at 07:38.
+        Last updated on 09 Sep 2021 at 11:59.
       </span>
 
     </p>

@@ -11,6 +11,8 @@ Here is a set of examples of how to:
 * add the certificate to the certificate authority bundle of your python installation
 * add the certificate to your keychain if you are using a Mac
 
+.. note::
+  You can also switch certificates validation off in the modules. For details see parameters section in each module.
 
 Generating the Certificate
 --------------------------

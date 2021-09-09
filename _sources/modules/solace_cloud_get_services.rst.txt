@@ -74,6 +74,12 @@ timeout (optional)
   | **type**: int
   | **default**: 60
 
+validate_certs (optional)
+  Flag to switch validation of client certificates on/off when using a secure connection.
+
+  | **type**: bool
+  | **default**: True
+
 
 
 

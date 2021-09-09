@@ -212,6 +212,12 @@ username (optional)
   | **type**: str
   | **default**: admin
 
+validate_certs (optional)
+  Flag to switch validation of client certificates on/off when using a secure connection.
+
+  | **type**: bool
+  | **default**: True
+
 x_broker (optional)
   Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
 

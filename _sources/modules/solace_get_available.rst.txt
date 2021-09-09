@@ -141,6 +141,12 @@ username (optional)
   | **type**: str
   | **default**: admin
 
+validate_certs (optional)
+  Flag to switch validation of client certificates on/off when using a secure connection.
+
+  | **type**: bool
+  | **default**: True
+
 wait_timeout_seconds (optional)
   Number of seconds to run tests for SEMP and spool availability. Polls every 5 seconds for `wait_timeout_seconds` until service is available.
 
