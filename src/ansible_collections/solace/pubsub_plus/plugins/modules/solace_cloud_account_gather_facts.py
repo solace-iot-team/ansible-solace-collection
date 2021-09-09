@@ -143,11 +143,11 @@ class SolaceCloudAccountGatherFactsTask(SolaceCloudGetTask):
         self.validate_params()
         account_name = self.get_module().params['account_name']
         return_format = self.module.params['return_format']
-        facts = dict()
+        facts = {}
         if return_format == 'dict':
             facts = dict(
-                data_centers=dict(),
-                services=dict()
+                data_centers={},
+                services={}
             )
         elif return_format == 'list':
             facts = dict(

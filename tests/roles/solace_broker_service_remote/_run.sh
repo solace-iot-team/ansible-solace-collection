@@ -41,10 +41,13 @@ source $PROJECT_HOME/.lib/functions.sh
   playbooks=(
     "$scriptDir/delete.single-node.service.playbook.yml"
     "$scriptDir/create.single-node.plain+secure.playbook.yml"
+
     "$scriptDir/delete.single-node.service.playbook.yml"
     "$scriptDir/create.single-node.default.playbook.yml"
+
     "$scriptDir/delete.single-node.service.playbook.yml"
     "$scriptDir/create.single-node.docker-compose-file.playbook.yml"
+
     "$scriptDir/delete.single-node.service.playbook.yml"
     "$scriptDir/ex-1.playbook.yml"
   )

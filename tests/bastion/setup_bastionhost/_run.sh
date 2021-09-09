@@ -21,9 +21,6 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$AZURE_BROKER_PROJECT_NAME" ]; then export AZURE_BROKER_PROJECT_NAME="asct-broker"; fi
   if [ -z "$AZURE_BASTION_PROJECT_NAME" ]; then export AZURE_BASTION_PROJECT_NAME="asct-bastion"; fi
   if [ -z "$AZURE_LOCATION" ]; then export AZURE_LOCATION="westeurope"; fi
-  # az vm image list --output table
-  # az vm image list --offer UbuntuServer --all --output table
-  if [ -z "$AZURE_VM_IMAGE_URN" ]; then export AZURE_VM_IMAGE_URN="UbuntuLTS"; fi
   if [ -z "$AZURE_VM_SEMP_PLAIN_PORT" ]; then export AZURE_VM_SEMP_PLAIN_PORT="8080"; fi
   if [ -z "$AZURE_VM_SEMP_SECURE_PORT" ]; then export AZURE_VM_SEMP_SECURE_PORT="1943"; fi
   # if [ -z "$AZURE_VM_ADMIN_USER" ]; then export AZURE_VM_ADMIN_USER="asct-admin"; fi

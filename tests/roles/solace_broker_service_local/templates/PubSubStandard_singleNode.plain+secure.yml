@@ -14,12 +14,6 @@ services:
         hard: 38048
     volumes:
       - "{{ host_mount_path_secrets }}:/run/secrets"
-      - "{{ host_mount_path_data }}/spool/softAdb:/usr/sw/internalSpool/softAdb:Z"
-      - "{{ host_mount_path_data }}/spool:/usr/sw/internalSpool:Z"
-      - "{{ host_mount_path_data }}/jail:/usr/sw/jail:Z"
-      - "{{ host_mount_path_data }}/diagnostics:/var/lib/solace/diags:Z"
-      - "{{ host_mount_path_data }}/adbBackup:/usr/sw/adb:Z"
-      - "{{ host_mount_path_data }}/var:/usr/sw/var:Z"
     ports:
       - "{{ _generated_inventory_settings.sempv2_port }}:1943"
       - "8080:8080"

@@ -134,7 +134,7 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
 
     def get_about_info(self):
         # GET /about, /about/api, /about/user, /about/user/msgVpns
-        about_info = dict()
+        about_info = {}
         path_array_list = [
             ["about"],
             ["about", "user"],
@@ -151,7 +151,7 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
     def get_service_info(self) -> dict:
         use_sempv1_also = self.get_config().get_params()['use_sempv1_also']
         resp = dict(
-            vpns=dict()
+            vpns={}
         )
         # get service info
         if self.get_config().is_solace_cloud():
@@ -186,7 +186,7 @@ class SolaceGatherFactsTask(SolaceBrokerGetTask):
     def do_task(self):
 
         ansible_facts = dict(
-            solace=dict()
+            solace={}
         )
         about_info = self.get_about_info()
         service_info = self.get_service_info()

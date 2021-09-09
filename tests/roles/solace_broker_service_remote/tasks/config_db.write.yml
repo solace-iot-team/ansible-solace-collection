@@ -1,0 +1,33 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "Write result inventory to config_db"
+  block:
+    - file:
+        path: "{{ settings.broker_service.config_db.inventory_file | dirname }}"
+        state: directory
+    - copy:
+        content: "{{ solace_broker_service_result.broker_service.inventory | to_nice_yaml(indent=2) }}"
+        dest: "{{ settings.broker_service.config_db.inventory_file }}"
+  delegate_to: localhost
+
+- name: "Write result docker_compose_settings to config_db"
+  block:
+    - file:
+        path: "{{ settings.broker_service.config_db.docker_compose_settings_file | dirname }}"
+        state: directory
+    - copy:
+        content: "{{ solace_broker_service_result.broker_service.docker_compose_settings | to_nice_yaml(indent=2) }}"
+        dest: "{{ settings.broker_service.config_db.docker_compose_settings_file }}"
+  delegate_to: localhost
+
+- name: "Write settings to config_db"
+  block:
+    - file:
+        path: "{{ settings.broker_service.config_db.base_path }}"
+        state: directory
+    - copy:
+        content: "{{ settings | to_nice_yaml(indent=2) }}"
+        dest: "{{ settings.broker_service.config_db.base_path }}/settings.yml"
+  delegate_to: localhost

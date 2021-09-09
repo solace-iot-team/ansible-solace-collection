@@ -112,8 +112,7 @@ class SolaceGetDmrClustersTask(SolaceBrokerGetPagingTask):
 
 
 def run_module():
-    module_args = dict(
-    )
+    module_args = {}
     arg_spec = SolaceTaskBrokerConfig.arg_spec_broker_config()
     arg_spec.update(
         SolaceTaskBrokerConfig.arg_spec_get_object_list_config_montor())

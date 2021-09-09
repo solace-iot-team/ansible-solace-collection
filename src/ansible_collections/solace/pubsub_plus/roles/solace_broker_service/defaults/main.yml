@@ -9,6 +9,7 @@ default_generate:
     sempv2_username: admin
     sempv2_password: admin
     sempv2_is_secure_connection: false
+    sempv2_validate_certs: false
     vpn: default
     virtual_router: primary
 default_docker_compose_settings:

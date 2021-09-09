@@ -46,6 +46,9 @@ class SolaceTaskConfig(object):
     def get_timeout(self) -> float:
         raise SolaceInternalErrorAbstractMethod()
 
+    def get_validate_certs(self) -> bool:
+        raise SolaceInternalErrorAbstractMethod()
+
     def get_headers(self, op: str) -> dict:
         raise SolaceInternalErrorAbstractMethod()
 
@@ -106,6 +109,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         self.broker_url = ('https' if is_secure else 'http') + \
             '://' + host + ':' + str(port)
         self.timeout = float(module.params['timeout'])
+        self.validate_certs = bool(module.params['validate_certs'])
         self.x_broker = module.params.get('x_broker', None)
         solace_cloud_api_token = module.params.get(
             'solace_cloud_api_token', None)
@@ -212,6 +216,9 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
     def get_timeout(self) -> float:
         return self.timeout
 
+    def get_validate_certs(self) -> bool:
+        return self.validate_certs
+
     def get_headers(self, op) -> dict:
         _headers = {
             'x-broker-name': self.x_broker
@@ -227,6 +234,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
             host=dict(type='str', default='localhost'),
             port=dict(type='int', default=8080),
             secure_connection=dict(type='bool', default=False),
+            validate_certs=dict(type='bool', default=True),
             username=dict(type='str', default='admin'),
             password=dict(type='str', default='admin', no_log=True),
             timeout=dict(type='int', default='10', required=False),
@@ -353,6 +361,7 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
         super().__init__(module)
         self.solace_cloud_api_token = module.params[self.PARAM_API_TOKEN]
         self.timeout = float(module.params['timeout'])
+        self.validate_certs = bool(module.params['validate_certs'])
         self.auth = BearerAuth(self.solace_cloud_api_token)
 
     def is_solace_cloud(self) -> bool:
@@ -367,15 +376,19 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
     def get_timeout(self) -> float:
         return self.timeout
 
+    def get_validate_certs(self) -> bool:
+        return self.validate_certs
+
     def get_headers(self, op) -> dict:
-        return dict()
+        return {}
 
     @ staticmethod
     def arg_spec_solace_cloud() -> dict:
         return dict(
             solace_cloud_api_token=dict(
                 type='str', required=True, no_log=True, aliases=['api_token']),
-            timeout=dict(type='int', default='60', required=False)
+            timeout=dict(type='int', default='60', required=False),
+            validate_certs=dict(type='bool', default=True)
         )
 
 

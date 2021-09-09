@@ -17,9 +17,10 @@ source $PROJECT_HOME/.lib/functions.sh
 
   if [ -z "$ANSIBLE_SOLACE_TESTS" ]; then
     export ANSIBLE_SOLACE_TESTS=(
+      "solace_broker_service_local"
       "teardown"
       "setup"
-      "solace_broker_service"
+      "solace_broker_service_remote"
       "teardown"
     )
   fi

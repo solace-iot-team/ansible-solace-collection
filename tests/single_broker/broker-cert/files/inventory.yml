@@ -1,0 +1,15 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+---
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+      sempv2_host: localhost
+      sempv2_port_plain: 8081
+      sempv2_port_secure: 8943
+      sempv2_username: admin
+      sempv2_password: admin
+      sempv2_timeout: '60'
+      vpn: default
+      virtual_router: primary

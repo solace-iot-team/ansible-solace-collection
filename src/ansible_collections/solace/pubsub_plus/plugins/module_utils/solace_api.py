@@ -80,7 +80,7 @@ class SolaceApi(object):
             j = resp.json()
             if 'data' in j.keys():
                 return j['data']
-        return dict()
+        return {}
 
     def _make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json_body, query_params, module_op):
         if self.safe_for_path_array:
@@ -89,7 +89,7 @@ class SolaceApi(object):
         else:
             _path = SolaceApi.compose_path(path_array)
         _url = self.get_url(config, _path)
-        _query_params = query_params if query_params else dict()
+        _query_params = query_params if query_params else {}
         _reverse_proxy_query_params = config.get_reverse_proxy_query_params()
         if _reverse_proxy_query_params:
             _query_params.update(_reverse_proxy_query_params)
@@ -105,6 +105,7 @@ class SolaceApi(object):
             auth=self.get_auth(config),
             timeout=config.get_timeout(),
             headers=_headers,
+            verify=config.get_validate_certs(),
             params=_query_params_str)
         SolaceApi.log_http_roundtrip(resp)
         return resp
@@ -295,7 +296,7 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
     def handle_good_response(self, resp, module_op):
         if resp.text:
             return resp.json()
-        return dict()
+        return {}
 
     def get_monitor_api_base(self) -> str:
         return SolaceSempV2Api.API_BASE_SEMPV2_MONITOR

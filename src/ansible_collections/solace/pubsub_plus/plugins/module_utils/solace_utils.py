@@ -102,7 +102,7 @@ class SolaceUtils(object):
         return copy.deepcopy(d)
 
     @staticmethod
-    def deep_dict_diff(new: dict, old: dict, changes: dict = dict()):
+    def deep_dict_diff(new: dict, old: dict, changes: dict = {}):
         for k in new.keys():
             if not isinstance(new[k], dict):
                 _old = old.get(k, None) if hasattr(old, 'get') else old
@@ -113,7 +113,7 @@ class SolaceUtils(object):
             else:
                 # changes[k] = dict()
                 if k in old:
-                    c = SolaceUtils.deep_dict_diff(new[k], old[k], dict())
+                    c = SolaceUtils.deep_dict_diff(new[k], old[k], {})
                     # logging.debug("\n\nc=\n{}\n\n".format(json.dumps(c, indent=2)))
                     if c:
                         # logging.debug("\n\nc not empty: c=\n{}\n\n".format(json.dumps(c, indent=2)))
