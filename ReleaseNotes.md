@@ -1,5 +1,27 @@
 # Release Notes
 
+## Version 1.7.0
+JNDI Modules.
+
+**New Modules:**
+* **[solace_jndi_connection_factory](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_jndi_connection_factory.html)**
+* **[solace_get_jndi_connection_factories](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_jndi_connection_factories.html)**
+* **[solace_jndi_queue](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_jndi_queue.html)**
+* **[solace_get_jndi_queues](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_jndi_queues.html)**
+* **[solace_jndi_queues](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_jndi_queues.html)**
+* **[solace_jndi_topic](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_jndi_topic.html)**
+* **[solace_get_jndi_topics](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_jndi_topics.html)**
+* **[solace_jndi_topics](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_jndi_topics.html)**
+
+**Framework:**
+* None.
+
+**Maintenance:**
+* None.
+
+**Known Issues:**
+* None.
+
 ## Version 1.6.0
 Maintenance & Misc Enhancements
 

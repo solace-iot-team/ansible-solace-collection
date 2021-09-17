@@ -1,0 +1,53 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: jndi-queue-list doc-example
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_jndi_queues:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  tasks:
+  - name: add
+    solace_jndi_queues:
+      names:
+      - bar_1
+      - bar_2
+      - bar_3
+      settings:
+        physicalName: foo
+      state: present
+
+  - name: replace old list with new list
+    solace_jndi_queues:
+      names:
+      - bar_2
+      - bar_3
+      - bar_4
+      settings:
+        physicalName: foo
+      state: exactly
+
+  - name: delete one
+    solace_jndi_queues:
+      names:
+      - bar_2
+      state: absent
+
+  - name: delete all
+    solace_jndi_queues:
+      names: null
+      state: exactly
+
+###
+# The End.

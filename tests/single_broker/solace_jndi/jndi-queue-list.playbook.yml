@@ -1,0 +1,139 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: jndi-queue-list
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_jndi_queues:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_jndi_queues:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  tasks:
+  - set_fact:
+      jndi_queue_names:
+      - asct-jndi-queue-1
+      - asct-jndi-queue-2
+      - asct-jndi-queue-3
+      jndi_queue_physical_name: asct-jndi-queue-physical-name
+
+  - name: delete all to start
+    solace_jndi_queues:
+      names: null
+      state: exactly
+
+  - name: add all
+    solace_jndi_queues:
+      names: "{{ jndi_queue_names }}"
+      settings:
+        physicalName: "{{ jndi_queue_physical_name }}"
+      state: present
+    register: result
+  - assert:
+      that:
+        - result.response|length == jndi_queue_names|length
+
+  - name: get list config
+    solace_get_jndi_queues:
+      query_params:
+        where:
+        - "queueName==asct*"
+    register: result
+  - assert:
+      that:
+      - result.result_list|length == jndi_queue_names|length
+      - result.result_list_count == jndi_queue_names|length
+
+  - name: get list config by physicalName
+    solace_get_jndi_queues:
+      query_params:
+        where:
+        - "physicalName==asct*"
+    register: result
+  - assert:
+      that:
+      - result.result_list|length == jndi_queue_names|length
+      - result.result_list_count == jndi_queue_names|length
+
+  - name: idempotency add all
+    solace_jndi_queues:
+      names: "{{ jndi_queue_names }}"
+      state: present
+    register: result
+  - assert:
+      that:
+        - result.changed == False
+        - result.response|length == 0
+
+  - name: delete all
+    solace_jndi_queues:
+      names: null
+      state: exactly
+    register: result
+  - assert:
+      that:
+        - result.changed == True
+        - result.response|length == jndi_queue_names|length
+
+  - name: get list config all
+    solace_get_jndi_queues:
+    register: result
+  - assert:
+      that:
+      - result.result_list|length == 0
+      - result.result_list_count == 0
+
+  - name: idempotency delete all
+    solace_jndi_queues:
+      names: null
+      state: exactly
+    register: result
+  - assert:
+      that:
+        - result.changed == False
+        - result.response|length == 0
+
+  - name: invalid queue name
+    solace_jndi_queues:
+      names:
+        - asct_good
+        - 0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789-0123456789
+      state: present
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.rc == 1
+        - "'Problem with queueName: value must be no greater than 256 characters in length' in result.msg|string"
+
+  - name: whitespace queue name
+    solace_jndi_queues:
+      names:
+        - asct_good
+        - "asct invalid queue name"
+      state: present
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.rc == 1
+        - "'must not contain any whitespace' in result.msg|string"
+
+###
+# The End.
