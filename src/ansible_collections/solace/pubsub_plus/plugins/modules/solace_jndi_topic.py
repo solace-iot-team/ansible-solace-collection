@@ -31,6 +31,7 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.state
 seealso:
 - module: solace_get_jndi_topics
+- module: solace_jndi_topics
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
