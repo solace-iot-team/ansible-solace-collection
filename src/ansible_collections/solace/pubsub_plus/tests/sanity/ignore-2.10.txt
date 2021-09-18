@@ -7,6 +7,7 @@ plugins/module_utils/solace_task.py compile-2.7!skip
 plugins/module_utils/solace_task.py pep8:E501
 plugins/module_utils/solace_sys.py compile-2.7!skip
 plugins/module_utils/solace_sys.py pylint:ansible-bad-function
+plugins/module_utils/solace_sys.py pep8:E501
 plugins/doc_fragments/solace.py pep8:E501
 plugins/module_utils/solace_api.py compile-2.7!skip
 plugins/modules/solace_gather_facts.py compile-2.7!skip
@@ -135,3 +136,8 @@ plugins/modules/solace_replay_log.py compile-2.7!skip
 plugins/modules/solace_get_replay_logs.py compile-2.7!skip
 plugins/module_utils/solace_facts.py compile-2.7!skip
 plugins/module_utils/solace_facts.py pep8:E501
+plugins/modules/solace_get_jndi_connection_factories.py compile-2.7!skip
+plugins/modules/solace_get_jndi_queues.py compile-2.7!skip
+plugins/modules/solace_get_jndi_topics.py compile-2.7!skip
+plugins/modules/solace_jndi_queues.py compile-2.7!skip
+plugins/modules/solace_jndi_topics.py compile-2.7!skip

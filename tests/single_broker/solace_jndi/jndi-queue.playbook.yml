@@ -1,0 +1,100 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: jndi-queue
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_jndi_queue:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_jndi_queues:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  tasks:
+  - set_fact:
+      jndi_queue_name: asct-jndi-queue
+
+  - name: delete to start
+    solace_jndi_queue:
+      name: "{{ jndi_queue_name }}"
+      state: absent
+
+  - name: add jndi_queue
+    solace_jndi_queue:
+      name: "{{ jndi_queue_name }}"
+      state: present
+
+  - name: idempotency add jndi_queue
+    solace_jndi_queue:
+      name: "{{ jndi_queue_name }}"
+      state: present
+    register: result
+  - assert:
+      that: result.changed == False
+
+  - name: update jndi_queue
+    solace_jndi_queue:
+      name: "{{ jndi_queue_name }}"
+      settings:
+        physicalName: "pysical-{{ jndi_queue_name }}"
+      state: present
+
+  - name: idempotency update jndi_queue
+    solace_jndi_queue:
+      name: "{{ jndi_queue_name }}"
+      settings:
+        physicalName: "pysical-{{ jndi_queue_name }}"
+      state: present
+    register: result
+  - assert:
+      that: result.changed == False
+
+  - name: get list config
+    solace_get_jndi_queues:
+      query_params:
+        where:
+        - "queueName==asct*"
+    register: result
+  - assert:
+      that: result.result_list_count == 1
+
+  - name: get list monitor
+    solace_get_jndi_queues:
+      api: monitor
+      query_params:
+        where:
+        - "queueName==asct*"
+    register: result
+  - assert:
+      that: result.result_list_count == 1
+
+  - name: remove jndi_queue
+    solace_jndi_queue:
+      name: "{{ jndi_queue_name }}"
+      state: absent
+
+  - name: idempotency remove jndi_queue
+    solace_jndi_queue:
+      name: "{{ jndi_queue_name }}"
+      state: absent
+    register: result
+  - assert:
+      that: result.changed == False
+
+###
+# The End.

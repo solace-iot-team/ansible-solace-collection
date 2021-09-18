@@ -15,9 +15,9 @@ _SC_SYSTEM_ERR_RC = -1
 # check python version
 _PY3_MIN = sys.version_info[:2] >= (3, 6)
 if not _PY3_MIN:
+    current_version = ''.join(sys.version.splitlines())
     print(
-        '\n{"failed": true, "rc": %d, "msg_hint": "Set ANSIBLE_PYTHON_INTERPRETER=path-to-python-3", '
-        '"msg": "solace.pubsub_plus requires a minimum of Python3 version 3.6. Current version: %s."}' % (_SC_SYSTEM_ERR_RC, ''.join(sys.version.splitlines()))
+        f'{{"failed": true, "rc": {_SC_SYSTEM_ERR_RC}, "msg_hint": "Set ANSIBLE_PYTHON_INTERPRETER=path-to-python-3", "msg": "solace.pubsub_plus requires a minimum of Python3 version 3.6. Current version: {current_version}."}}'
     )
     sys.exit(1)
 
@@ -31,7 +31,8 @@ if enableLoggingEnvVal is not None and enableLoggingEnvVal != '':
         ENABLE_LOGGING = bool(strtobool(enableLoggingEnvVal))
     except ValueError as e:
         # note: from e ==> import error python 2.7
-        raise ValueError("failed: invalid value for env var: 'ANSIBLE_SOLACE_ENABLE_LOGGING'", enableLoggingEnvVal, "use 'true' or 'false' instead.") from e
+        raise ValueError("failed: invalid value for env var: 'ANSIBLE_SOLACE_ENABLE_LOGGING'",
+                         enableLoggingEnvVal, "use 'true' or 'false' instead.") from e
 
 if ENABLE_LOGGING:
     logFile = './ansible-solace.log'
@@ -41,9 +42,11 @@ if ENABLE_LOGGING:
             try:
                 os.makedirs(log_path)
             except Exception as e:
-                raise ValueError("failed to make dirs for log path 'ANSIBLE_SOLACE_LOG_PATH'", loggingPathEnvVal) from e
+                raise ValueError(
+                    "failed to make dirs for log path 'ANSIBLE_SOLACE_LOG_PATH'", loggingPathEnvVal) from e
         logFile = loggingPathEnvVal
     logging.basicConfig(filename=logFile,
                         level=logging.DEBUG,
                         format='%(asctime)s - %(levelname)s - %(name)s - %(module)s - %(funcName)s(): %(message)s')
-    logging.info('Module start #############################################################################################')
+    logging.info(
+        'Module start #############################################################################################')

@@ -37,8 +37,9 @@ class SolaceUtils(object):
             if import_error_traceback is not None:
                 exceptiondata = import_error_traceback.splitlines()
                 exceptionarray = [exceptiondata[-1]] + exceptiondata[1:-1]
-                module.fail_json(msg="Missing module: %s" %
-                                 exceptionarray[0], rc=solace_sys._SC_SYSTEM_ERR_RC, exception=import_error_traceback)
+                module.fail_json(
+                    msg=f"Missing module: {exceptionarray[0]}", rc=solace_sys._SC_SYSTEM_ERR_RC, exception=import_error_traceback)
+                # module.fail_json(msg="Missing module: %s" % exceptionarray[0], rc=solace_sys._SC_SYSTEM_ERR_RC, exception=import_error_traceback)
             else:
                 module.fail_json(msg="Missing module: unknown",
                                  rc=solace_sys._SC_SYSTEM_ERR_RC)

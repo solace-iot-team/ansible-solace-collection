@@ -1,0 +1,61 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: jndi-connection-factory doc example
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_jndi_connection_factory:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_jndi_connection_factories:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  tasks:
+  - name: add JNDI connection factory
+    solace_jndi_connection_factory:
+      name: bar
+      state: present
+
+  - name: update JNDI connection factory
+    solace_jndi_connection_factory:
+      name: bar
+      settings:
+        guaranteedReceiveWindowSize: 193
+      state: present
+
+  - name: get list config
+    solace_get_jndi_connection_factories:
+      query_params:
+        where:
+        - "connectionFactoryName==bar*"
+
+  - name: get list monitor
+    solace_get_jndi_connection_factories:
+      api: monitor
+      query_params:
+        where:
+        - "connectionFactoryName==bar*"
+
+  - name: remove JNDI connection factory
+    solace_jndi_connection_factory:
+      name: bar
+      state: absent
+
+
+###
+# The End.

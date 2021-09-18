@@ -221,6 +221,8 @@ options:
 '''
 
     STATE_CRUD_LIST = r'''
+notes:
+- "Updating the `settings` on a list is not supported."
 options:
   state:
     description: Target state for CRUD list operation.

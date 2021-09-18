@@ -18,6 +18,9 @@
     docker_compose_path: "{{ BROKER_DOCKER_COMPOSE_FILE | dirname }}"
     docker_compose_file: "{{ BROKER_DOCKER_COMPOSE_FILE | basename }}"
 
+    # whats the LOCAL_BROKER_INVENTORY_FILE?
+    # get the sempv2 version and write into inventory
+
 - name: "Docker Compose up"
   community.general.docker_compose:
     project_src: "{{ docker_compose_path }}"

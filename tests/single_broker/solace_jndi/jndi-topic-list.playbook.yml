@@ -1,0 +1,140 @@
+# Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: jndi-topic-list
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace_jndi_topics:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace_get_jndi_topics:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  tasks:
+  - set_fact:
+      jndi_topic_names:
+      - asct-jndi-topic-1
+      - asct-jndi-topic-2
+      - asct-jndi-topic-3
+      jndi_topic_physical_name: asct-jndi-topic-physical-name
+
+  - name: delete all to start
+    solace_jndi_topics:
+      names: null
+      state: exactly
+
+  - name: add all
+    solace_jndi_topics:
+      names: "{{ jndi_topic_names }}"
+      settings:
+        physicalName: "{{ jndi_topic_physical_name }}"
+      state: present
+    register: result
+  - assert:
+      that:
+        - result.response|length == jndi_topic_names|length
+
+  - name: get list config
+    solace_get_jndi_topics:
+      query_params:
+        where:
+        - "topicName==asct*"
+    register: result
+  - assert:
+      that:
+      - result.result_list|length == jndi_topic_names|length
+      - result.result_list_count == jndi_topic_names|length
+
+  - name: get list config by physicalName
+    solace_get_jndi_topics:
+      query_params:
+        where:
+        - "physicalName==asct*"
+    register: result
+  - assert:
+      that:
+      - result.result_list|length == jndi_topic_names|length
+      - result.result_list_count == jndi_topic_names|length
+
+  - name: idempotency add all
+    solace_jndi_topics:
+      names: "{{ jndi_topic_names }}"
+      state: present
+    register: result
+  - assert:
+      that:
+        - result.changed == False
+        - result.response|length == 0
+
+  - name: delete all
+    solace_jndi_topics:
+      names: null
+      state: exactly
+    register: result
+  - assert:
+      that:
+        - result.changed == True
+        - result.response|length == jndi_topic_names|length
+
+  - name: get list config all
+    solace_get_jndi_topics:
+    register: result
+  - assert:
+      that:
+      - result.result_list|length == 0
+      - result.result_list_count == 0
+
+  - name: idempotency delete all
+    solace_jndi_topics:
+      names: null
+      state: exactly
+    register: result
+  - assert:
+      that:
+        - result.changed == False
+        - result.response|length == 0
+
+  - name: invalid topic name
+    solace_jndi_topics:
+      names:
+        - asct_good-jndi-topic-bad-physical-name
+      settings:
+        physicalName: /bad-physical-name
+      state: present
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.rc == 1
+        - "'Problem with physicalName: Value \\'/bad-physical-name\\' is not valid for property \\'physical-name' in result.msg|string"
+
+  - name: whitespace topic name
+    solace_jndi_topics:
+      names:
+        - asct_good
+        - "asct invalid topic name"
+      state: present
+    register: result
+    ignore_errors: yes
+  - assert:
+      that:
+        - result.rc == 1
+        - "'must not contain any whitespace' in result.msg|string"
+
+###
+# The End.
