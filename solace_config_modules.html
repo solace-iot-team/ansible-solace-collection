@@ -1,75 +1,36 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Solace Configuration &amp; Action Modules &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/contentui.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/contentui.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/contentui.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="solace_acl_client_connect_exception – client connect exception for acl profile" href="modules/solace_acl_client_connect_exception.html" />
     <link rel="prev" title="solace_cloud_service – manage Solace Cloud services" href="modules/solace_cloud_service.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +38,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Using Solace PubSub+ Ansible Collection</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart for Solace PubSub+ Ansible Collection</a></li>
@@ -136,6 +86,11 @@
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_dmr_cluster_link.html">solace_dmr_cluster_link – link on a dmr cluster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_dmr_cluster_link_remote_address.html">solace_dmr_cluster_link_remote_address – remote address for dmr cluster link</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_dmr_cluster_link_trusted_cn.html">solace_dmr_cluster_link_trusted_cn – trusted common name for dmr cluster link</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_jndi_connection_factory.html">solace_jndi_connection_factory – JNDI connection-factory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_jndi_queue.html">solace_jndi_queue – jndi queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_jndi_queues.html">solace_jndi_queues – manage a list of jndi queues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_jndi_topic.html">solace_jndi_topic – jndi topic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_jndi_topics.html">solace_jndi_topics – manage a list of jndi topics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_mqtt_session.html">solace_mqtt_session – mqtt session</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_mqtt_session_subscription.html">solace_mqtt_session_subscription – subscription for mqtt session</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_queue.html">solace_queue – queue</a></li>
@@ -160,81 +115,40 @@
 <li class="toctree-l1"><a class="reference internal" href="roles.html">Roles</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">Solace PubSub+ Ansible Collection </a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Solace Configuration &amp; Action Modules</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/solace_config_modules.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="solace-configuration-action-modules">
-<h1>Solace Configuration &amp; Action Modules<a class="headerlink" href="#solace-configuration-action-modules" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="solace-configuration-action-modules">
+<h1>Solace Configuration &amp; Action Modules<a class="headerlink" href="#solace-configuration-action-modules" title="Permalink to this headline"></a></h1>
 <p>Configuration modules mostly use the Solace Sempv2 Config Api. Some modules also use the Solace Cloud Api where required,
 so the same module can be used for both, standalone brokers and Solace Cloud services.</p>
 <ul class="simple">
 <li><p>Solace Sempv2 Config Api: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html</a></p></li>
 <li><p>Solace Cloud Rest Api: <a class="reference external" href="https://docs.solace.com/Solace-Cloud/solace_cloud_rest_api.htm">https://docs.solace.com/Solace-Cloud/solace_cloud_rest_api.htm</a></p></li>
 </ul>
-<div class="section" id="configuration-settings-for-modules">
-<h2>Configuration Settings for Modules<a class="headerlink" href="#configuration-settings-for-modules" title="Permalink to this headline">¶</a></h2>
+<section id="configuration-settings-for-modules">
+<h2>Configuration Settings for Modules<a class="headerlink" href="#configuration-settings-for-modules" title="Permalink to this headline"></a></h2>
 <p>Each API used, Sempv2, Sempv1, Solace Cloud, offers settings or parameters to be included.</p>
 <p>The settings are NOT documented in the modules.</p>
 <p>Instead, each module documentation contains the URLs of the SEMP API call / Solace Cloud API call.
@@ -251,8 +165,8 @@ is based on the Sempv2 Config Api: <a class="reference external" href="https://d
 <li><p>…</p></li>
 </ul>
 </div></blockquote>
-<div class="section" id="example-usage">
-<h3>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h3>
+<section id="example-usage">
+<h3>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline"></a></h3>
 <p>Modify these settings in a playbook using the <cite>settings</cite> argument:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Quickstart Configure Playbook</span>
 <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
@@ -279,10 +193,10 @@ is based on the Sempv2 Config Api: <a class="reference external" href="https://d
       <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="idempotency">
-<h2>Idempotency<a class="headerlink" href="#idempotency" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="idempotency">
+<h2>Idempotency<a class="headerlink" href="#idempotency" title="Permalink to this headline"></a></h2>
 <p>The configuration modules update/add/delete Broker objects in an idempotent manner.</p>
 <p>They argument <cite>state=[present, absent]</cite> determines the desired outcome of the module.
 The module’s behavior is as follows:</p>
@@ -315,9 +229,9 @@ The module’s behavior is as follows:</p>
 </ul>
 </li>
 </ul>
-</div>
-<div class="section" id="module-reference">
-<h2>Module Reference<a class="headerlink" href="#module-reference" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-reference">
+<h2>Module Reference<a class="headerlink" href="#module-reference" title="Permalink to this headline"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_acl_client_connect_exception.html">solace_acl_client_connect_exception – client connect exception for acl profile</a></li>
@@ -344,6 +258,11 @@ The module’s behavior is as follows:</p>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_dmr_cluster_link.html">solace_dmr_cluster_link – link on a dmr cluster</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_dmr_cluster_link_remote_address.html">solace_dmr_cluster_link_remote_address – remote address for dmr cluster link</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_dmr_cluster_link_trusted_cn.html">solace_dmr_cluster_link_trusted_cn – trusted common name for dmr cluster link</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_jndi_connection_factory.html">solace_jndi_connection_factory – JNDI connection-factory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_jndi_queue.html">solace_jndi_queue – jndi queue</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_jndi_queues.html">solace_jndi_queues – manage a list of jndi queues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_jndi_topic.html">solace_jndi_topic – jndi topic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_jndi_topics.html">solace_jndi_topics – manage a list of jndi topics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_mqtt_session.html">solace_mqtt_session – mqtt session</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_mqtt_session_subscription.html">solace_mqtt_session_subscription – subscription for mqtt session</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_queue.html">solace_queue – queue</a></li>
@@ -362,58 +281,40 @@ The module’s behavior is as follows:</p>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_vpn.html">solace_vpn – vpn</a></li>
 </ul>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="modules/solace_acl_client_connect_exception.html" class="btn btn-neutral float-right" title="solace_acl_client_connect_exception – client connect exception for acl profile" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="modules/solace_cloud_service.html" class="btn btn-neutral float-left" title="solace_cloud_service – manage Solace Cloud services" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules/solace_acl_client_connect_exception.html" class="btn btn-neutral float-right" title="solace_acl_client_connect_exception – client connect exception for acl profile" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">
-        Last updated on 09 Sep 2021 at 11:59.
-      </span>
-
-    </p>
+    <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
+      <span class="lastupdated">Last updated on 18 Sep 2021 at 12:37.
+      </span></p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

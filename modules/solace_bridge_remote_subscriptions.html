@@ -1,75 +1,36 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>solace_bridge_remote_subscriptions – list of remote subscriptions on a bridge &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/contentui.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/contentui.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/contentui.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="solace_bridge_remote_vpn – bridge remote vpn" href="solace_bridge_remote_vpn.html" />
     <link rel="prev" title="solace_bridge_remote_subscription – remote subscription on a bridge" href="solace_bridge_remote_subscription.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +38,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Using Solace PubSub+ Ansible Collection</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Solace PubSub+ Ansible Collection</a></li>
@@ -140,6 +90,11 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_dmr_cluster_link.html">solace_dmr_cluster_link – link on a dmr cluster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_dmr_cluster_link_remote_address.html">solace_dmr_cluster_link_remote_address – remote address for dmr cluster link</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_dmr_cluster_link_trusted_cn.html">solace_dmr_cluster_link_trusted_cn – trusted common name for dmr cluster link</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_jndi_connection_factory.html">solace_jndi_connection_factory – JNDI connection-factory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_jndi_queue.html">solace_jndi_queue – jndi queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_jndi_queues.html">solace_jndi_queues – manage a list of jndi queues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_jndi_topic.html">solace_jndi_topic – jndi topic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_jndi_topics.html">solace_jndi_topics – manage a list of jndi topics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_mqtt_session.html">solace_mqtt_session – mqtt session</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_mqtt_session_subscription.html">solace_mqtt_session_subscription – subscription for mqtt session</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_queue.html">solace_queue – queue</a></li>
@@ -164,88 +119,42 @@
 <li class="toctree-l1"><a class="reference internal" href="../roles.html">Roles</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Solace PubSub+ Ansible Collection </a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a> &raquo;</li>
-        
       <li>solace_bridge_remote_subscriptions – list of remote subscriptions on a bridge</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
-            
               <!-- User defined GitHub URL -->
               <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_bridge_remote_subscriptions.py" class="fa fa-github"> Edit on GitHub</a>
-            
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="solace-bridge-remote-subscriptions-list-of-remote-subscriptions-on-a-bridge">
-<span id="solace-bridge-remote-subscriptions-module"></span><h1>solace_bridge_remote_subscriptions – list of remote subscriptions on a bridge<a class="headerlink" href="#solace-bridge-remote-subscriptions-list-of-remote-subscriptions-on-a-bridge" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="solace-bridge-remote-subscriptions-list-of-remote-subscriptions-on-a-bridge">
+<span id="solace-bridge-remote-subscriptions-module"></span><h1>solace_bridge_remote_subscriptions – list of remote subscriptions on a bridge<a class="headerlink" href="#solace-bridge-remote-subscriptions-list-of-remote-subscriptions-on-a-bridge" title="Permalink to this headline"></a></h1>
 <p>Configure a list of Remote Subscription objects on a Bridge in a single transaction.</p>
 <p>Allows addition and removal of a list of Remote Subscription objects as well as replacement of all existing Remote Subscription objects on a bridge.</p>
 <p>Supports ‘transactional’ behavior with rollback to original list in case of error.</p>
 <p>De-duplicates Remote Subscription object list.</p>
 <p>Reports which topics were added, deleted and omitted (duplicates). In case of an error, reports the invalid Remote Subscription object.</p>
 <p>To delete all Remote Subscription objects, use state=’exactly’ with an empty/null list (see examples).</p>
-<div class="section" id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="c1"># ##########################################################################################</span>
 <span class="c1"># sample_topology_file: bridges.topology.yml</span>
 <span class="c1">#   bridges:</span>
@@ -406,9 +315,9 @@
       <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">absent</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
@@ -416,11 +325,12 @@
 <li><p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a></p></li>
 <li><p>Sempv2 Monitor Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/</a></p></li>
 <li><p>Sempv2 Action Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/</a></p></li>
+<li><p>Updating the <cite>settings</cite> on a list is not supported.</p></li>
 </ul>
 </div>
-</div>
-<div class="section" id="see-also">
-<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline"></a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -429,9 +339,9 @@
 <li><p><a class="reference internal" href="solace_get_bridge_remote_subscriptions.html#solace-get-bridge-remote-subscriptions-module"><span class="std std-ref">solace_get_bridge_remote_subscriptions – get list of remote subscriptions on a bridge</span></a></p></li>
 </ul>
 </div>
-</div>
-<div class="section" id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline"></a></h2>
 <dl>
 <dt>bridge_name (required)</dt><dd><p>The bridge. Maps to ‘bridgeName’ in the API.</p>
 <div class="line-block">
@@ -560,9 +470,9 @@
 </div>
 </dd>
 </dl>
-</div>
-<div class="section" id="return-values">
-<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="return-values">
+<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this headline"></a></h2>
 <dl>
 <dt>response</dt><dd><p>The response of the operation.</p>
 <div class="line-block">
@@ -637,58 +547,40 @@
 </div>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="solace_bridge_remote_vpn.html" class="btn btn-neutral float-right" title="solace_bridge_remote_vpn – bridge remote vpn" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="solace_bridge_remote_subscription.html" class="btn btn-neutral float-left" title="solace_bridge_remote_subscription – remote subscription on a bridge" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="solace_bridge_remote_vpn.html" class="btn btn-neutral float-right" title="solace_bridge_remote_vpn – bridge remote vpn" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">
-        Last updated on 09 Sep 2021 at 11:59.
-      </span>
-
-    </p>
+    <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
+      <span class="lastupdated">Last updated on 18 Sep 2021 at 12:37.
+      </span></p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
