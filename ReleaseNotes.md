@@ -17,7 +17,7 @@ JNDI Modules.
 * None.
 
 **Maintenance:**
-* fixed pylint issues with new version
+* fixed pylint issues for new version
 
 **Known Issues:**
 * None.
