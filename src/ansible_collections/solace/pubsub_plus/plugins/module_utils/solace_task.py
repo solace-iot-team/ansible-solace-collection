@@ -529,6 +529,130 @@ class SolaceBrokerCRUDListTask(SolaceBrokerCRUDTask):
         return None, self.get_result()
 
 
+class SolaceBrokerCRUDTopicExListTask(SolaceBrokerCRUDListTask):
+    def __init__(self, module: AnsibleModule):
+        super().__init__(module)
+        self.sempv2_api = SolaceSempV2Api(module)
+        self.sempv2_get_paging_api = SolaceSempV2PagingGetApi(
+            module, self.is_supports_paging())
+        self.existing_key_list = None
+        self.created_key_list = []
+        self.deleted_key_list = []
+        self.duplicate_key_list = []
+        self.error_key_list = []
+        self.changed = False
+
+    def get_objects_path_array(self) -> list:
+        raise SolaceInternalErrorAbstractMethod()
+
+    def get_objects_result_data_object_keys(self) -> list:
+        raise SolaceInternalErrorAbstractMethod()
+
+    def get_target_key_list(self) -> list:
+        params = self.get_config().get_params()
+        names = params['names']
+        topic_syntax = params['topic_syntax']
+        if not isinstance(names, list):
+            return []
+        target_key_list = [
+            f"{topic_syntax},{name}" for name in names]
+        return target_key_list
+
+    def get_crud_args(self, object_key) -> list:
+        raise SolaceInternalErrorAbstractMethod()
+
+    def get_object_key_list(self, topic_syntax_key, subscribe_topic_exception_key) -> list:
+        objects = self.get_objects()
+        object_key_list = [
+            f"{d['data'][topic_syntax_key]},{d['data'][subscribe_topic_exception_key]}" for d in objects]
+        return object_key_list
+
+    def do_task(self):
+        self.validate_params()
+        params = self.get_config().get_params()
+        is_check_mode = self.get_module().check_mode
+
+        self.existing_key_list = self.get_object_key_list(
+            *self.get_objects_result_data_object_keys())
+        # logging.debug(
+        #     f"\n\n>>>>>>>>>>existing_key_list={json.dumps(self.existing_key_list, indent=2)}\n\n")
+        target_key_list = self.deduplicate_keys(self.get_target_key_list())
+        # logging.debug(
+        #     f"\n\n>>>>>>>>>>target_key_list={json.dumps(target_key_list, indent=2)}\n\n")
+        self.set_result(self.create_result(rc=0, changed=False))
+        state_object_combination_error = False
+        new_state = params['state']
+        new_settings = self.get_new_settings()
+        for target_key in target_key_list:
+            crud_args = self.get_crud_args(target_key)
+            target_key_exists = target_key in self.existing_key_list
+            if (new_state == 'present' or new_state == 'exactly') and not target_key_exists:
+                self.changed = True
+                if not is_check_mode:
+                    try:
+                        _response = self.create_func(*crud_args, new_settings)
+                        self.created_key_list.append(target_key)
+                    except Exception as ex:
+                        self.do_rollback_on_error(target_key, ex)
+
+            elif new_state == 'present' and target_key_exists:
+                pass
+            elif new_state == 'absent' and target_key_exists:
+                if not is_check_mode:
+                    try:
+                        _response = self.delete_func(*crud_args)
+                        self.deleted_key_list.append(target_key)
+                    except Exception as ex:
+                        self.do_rollback_on_error(target_key, ex)
+            elif new_state == 'absent' and not target_key_exists:
+                pass
+            elif new_state == 'exactly' and target_key_exists:
+                pass
+            elif new_state == 'exactly':
+                pass
+            else:
+                state_object_combination_error = True
+
+        if new_state == 'exactly':
+            for existing_key in self.existing_key_list:
+                crud_args = self.get_crud_args(existing_key)
+                if new_state == 'exactly' and existing_key not in target_key_list:
+                    if not is_check_mode:
+                        try:
+                            _response = self.delete_func(*crud_args)
+                            self.deleted_key_list.append(existing_key)
+                        except Exception as ex:
+                            self.do_rollback_on_error(existing_key, ex)
+                elif new_state == 'exactly' and existing_key in target_key_list:
+                    pass
+                else:
+                    state_object_combination_error = True
+
+        if state_object_combination_error:
+            raise SolaceInternalError([
+                "unsupported state / object combination",
+                f"state={new_state}",
+                f"target_key_list={target_key_list}",
+                f"existing_key_list={self.existing_key_list}"
+            ])
+
+        response_list = []
+        for k in self.created_key_list:
+            response_list.append({'added': k})
+        for k in self.deleted_key_list:
+            response_list.append({'deleted': k})
+        for k in self.duplicate_key_list:
+            response_list.append({'duplicate': k})
+        if len(response_list) > 0:
+            self.changed = True
+        self.update_result(
+            {
+                'changed': self.changed,
+                'response': response_list
+            })
+        return None, self.get_result()
+
+
 class SolaceGetTask(SolaceTask):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)

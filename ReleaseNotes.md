@@ -1,5 +1,16 @@
 # Release Notes
 
+## Version 1.7.1
+Maintenance.
+
+**Bug Fix for Modules:**
+
+Description: managing lists with topic syntax MQTT and SMF led to state=exactly to fail deleting topics.
+
+* **[solace_acl_publish_topic_exceptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_acl_publish_topic_exceptions.html)**
+* **[solace_acl_subscribe_topic_exceptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_acl_subscribe_topic_exceptions.html)**
+* **[solace_acl_subscribe_share_name_exceptions](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_acl_subscribe_share_name_exceptions.html)**
+
 ## Version 1.7.0
 JNDI Modules.
 

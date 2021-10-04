@@ -150,7 +150,7 @@
           replicationAllowClientConnectWhenStandbyEnabled: true
           serviceMinKeepaliveTimeout: 10
           serviceSmfMaxConnectionCountPerClientUsername: 10
-          serviceSmfMinKeepaliveEnabled: 10
+          serviceSmfMinKeepaliveEnabled: true
           serviceWebInactiveTimeout: 10
           serviceWebMaxConnectionCountPerClientUsername: 10
           serviceWebMaxPayload: 310
