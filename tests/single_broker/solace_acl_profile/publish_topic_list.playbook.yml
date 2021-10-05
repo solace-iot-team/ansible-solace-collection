@@ -165,6 +165,81 @@
           - result.result_list|length == exactly_topic_list_name_length|int
           - result.result_list_count == exactly_topic_list_name_length|int
 
+# SMF & MQTT mix
+    - set_fact:
+        smf_topic_name_list:
+          - syntax/smf/*/_1_/>
+          - syntax/smf/*/_2_/>
+          - syntax/smf/*/_3_/>
+        mqtt_topic_name_list:
+          - syntax/mqtt/*/_1_/>
+          - syntax/mqtt/*/_2_/>
+          - syntax/mqtt/*/_3_/>
+          - syntax/mqtt/*/_4_/>
+
+    - name: exactly smf
+      solace_acl_publish_topic_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        topics: "{{ smf_topic_name_list }}"
+        topic_syntax: smf
+        state: exactly
+    - solace_get_acl_publish_topic_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+      register: result
+    - assert:
+        that:
+          - result.result_list|length == smf_topic_name_list|length
+          - result.result_list_count == smf_topic_name_list|length
+
+    - name: exactly mqtt
+      solace_acl_publish_topic_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        topics: "{{ mqtt_topic_name_list }}"
+        topic_syntax: mqtt
+        state: exactly
+    - solace_get_acl_publish_topic_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+      register: result
+    - assert:
+        that:
+          - result.result_list|length == mqtt_topic_name_list|length
+          - result.result_list_count == mqtt_topic_name_list|length
+
+# SMF & MQTT topics at the same time
+    - name: exactly smf
+      solace_acl_publish_topic_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        topics: "{{ smf_topic_name_list }}"
+        topic_syntax: smf
+        state: exactly
+    - name: present mqtt
+      solace_acl_publish_topic_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        topics: "{{ mqtt_topic_name_list }}"
+        topic_syntax: mqtt
+        state: present
+    - solace_get_acl_publish_topic_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+      register: result
+    - assert:
+        that:
+          - result.result_list|length == mqtt_topic_name_list|length + smf_topic_name_list|length
+          - result.result_list_count == mqtt_topic_name_list|length + smf_topic_name_list|length
+
+    - name: exactly mqtt
+      solace_acl_publish_topic_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+        topics: "{{ mqtt_topic_name_list }}"
+        topic_syntax: mqtt
+        state: exactly
+    - solace_get_acl_publish_topic_exceptions:
+        acl_profile_name: "{{ target.acl_profile_name }}"
+      register: result
+    - assert:
+        that:
+          - result.result_list|length == mqtt_topic_name_list|length
+          - result.result_list_count == mqtt_topic_name_list|length
+
     - name: delete acl profile
       solace_acl_profile:
         name: "{{ target.acl_profile_name }}"

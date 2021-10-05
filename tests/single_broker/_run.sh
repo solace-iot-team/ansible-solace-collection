@@ -36,7 +36,7 @@ source $PROJECT_HOME/.lib/functions.sh
       "solace_mqtt"
       "solace_topic_endpoint"
       "solace_get_vpn_clients"
-      # "solace_client_profile"
+      "solace_client_profile"
       "teardown"
     )
   fi

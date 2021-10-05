@@ -183,15 +183,16 @@ rc:
 '''
 
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDListTask
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTopicExListTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
 from ansible.module_utils.basic import AnsibleModule
 
 
-class SolaceACLSubscribeShareNameExceptionsTask(SolaceBrokerCRUDListTask):
+class SolaceACLSubscribeShareNameExceptionsTask(SolaceBrokerCRUDTopicExListTask):
 
     OBJECT_KEY = 'subscribeShareNameException'
+    TOPIC_SYNTAX_KEY = 'subscribeShareNameExceptionSyntax'
 
     def __init__(self, module):
         super().__init__(module)
@@ -201,12 +202,19 @@ class SolaceACLSubscribeShareNameExceptionsTask(SolaceBrokerCRUDListTask):
         params = self.get_config().get_params()
         return ['msgVpns', params['msg_vpn'], 'aclProfiles', params['acl_profile_name'], 'subscribeShareNameExceptions']
 
-    def get_objects_result_data_object_key(self) -> str:
-        return self.OBJECT_KEY
+    def get_objects_result_data_object_keys(self) -> list:
+        return [self.TOPIC_SYNTAX_KEY, self.OBJECT_KEY]
 
     def get_crud_args(self, object_key) -> list:
         params = self.get_module().params
-        return [params['msg_vpn'], params['acl_profile_name'], params['topic_syntax'], object_key]
+        list = object_key.split(',')
+        if len(list) == 2:
+            topic_syntax = list[0]
+            topic = list[1]
+        else:
+            topic_syntax = params['topic_syntax']
+            topic = list[0]
+        return [params['msg_vpn'], params['acl_profile_name'], topic_syntax, topic]
 
     def create_func(self, vpn_name, acl_profile_name, topic_syntax, topic, settings=None):
         # POST /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeShareNameExceptions
