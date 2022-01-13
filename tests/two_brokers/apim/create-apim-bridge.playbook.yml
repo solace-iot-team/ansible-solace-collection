@@ -9,7 +9,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_gather_facts:
+    solace.pubsub_plus.solace_gather_facts:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -19,7 +19,7 @@
       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_get_bridges:
+    solace.pubsub_plus.solace_get_bridges:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -28,7 +28,7 @@
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_client_username:
+    solace.pubsub_plus.solace_client_username:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -37,7 +37,7 @@
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_queue:
+    solace.pubsub_plus.solace_queue:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -46,7 +46,7 @@
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_bridge:
+    solace.pubsub_plus.solace_bridge:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -55,7 +55,7 @@
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_bridge_remote_vpn:
+    solace.pubsub_plus.solace_bridge_remote_vpn:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"

@@ -9,7 +9,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_acl_profile:
+    solace.pubsub_plus.solace_acl_profile:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -18,7 +18,7 @@
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_acl_subscribe_share_name_exceptions:
+    solace.pubsub_plus.solace_acl_subscribe_share_name_exceptions:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -27,7 +27,7 @@
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_get_acl_subscribe_share_name_exceptions:
+    solace.pubsub_plus.solace_get_acl_subscribe_share_name_exceptions:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"

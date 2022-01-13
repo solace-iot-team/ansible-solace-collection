@@ -9,7 +9,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_acl_profile:
+    solace.pubsub_plus.solace_acl_profile:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -17,7 +17,7 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-    solace_acl_subscribe_topic_exception:
+    solace.pubsub_plus.solace_acl_subscribe_topic_exception:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -25,7 +25,7 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-    solace_acl_publish_topic_exception:
+    solace.pubsub_plus.solace_acl_publish_topic_exception:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -33,7 +33,7 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-    solace_acl_client_connect_exception:
+    solace.pubsub_plus.solace_acl_client_connect_exception:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -41,7 +41,7 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-    solace_acl_subscribe_share_name_exception:
+    solace.pubsub_plus.solace_acl_subscribe_share_name_exception:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"

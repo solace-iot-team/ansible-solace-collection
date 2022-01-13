@@ -9,7 +9,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_rdp:
+    solace.pubsub_plus.solace_rdp:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -17,7 +17,7 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-    solace_rdp_rest_consumer:
+    solace.pubsub_plus.solace_rdp_rest_consumer:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"

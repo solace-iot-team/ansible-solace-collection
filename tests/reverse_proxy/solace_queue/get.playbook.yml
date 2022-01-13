@@ -8,7 +8,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_get_vpns:
+    solace.pubsub_plus.solace_get_vpns:
       secure_connection: "{{ semp_is_secure_connection }}"
       host: "{{ semp_host }}"
       port: "{{ semp_port }}"
@@ -16,7 +16,7 @@
       password: "{{ semp_password }}"
       timeout: "{{ semp_timeout }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_queue:
+    solace.pubsub_plus.solace_queue:
       secure_connection: "{{ semp_is_secure_connection }}"
       host: "{{ semp_host }}"
       port: "{{ semp_port }}"
@@ -24,7 +24,7 @@
       password: "{{ semp_password }}"
       timeout: "{{ semp_timeout }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_get_queues:
+    solace.pubsub_plus.solace_get_queues:
       secure_connection: "{{ semp_is_secure_connection }}"
       host: "{{ semp_host }}"
       port: "{{ semp_port }}"
@@ -32,7 +32,7 @@
       password: "{{ semp_password }}"
       timeout: "{{ semp_timeout }}"
       reverse_proxy: "{{ semp_reverse_proxy | default(omit) }}"
-    solace_queue_subscription:
+    solace.pubsub_plus.solace_queue_subscription:
       secure_connection: "{{ semp_is_secure_connection }}"
       host: "{{ semp_host }}"
       port: "{{ semp_port }}"

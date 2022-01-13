@@ -1,0 +1,208 @@
+# Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_cert_authority"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace.pubsub_plus.solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace.pubsub_plus.solace_client_cert_authority:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace.pubsub_plus.solace_get_client_cert_authorities:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace.pubsub_plus.solace_client_cert_authority_ocsp_trusted_cn:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+    solace.pubsub_plus.solace_get_client_cert_authority_ocsp_trusted_cns:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+  tasks:
+  - name: "check sempv2 version / solace cloud"
+    solace_gather_facts:
+    # no_log: true
+  - set_fact:
+      is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud }}"
+      sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
+  - meta: end_play
+    when: sempv2_version|float < 2.19
+
+  - name: "main: Check vars"
+    set_fact:
+      working_dir: "{{ WORKING_DIR }}"
+      cert_file: "{{ WORKING_DIR }}/cert.pem"
+      cert_authority_name: asc_test
+
+  - name: "main: generate certificate"
+    command: >
+      openssl req
+      -x509
+      -newkey
+      rsa:4096
+      -keyout {{ working_dir }}/key.pem
+      -out {{ cert_file }}
+      -days 365
+      -nodes
+      -subj "/C=UK/ST=London/L=London/O=Solace/OU=Org/CN=www.example.com"
+
+  - name: "main: solace_client_cert_authority: absent"
+    solace_client_cert_authority:
+      name: "{{ cert_authority_name }}"
+      state: absent
+
+  - name: "main: solace_get_client_cert_authorities: config"
+    solace_get_client_cert_authorities:
+      query_params:
+        where:
+          - "certAuthorityName=={{ cert_authority_name }}"
+    register: result
+  - assert:
+        that: result.result_list_count == 0
+
+  - name: "main: solace_client_cert_authority: create"
+    solace_client_cert_authority:
+      name: "{{ cert_authority_name }}"
+      settings:
+        certContent: "{{ lookup('file', cert_file) }}"
+        revocationCheckEnabled: false
+      state: present
+
+  - name: "main: solace_get_client_cert_authorities: config"
+    solace_get_client_cert_authorities:
+      query_params:
+        where:
+          - "certAuthorityName=={{ cert_authority_name }}"
+    register: result
+  - assert:
+        that: result.result_list_count == 1
+
+  - name: "main: solace_get_client_cert_authorities: monitor"
+    solace_get_client_cert_authorities:
+      api: monitor
+      query_params:
+        where:
+          - "certAuthorityName=={{ cert_authority_name }}"
+    register: result
+  - assert:
+        that: result.result_list_count == 1
+
+  - name: "main: solace_client_cert_authority: no change"
+    solace_client_cert_authority:
+      name: "{{ cert_authority_name }}"
+      settings:
+        # solace cloud api does not return the content
+        # certContent: "{{ lookup('file', cert_file) }}"
+        revocationCheckEnabled: false
+      state: present
+    register: result
+  - assert:
+      that: result.changed == False
+
+  - name: "main: solace_client_cert_authority: update"
+    solace_client_cert_authority:
+      name: "{{ cert_authority_name }}"
+      settings:
+        revocationCheckEnabled: true
+      state: present
+    register: result
+  - assert:
+      that: result.changed == True
+
+# OCSP trusted names for non solace cloud
+  - name: "main: solace_client_cert_authority_ocsp_trusted_cn for non-solace cloud"
+    block:
+    - name: "main: solace_client_cert_authority_ocsp_trusted_cn: add"
+      solace_client_cert_authority_ocsp_trusted_cn:
+        name: "*.domain.com"
+        client_cert_authority_name: "{{ cert_authority_name }}"
+        state: present
+
+    - name: "main: solace_get_client_cert_authority_ocsp_trusted_cns: config - no query params"
+      solace_get_client_cert_authority_ocsp_trusted_cns:
+        client_cert_authority_name: "{{ cert_authority_name }}"
+      register: result
+    - assert:
+          that: result.result_list_count == 1
+    - name: "main: solace_get_client_cert_authority_ocsp_trusted_cns: config"
+      solace_get_client_cert_authority_ocsp_trusted_cns:
+        client_cert_authority_name: "{{ cert_authority_name }}"
+        query_params:
+          where:
+            - "ocspTlsTrustedCommonName==*.domain.*"
+      register: result
+    - assert:
+          that: result.result_list_count == 1
+
+    - name: "main: solace_get_client_cert_authority_ocsp_trusted_cns: monitor"
+      solace_get_client_cert_authority_ocsp_trusted_cns:
+        client_cert_authority_name: "{{ cert_authority_name }}"
+        api: monitor
+        query_params:
+          where:
+            - "ocspTlsTrustedCommonName==*.domain.*"
+
+    - name: "main: solace_client_cert_authority_ocsp_trusted_cn: remove"
+      solace_client_cert_authority_ocsp_trusted_cn:
+        name: "*.domain.com"
+        client_cert_authority_name: "{{ cert_authority_name }}"
+        state: absent
+
+    - name: "main: solace_get_client_cert_authority_ocsp_trusted_cns: config"
+      solace_get_client_cert_authority_ocsp_trusted_cns:
+        client_cert_authority_name: "{{ cert_authority_name }}"
+      register: result
+    - assert:
+          that: result.result_list_count == 0
+
+    when: not is_solace_cloud
+# END: OCSP trusted names for non solace cloud
+
+  - name: "main: solace_client_cert_authority: absent"
+    solace_client_cert_authority:
+      name: "{{ cert_authority_name }}"
+      state: absent
+
+  - name: "main: solace_get_client_cert_authorities: config"
+    solace_get_client_cert_authorities:
+      query_params:
+        where:
+          - "certAuthorityName=={{ cert_authority_name }}"
+    register: result
+  - assert:
+        that: result.result_list_count == 0
+
+###
+# The End.

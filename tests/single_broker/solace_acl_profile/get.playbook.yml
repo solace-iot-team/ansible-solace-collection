@@ -9,7 +9,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_acl_profile:
+    solace.pubsub_plus.solace_acl_profile:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -17,7 +17,7 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-    solace_get_acl_profiles:
+    solace.pubsub_plus.solace_get_acl_profiles:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"

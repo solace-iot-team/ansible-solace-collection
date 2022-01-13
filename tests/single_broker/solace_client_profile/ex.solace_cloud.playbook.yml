@@ -9,7 +9,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_cloud_client_profile:
+    solace.pubsub_plus.solace_cloud_client_profile:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -88,7 +88,7 @@
       that:
         - "'missing' in result.msg | string"
         - "'solace_cloud_service_id' in result.msg | string"
-        - "'solace_cloud_api_token' in result.msg | string"        
+        - "'solace_cloud_api_token' in result.msg | string"
 
   - name: "ex: Delete Client Profile"
     solace_cloud_client_profile:

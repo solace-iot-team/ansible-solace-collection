@@ -8,7 +8,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_authorization_group:
+    solace.pubsub_plus.solace_authorization_group:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -16,7 +16,7 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-    solace_get_authorization_groups:
+    solace.pubsub_plus.solace_get_authorization_groups:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"

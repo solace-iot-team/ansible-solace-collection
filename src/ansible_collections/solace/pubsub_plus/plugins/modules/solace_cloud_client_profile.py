@@ -198,6 +198,11 @@ class SolaceCloudClientProfileTask(SolaceBrokerCRUDTask):
     def get_settings_type_conversion(self, d):
         # note: d must be a flat dict, no recursion here
         # everything is a string or null
+
+        import logging
+        import json
+        logging.debug(f"d={json.dumps(d, indent=2)}")
+
         for k, i in d.items():
             t = type(i)
             if i and t != str:

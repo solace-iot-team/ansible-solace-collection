@@ -1,0 +1,109 @@
+# Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: "main: solace_cert_authority"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace.pubsub_plus.solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace.pubsub_plus.solace_domain_cert_authority:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace.pubsub_plus.solace_get_domain_cert_authorities:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+  pre_tasks:
+  - include_vars:
+      file: "get.vars.yml"
+      name: target_vars
+  tasks:
+  - name: "check sempv2 version / solace cloud"
+    solace_gather_facts:
+    # no_log: true
+  - set_fact:
+      is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud }}"
+      sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
+  - meta: end_play
+    when: sempv2_version|float < 2.19
+
+  - set_fact:
+      working_dir: "{{ WORKING_DIR }}"
+      target_list: "{{ target_vars.domain }}"
+
+  - name: "ex: solace_domain_cert_authority: create wrong name"
+    solace_domain_cert_authority:
+      name: contains-minus
+      state: present
+    register: result
+    ignore_errors: yes
+  - assert:
+      that: result.rc==1 and 'must not contain \'-\'' in result.msg | string
+
+  - name: "ex: include add tasks"
+    include_tasks: ./tasks/add.tasks.yml
+    loop: "{{ target_list.cert_authority_names }}"
+
+  - name: "ex: config: solace_get_domain_cert_authorities: no query_params"
+    solace_get_domain_cert_authorities:
+    register: result
+
+  - name: "ex: solace_get_domain_cert_authorities: wrong format for where"
+    solace_get_domain_cert_authorities:
+      query_params:
+        where:
+          - "certAuthorityName=my-pattern*"
+    register: result
+    ignore_errors: yes
+  - assert:
+      that: result.rc == 1
+  - assert:
+      that: "'cannot parse where clause - must be in format' in result.msg | string"
+    when: is_solace_cloud
+  - assert:
+      that: "'where query error: Illegal condition' in result.msg | string"
+    when: not is_solace_cloud
+
+  - name: "ex: solace_get_domain_cert_authorities: unknown key in where clause"
+    solace_get_domain_cert_authorities:
+      query_params:
+        where:
+          - "unknown_key==my-pattern*"
+    register: result
+    ignore_errors: yes
+  - assert:
+      that: result.rc == 1
+  - assert:
+      that: "'unknown key for solace cloud' in result.msg | string"
+    when: is_solace_cloud
+  - assert:
+      that: "'INVALID_PARAMETER' in result.msg | string"
+    when: not is_solace_cloud
+
+
+
+###
+# The End.

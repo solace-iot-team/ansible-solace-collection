@@ -10,9 +10,9 @@ on:
   #     mtn-120
 
   schedule:
-    # - cron: '0 5 * * THU'
+    - cron: '0 1 * * THU'
     # - cron: '0 5 * * *'
-    - cron: 0 22 */2 * *  # every two days
+    # - cron: 0 22 */2 * *  # every two days
   pull_request:
     branches:
       - main
@@ -29,9 +29,10 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       max-parallel: 1
+      fail-fast: false
       matrix:
         python-version: [ '3.8' ]
-        ansible-version: [ 'ansible>=2.11', 'ansible>=2.10.3,<2.11' ]
+        ansible-version: [ 'ansible>=2.11,<2.12', 'ansible>=2.10.3,<2.11', 'ansible>=2.12' ]
     steps:
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'

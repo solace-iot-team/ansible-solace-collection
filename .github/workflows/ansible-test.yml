@@ -28,10 +28,11 @@ jobs:
     # runs-on: ubuntu-latest
       # pre-installed: /usr/bin/python=2.7.17 and /usr/bin/python3=3.6.9
     strategy:
+      fail-fast: false
       matrix:
         # 3.6 is always tested
         python-version: [ '3.8' ]
-        ansible-version: [ 'ansible>=2.11', 'ansible>=2.10.3,<2.11' ]
+        ansible-version: [ 'ansible>=2.11,<2.12', 'ansible>=2.10.3,<2.11', 'ansible>=2.12' ]
     steps:
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'

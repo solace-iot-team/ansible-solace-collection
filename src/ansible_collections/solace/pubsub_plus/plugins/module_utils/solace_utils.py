@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceFeatureNotSupportedError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceFeatureNotSupportedError, SolaceMaxSempv2VersionSupportedError
 from ansible.module_utils.basic import AnsibleModule
 import json
 import re

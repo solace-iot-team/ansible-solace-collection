@@ -9,7 +9,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_gather_facts:
+    solace.pubsub_plus.solace_gather_facts:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -18,7 +18,7 @@
       timeout: "{{ sempv2_timeout }}"
       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-    solace_client_username:
+    solace.pubsub_plus.solace_client_username:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -26,16 +26,7 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-    solace_mqtt_session:
-      host: "{{ sempv2_host }}"
-      port: "{{ sempv2_port }}"
-      secure_connection: "{{ sempv2_is_secure_connection }}"
-      username: "{{ sempv2_username }}"
-      password: "{{ sempv2_password }}"
-      timeout: "{{ sempv2_timeout }}"
-      msg_vpn: "{{ vpn }}"
-      virtual_router: "{{ virtual_router }}"
-    solace_mqtt_session_subscription:
+    solace.pubsub_plus.solace_mqtt_session:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -44,14 +35,23 @@
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
       virtual_router: "{{ virtual_router }}"
-    solace_get_mqtt_sessions:
+    solace.pubsub_plus.solace_mqtt_session_subscription:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-    solace_get_mqtt_session_subscriptions:
+      msg_vpn: "{{ vpn }}"
+      virtual_router: "{{ virtual_router }}"
+    solace.pubsub_plus.solace_get_mqtt_sessions:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+    solace.pubsub_plus.solace_get_mqtt_session_subscriptions:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"

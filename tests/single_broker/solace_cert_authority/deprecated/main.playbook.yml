@@ -1,4 +1,4 @@
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
@@ -9,7 +9,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_cert_authority:
+    solace.pubsub_plus.solace_gather_facts:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -18,7 +18,22 @@
       timeout: "{{ sempv2_timeout }}"
       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
       solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace.pubsub_plus.solace_cert_authority:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
   tasks:
+  - name: "check sempv2 version / solace cloud"
+    solace_gather_facts:
+    # no_log: true
+  - set_fact:
+      is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud }}"
+      sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
+  - meta: end_play
+    when: sempv2_version|float > 2.18 or is_solace_cloud
 
   - name: "main: Check vars"
     set_fact:
@@ -55,8 +70,6 @@
     solace_cert_authority:
       name: "{{ cert_authority_name }}"
       settings:
-        # solace cloud api does not return the content
-        # certContent: "{{ lookup('file', cert_file) }}"
         revocationCheckEnabled: false
       state: present
     register: result

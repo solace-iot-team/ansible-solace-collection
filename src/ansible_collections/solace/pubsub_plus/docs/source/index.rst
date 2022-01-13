@@ -13,6 +13,7 @@ The collection is available on `Ansible Galaxy`_.
   quickstart
   installation
   tutorials
+  ansible-versions
 
 
 .. toctree::

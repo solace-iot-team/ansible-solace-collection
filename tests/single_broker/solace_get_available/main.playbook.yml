@@ -10,7 +10,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_get_available:
+    solace.pubsub_plus.solace_get_available:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
