@@ -196,7 +196,6 @@ class SolaceCloudClientProfileTask(SolaceBrokerCRUDTask):
         return new_settings
 
     def get_settings_type_conversion(self, d):
-        # note: d must be a flat dict, no recursion here
         # everything is a string or null
 
         import logging
@@ -205,26 +204,29 @@ class SolaceCloudClientProfileTask(SolaceBrokerCRUDTask):
 
         for k, i in d.items():
             t = type(i)
-            if i and t != str:
-                raise SolaceInternalError(
-                    f"unhandled type, field={k}, value={i}, type={t}")
-            if not i:
-                # placeholder, leave it for now
-                d[k] = None
-            elif i == "":
-                # placeholder, leave it for now
-                d[k] = i
-            elif i.lower() == 'false':
-                d[k] = False
-            elif i.lower() == 'true':
-                d[k] = True
-            elif re.search(r'^[0-9]+$', i):
-                d[k] = int(i)
-            elif re.search(r'^[0-9]+\.[0-9]$', i):
-                d[k] = float(i)
+            if t == dict:
+                d[k] = self.get_settings_type_conversion(i)
             else:
-                # leave any other strings
-                d[k] = i
+                if i and t != str:
+                    raise SolaceInternalError(
+                        f"unhandled type, field={k}, value={i}, type={t}")
+                if not i:
+                    # placeholder, leave it for now
+                    d[k] = None
+                elif i == "":
+                    # placeholder, leave it for now
+                    d[k] = i
+                elif i.lower() == 'false':
+                    d[k] = False
+                elif i.lower() == 'true':
+                    d[k] = True
+                elif re.search(r'^[0-9]+$', i):
+                    d[k] = int(i)
+                elif re.search(r'^[0-9]+\.[0-9]$', i):
+                    d[k] = float(i)
+                else:
+                    # leave any other strings
+                    d[k] = i
         return d
 
     def normalize_current_settings(self, current_settings: dict, new_settings: dict) -> dict:

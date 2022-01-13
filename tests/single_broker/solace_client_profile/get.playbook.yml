@@ -57,19 +57,22 @@
 
   - name: "get: remove all found client profiles"
     solace_client_profile:
-      name: "{{ item.clientProfileName }}"
+      name: "{{ item.data.clientProfileName }}"
       state: absent
     register: result
     loop: "{{ pre_existing_list.result_list }}"
     when: broker_type != 'solace_cloud'
 
-  - name: "get: remove all found client profiles"
+  - name: "get: remove all found client profiles - solace cloud"
     solace_cloud_client_profile:
-      name: "{{ item.clientProfileName }}"
+      name: "{{ item.data.clientProfileName }}"
       state: absent
     register: result
     loop: "{{ pre_existing_list.result_list }}"
     when: broker_type == 'solace_cloud'
+
+  # - fail:
+  #     msg: continue here - check result list, has data in it?
 
   - name: "get: add client profiles"
     solace_client_profile:
@@ -93,6 +96,9 @@
         select:
           - "clientProfileName"
     register: new_list_result
+
+  # - fail:
+  #     msg: continue here - check result list, has data in it?
 
   - name: "get: config: print new client profile list"
     debug:
