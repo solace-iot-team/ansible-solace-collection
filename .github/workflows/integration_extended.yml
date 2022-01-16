@@ -30,7 +30,7 @@ jobs:
       max-parallel: 1
       matrix:
         python-version: [ '3.8' ]
-        ansible-version: [ 'ansible>=2.11', 'ansible>=2.10.3,<2.11' ]
+        ansible-version: [ 'ansible>=2.11,<2.12', 'ansible>=2.10.3,<2.11', 'ansible>=2.12' ]
     steps:
       - name: Check Auth
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
