@@ -13,20 +13,17 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_cert_authority
-
-TODO: only works on standalone brokers, sempv2 version < 2.19
-does not work on solace cloud
-
 short_description: certificate authority
 description:
 - "Allows addition, removal and configuration of certificate authority objects on Solace Brokers in an idempotent manner."
-- "Supports standalone brokers and Solace Cloud."
+- "Supports only standalone brokers. The Solace Cloud API is not supported, use M(solace_client_cert_authority) or M(solace_domain_cert_authority) instead."
 notes:
 - "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority"
-- "Module Solace Cloud API: not available"
-- "Uses deprecated SempV2 API. Since 2.19, broker supports 'clientCertAuthority' & 'domainCertAuthority' instead. Raise an issue if these are required."
+- "Uses deprecated SempV2 API. Since 2.19, broker supports 'clientCertAuthority' & 'domainCertAuthority' instead."
 seealso:
 - module: solace_get_cert_authorities
+- module: solace_client_cert_authority
+- module: solace_domain_cert_authority
 options:
   name:
     description: The name of the Certificate Authority. Maps to 'certAuthorityName' in the Sempv2 API.
@@ -36,7 +33,6 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.sempv2_settings
 - solace.pubsub_plus.solace.state
-- solace.pubsub_plus.solace.broker_config_solace_cloud
 author:
   - Ricardo Gomez-Ulmke (@rjgu)
 '''
@@ -110,12 +106,10 @@ rc:
 '''
 
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceBrokerCRUDTask
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceSempV2Api
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskBrokerConfig
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceMaxSempv2VersionSupportedError, SolaceParamsValidationError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceParamsValidationError
 from ansible.module_utils.basic import AnsibleModule
 
 

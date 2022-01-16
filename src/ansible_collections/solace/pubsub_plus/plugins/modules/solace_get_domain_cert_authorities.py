@@ -13,73 +13,117 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_domain_cert_authorities
-TODO
-short_description: get list of rdp rest consumer trusted common names
+short_description: get list of domain certificates
 description:
-- "Get a list of Trusted Common Name objects configured on a Rest Delivery Point object's Rest Consumer object."
+- "Get a list of Domain Certificate objects configured on a service."
+- "Supports standalone brokers and Solace Cloud."
+requirements:
+- "Requires min SempV2 API v2.19 for standalone brokers. See M(solace_get_cert_authorities) for earlier SempV2 versions."
 notes:
-- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPointRestConsumerTlsTrustedCommonNames"
-- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/restDeliveryPoint/getMsgVpnRestDeliveryPointRestConsumerTlsTrustedCommonNames"
-options:
-  rdp_name:
-    description: The name of the Rest Delivery Point. Maps to 'restDeliveryPointName' in the API.
-    type: str
-    required: true
-  rest_consumer_name:
-    description: The name of the Rest Delivery Point. Maps to 'restConsumerName' in the API.
-    type: str
-    required: true
+- "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/domainCertAuthority/getDomainCertAuthorities"
+- "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/domainCertAuthority/getDomainCertAuthorities"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
-- solace.pubsub_plus.solace.vpn
 - solace.pubsub_plus.solace.get_list
+- solace.pubsub_plus.solace.broker_config_solace_cloud
 seealso:
-- module: solace_rdp_rest_consumer_trusted_cn
+- module: solace_domain_cert_authority
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
 '''
 
 EXAMPLES = '''
-TODO
-hosts: all
-gather_facts: no
-any_errors_fatal: true
-collections:
-- solace.pubsub_plus
-module_defaults:
-  solace_get_rdp_rest_consumer_trusted_cns:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
-tasks:
-- name: get list config
-  solace_get_rdp_rest_consumer_trusted_cns:
-    rdp_name: foo
-    rest_consumer_name: bar
-  register: result
+# Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-- name: print result
-  debug:
-    msg:
-    - "{{ result.result_list }}"
-    - "{{ result.result_list_count }}"
+-
+  name: "solace_domain_cert_authority.doc-example"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace.pubsub_plus.solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace.pubsub_plus.solace_domain_cert_authority:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace.pubsub_plus.solace_get_domain_cert_authorities:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+  tasks:
+  - name: gather facts
+    solace_gather_facts:
+    # no_log: true
+  - set_fact:
+      is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud }}"
+      sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
+      working_dir: "{{ WORKING_DIR }}"
+      cert_file: "{{ WORKING_DIR }}/cert.pem"
 
-- name: get list monitor
-  solace_get_rdp_rest_consumer_trusted_cns:
-    api: monitor
-    rdp_name: foo
-    rest_consumer_name: bar
-  register: result
+  - name: end play if incorrect sempV2 version
+    meta: end_play
+    when: sempv2_version|float < 2.19
 
-- name: print result
-  debug:
-    msg:
-    - "{{ result.result_list }}"
-    - "{{ result.result_list_count }}"
+  - name: "main: generate certificate"
+    command: >
+      openssl req
+      -x509
+      -newkey
+      rsa:4096
+      -keyout {{ working_dir }}/key.pem
+      -out {{ cert_file }}
+      -days 365
+      -nodes
+      -subj "/C=UK/ST=London/L=London/O=Solace/OU=Org/CN=www.example.com"
+
+  - name: create cert authority
+    solace_domain_cert_authority:
+      name: asc_test
+      settings:
+        certContent: "{{ lookup('file', cert_file) }}"
+      state: present
+
+  - name: get config of cert authority
+    solace_get_domain_cert_authorities:
+      query_params:
+        where:
+          - "certAuthorityName==asc_test"
+
+  - name: get monitor of cert authority
+    solace_get_domain_cert_authorities:
+      api: monitor
+      query_params:
+        where:
+          - "certAuthorityName==asc_test"
+
+  - name: remove cert authority
+    solace_domain_cert_authority:
+      name: asc_test
+      state: absent
+
+###
+# The End.
 '''
 
 RETURN = '''
@@ -118,15 +162,6 @@ class SolaceCloudGetDomainCertAuthoritiesTask(SolaceCloudGetTask):
     def __init__(self, module):
         super().__init__(module)
         self.solace_cloud_cert_auth_api = SolaceCloudApiCertAuthority(module)
-
-    # def _get_cert_authority(self, service_id, cert_authority_name, query_params):
-    #     # GET services/{serviceId}/serviceCertificateAuthorities/{certAuthorityName}
-    #     path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
-    #                   service_id, 'serviceCertificateAuthorities', cert_authority_name]
-    #     resp = self.solace_cloud_api.get_object_settings(
-    #         self.get_config(), path_array)
-    #     cert_authority = resp['certificate']
-    #     return self.solace_cloud_cert_auth_api.filter(cert_authority, query_params)
 
     def do_task(self):
         params = self.get_module().params

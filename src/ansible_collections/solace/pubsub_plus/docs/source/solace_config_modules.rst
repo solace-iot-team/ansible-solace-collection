@@ -105,6 +105,7 @@ Module Reference
    modules/solace_cert_authority*
    modules/solace_client*
    modules/solace_dmr_*
+   modules/solace_domain_*
    modules/solace_jndi_*
    modules/solace_mqtt_session*
    modules/solace_queue*

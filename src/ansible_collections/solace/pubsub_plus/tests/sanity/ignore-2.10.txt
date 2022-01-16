@@ -1,3 +1,14 @@
+plugins/modules/solace_domain_cert_authority.py compile-2.7!skip
+plugins/modules/solace_get_client_cert_authorities.py compile-2.7!skip
+plugins/modules/solace_get_client_cert_authorities.py pep8:E501
+plugins/modules/solace_get_client_cert_authority_ocsp_trusted_cns.py compile-2.7!skip
+plugins/modules/solace_get_client_cert_authority_ocsp_trusted_cns.py pep8:E501
+plugins/modules/solace_get_domain_cert_authorities.py compile-2.7!skip
+plugins/modules/solace_get_domain_cert_authorities.py pep8:E501
+plugins/modules/solace_client_cert_authority_ocsp_trusted_cn.py compile-2.7!skip
+plugins/modules/solace_client_cert_authority_ocsp_trusted_cn.py pep8:E501
+plugins/module_utils/solace_api.py pep8:E501
+plugins/modules/solace_get_cert_authorities.py pep8:E501
 plugins/module_utils/solace_utils.py compile-2.7!skip
 plugins/module_utils/solace_utils.py pylint:dangerous-default-value
 plugins/module_utils/solace_error.py compile-2.7!skip

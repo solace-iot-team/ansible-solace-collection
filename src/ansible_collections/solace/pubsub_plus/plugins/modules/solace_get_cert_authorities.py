@@ -13,24 +13,19 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: solace_get_cert_authorities
-
-TODO: only works on standalone brokers, sempv2 version < 2.19
-does not work on solace cloud
-
 short_description: get list of cert authorities
 description:
 - "Get a list of Certificate Authority objects."
-- "Supports Solace Cloud Brokers as well as Solace Standalone Brokers."
+- "Supports only Solace Standalone Brokers. For Solace Cloud see M(solace_get_client_cert_authorities) and M(solace_get_domain_cert_authorities)."
+requirements:
+- "Works up to SempV2 API v2.18 for standalone brokers. See M(solace_get_client_cert_authorities) and M(solace_get_domain_cert_authorities) for later SempV2 versions."
 notes:
-- "Using Solace Cloud: where clause only supports operations: '=='"
-- ""
 - "Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority/getCertAuthorities"
 - "Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/certAuthority/getCertAuthorities"
 - "Module Solace Cloud API: not available"
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.broker
 - solace.pubsub_plus.solace.get_list
-- solace.pubsub_plus.solace.broker_config_solace_cloud
 seealso:
 - module: solace_cert_authority
 author:

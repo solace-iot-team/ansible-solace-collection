@@ -29,9 +29,11 @@ playbooks=(
   "$scriptDir/client/main.playbook.yml"
   "$scriptDir/client/get.playbook.yml"
   "$scriptDir/client/ex.playbook.yml"
+  "$scriptDir/client/doc-example.playbook.yml"
   "$scriptDir/domain/main.playbook.yml"
   "$scriptDir/domain/get.playbook.yml"
   "$scriptDir/domain/ex.playbook.yml"
+  "$scriptDir/domain/doc-example.playbook.yml"
   "$scriptDir/combined/main.playbook.yml"
 )
 

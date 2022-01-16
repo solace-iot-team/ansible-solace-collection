@@ -7,7 +7,7 @@ __metaclass__ = type
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceCloudApiError, SolaceCloudApiResponseDataError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceModuleDeprecatedError, SolaceParamsValidationError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceCloudApiResponseDataError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudConfig
 from ansible.module_utils.basic import AnsibleModule
@@ -799,31 +799,3 @@ class SolaceCloudApiCertAuthority(SolaceCloudApi):
         resp = self.get_object_settings(config, path_array)
         cert_authority = resp['certificate']
         return self.filter(cert_authority, query_params)
-
-    # def get_object_settings(self, config: SolaceTaskBrokerConfig, path_array: list) -> dict:
-    #     # returns settings or None if not found
-    #     module_op = SolaceTaskOps.OP_READ_OBJECT
-    #     try:
-    #         _data = self.make_get_request(config, path_array, module_op)
-    #         logging.debug(
-    #             f"get_object_settings._data=\n{json.dumps(_data, indent=2)}")
-    #         if isinstance(_data, list):
-    #             if len(_data) == 1 and isinstance(_data[0], dict):
-    #                 resp = _data[0]
-    #             else:
-    #                 # return the one with certType="client" or "default"
-    #                 _matches = [x for x in _data if (
-    #                     x['certType'] == 'default' or x['certType'] == 'client')]
-    #                 if(len(_matches) != 1):
-    #                     raise SolaceModuleDeprecatedError(
-    #                         config.get_module()._name, 'see documentation for alternative module(s)')
-    #                 resp = _matches[0]
-    #         else:
-    #             resp = _data
-    #     except SolaceApiError as e:
-    #         resp = e.get_resp()
-    #         if resp['status_code'] == 404:
-    #             return None
-    #         raise SolaceApiError(e.get_http_resp(), resp,
-    #                              self.get_module()._name, module_op) from e
-    #     return resp
