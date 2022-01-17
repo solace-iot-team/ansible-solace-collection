@@ -32,13 +32,6 @@
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-    solace.pubsub_plus.solace_dmr_link:
-      host: "{{ sempv2_host }}"
-      port: "{{ sempv2_port }}"
-      secure_connection: "{{ sempv2_is_secure_connection }}"
-      username: "{{ sempv2_username }}"
-      password: "{{ sempv2_password }}"
-      timeout: "{{ sempv2_timeout }}"
     solace.pubsub_plus.solace_get_dmr_cluster_links:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
