@@ -26,6 +26,16 @@ Install dependencies:
   $ pip install -r requirements.txt
   $ pip install ansible
 
+.. note::
+  Installing a specific version of ansible:
+
+  .. code-block:: bash
+
+    pip install "ansible>=2.10.3,<2.11", # for latest ansible_core 2.10
+    pip install "ansible>=4.10.0,<5.0.0", # for latest ansible_core 2.11
+    pip install "ansible>=5.1.0,<6.0.0" # for latest ansible core 2.12
+
+
 Install the Solace PubSub+ Ansible Collection
 +++++++++++++++++++++++++++++++++++++++++++++
 
