@@ -28,7 +28,6 @@ jobs:
     # runs-on: ubuntu-latest
       # pre-installed: /usr/bin/python=2.7.17 and /usr/bin/python3=3.6.9
     strategy:
-      max-parallel: 1
       fail-fast: false
       matrix:
         # 3.6 is always tested
@@ -75,15 +74,16 @@ jobs:
         # vm comes with a pre-installed python3.6
         # ansible-test will also use that
         # ==> install all devel requirements on that python3.6 version first
+        # python 3.6 support only available up to 2.11 ansible_core
 
       - name: set up python 3.6
         uses: actions/setup-python@v2
         with:
           python-version: 3.6
 
-      - name: Install ansible and devel requirements
+      - name: Install ansible and devel requirements for 3.6
         env:
-          ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
+          ANSIBLE_VERSION: "ansible>=2.10.3,<2.11"
         run: |
           python -m pip install --upgrade pip
           pip install "$ANSIBLE_VERSION"
@@ -95,7 +95,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install ansible and devel requirements
+      - name: Install ansible and devel requirements for matrix version
         env:
           ANSIBLE_VERSION: "${{ matrix.ansible-version }}"
         run: |
