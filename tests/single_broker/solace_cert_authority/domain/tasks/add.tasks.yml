@@ -1,0 +1,29 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- set_fact:
+    cert_file: "{{ working_dir }}/cert-{{ item.name }}.pem"
+
+- name: "get: generate certificate"
+  command: >
+    openssl req
+    -x509
+    -newkey
+    rsa:4096
+    -keyout {{ working_dir }}/key-{{ item.name }}.pem
+    -out {{ cert_file }}
+    -days 365
+    -nodes
+    -subj "/C=UK/ST=London/L=London/O=Solace/OU=Org/CN=www.example.com"
+
+- name: "get: solace_domain_cert_authority: add"
+  solace_domain_cert_authority:
+    name: "{{ item.name }}"
+    settings:
+      certContent: "{{ lookup('file', cert_file) }}"
+    state: present
+
+###
+# The End.

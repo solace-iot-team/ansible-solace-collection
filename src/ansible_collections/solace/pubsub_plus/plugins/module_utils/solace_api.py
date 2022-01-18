@@ -7,7 +7,7 @@ __metaclass__ = type
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalErrorAbstractMethod, SolaceApiError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceCloudApiResponseDataError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudConfig
 from ansible.module_utils.basic import AnsibleModule
@@ -16,6 +16,8 @@ import urllib.parse
 import logging
 import time
 import xml.etree.ElementTree as ET
+import re
+
 
 SOLACE_API_HAS_IMPORT_ERROR = False
 SOLACE_API_IMPORT_ERR_TRACEBACK = None
@@ -679,13 +681,14 @@ class SolaceCloudApi(SolaceApi):
         try:
             _resp = self.make_get_request(config, path_array, module_op)
             # api oddity: 'some' calls return a list with 1 dict in it
-            # logging.debug(f"get_object_settings._resp=\n{json.dumps(_resp, indent=2)}")
+            # logging.debug(
+            #     f"get_object_settings._resp=\n{json.dumps(_resp, indent=2)}")
             if isinstance(_resp, list):
                 if len(_resp) == 1 and isinstance(_resp[0], dict):
                     resp = _resp[0]
                 else:
-                    raise SolaceApiError(
-                        _resp, _resp, self.get_module()._name, module_op)
+                    raise SolaceCloudApiResponseDataError(self.get_module()._name,
+                                                          'api response has more than 1 element in list, needs investigation', {'resp': _resp})
             else:
                 resp = _resp
         except SolaceApiError as e:
@@ -741,3 +744,58 @@ class SolaceCloudApi(SolaceApi):
                 f"timeout service post request - not completed, state={resp['adminProgress']}", str(resp)]
             raise SolaceInternalError(msg)
         return resp
+
+
+class SolaceCloudApiCertAuthority(SolaceCloudApi):
+
+    def __init__(self, module: AnsibleModule):
+        super().__init__(module)
+        return
+
+    MAPPINGS = {
+        'certAuthorityName': 'name'
+    }
+
+    # TODO: implement the other OPs: !=, <, >, <=, >=
+    def filter(self, settings: dict, query_params: dict) -> dict:
+        if not query_params:
+            return settings
+        where_list = []
+        if ("where" in query_params and query_params['where'] and len(query_params['where']) > 0):
+            where_list = query_params['where']
+        is_match = True
+        for where in where_list:
+            # OP: ==
+            where_elements = where.split('==')
+            if len(where_elements) != 2:
+                raise SolaceParamsValidationError(
+                    'query_params.where', where, "cannot parse where clause - must be in format '{key}=={pattern}' (other ops are not supported)")
+            sempv2_key = where_elements[0]
+            pattern = where_elements[1]
+            solace_cloud_key = self.MAPPINGS.get(sempv2_key, None)
+            if not solace_cloud_key:
+                raise SolaceParamsValidationError(
+                    'query_params.where', where, f"unknown key for solace cloud '{sempv2_key}' - check with Solace Cloud API settings")
+            # pattern match
+            solace_cloud_value = settings.get(
+                solace_cloud_key, None)
+            if not solace_cloud_value:
+                raise SolaceInternalError(
+                    f"solace-cloud-key={solace_cloud_key} not found in solace cloud settings - likely a key map issue")
+            # create regex
+            regex = pattern.replace("*", ".+")
+            this_match = re.search(regex, solace_cloud_value)
+            is_match = (is_match and this_match)
+            if not is_match:
+                break
+        if is_match:
+            return settings
+        return None
+
+    def get_cert_authority(self, config, service_id, cert_authority_name, query_params):
+        # GET services/{serviceId}/serviceCertificateAuthorities/{certAuthorityName}
+        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+                      service_id, 'serviceCertificateAuthorities', cert_authority_name]
+        resp = self.get_object_settings(config, path_array)
+        cert_authority = resp['certificate']
+        return self.filter(cert_authority, query_params)

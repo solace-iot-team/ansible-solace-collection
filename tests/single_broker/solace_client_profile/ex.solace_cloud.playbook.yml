@@ -9,7 +9,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_cloud_client_profile:
+    solace.pubsub_plus.solace_cloud_client_profile:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -48,7 +48,8 @@
   - assert:
       that:
         - result.rc == 1
-        - result.msg.status_code == 404
+        - result.msg.status_code == 400
+        - "'type service Id was passed in an invalid format' in result.msg | string"
 
   - name: "ex: Client Profile - Wrong Params - 3"
     solace_cloud_client_profile:
@@ -88,7 +89,7 @@
       that:
         - "'missing' in result.msg | string"
         - "'solace_cloud_service_id' in result.msg | string"
-        - "'solace_cloud_api_token' in result.msg | string"        
+        - "'solace_cloud_api_token' in result.msg | string"
 
   - name: "ex: Delete Client Profile"
     solace_cloud_client_profile:

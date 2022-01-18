@@ -1,5 +1,39 @@
 # Release Notes
 
+## Version 1.8.0
+New modules to manage cert authorities & support for ansible_core 2.12.
+
+_**Note: this release contains breaking changes.**_
+
+
+**New Modules:**
+* **[solace_client_cert_authority](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_client_cert_authority.html)**
+* **[solace_get_client_cert_authorities](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_client_cert_authorities.html)**
+* **[solace_client_cert_authority_ocsp_trusted_cn](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_client_cert_authority_ocsp_trusted_cn.html)**
+* **[solace_get_client_cert_authority_ocsp_trusted_cns](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_client_cert_authority_ocsp_trusted_cns.html)**
+* **[solace_domain_cert_authority](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_domain_cert_authority.html)**
+* **[solace_get_domain_cert_authorities](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_domain_cert_authorities.html)**
+
+**Updated Modules:**
+* **BREAKING CHANGES: [solace_cert_authority](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_cert_authority.html)**
+* **BREAKING CHANGES: [solace_get_cert_authorities](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_cert_authorities.html)**
+
+**Framework:**
+* **Solace Cloud API:**
+  - Some solace cloud apis now return nested dicts in response. Fixed type conversion to recursively convert types in nested dicts.
+
+**Maintenance: supporting ansible_core version 2.12**
+* **test playbooks:**
+  - module defaults in 2.12 do not take into account collection definition, added fully qualified module names to all module_defaults
+* minor ansible test issues
+
+
+**Known Issues:**
+* **Modules using Solace Cloud API:**
+  - If an entity is still busy performing an operation triggered outside of the module, the module will fail.
+    - **Workaround:** wait until other operation finished and run module again
+
+
 ## Version 1.7.1
 Maintenance.
 

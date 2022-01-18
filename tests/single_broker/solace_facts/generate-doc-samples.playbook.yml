@@ -9,7 +9,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_gather_facts:
+    solace.pubsub_plus.solace_gather_facts:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
@@ -86,7 +86,7 @@
       content: "{{ result_self_hosted.facts | to_nice_yaml }}"
       dest: "{{ working_dir }}/{{ generated_doc_sample_file }}"
     delegate_to: localhost
-    when: not is_solace_cloud  
+    when: not is_solace_cloud
 
 ###
 # The End.

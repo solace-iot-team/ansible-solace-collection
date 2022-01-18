@@ -89,6 +89,7 @@ class SolaceNoModuleSupportForSolaceCloudError(Exception):
 
 class SolaceNoModuleStateSupportError(Exception):
     def __init__(self, module_name, state, broker_type, msg=None):
+        super().__init__()
         self.module_name = module_name
         self.state = state
         self.broker_type = broker_type
@@ -97,8 +98,23 @@ class SolaceNoModuleStateSupportError(Exception):
 
 class SolaceModuleUsageError(Exception):
     def __init__(self, module_name, state, msg=None):
+        super().__init__()
         self.module_name = module_name
         self.state = state
+        self.msg = msg
+
+
+class SolaceCloudApiError(Exception):
+    def __init__(self, module_name, msg=None):
+        super().__init__()
+        self.module_name = module_name
+        self.msg = msg
+
+
+class SolaceModuleDeprecatedError(Exception):
+    def __init__(self, module_name, msg):
+        super().__init__(f"module '{module_name}': {msg}")
+        self.module_name = module_name
         self.msg = msg
 
 
@@ -106,6 +122,31 @@ class SolaceSempv1VersionNotSupportedError(Exception):
     def __init__(self, module_name, sempv1_version_float, min_sempv1_version_float):
         super().__init__(
             f"module '{module_name}': service SEMP V1 version: {sempv1_version_float}; minimum version required: {min_sempv1_version_float}")
+
+
+class SolaceMinSempv2VersionSupportedError(Exception):
+    def __init__(self, module_name, actual_sempv2_version, min_sempv2_version):
+        super().__init__(
+            f"module '{module_name}': service SEMP V2 version: {actual_sempv2_version}; minimum version required: {min_sempv2_version}")
+
+
+class SolaceMaxSempv2VersionSupportedError(Exception):
+    def __init__(self, module_name, actual_sempv2_version, max_sempv2_version):
+        super().__init__(
+            f"module '{module_name}': service SEMP V2 version: {actual_sempv2_version}; max version supported: {max_sempv2_version}")
+
+
+class SolaceCloudApiResponseDataError(Exception):
+    def __init__(self, module_name, msg, details):
+        super().__init__(f"module '{module_name}': {msg}")
+        self.module_name = module_name
+        self.msg = msg
+        self.details = details
+
+    def to_list(self):
+        if isinstance(self.msg, list):
+            return self.msg
+        return [str(self.msg)]
 
 
 class SolaceError(Exception):

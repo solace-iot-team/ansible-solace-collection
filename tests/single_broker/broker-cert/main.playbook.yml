@@ -9,7 +9,7 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace_vpn:
+    solace.pubsub_plus.solace_vpn:
       host: "{{ sempv2_host }}"
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
@@ -54,7 +54,7 @@
     register: result
     until: result.status == 200
     retries: 20
-    delay: 5
+    delay: 10
 
   - assert:
       that: result.status == 200

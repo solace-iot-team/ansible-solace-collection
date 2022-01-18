@@ -7,7 +7,7 @@ __metaclass__ = type
 
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceModuleUsageError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError, SolaceSempv1VersionNotSupportedError, SolaceNoModuleSupportForSolaceCloudError, SolaceNoModuleStateSupportError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceCloudApiResponseDataError, SolaceInternalError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceMaxSempv2VersionSupportedError, SolaceModuleUsageError, SolaceParamsValidationError, SolaceError, SolaceFeatureNotSupportedError, SolaceSempv1VersionNotSupportedError, SolaceNoModuleSupportForSolaceCloudError, SolaceNoModuleStateSupportError, SolaceMinSempv2VersionSupportedError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudServiceConfig, SolaceTaskSolaceCloudConfig
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceApi, SolaceSempV2Api, SolaceCloudApi, SolaceSempV2PagingGetApi
 from ansible.module_utils.basic import AnsibleModule
@@ -34,6 +34,10 @@ if not SOLACE_TASK_HAS_IMPORT_ERROR:
 
 
 class SolaceTask(object):
+
+    MAX_SEMP_V2_VERSION_STR = None
+    MIN_SEMP_V2_VERSION_STR = None
+
     def __init__(self, module: AnsibleModule):
         SolaceUtils.module_fail_on_import_error(
             module, SOLACE_TASK_HAS_IMPORT_ERROR, SOLACE_TASK_ERR_TRACEBACK)
@@ -41,6 +45,32 @@ class SolaceTask(object):
         self.changed = False
         self.result = SolaceUtils.create_result()
         return
+
+    def assert_max_sempv2_version_supported(self):
+        if self.MAX_SEMP_V2_VERSION_STR is not None:
+            sempv2_api = SolaceSempV2Api(self.get_module())
+            _version_str, version = sempv2_api.get_sempv2_version(
+                self.get_config())
+            max_sempv2_version = SolaceUtils.create_version(
+                self.MAX_SEMP_V2_VERSION_STR)
+            if version > max_sempv2_version:
+                raise SolaceMaxSempv2VersionSupportedError(
+                    self.get_module()._name, f"{version}", max_sempv2_version)
+
+    def assert_min_sempv2_version_supported(self):
+        if self.MIN_SEMP_V2_VERSION_STR is not None:
+            sempv2_api = SolaceSempV2Api(self.get_module())
+            _version_str, version = sempv2_api.get_sempv2_version(
+                self.get_config())
+            min_sempv2_version = SolaceUtils.create_version(
+                self.MIN_SEMP_V2_VERSION_STR)
+            if version < min_sempv2_version:
+                raise SolaceMinSempv2VersionSupportedError(
+                    self.get_module()._name, f"{version}", min_sempv2_version)
+
+    def assert_versions(self):
+        self.assert_max_sempv2_version_supported()
+        self.assert_min_sempv2_version_supported()
 
     def get_module(self) -> AnsibleModule:
         return self.module
@@ -87,6 +117,7 @@ class SolaceTask(object):
 
     def execute(self):
         try:
+            self.assert_versions()
             config = self.get_config()
             if config:
                 config.validate_params()
@@ -190,6 +221,16 @@ class SolaceTask(object):
                 usr_msg.append(e.msg)
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
+        except SolaceMinSempv2VersionSupportedError as e:
+            self.logExceptionAsError(type(e), e)
+            usr_msg = [str(e)]
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
+        except SolaceMaxSempv2VersionSupportedError as e:
+            self.logExceptionAsError(type(e), e)
+            usr_msg = [str(e)]
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
         except SolaceSempv1VersionNotSupportedError as e:
             self.logExceptionAsError(type(e), e)
             usr_msg = [str(e)]
@@ -201,6 +242,14 @@ class SolaceTask(object):
                        "raise a feature request if required"]
             self.update_result(dict(rc=1, changed=self.changed))
             self.module.exit_json(msg=usr_msg, **self.get_result())
+        except SolaceCloudApiResponseDataError as e:
+            self.logExceptionAsError(type(e), e)
+            ex = traceback.format_exc()
+            ex_msg_list = e.to_list()
+            usr_msg = ["Pls raise an issue including the full traceback. (hint: use -vvv)"] + ex_msg_list + ex.split('\n') + [
+                f"details: {e.details}"]
+            self.update_result(dict(rc=1, changed=self.changed))
+            self.module.exit_json(msg=usr_msg, **self.get_result())
         except (requests.exceptions.SSLError) as e:
             # these paths do not seem to work
             # logging.debug("ssl verify paths: %s", SolaceUtils.get_ssl_default_verify_paths())
@@ -209,8 +258,8 @@ class SolaceTask(object):
             self.logExceptionAsError(log_msg, e)
             self.update_result(dict(rc=1, changed=self.changed))
             usr_msg = ["Check SSL configuration & certificate required for host"] + \
-                      [f"Certificate authority (CA) bundle used: {certifi.where()}"] + \
-                      [str(e)]
+                [f"Certificate authority (CA) bundle used: {certifi.where()}"] + [
+                str(e)]
             self.module.exit_json(msg=usr_msg, **self.get_result())
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
             self.logExceptionAsError(type(e), e)
