@@ -11,9 +11,15 @@ Implements the config and monitor API.
 
 Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter.
 
-Supports Solace Cloud Brokers as well as Solace Standalone Brokers.
+Supports only Solace Standalone Brokers. For Solace Cloud see :ref:`solace_get_client_cert_authorities <solace_get_client_cert_authorities_module>` and :ref:`solace_get_domain_cert_authorities <solace_get_domain_cert_authorities_module>`.
 
 
+Requirements
+------------
+
+The below requirements are needed on the host that executes this module:
+
+- Works up to SempV2 API v2.18 for standalone brokers. See :ref:`solace_get_client_cert_authorities <solace_get_client_cert_authorities_module>` and :ref:`solace_get_domain_cert_authorities <solace_get_domain_cert_authorities_module>` for later SempV2 versions.
 
 
 Examples
@@ -87,8 +93,6 @@ Notes
 -----
 
 .. note::
-   - Using Solace Cloud: where clause only supports operations: '=='
-   - 
    - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority/getCertAuthorities
    - Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/certAuthority/getCertAuthorities
    - Module Solace Cloud API: not available
@@ -206,24 +210,6 @@ secure_connection (optional)
 
   | **type**: bool
   | **default**: False
-
-solace_cloud_api_token (optional)
-  The API Token.
-
-  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
-
-  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
-
-  | **type**: str
-
-solace_cloud_service_id (optional)
-  The service id in Solace Cloud.
-
-  Click on the service in Solace Cloud - the service id is in the URL.
-
-  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
-
-  | **type**: str
 
 timeout (optional)
   Connection timeout in seconds for the http request.

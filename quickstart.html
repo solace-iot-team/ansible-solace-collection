@@ -50,6 +50,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ansible-versions.html">Ansible Version Details</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
@@ -94,7 +95,7 @@
 <h1>Quickstart for Solace PubSub+ Ansible Collection<a class="headerlink" href="#quickstart-for-solace-pubsub-ansible-collection" title="Permalink to this headline"></a></h1>
 <section id="installation-dependencies">
 <h2>Installation &amp; Dependencies<a class="headerlink" href="#installation-dependencies" title="Permalink to this headline"></a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">requires_ansible</span><span class="p">:</span> <span class="s2">&quot;&gt;=2.10,&lt;2.12&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">requires_ansible</span><span class="p">:</span> <span class="s2">&quot;&gt;=2.10,&lt;2.13&quot;</span>
 </pre></div>
 </div>
 <dl class="simple">
@@ -118,6 +119,15 @@ $ pip install -r requirements.txt
 $ pip install ansible
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Installing a specific version of ansible:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="s2">&quot;ansible&gt;=2.10.3,&lt;2.11&quot;</span>, <span class="c1"># for latest ansible_core 2.10</span>
+pip install <span class="s2">&quot;ansible&gt;=4.10.0,&lt;5.0.0&quot;</span>, <span class="c1"># for latest ansible_core 2.11</span>
+pip install <span class="s2">&quot;ansible&gt;=5.1.0,&lt;6.0.0&quot;</span> <span class="c1"># for latest ansible core 2.12</span>
+</pre></div>
+</div>
+</div>
 <p>Install the Solace PubSub+ Ansible Collection:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ansible-galaxy collection install solace.pubsub_plus
 </pre></div>
@@ -133,78 +143,78 @@ $ pip install ansible
 </dd>
 </dl>
 <p><a class="reference download internal" download="" href="_downloads/6dedef375993359d20e75b923bae6800/service.playbook.yml"><code class="xref download docutils literal notranslate"><span class="pre">service.playbook.yml</span></code></a>:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Quickstart Service Playbook</span>
-  <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
-  <span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-  <span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-  <span class="nt">tasks</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Broker</span><span class="nv"> </span><span class="s">service</span><span class="nv"> </span><span class="s">up&quot;</span>
-    <span class="nt">include_role</span><span class="p">:</span>
-      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span>
-    <span class="nt">vars</span><span class="p">:</span>
-      <span class="nt">docker_compose_settings</span><span class="p">:</span>
-        <span class="nt">project_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">quickstart_broker_service_single_node</span>
-        <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Quickstart Service Playbook</span><span class="w"></span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w"></span>
+<span class="w">  </span><span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">  </span><span class="nt">any_errors_fatal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Broker</span><span class="nv"> </span><span class="s">service</span><span class="nv"> </span><span class="s">up&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">include_role</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span><span class="w"></span>
+<span class="w">    </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">docker_compose_settings</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quickstart_broker_service_single_node</span><span class="w"></span>
+<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
 
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Save</span><span class="nv"> </span><span class="s">inventory&quot;</span>
-    <span class="nt">block</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">file</span><span class="p">:</span>
-          <span class="nt">path</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">WORKING_DIR</span><span class="nv"> </span><span class="s">}}&quot;</span>
-          <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">directory</span>
-      <span class="p p-Indicator">-</span> <span class="nt">copy</span><span class="p">:</span>
-          <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result.broker_service.inventory</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">to_nice_yaml(indent=2)</span><span class="nv"> </span><span class="s">}}&quot;</span>
-          <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">WORKING_DIR</span><span class="nv"> </span><span class="s">}}/broker.inventory.yml&quot;</span>
-    <span class="nt">delegate_to</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Save</span><span class="nv"> </span><span class="s">inventory&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">block</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"></span>
+<span class="w">          </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">WORKING_DIR</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">          </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">directory</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">copy</span><span class="p">:</span><span class="w"></span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result.broker_service.inventory</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">to_nice_yaml(indent=2)</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">          </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">WORKING_DIR</span><span class="nv"> </span><span class="s">}}/broker.inventory.yml&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w"></span>
 </pre></div>
 </div>
 <p><a class="reference download internal" download="" href="_downloads/1dfe6a37e9d4f72ef7e6a19f577b5c8c/configure.playbook.yml"><code class="xref download docutils literal notranslate"><span class="pre">configure.playbook.yml</span></code></a>:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Quickstart Configure Playbook</span>
-  <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
-  <span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
-  <span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-  <span class="nt">collections</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span>
-  <span class="nt">module_defaults</span><span class="p">:</span>
-    <span class="nt">solace_queue</span><span class="p">:</span>
-      <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_host</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_port</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_is_secure_connection</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_username</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_password</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_timeout</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vpn</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">solace_queue_subscription</span><span class="p">:</span>
-      <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_host</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_port</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_is_secure_connection</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_username</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_password</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_timeout</span><span class="nv"> </span><span class="s">}}&quot;</span>
-      <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vpn</span><span class="nv"> </span><span class="s">}}&quot;</span>
-  <span class="nt">tasks</span><span class="p">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Quickstart Configure Playbook</span><span class="w"></span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
+<span class="w">  </span><span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">no</span><span class="w"></span>
+<span class="w">  </span><span class="nt">any_errors_fatal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">  </span><span class="nt">collections</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span><span class="w"></span>
+<span class="w">  </span><span class="nt">module_defaults</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">solace.pubsub_plus.solace_queue</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_host</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_port</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">secure_connection</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_is_secure_connection</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_username</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_password</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_timeout</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">msg_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vpn</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">solace.pubsub_plus.solace_queue_subscription</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_host</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_port</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">secure_connection</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_is_secure_connection</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_username</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_password</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_timeout</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">msg_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vpn</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
 
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create queue</span>
-      <span class="nt">solace_queue</span><span class="p">:</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">quickstart_queue</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create queue</span><span class="w"></span>
+<span class="w">      </span><span class="nt">solace_queue</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quickstart_queue</span><span class="w"></span>
 
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">add subscription</span>
-      <span class="nt">solace_queue_subscription</span><span class="p">:</span>
-        <span class="nt">queue</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">quickstart_queue</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;quickstart/topic&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">add subscription</span><span class="w"></span>
+<span class="w">      </span><span class="nt">solace_queue_subscription</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">queue</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quickstart_queue</span><span class="w"></span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;quickstart/topic&quot;</span><span class="w"></span>
 
-    <span class="c1"># create user message</span>
-    <span class="p p-Indicator">-</span> <span class="nt">set_fact</span><span class="p">:</span>
-        <span class="nt">broker_url</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">&#39;https&#39;</span><span class="nv"> </span><span class="s">if</span><span class="nv"> </span><span class="s">sempv2_is_secure_connection</span><span class="nv"> </span><span class="s">else</span><span class="nv"> </span><span class="s">&#39;http&#39;</span><span class="nv"> </span><span class="s">}}://{{</span><span class="nv"> </span><span class="s">sempv2_host</span><span class="nv"> </span><span class="s">}}:{{</span><span class="nv"> </span><span class="s">sempv2_port</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">message</span>
-      <span class="nt">debug</span><span class="p">:</span>
-        <span class="nt">msg</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="s">&quot;open</span><span class="nv"> </span><span class="s">private</span><span class="nv"> </span><span class="s">browser</span><span class="nv"> </span><span class="s">window:</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">broker_url</span><span class="nv"> </span><span class="s">}}&quot;</span>
-          <span class="p p-Indicator">-</span> <span class="s">&quot;login:</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">sempv2_username</span><span class="nv"> </span><span class="s">}}</span><span class="nv"> </span><span class="s">/</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">sempv2_password</span><span class="nv"> </span><span class="s">}}&quot;</span>
-          <span class="p p-Indicator">-</span> <span class="s">&quot;vpn:</span><span class="nv"> </span><span class="s">default&quot;</span>
-          <span class="p p-Indicator">-</span> <span class="s">&quot;Queues:</span><span class="nv"> </span><span class="s">quickstart_queue&quot;</span>
-          <span class="p p-Indicator">-</span> <span class="s">&quot;Subscriptions:</span><span class="nv"> </span><span class="s">quickstart/topic&quot;</span>
+<span class="w">    </span><span class="c1"># create user message</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">set_fact</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">broker_url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">&#39;https&#39;</span><span class="nv"> </span><span class="s">if</span><span class="nv"> </span><span class="s">sempv2_is_secure_connection</span><span class="nv"> </span><span class="s">else</span><span class="nv"> </span><span class="s">&#39;http&#39;</span><span class="nv"> </span><span class="s">}}://{{</span><span class="nv"> </span><span class="s">sempv2_host</span><span class="nv"> </span><span class="s">}}:{{</span><span class="nv"> </span><span class="s">sempv2_port</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">message</span><span class="w"></span>
+<span class="w">      </span><span class="nt">debug</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">msg</span><span class="p">:</span><span class="w"></span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;open</span><span class="nv"> </span><span class="s">private</span><span class="nv"> </span><span class="s">browser</span><span class="nv"> </span><span class="s">window:</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">broker_url</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;login:</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">sempv2_username</span><span class="nv"> </span><span class="s">}}</span><span class="nv"> </span><span class="s">/</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">sempv2_password</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;vpn:</span><span class="nv"> </span><span class="s">default&quot;</span><span class="w"></span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;Queues:</span><span class="nv"> </span><span class="s">quickstart_queue&quot;</span><span class="w"></span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;Subscriptions:</span><span class="nv"> </span><span class="s">quickstart/topic&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -273,7 +283,7 @@ console at <a class="reference external" href="http://localhost:8080">http://loc
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 05 Oct 2021 at 10:24.
+      <span class="lastupdated">Last updated on 18 Jan 2022 at 06:27.
       </span></p>
   </div>
 

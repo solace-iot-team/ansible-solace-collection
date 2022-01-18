@@ -7,7 +7,7 @@ solace_cert_authority -- certificate authority
 
 Allows addition, removal and configuration of certificate authority objects on Solace Brokers in an idempotent manner.
 
-Supports standalone brokers and Solace Cloud.
+Supports only standalone brokers. The Solace Cloud API is not supported, use :ref:`solace_client_cert_authority <solace_client_cert_authority_module>` or :ref:`solace_domain_cert_authority <solace_domain_cert_authority_module>` instead.
 
 
 
@@ -71,8 +71,7 @@ Notes
 
 .. note::
    - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/certAuthority
-   - Module Solace Cloud API: not available
-   - Uses deprecated SempV2 API. Since 2.19, broker supports 'clientCertAuthority' & 'domainCertAuthority' instead. Raise an issue if these are required.
+   - Uses deprecated SempV2 API. Since 2.19, broker supports 'clientCertAuthority' & 'domainCertAuthority' instead.
    - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
    - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
    - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
@@ -84,6 +83,8 @@ See Also
 .. seealso::
 
    - :ref:`solace_get_cert_authorities_module`
+   - :ref:`solace_client_cert_authority_module`
+   - :ref:`solace_domain_cert_authority_module`
 
 
 
@@ -164,24 +165,6 @@ sempv2_settings (optional)
 
   | **type**: dict
   | **aliases**: settings
-
-solace_cloud_api_token (optional)
-  The API Token.
-
-  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
-
-  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
-
-  | **type**: str
-
-solace_cloud_service_id (optional)
-  The service id in Solace Cloud.
-
-  Click on the service in Solace Cloud - the service id is in the URL.
-
-  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
-
-  | **type**: str
 
 state (optional)
   Target state.

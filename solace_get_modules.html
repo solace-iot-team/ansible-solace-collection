@@ -44,6 +44,7 @@
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart for Solace PubSub+ Ansible Collection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ansible-versions.html">Ansible Version Details</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
@@ -70,6 +71,8 @@
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_bridge_remote_vpns.html">solace_get_bridge_remote_vpns – get list of remote vpns of a bridge</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_bridges.html">solace_get_bridges – get list of bridges</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_cert_authorities.html">solace_get_cert_authorities – get list of cert authorities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_get_client_cert_authorities.html">solace_get_client_cert_authorities – get list of client certificates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_get_client_cert_authority_ocsp_trusted_cns.html">solace_get_client_cert_authority_ocsp_trusted_cns – get list of ocsp responder trusted common names</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_client_profiles.html">solace_get_client_profiles – get list of client profiles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_client_usernames.html">solace_get_client_usernames – get list of client usernames</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_dmr_bridges.html">solace_get_dmr_bridges – get list of dmr bridges</a></li>
@@ -77,6 +80,7 @@
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_dmr_cluster_link_trusted_cns.html">solace_get_dmr_cluster_link_trusted_cns – get list of trusted common names on a dmr cluster link</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_dmr_cluster_links.html">solace_get_dmr_cluster_links – get list of links on a dmr cluster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_dmr_clusters.html">solace_get_dmr_clusters – get list of dmr clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_get_domain_cert_authorities.html">solace_get_domain_cert_authorities – get list of domain certificates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_facts.html">solace_get_facts – get facts for a broker/vpn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_jndi_connection_factories.html">solace_get_jndi_connection_factories – get list of JNDI Connection Factories</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_get_jndi_queues.html">solace_get_jndi_queues – get list of jndi queues</a></li>
@@ -154,6 +158,8 @@ standalone brokers and Solace Cloud services.</p>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_bridge_remote_vpns.html">solace_get_bridge_remote_vpns – get list of remote vpns of a bridge</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_bridges.html">solace_get_bridges – get list of bridges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_cert_authorities.html">solace_get_cert_authorities – get list of cert authorities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_get_client_cert_authorities.html">solace_get_client_cert_authorities – get list of client certificates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_get_client_cert_authority_ocsp_trusted_cns.html">solace_get_client_cert_authority_ocsp_trusted_cns – get list of ocsp responder trusted common names</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_client_profiles.html">solace_get_client_profiles – get list of client profiles</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_client_usernames.html">solace_get_client_usernames – get list of client usernames</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_dmr_bridges.html">solace_get_dmr_bridges – get list of dmr bridges</a></li>
@@ -161,6 +167,7 @@ standalone brokers and Solace Cloud services.</p>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_dmr_cluster_link_trusted_cns.html">solace_get_dmr_cluster_link_trusted_cns – get list of trusted common names on a dmr cluster link</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_dmr_cluster_links.html">solace_get_dmr_cluster_links – get list of links on a dmr cluster</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_dmr_clusters.html">solace_get_dmr_clusters – get list of dmr clusters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_get_domain_cert_authorities.html">solace_get_domain_cert_authorities – get list of domain certificates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_facts.html">solace_get_facts – get facts for a broker/vpn</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_jndi_connection_factories.html">solace_get_jndi_connection_factories – get list of JNDI Connection Factories</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_get_jndi_queues.html">solace_get_jndi_queues – get list of jndi queues</a></li>
@@ -198,7 +205,7 @@ standalone brokers and Solace Cloud services.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 05 Oct 2021 at 10:24.
+      <span class="lastupdated">Last updated on 18 Jan 2022 at 06:27.
       </span></p>
   </div>
 

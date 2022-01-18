@@ -55,6 +55,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ansible-versions.html">Ansible Version Details</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
@@ -97,7 +98,7 @@
              
   <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">requires_ansible</span><span class="p">:</span> <span class="s2">&quot;&gt;=2.10,&lt;2.12&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">requires_ansible</span><span class="p">:</span> <span class="s2">&quot;&gt;=2.10,&lt;2.13&quot;</span>
 </pre></div>
 </div>
 <section id="installation-dependencies">
@@ -122,6 +123,15 @@ $ python3 -m pip install --upgrade pip
 $ pip install -r requirements.txt
 $ pip install ansible
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Installing a specific version of ansible:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="s2">&quot;ansible&gt;=2.10.3,&lt;2.11&quot;</span>, <span class="c1"># for latest ansible_core 2.10</span>
+pip install <span class="s2">&quot;ansible&gt;=4.10.0,&lt;5.0.0&quot;</span>, <span class="c1"># for latest ansible_core 2.11</span>
+pip install <span class="s2">&quot;ansible&gt;=5.1.0,&lt;6.0.0&quot;</span> <span class="c1"># for latest ansible core 2.12</span>
+</pre></div>
+</div>
 </div>
 </section>
 <section id="install-the-solace-pubsub-ansible-collection">
@@ -325,7 +335,7 @@ $ ansible-galaxy collection list
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 05 Oct 2021 at 10:24.
+      <span class="lastupdated">Last updated on 18 Jan 2022 at 06:27.
       </span></p>
   </div>
 

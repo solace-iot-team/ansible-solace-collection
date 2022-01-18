@@ -44,6 +44,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Solace PubSub+ Ansible Collection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ansible-versions.html">Ansible Version Details</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul class="current">
@@ -101,45 +102,45 @@ the Ansible-Solace modules to our local host (our Ansible controller) for debugg
 <li><p>describes a bastion host</p></li>
 <li><p>describes a solace cloud service</p></li>
 </ul>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
-<span class="nt">all</span><span class="p">:</span>
-  <span class="nt">hosts</span><span class="p">:</span>
-    <span class="nt">my-solace-cloud-service</span><span class="p">:</span> <span class="c1"># name of solace cloud service</span>
-      <span class="c1"># start: bastion host config</span>
-      <span class="nt">ansible_become</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-      <span class="nt">ansible_host</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nv">ip-address-of-bastion-host</span><span class="p p-Indicator">}</span>
-      <span class="nt">ansible_python_interpreter</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/usr/bin/python3</span>
-      <span class="nt">ansible_user</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nv">ansible-user-on-bastion-host</span><span class="p p-Indicator">}</span>
-      <span class="c1"># log path on bastion host</span>
-      <span class="c1"># note: ensure that the ansible_user (here: root) has write access to the path</span>
-      <span class="nt">ansible_solace_log_base_path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/var/local</span>
-      <span class="c1"># end: bastion host config</span>
-      <span class="c1"># start: solace cloud service config</span>
-      <span class="nt">broker_type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">solace_cloud</span>
-      <span class="nt">meta</span><span class="p">:</span>
-        <span class="nt">datacenterId</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">aws-ca-central-1a</span>
-        <span class="nt">sc_service_id</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d9x91ert6e</span>
-        <span class="nt">serviceClassDisplayedAttributes</span><span class="p">:</span>
-          <span class="nt">Clients</span><span class="p">:</span> <span class="s">&#39;250&#39;</span>
-          <span class="nt">High Availability</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">HA Group</span>
-          <span class="nt">Message Broker Tenancy</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Dedicated</span>
-          <span class="nt">Network Speed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">450 Mbps</span>
-          <span class="nt">Network Usage</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50 GB per month</span>
-          <span class="nt">Queues</span><span class="p">:</span> <span class="s">&#39;250&#39;</span>
-          <span class="nt">Storage</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">25 GB</span>
-        <span class="nt">serviceClassId</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">enterprise-250-nano</span>
-        <span class="nt">serviceTypeId</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">enterprise</span>
-        <span class="nt">service_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">asct_sc_bastion_2</span>
-      <span class="nt">sempv2_host</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nv">dns-or-ip-of-semp-service-of-broker-service</span><span class="p p-Indicator">}</span>
-      <span class="nt">sempv2_is_secure_connection</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-      <span class="nt">sempv2_password</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nv">password</span><span class="p p-Indicator">}</span>
-      <span class="nt">sempv2_port</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">943</span>
-      <span class="nt">sempv2_timeout</span><span class="p">:</span> <span class="s">&#39;60&#39;</span>
-      <span class="nt">sempv2_username</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nv">username</span><span class="p p-Indicator">}</span>
-      <span class="nt">solace_cloud_service_id</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d9x91ert6e</span>
-      <span class="nt">virtual_router</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">primary</span>
-      <span class="nt">vpn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">my-solace-cloud-service</span>
-      <span class="c1"># end: solace cloud service config</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span><span class="w"></span>
+<span class="nt">all</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">my-solace-cloud-service</span><span class="p">:</span><span class="w"> </span><span class="c1"># name of solace cloud service</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># start: bastion host config</span><span class="w"></span>
+<span class="w">      </span><span class="nt">ansible_become</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">      </span><span class="nt">ansible_host</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">ip-address-of-bastion-host</span><span class="p p-Indicator">}</span><span class="w"></span>
+<span class="w">      </span><span class="nt">ansible_python_interpreter</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/usr/bin/python3</span><span class="w"></span>
+<span class="w">      </span><span class="nt">ansible_user</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">ansible-user-on-bastion-host</span><span class="p p-Indicator">}</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># log path on bastion host</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># note: ensure that the ansible_user (here: root) has write access to the path</span><span class="w"></span>
+<span class="w">      </span><span class="nt">ansible_solace_log_base_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># end: bastion host config</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># start: solace cloud service config</span><span class="w"></span>
+<span class="w">      </span><span class="nt">broker_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace_cloud</span><span class="w"></span>
+<span class="w">      </span><span class="nt">meta</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">datacenterId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aws-ca-central-1a</span><span class="w"></span>
+<span class="w">        </span><span class="nt">sc_service_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">d9x91ert6e</span><span class="w"></span>
+<span class="w">        </span><span class="nt">serviceClassDisplayedAttributes</span><span class="p">:</span><span class="w"></span>
+<span class="w">          </span><span class="nt">Clients</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;250&#39;</span><span class="w"></span>
+<span class="w">          </span><span class="nt">High Availability</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HA Group</span><span class="w"></span>
+<span class="w">          </span><span class="nt">Message Broker Tenancy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dedicated</span><span class="w"></span>
+<span class="w">          </span><span class="nt">Network Speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">450 Mbps</span><span class="w"></span>
+<span class="w">          </span><span class="nt">Network Usage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50 GB per month</span><span class="w"></span>
+<span class="w">          </span><span class="nt">Queues</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;250&#39;</span><span class="w"></span>
+<span class="w">          </span><span class="nt">Storage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">25 GB</span><span class="w"></span>
+<span class="w">        </span><span class="nt">serviceClassId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enterprise-250-nano</span><span class="w"></span>
+<span class="w">        </span><span class="nt">serviceTypeId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enterprise</span><span class="w"></span>
+<span class="w">        </span><span class="nt">service_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asct_sc_bastion_2</span><span class="w"></span>
+<span class="w">      </span><span class="nt">sempv2_host</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">dns-or-ip-of-semp-service-of-broker-service</span><span class="p p-Indicator">}</span><span class="w"></span>
+<span class="w">      </span><span class="nt">sempv2_is_secure_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">      </span><span class="nt">sempv2_password</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">password</span><span class="p p-Indicator">}</span><span class="w"></span>
+<span class="w">      </span><span class="nt">sempv2_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">943</span><span class="w"></span>
+<span class="w">      </span><span class="nt">sempv2_timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;60&#39;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">sempv2_username</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">username</span><span class="p p-Indicator">}</span><span class="w"></span>
+<span class="w">      </span><span class="nt">solace_cloud_service_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">d9x91ert6e</span><span class="w"></span>
+<span class="w">      </span><span class="nt">virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span><span class="w"></span>
+<span class="w">      </span><span class="nt">vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-solace-cloud-service</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># end: solace cloud service config</span><span class="w"></span>
 </pre></div>
 </div>
 <p>We can use the following playbook to:</p>
@@ -154,63 +155,63 @@ the Ansible-Solace modules to our local host (our Ansible controller) for debugg
 </li>
 <li><p>a variable <cite>ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH</cite> with the path on the ansible controller for the log files</p></li>
 </ul>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
-<span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
-<span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="nt">collections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span>
-<span class="nt">module_defaults</span><span class="p">:</span>
-  <span class="c1"># ... define additional module defaults</span>
-  <span class="nt">solace_queue</span><span class="p">:</span>
-    <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_host</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_port</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_is_secure_connection</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_username</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_password</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_timeout</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vpn</span><span class="nv"> </span><span class="s">}}&quot;</span>
-<span class="nt">handlers</span><span class="p">:</span>
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Fetch log file</span>
-  <span class="nt">fetch</span><span class="p">:</span>
-    <span class="nt">src</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_ansible_solace_log_path</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH</span><span class="nv"> </span><span class="s">}}/&quot;</span>
-    <span class="nt">flat</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
-    <span class="nt">fail_on_missing</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
-  <span class="nt">listen</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">log-file-handler</span>
-  <span class="nt">no_log</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Delete log file</span>
-  <span class="nt">file</span><span class="p">:</span>
-    <span class="nt">path</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_ansible_solace_log_path</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">absent</span>
-  <span class="nt">listen</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">log-file-handler</span>
-<span class="nt">pre_tasks</span><span class="p">:</span>
-  <span class="c1"># generate the name of the log file with timestamp and inventory host</span>
-<span class="p p-Indicator">-</span> <span class="nt">set_fact</span><span class="p">:</span>
-    <span class="c1"># Note: use this custom formatting, no &#39;:&#39; in file name!</span>
-    <span class="nt">date_time_file</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">lookup(&#39;pipe&#39;,&#39;date</span><span class="nv"> </span><span class="s">+%Y-%m-%d-%H-%M-%S&#39;)</span><span class="nv"> </span><span class="s">}}&quot;</span>
-<span class="p p-Indicator">-</span> <span class="nt">set_fact</span><span class="p">:</span>
-    <span class="c1"># e.g. resulting in: /var/local/my-solace-cloud-service.2021-05-14-09-01-00.ansible-solace.log</span>
-    <span class="nt">remote_ansible_solace_log_path</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ansible_solace_log_base_path</span><span class="nv"> </span><span class="s">}}/{{</span><span class="nv"> </span><span class="s">inventory_hostname</span><span class="nv"> </span><span class="s">}}.{{</span><span class="nv"> </span><span class="s">date_time_file</span><span class="nv"> </span><span class="s">}}.ansible-solace.log&quot;</span>
-<span class="nt">tasks</span><span class="p">:</span>
-  <span class="c1"># ensure the handler is notified at least once</span>
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Set up Handler</span>
-  <span class="nt">debug</span><span class="p">:</span>
-    <span class="nt">msg</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">setup handler</span>
-  <span class="nt">changed_when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-  <span class="nt">notify</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">log-file-handler</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
+<span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span><span class="w"></span>
+<span class="nt">any_errors_fatal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="nt">collections</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span><span class="w"></span>
+<span class="nt">module_defaults</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># ... define additional module defaults</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_queue</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_host</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_port</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">secure_connection</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_is_secure_connection</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_username</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_password</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">sempv2_timeout</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">msg_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vpn</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="nt">handlers</span><span class="p">:</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Fetch log file</span><span class="w"></span>
+<span class="w">  </span><span class="nt">fetch</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_ansible_solace_log_path</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ANSIBLE_SOLACE_LOCAL_LOG_BASE_PATH</span><span class="nv"> </span><span class="s">}}/&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">flat</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span><span class="w"></span>
+<span class="w">    </span><span class="nt">fail_on_missing</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">no</span><span class="w"></span>
+<span class="w">  </span><span class="nt">listen</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log-file-handler</span><span class="w"></span>
+<span class="w">  </span><span class="nt">no_log</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Delete log file</span><span class="w"></span>
+<span class="w">  </span><span class="nt">file</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_ansible_solace_log_path</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absent</span><span class="w"></span>
+<span class="w">  </span><span class="nt">listen</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log-file-handler</span><span class="w"></span>
+<span class="nt">pre_tasks</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># generate the name of the log file with timestamp and inventory host</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">set_fact</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># Note: use this custom formatting, no &#39;:&#39; in file name!</span><span class="w"></span>
+<span class="w">    </span><span class="nt">date_time_file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">lookup(&#39;pipe&#39;,&#39;date</span><span class="nv"> </span><span class="s">+%Y-%m-%d-%H-%M-%S&#39;)</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">set_fact</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># e.g. resulting in: /var/local/my-solace-cloud-service.2021-05-14-09-01-00.ansible-solace.log</span><span class="w"></span>
+<span class="w">    </span><span class="nt">remote_ansible_solace_log_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ansible_solace_log_base_path</span><span class="nv"> </span><span class="s">}}/{{</span><span class="nv"> </span><span class="s">inventory_hostname</span><span class="nv"> </span><span class="s">}}.{{</span><span class="nv"> </span><span class="s">date_time_file</span><span class="nv"> </span><span class="s">}}.ansible-solace.log&quot;</span><span class="w"></span>
+<span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># ensure the handler is notified at least once</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set up Handler</span><span class="w"></span>
+<span class="w">  </span><span class="nt">debug</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">setup handler</span><span class="w"></span>
+<span class="w">  </span><span class="nt">changed_when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">  </span><span class="nt">notify</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log-file-handler</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Block of ansible-solace tasks</span>
-  <span class="nt">block</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Create Queue</span>
-    <span class="nt">solace_queue</span><span class="p">:</span>
-      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">my-queue</span>
-      <span class="nt">state</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">present</span>
-  <span class="nt">environment</span><span class="p">:</span>
-    <span class="nt">ANSIBLE_SOLACE_ENABLE_LOGGING</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-    <span class="nt">ANSIBLE_SOLACE_LOG_PATH</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_ansible_solace_log_path</span><span class="nv"> </span><span class="s">}}&quot;</span>
-  <span class="nt">always</span><span class="p">:</span>
-    <span class="c1"># ensure handlers are called no matter if a task inside the block fails or not</span>
-    <span class="p p-Indicator">-</span> <span class="nt">meta</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">flush_handlers</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Block of ansible-solace tasks</span><span class="w"></span>
+<span class="w">  </span><span class="nt">block</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create Queue</span><span class="w"></span>
+<span class="w">    </span><span class="nt">solace_queue</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-queue</span><span class="w"></span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<span class="w">  </span><span class="nt">environment</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ANSIBLE_SOLACE_ENABLE_LOGGING</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ANSIBLE_SOLACE_LOG_PATH</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_ansible_solace_log_path</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nt">always</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># ensure handlers are called no matter if a task inside the block fails or not</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">meta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flush_handlers</span><span class="w"></span>
 </pre></div>
 </div>
 <p>… and call the playbook with the local log path:</p>
@@ -244,7 +245,7 @@ ansible-playbook <span class="se">\</span>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 05 Oct 2021 at 10:24.
+      <span class="lastupdated">Last updated on 18 Jan 2022 at 06:27.
       </span></p>
   </div>
 

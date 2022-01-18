@@ -44,6 +44,7 @@
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart for Solace PubSub+ Ansible Collection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ansible-versions.html">Ansible Version Details</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
@@ -118,25 +119,25 @@ each host in the inventory BEFORE the <cite>solace_bridge_remote_vpn</cite> is c
 <p>An additional convenience module allows you to retrieve certain facts from Ansible’s <cite>hostvars</cite>: <a class="reference internal" href="modules/solace_get_facts.html#solace-get-facts-module"><span class="std std-ref">solace_get_facts – get facts for a broker/vpn</span></a>.</p>
 <p>It implements a few functions to directly collect a set of facts without the need to understand the JSON structure.
 For example, to get the connection details of a newly created Solace Cloud service use the following in your playbook:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Gather</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Facts&quot;</span>
-  <span class="nt">solace_gather_facts</span><span class="p">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Gather</span><span class="nv"> </span><span class="s">Solace</span><span class="nv"> </span><span class="s">Facts&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_gather_facts</span><span class="p">:</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get_vpnClientConnectionDetails</span>
-  <span class="nt">solace_get_facts</span><span class="p">:</span>
-    <span class="nt">hostvars</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">hostvars</span><span class="nv"> </span><span class="s">}}&quot;</span> <span class="c1"># always use this setting</span>
-    <span class="nt">hostvars_inventory_hostname</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">inventory_hostname</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vpn</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">get_functions</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">get_vpnClientConnectionDetails</span>
-  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get_vpnClientConnectionDetails</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_get_facts</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">hostvars</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">hostvars</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"> </span><span class="c1"># always use this setting</span><span class="w"></span>
+<span class="w">    </span><span class="nt">hostvars_inventory_hostname</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">inventory_hostname</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">msg_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vpn</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">get_functions</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get_vpnClientConnectionDetails</span><span class="w"></span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">set_fact</span><span class="p">:</span>
-    <span class="nt">client_connection_details</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">result.facts.vpnClientConnectionDetails</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">set_fact</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">client_connection_details</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">result.facts.vpnClientConnectionDetails</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="s">&quot;Save</span><span class="nv"> </span><span class="s">&#39;client_connection_details&#39;</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">File&quot;</span>
-  <span class="nt">copy</span><span class="p">:</span>
-    <span class="nt">content</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">client_connection_details</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">to_nice_json</span><span class="nv"> </span><span class="s">}}&quot;</span>
-    <span class="nt">dest</span><span class="p">:</span> <span class="s">&quot;./tmp/generated/{{</span><span class="nv"> </span><span class="s">inventory_hostname</span><span class="nv"> </span><span class="s">}}.client_connection_details.json&quot;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Save</span><span class="nv"> </span><span class="s">&#39;client_connection_details&#39;</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">File&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nt">copy</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">client_connection_details</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">to_nice_json</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./tmp/generated/{{</span><span class="nv"> </span><span class="s">inventory_hostname</span><span class="nv"> </span><span class="s">}}.client_connection_details.json&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -166,7 +167,7 @@ For example, to get the connection details of a newly created Solace Cloud servi
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 05 Oct 2021 at 10:24.
+      <span class="lastupdated">Last updated on 18 Jan 2022 at 06:27.
       </span></p>
   </div>
 

@@ -44,6 +44,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Solace PubSub+ Ansible Collection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ansible-versions.html">Ansible Version Details</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
@@ -70,6 +71,8 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_get_bridge_remote_vpns.html">solace_get_bridge_remote_vpns – get list of remote vpns of a bridge</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_bridges.html">solace_get_bridges – get list of bridges</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_cert_authorities.html">solace_get_cert_authorities – get list of cert authorities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_client_cert_authorities.html">solace_get_client_cert_authorities – get list of client certificates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_client_cert_authority_ocsp_trusted_cns.html">solace_get_client_cert_authority_ocsp_trusted_cns – get list of ocsp responder trusted common names</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_client_profiles.html">solace_get_client_profiles – get list of client profiles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_client_usernames.html">solace_get_client_usernames – get list of client usernames</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_bridges.html">solace_get_dmr_bridges – get list of dmr bridges</a></li>
@@ -77,6 +80,7 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_cluster_link_trusted_cns.html">solace_get_dmr_cluster_link_trusted_cns – get list of trusted common names on a dmr cluster link</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_cluster_links.html">solace_get_dmr_cluster_links – get list of links on a dmr cluster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_dmr_clusters.html">solace_get_dmr_clusters – get list of dmr clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_domain_cert_authorities.html">solace_get_domain_cert_authorities – get list of domain certificates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_facts.html">solace_get_facts – get facts for a broker/vpn</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_jndi_connection_factories.html">solace_get_jndi_connection_factories – get list of JNDI Connection Factories</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_jndi_queues.html">solace_get_jndi_queues – get list of jndi queues</a></li>
@@ -144,52 +148,52 @@
 <p>Retrieves all objects that match the criteria defined in the ‘where’ clause and returns the fields defined in the ‘select’ parameter.</p>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
-<span class="nt">gather_facts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">no</span>
-<span class="nt">any_errors_fatal</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="nt">collections</span><span class="p">:</span>
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span>
-<span class="nt">module_defaults</span><span class="p">:</span>
-  <span class="nt">solace_get_mqtt_session_subscriptions</span><span class="p">:</span>
-    <span class="nt">host</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">port</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">secure_connection</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">username</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">password</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">timeout</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="nt">msg_vpn</span><span class="p">:</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span>
-<span class="nt">tasks</span><span class="p">:</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
+<span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">no</span><span class="w"></span>
+<span class="nt">any_errors_fatal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="nt">collections</span><span class="p">:</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span><span class="w"></span>
+<span class="nt">module_defaults</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_get_mqtt_session_subscriptions</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">secure_connection</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">msg_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get list config</span>
-  <span class="nt">solace_get_mqtt_session_subscriptions</span><span class="p">:</span>
-    <span class="nt">mqtt_session_client_id</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
-    <span class="nt">query_params</span><span class="p">:</span>
-      <span class="nt">where</span><span class="p">:</span>
-        <span class="p p-Indicator">-</span> <span class="s">&quot;subscriptionTopic==foo/bar/*&quot;</span>
-      <span class="nt">select</span><span class="p">:</span>
-        <span class="p p-Indicator">-</span> <span class="s">&quot;mqttSessionClientId&quot;</span>
-        <span class="p p-Indicator">-</span> <span class="s">&quot;mqttSessionVirtualRouter&quot;</span>
-        <span class="p p-Indicator">-</span> <span class="s">&quot;subscriptionTopic&quot;</span>
-        <span class="p p-Indicator">-</span> <span class="s">&quot;subscriptionQos&quot;</span>
-  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get list config</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_get_mqtt_session_subscriptions</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">mqtt_session_client_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span><span class="w"></span>
+<span class="w">    </span><span class="nt">query_params</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">where</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;subscriptionTopic==foo/bar/*&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">select</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;mqttSessionClientId&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;mqttSessionVirtualRouter&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;subscriptionTopic&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;subscriptionQos&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">print result</span>
-  <span class="nt">debug</span><span class="p">:</span>
-    <span class="nt">msg</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">print result</span><span class="w"></span>
+<span class="w">  </span><span class="nt">debug</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get list monitor</span>
-  <span class="nt">solace_get_mqtt_session_subscriptions</span><span class="p">:</span>
-    <span class="nt">api</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">monitor</span>
-    <span class="nt">mqtt_session_client_id</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">foo</span>
-  <span class="nt">register</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">result</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get list monitor</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_get_mqtt_session_subscriptions</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">monitor</span><span class="w"></span>
+<span class="w">    </span><span class="nt">mqtt_session_client_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span><span class="w"></span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">print result</span>
-  <span class="nt">debug</span><span class="p">:</span>
-    <span class="nt">msg</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span>
-    <span class="p p-Indicator">-</span> <span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">print result</span><span class="w"></span>
+<span class="w">  </span><span class="nt">debug</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -382,14 +386,14 @@
 <div class="line"><strong>type</strong>: int</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
-  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;rc&quot;</span><span class="p">:</span> <span class="mi">1</span>
-  <span class="p">},</span>
-  <span class="nt">&quot;success&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;rc&quot;</span><span class="p">:</span> <span class="mi">0</span>
-  <span class="p">}</span>
-<span class="p">}</span>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;rc&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;rc&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 </dd>
@@ -415,7 +419,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 05 Oct 2021 at 10:24.
+      <span class="lastupdated">Last updated on 18 Jan 2022 at 06:27.
       </span></p>
   </div>
 
