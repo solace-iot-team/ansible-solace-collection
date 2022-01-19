@@ -8,10 +8,10 @@ on:
   # push:
   #   branches:
   #     mtn-120
-
   schedule:
-    - cron: '0 1 * * THU'
-    # - cron: '0 5 * * *'
+    - cron: '1 1 1 * *' # once per month
+    # - cron: '0 1 * * THU' # every thursday
+    # - cron: '0 5 * * *' # every day
     # - cron: 0 22 */2 * *  # every two days
   pull_request:
     branches:
