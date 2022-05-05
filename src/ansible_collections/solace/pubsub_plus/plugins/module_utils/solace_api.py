@@ -317,7 +317,7 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
                 "count": page_count
             })
         if query_params:
-            if ("where" in query_params 
+            if ("where" in query_params
                     and query_params['where'] is not None
                     and len(query_params['where']) > 0):
                 _query_params.update({
