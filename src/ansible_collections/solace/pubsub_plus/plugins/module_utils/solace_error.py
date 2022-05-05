@@ -77,6 +77,11 @@ class SolaceParamsValidationError(Exception):
         super().__init__(f"arg '{param}={value}': {msg}")
 
 
+class SolaceEnvVarError(Exception):
+    def __init__(self, name, value, msg):
+        super().__init__(f"invalid env var: '{name}={value}'. {msg}.")
+
+
 class SolaceFeatureNotSupportedError(Exception):
     def __init__(self, feature):
         super().__init__(f"feature: '{feature}")

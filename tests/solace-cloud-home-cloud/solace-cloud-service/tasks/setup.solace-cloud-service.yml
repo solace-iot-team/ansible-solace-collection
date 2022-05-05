@@ -1,0 +1,59 @@
+# Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- set_fact:
+    service_name: "{{ sc_service.name }}_{{ solace_cloud_home_cloud }}"
+  when: solace_cloud_home_cloud is defined
+
+- set_fact:
+    service_name: "{{ sc_service.name }}_default_us"
+  when: solace_cloud_home_cloud is not defined or solace_cloud_home_cloud == ''
+
+- name: "Create Solace Cloud Service - wait until completed"
+  solace_cloud_service:
+    api_token: "{{ solace_cloud_api_token }}"
+    name: "{{ service_name }}"
+    wait_timeout_minutes: 30
+    settings:
+      # msgVpnName: "{{ sc_service.msgVpnName }}"
+      datacenterId: "{{ sc_service.datacenterId }}"
+      serviceTypeId: "{{ sc_service.serviceTypeId }}"
+      serviceClassId: "{{ sc_service.serviceClassId }}"
+      attributes: "{{ sc_service.attributes | default(omit) }}"
+    state: present
+  register: result
+
+- set_fact:
+    sc_service_id: "{{ result.response.serviceId }}"
+    sc_service_info: "{{ result.response }}"
+
+- name: "Get Solace Cloud Service Inventory"
+  solace_cloud_get_facts:
+    from_dict: "{{ sc_service_info }}"
+    get_formattedHostInventory:
+      host_entry: "{{ service_name }}"
+      meta:
+        solace_cloud_home: "{{ solace_cloud_home_cloud }}"
+        service_name: "{{ sc_service_info.name }}"
+        sc_service_id: "{{ sc_service_info.serviceId }}"
+        datacenterId: "{{ sc_service_info.datacenterId }}"
+        serviceTypeId: "{{ sc_service_info.serviceTypeId}}"
+        serviceClassId: "{{ sc_service_info.serviceClassId }}"
+        serviceClassDisplayedAttributes: "{{ sc_service_info.serviceClassDisplayedAttributes }}"
+  register: result
+
+- name: "Save Solace Cloud Service Inventory to File"
+  copy:
+    content: "{{ result.facts.formattedHostInventory | to_nice_yaml }}"
+    dest: "{{ WORKING_DIR }}/{{ sc_service.name }}.{{ env.broker_inventory_file_name_postfix }}"
+  changed_when: false
+  delegate_to: localhost
+
+- name: "Add new solace cloud service to dict"
+  set_fact:
+    created_services_dict: "{{ created_services_dict | combine(result.facts.formattedHostInventory.all.hosts, recursive=True) }}"
+
+###
+# The End.
