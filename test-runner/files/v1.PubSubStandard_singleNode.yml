@@ -1,13 +1,14 @@
-
-version: "3.7"
+# docker-compose -f PubSubStandard_singleNode.yml up
+version: '3.3'
 
 services:
   primary:
+    # container_name: "${brokerDockerContainerName}"
     container_name: "pubSubStandardSingleNode"
     image: "${BROKER_DOCKER_IMAGE}"
     shm_size: 1g
     ulimits:
-      core: 1
+      core: 2
       nofile:
         soft: 2448
         hard: 38048
@@ -24,7 +25,7 @@ services:
       #Web transport over TLS
       - '443:443'
       #SEMP over TLS
-      - "1943:1943"
+      - '1943:1943'
       #MQTT Default VPN
       - '1883:1883'
       #AMQP Default VPN over TLS
@@ -44,7 +45,7 @@ services:
       #REST Default VPN over TLS
       - '9443:9443'
       #SMF
-      - "59555:55555"
+      - '55554:55555'
       #SMF Compressed
       - '55003:55003'
       #SMF over TLS
@@ -53,3 +54,8 @@ services:
       - username_admin_globalaccesslevel=admin
       - username_admin_password=admin
       - system_scaling_maxconnectioncount=100
+      #- routername=ansible-solace__test
+
+
+###
+# The End.

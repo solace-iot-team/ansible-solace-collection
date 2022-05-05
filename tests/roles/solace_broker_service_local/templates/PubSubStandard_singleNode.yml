@@ -1,19 +1,20 @@
-# docker-compose -f PubSubStandard_singleNode.yml up
-version: '3.3'
+
+version: "3.7"
+
 services:
   primary:
-    container_name: "{{ _container_name }}"
-    image: "{{ _image }}"
+    container_name: "pubSubStandardSingleNode"
+    image: "${BROKER_DOCKER_IMAGE}"
     shm_size: 1g
     ulimits:
-      core: 2
+      core: 1
       nofile:
         soft: 2448
         hard: 38048
     deploy:
       restart_policy:
         condition: on-failure
-        max_attempts: 3
+        max_attempts: 1
     ports:
     #Port Mappings:  Ports are mapped straight through from host to
     #container.  This may result in port collisions on commonly used
@@ -23,7 +24,7 @@ services:
       #Web transport over TLS
       - '443:443'
       #SEMP over TLS
-      - '1943:1943'
+      - "1943:1943"
       #MQTT Default VPN
       - '1883:1883'
       #AMQP Default VPN over TLS
@@ -43,7 +44,7 @@ services:
       #REST Default VPN over TLS
       - '9443:9443'
       #SMF
-      - '55555:55555'
+      - "59555:55555"
       #SMF Compressed
       - '55003:55003'
       #SMF over TLS
@@ -52,6 +53,3 @@ services:
       - username_admin_globalaccesslevel=admin
       - username_admin_password=admin
       - system_scaling_maxconnectioncount=100
-
-###
-# The End.

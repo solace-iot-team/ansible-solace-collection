@@ -21,10 +21,18 @@ ansibleSolaceTests=(
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
 # local broker
+  export BROKER_DOCKER_COMPOSE_FILE="$projectHome/test-runner/files/PubSubStandard_singleNode.yml"
   export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
-  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.8.0.12"
-  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.7.0.29"
-  # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.3.1.28"
+  export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.13.0.16"
+
+  # these don't run any more with new docker-compose in python
+    # export BROKER_DOCKER_COMPOSE_FILE="$projectHome/test-runner/files/v1.PubSubStandard_singleNode.yml"
+    # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.10.0.15"
+    # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.9.0.23"
+    # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.8.0.12"
+    # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.7.0.42"
+    # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.6.0.46"
+    # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.3.1.28"
   export LOCAL_BROKER_INVENTORY_FILE="$projectHome/test-runner/files/local.broker.inventory.yml"
   export BROKER_DOCKER_COMPOSE_FILE="$projectHome/test-runner/files/PubSubStandard_singleNode.yml"
 

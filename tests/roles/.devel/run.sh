@@ -14,9 +14,9 @@ export AZURE_BROKER_PROJECT_NAME="asct-devel-broker"
 ansibleSolaceTests=(
   "solace_broker_service_local"
   "teardown"
-  "setup"
-  "solace_broker_service_remote"
-  "teardown"
+  # "setup"
+  # "solace_broker_service_remote"
+  # "teardown"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
