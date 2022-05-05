@@ -3,7 +3,7 @@ pycodestyle
 pyyaml
 voluptuous
 yamllint
-rstcheck
+rstcheck==3.3.1
 Sphinx
 sphinx-rtd-theme
 sphinxcontrib-contentui
