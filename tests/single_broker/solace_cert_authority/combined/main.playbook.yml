@@ -82,6 +82,7 @@
   - name: "main: solace_domain_cert_authority: delete all"
     solace_domain_cert_authority:
       name: "{{ item.name }}"
+      timeout: 600
       state: absent
     loop: "{{ domain_target_list.cert_authority_names }}"
 

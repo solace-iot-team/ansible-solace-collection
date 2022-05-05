@@ -111,6 +111,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
         self.timeout = float(module.params['timeout'])
         self.validate_certs = bool(module.params['validate_certs'])
         self.x_broker = module.params.get('x_broker', None)
+        self.solace_cloud_home = module.params.get('solace_cloud_home', None)
         solace_cloud_api_token = module.params.get(
             'solace_cloud_api_token', None)
         solace_cloud_service_id = module.params.get(
@@ -266,6 +267,7 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
     @ staticmethod
     def arg_spec_solace_cloud_mandatory() -> dict:
         return dict(
+            solace_cloud_home=dict(type='str', required=False, default=None, choices=['us', 'au', 'US', 'AU', '']),
             solace_cloud_api_token=dict(type='str',
                                         required=True,
                                         no_log=True),
@@ -364,7 +366,7 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
         self.timeout = float(module.params['timeout'])
         self.validate_certs = bool(module.params['validate_certs'])
         self.auth = BearerAuth(self.solace_cloud_api_token)
-        self.solace_cloud_home = module.params['solace_cloud_home']
+        self.solace_cloud_home = module.params.get('solace_cloud_home', None)
 
     def is_solace_cloud(self) -> bool:
         return True

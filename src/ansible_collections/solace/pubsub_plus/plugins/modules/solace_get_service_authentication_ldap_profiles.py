@@ -219,7 +219,7 @@ class SolaceGetServiceAuthenticationLdapProfilesTask(SolaceGetTask):
         # GET services/{service-id}/requests/ldapAuthenticationProfile/default
         # only 1 exists, name=default
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()), SolaceCloudApi.API_SERVICES,
                       service_id, 'ldapAuthenticationProfile', 'default']
         return [self.solace_cloud_api.get_object_settings(self.get_config(), path_array)]
 

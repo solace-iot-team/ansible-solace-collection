@@ -113,6 +113,7 @@ options:
       - au
       - US
       - AU
+      - ''
   solace_cloud_api_token:
     description:
       - The API Token.
@@ -140,6 +141,7 @@ options:
       - au
       - US
       - AU
+      - ''
   solace_cloud_api_token:
     description:
       - The API Token.
@@ -167,6 +169,7 @@ options:
       - au
       - US
       - AU
+      - ''
   solace_cloud_api_token:
     description:
       - The API Token.

@@ -81,6 +81,7 @@
   - name: "main: solace_client_cert_authority: absent"
     solace_client_cert_authority:
       name: "{{ cert_authority_name }}"
+      timeout: 600
       state: absent
 
   - name: "main: solace_get_client_cert_authorities: config"
@@ -95,6 +96,7 @@
   - name: "main: solace_client_cert_authority: create"
     solace_client_cert_authority:
       name: "{{ cert_authority_name }}"
+      timeout: 600
       settings:
         certContent: "{{ lookup('file', cert_file) }}"
         revocationCheckEnabled: false
@@ -122,6 +124,7 @@
   - name: "main: solace_client_cert_authority: no change"
     solace_client_cert_authority:
       name: "{{ cert_authority_name }}"
+      timeout: 600
       settings:
         # solace cloud api does not return the content
         # certContent: "{{ lookup('file', cert_file) }}"
@@ -134,6 +137,7 @@
   - name: "main: solace_client_cert_authority: update"
     solace_client_cert_authority:
       name: "{{ cert_authority_name }}"
+      timeout: 600
       settings:
         revocationCheckEnabled: true
       state: present
@@ -193,6 +197,7 @@
   - name: "main: solace_client_cert_authority: absent"
     solace_client_cert_authority:
       name: "{{ cert_authority_name }}"
+      timeout: 600      
       state: absent
 
   - name: "main: solace_get_client_cert_authorities: config"

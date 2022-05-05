@@ -255,7 +255,7 @@ class SolaceCloudClientProfileTask(SolaceBrokerCRUDTask):
     def get_func(self, client_profile_name):
         # GET services/{paste-your-serviceId-here}/clientProfiles/{{clientProfileName}}
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()), SolaceCloudApi.API_SERVICES,
                       service_id, 'clientProfiles', client_profile_name]
         return self.solace_cloud_api.get_object_settings(self.get_config(), path_array)
 
@@ -272,7 +272,7 @@ class SolaceCloudClientProfileTask(SolaceBrokerCRUDTask):
                                           operation_type=self.OPERATION,
                                           settings=data)
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()),
                       SolaceCloudApi.API_SERVICES,
                       service_id,
                       SolaceCloudApi.API_REQUESTS,
@@ -294,7 +294,7 @@ class SolaceCloudClientProfileTask(SolaceBrokerCRUDTask):
                                           operation_type=self.OPERATION,
                                           settings=data)
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()), SolaceCloudApi.API_SERVICES,
                       service_id, SolaceCloudApi.API_REQUESTS, 'clientProfileRequests']
         return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, json_body=body, module_op=module_op)
 
@@ -307,7 +307,7 @@ class SolaceCloudClientProfileTask(SolaceBrokerCRUDTask):
         body = self._compose_request_body(operation='delete',
                                           operation_type=self.OPERATION, settings=data)
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()), SolaceCloudApi.API_SERVICES,
                       service_id, SolaceCloudApi.API_REQUESTS, 'clientProfileRequests']
         return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, json_body=body, module_op=module_op)
 

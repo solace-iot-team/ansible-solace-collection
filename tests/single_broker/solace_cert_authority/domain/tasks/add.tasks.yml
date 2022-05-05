@@ -21,6 +21,7 @@
 - name: "get: solace_domain_cert_authority: add"
   solace_domain_cert_authority:
     name: "{{ item.name }}"
+    timeout: 600
     settings:
       certContent: "{{ lookup('file', cert_file) }}"
     state: present

@@ -317,7 +317,7 @@ class SolaceSempV2PagingGetApi(SolaceSempV2Api):
                 "count": page_count
             })
         if query_params:
-            if ("where" in query_params
+            if ("where" in query_params 
                     and query_params['where'] is not None
                     and len(query_params['where']) > 0):
                 _query_params.update({
@@ -506,20 +506,20 @@ class SolaceCloudApi(SolaceApi):
 
     def get_api_base_path(self, config: SolaceTaskSolaceCloudConfig) -> str:
         solace_cloud_home_value = self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US
-        
-        if config.solace_cloud_home is not None and config.solace_cloud_home != '':            
+
+        if config.solace_cloud_home is not None and config.solace_cloud_home != '':
             solace_cloud_home_value = config.solace_cloud_home.lower()
         else:
-            solaceCloudHomeEnvVal = os.getenv(self.ENV_VAR_ANSIBLE_SOLACE_SOLACE_CLOUD_HOME)  
+            solaceCloudHomeEnvVal = os.getenv(self.ENV_VAR_ANSIBLE_SOLACE_SOLACE_CLOUD_HOME)
             if solaceCloudHomeEnvVal is not None and solaceCloudHomeEnvVal != '':
                 if solaceCloudHomeEnvVal.lower() == self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US:
                     solace_cloud_home_value = self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US
                 elif solaceCloudHomeEnvVal.lower() == self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_AU:
                     solace_cloud_home_value = self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_AU
                 else:
-                    raise SolaceEnvVarError(self.ENV_VAR_ANSIBLE_SOLACE_SOLACE_CLOUD_HOME, 
-                        solaceCloudHomeEnvVal, 
-                        f"allowed values: {self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US}, {self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_AU}")
+                    raise SolaceEnvVarError(self.ENV_VAR_ANSIBLE_SOLACE_SOLACE_CLOUD_HOME,
+                                            solaceCloudHomeEnvVal,
+                                            f"allowed values: {self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US}, {self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_AU}")
         if solace_cloud_home_value == self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US:
             return self.API_BASE_PATH_US
         else:
@@ -743,11 +743,14 @@ class SolaceCloudApi(SolaceApi):
         # import logging, json
         # logging.debug(f"resp (make_request) = \n{json.dumps(resp, indent=2)}")
         request_id = resp['id']
-        timeout_minutes = 2
+        timeout_minutes = config.get_timeout() // 60
+        # set min timeout to 5 mins
+        if timeout_minutes < 5:
+            timeout_minutes = 5
         is_completed = False
         is_failed = False
         try_count = -1
-        delay = 5  # seconds
+        delay = 10  # seconds
         max_retries = (timeout_minutes * 60) // delay
         # wait 1 cycle before start polling
         time.sleep(delay)
@@ -768,7 +771,7 @@ class SolaceCloudApi(SolaceApi):
                 resp, resp, self.get_module()._name, module_op)
         if not is_completed:
             msg = [
-                f"timeout service post request - not completed, state={resp['adminProgress']}", str(resp)]
+                f"timeout service post request - not completed, timeout(mins)={timeout_minutes}, state={resp['adminProgress']}", str(resp)]
             raise SolaceInternalError(msg)
         return resp
 
@@ -821,7 +824,7 @@ class SolaceCloudApiCertAuthority(SolaceCloudApi):
 
     def get_cert_authority(self, config, service_id, cert_authority_name, query_params):
         # GET services/{serviceId}/serviceCertificateAuthorities/{certAuthorityName}
-        path_array = [self.get_api_base_path(), SolaceCloudApi.API_SERVICES,
+        path_array = [self.get_api_base_path(config), SolaceCloudApi.API_SERVICES,
                       service_id, 'serviceCertificateAuthorities', cert_authority_name]
         resp = self.get_object_settings(config, path_array)
         cert_authority = resp['certificate']

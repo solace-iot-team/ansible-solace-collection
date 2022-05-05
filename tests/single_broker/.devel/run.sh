@@ -13,10 +13,10 @@ export PROJECT_HOME=$projectHome
 
 ansibleSolaceTests=(
   # "broker-cert"
-  "setup"
+  # "setup"
   # "solace_acl_profile"
   # "solace_auth"
-  # "solace_cert_authority"
+  "solace_cert_authority"
   # "solace_client_profile"
   # "solace_jndi"
   # "solace_replay"

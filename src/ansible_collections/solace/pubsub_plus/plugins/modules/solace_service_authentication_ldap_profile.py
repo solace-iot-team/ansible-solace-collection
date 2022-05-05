@@ -254,7 +254,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
     def _get_func_solace_cloud(self, ldap_profile_name):
         # GET services/{service-id}/requests/ldapAuthenticationProfile/default
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()), SolaceCloudApi.API_SERVICES,
                       service_id, 'ldapAuthenticationProfile', ldap_profile_name]
         return self.solace_cloud_api.get_object_settings(self.get_config(), path_array)
 
@@ -355,7 +355,7 @@ class SolaceServiceAuthenticationLdapProfileTask(SolaceBrokerCRUDTask):
         body = self._compose_solace_cloud_request_body(
             operation='update', settings=data)
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()), SolaceCloudApi.API_SERVICES,
                       service_id, SolaceCloudApi.API_REQUESTS, 'ldapAuthenticationProfileRequests']
         return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, json_body=body, module_op=module_op)
 
