@@ -30,8 +30,6 @@ The logic of choosing the home region is as follows:
   - else
     - use default
 
-  <code>
-
 
 Module Reference
 ----------------

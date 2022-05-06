@@ -510,7 +510,8 @@ class SolaceCloudApi(SolaceApi):
         if config.solace_cloud_home is not None and config.solace_cloud_home != '':
             solace_cloud_home_value = config.solace_cloud_home.lower()
         else:
-            solaceCloudHomeEnvVal = os.getenv(self.ENV_VAR_ANSIBLE_SOLACE_SOLACE_CLOUD_HOME)
+            solaceCloudHomeEnvVal = os.getenv(
+                self.ENV_VAR_ANSIBLE_SOLACE_SOLACE_CLOUD_HOME)
             if solaceCloudHomeEnvVal is not None and solaceCloudHomeEnvVal != '':
                 if solaceCloudHomeEnvVal.lower() == self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US:
                     solace_cloud_home_value = self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US
@@ -738,19 +739,63 @@ class SolaceCloudApi(SolaceApi):
             resp['adminProgress'] = 'inProgress'
         return resp
 
+    def wait_for_service_requests_to_finish(self, config: SolaceTaskBrokerConfig, timeout_minutes: int, service_id: str):
+        module_op = SolaceTaskOps.OP_READ_OBJECT
+        # GET https://api.solace.cloud/api/v0/services/{paste-your-serviceId-here}/requests
+        # returns list of dicts,
+        # - check all elements,
+        # - if "adminProgress" not "completed", log the dict and wait to try again
+        # - until all elements are completed
+        # - raise SolaceApiError if timeout
+        are_all_completed = False
+        try_count = -1
+        delay = 15  # seconds
+        max_retries = (timeout_minutes * 60) // delay
+        while not are_all_completed and try_count < max_retries:
+            path_array = [self.get_api_base_path(config), self.API_SERVICES,
+                          service_id, self.API_REQUESTS]
+            resp = self.make_get_request(config, path_array, module_op)
+            # logging.debug(f"wait_for_service_requests_to_finish(): resp=\n{json.dumps(resp, indent=2)}")
+            # iterate through list to check if any adminProgress != completed
+            # use generator:
+            matches = (
+                respElem for respElem in resp if respElem['adminProgress'] != 'completed')
+            notCompletedElement = next(matches, None)
+            if notCompletedElement is None:
+                are_all_completed = True
+            try_count += 1
+            if not are_all_completed and timeout_minutes > 0:
+                time.sleep(delay)
+
+        if not are_all_completed:
+            msg = [
+                "timeout waiting for all outstanding service requests to be completed",
+                f"timeout(mins)={timeout_minutes}",
+                "incomplete request:",
+                str(notCompletedElement)]
+            raise SolaceApiError(
+                resp, msg, self.get_module()._name, module_op)
+        return
+
     def make_service_post_request(self, config: SolaceTaskBrokerConfig, path_array: list, service_id: str, json_body, module_op):
+
+        timeout_minutes = config.get_timeout() // 60
+        # set min timeout to 5 mins
+        timeout_minutes = max(timeout_minutes, 5)
+
+        # check if there are any jobs still running against this service and wait until completed
+        self.wait_for_service_requests_to_finish(
+            config, timeout_minutes, service_id)
+
+        # now make the request
         resp = self.make_request(config, requests.post, path_array, json_body)
         # import logging, json
         # logging.debug(f"resp (make_request) = \n{json.dumps(resp, indent=2)}")
         request_id = resp['id']
-        timeout_minutes = config.get_timeout() // 60
-        # set min timeout to 5 mins
-        if timeout_minutes < 5:
-            timeout_minutes = 5
         is_completed = False
         is_failed = False
         try_count = -1
-        delay = 10  # seconds
+        delay = 15  # seconds
         max_retries = (timeout_minutes * 60) // delay
         # wait 1 cycle before start polling
         time.sleep(delay)

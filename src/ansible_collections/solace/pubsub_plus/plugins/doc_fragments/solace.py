@@ -178,7 +178,7 @@ options:
     required: true
     aliases: [api_token]
   timeout:
-    description: Connection timeout in seconds for the http request.
+    description: Connection timeout in seconds for the http request or overall call interaction timeout for Solace Cloud API.
     required: false
     default: 60
     type: int

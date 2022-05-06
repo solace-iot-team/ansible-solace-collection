@@ -15,6 +15,9 @@
   * **Fixed timeout for Solace Cloud Api Post request polling**
     - timeout parameter now passed through
     - min polling time set to 5 mins
+  * **Fixed error on outstanding requests for serviceId for Solace Cloud Api**
+    - check if serviceId has any outstanding requests before submitting a new one
+    - uses same timeout as the actual request
 
 
 ## Version 1.8.0
