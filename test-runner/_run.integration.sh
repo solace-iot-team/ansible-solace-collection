@@ -131,6 +131,23 @@ ansibleSolaceTestTargetGroup="two_brokers"
   done
 
 #################################################################################################################################################
+ansibleSolaceTestTargetGroup="solace-cloud-home-cloud"
+#################################################################################################################################################
+  echo "##############################################################################################################"
+  echo "# Test target group: $ansibleSolaceTestTargetGroup(solace_cloud)"
+
+  export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup"
+  mkdir -p $LOG_DIR
+
+  export SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE=$solaceCloudAccountInventoryFile
+  export TEARDOWN_SOLACE_CLOUD=True
+
+  runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
+  $runScript
+  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+
+
+#################################################################################################################################################
 ansibleSolaceTestTargetGroup="solace_cloud"
 #################################################################################################################################################
   echo "##############################################################################################################"
