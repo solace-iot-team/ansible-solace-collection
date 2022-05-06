@@ -3,17 +3,17 @@ client:
   where_pattern: asc_client_test*
   cert_authority_names:
   - name: asc_client_test_1
-  - name: asc_client_test_2
-  - name: asc_client_test_3
+  # - name: asc_client_test_2
+  # - name: asc_client_test_3
 domain:
   where_pattern: asc_domain_test*
   cert_authority_names:
   - name: asc_domain_test_1
-  - name: asc_domain_test_2
-  - name: asc_domain_test_3
+  # - name: asc_domain_test_2
+  # - name: asc_domain_test_3
 default:
   where_pattern: asc_default_test*
   cert_authority_names:
   - name: asc_default_test_1
-  - name: asc_default_test_2
-  - name: asc_default_test_3
+  # - name: asc_default_test_2
+  # - name: asc_default_test_3
