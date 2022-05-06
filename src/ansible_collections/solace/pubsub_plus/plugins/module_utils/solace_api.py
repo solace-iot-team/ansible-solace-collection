@@ -744,22 +744,21 @@ class SolaceCloudApi(SolaceApi):
         # GET https://api.solace.cloud/api/v0/services/{paste-your-serviceId-here}/requests
         # returns list of dicts,
         # - check all elements,
-        # - if "adminProgress" not "completed", log the dict and wait to try again
-        # - until all elements are completed
+        # - if "adminProgress" == "inProgress", wait and try again
         # - raise SolaceApiError if timeout
         are_all_completed = False
         try_count = -1
-        delay = 15  # seconds
+        delay = 30  # seconds
         max_retries = (timeout_minutes * 60) // delay
         while not are_all_completed and try_count < max_retries:
             path_array = [self.get_api_base_path(config), self.API_SERVICES,
                           service_id, self.API_REQUESTS]
             resp = self.make_get_request(config, path_array, module_op)
             # logging.debug(f"wait_for_service_requests_to_finish(): resp=\n{json.dumps(resp, indent=2)}")
-            # iterate through list to check if any adminProgress != completed
+            # iterate through list to check if any adminProgress == inProgress
             # use generator:
             matches = (
-                respElem for respElem in resp if respElem['adminProgress'] != 'completed')
+                respElem for respElem in resp if respElem['adminProgress'] == 'inProgress')
             notCompletedElement = next(matches, None)
             if notCompletedElement is None:
                 are_all_completed = True
@@ -771,7 +770,7 @@ class SolaceCloudApi(SolaceApi):
             msg = [
                 "timeout waiting for all outstanding service requests to be completed",
                 f"timeout(mins)={timeout_minutes}",
-                "incomplete request:",
+                "request in progress:",
                 str(notCompletedElement)]
             raise SolaceApiError(
                 resp, msg, self.get_module()._name, module_op)
