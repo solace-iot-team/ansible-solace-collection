@@ -1,0 +1,367 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_client_cert_authorities.py
+
+.. _solace_get_client_cert_authorities_module:
+
+solace_get_client_cert_authorities -- get list of client certificates
+=====================================================================
+
+Get a list of Client Certificate objects configured on a service.
+
+Implements the config and monitor API.
+
+Retrieves all objects that match the criteria defined in the 'where' clause and returns the fields defined in the 'select' parameter.
+
+Supports standalone brokers and Solace Cloud.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   # Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+   # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+   -
+     name: "solace_client_cert_authority.doc-example"
+     hosts: all
+     gather_facts: no
+     any_errors_fatal: true
+     collections:
+       - solace.pubsub_plus
+     module_defaults:
+       solace.pubsub_plus.solace_gather_facts:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+       solace.pubsub_plus.solace_client_cert_authority:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+       solace.pubsub_plus.solace_get_client_cert_authorities:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+       solace.pubsub_plus.solace_client_cert_authority_ocsp_trusted_cn:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+       solace.pubsub_plus.solace_get_client_cert_authority_ocsp_trusted_cns:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+     tasks:
+     - name: gather facts
+       solace_gather_facts:
+       # no_log: true
+     - set_fact:
+         is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud }}"
+         sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
+         working_dir: "{{ WORKING_DIR }}"
+         cert_file: "{{ WORKING_DIR }}/cert.pem"
+
+     - name: end play if incorrect sempV2 version
+       meta: end_play
+       when: sempv2_version|float < 2.19
+
+     - name: "main: generate certificate"
+       command: >
+         openssl req
+         -x509
+         -newkey
+         rsa:4096
+         -keyout {{ working_dir }}/key.pem
+         -out {{ cert_file }}
+         -days 365
+         -nodes
+         -subj "/C=UK/ST=London/L=London/O=Solace/OU=Org/CN=www.example.com"
+
+     - name: create cert authority
+       solace_client_cert_authority:
+         name: asc_test
+         settings:
+           certContent: "{{ lookup('file', cert_file) }}"
+           revocationCheckEnabled: false
+         state: present
+
+     - name: get config of cert authority
+       solace_get_client_cert_authorities:
+         query_params:
+           where:
+             - "certAuthorityName==asc_test"
+
+     - name: get monitor of cert authority
+       solace_get_client_cert_authorities:
+         api: monitor
+         query_params:
+           where:
+             - "certAuthorityName==asc_test"
+
+   # set an OCSP trusted name
+   # note: not available in Solace Cloud API
+     - name: set trusted name
+       block:
+       - name: add trusted name
+         solace_client_cert_authority_ocsp_trusted_cn:
+           name: "*.domain.com"
+           client_cert_authority_name: asc_test
+           state: present
+
+       - name: get list of trusted names
+         solace_get_client_cert_authority_ocsp_trusted_cns:
+           client_cert_authority_name: asc_test
+
+       - name: remove trusted name
+         solace_client_cert_authority_ocsp_trusted_cn:
+           name: "*.domain.com"
+           client_cert_authority_name: asc_test
+           state: absent
+
+       when: not is_solace_cloud
+
+     - name: remove cert authority
+       solace_client_cert_authority:
+         name: asc_test
+         state: absent
+
+   ###
+   # The End.
+
+
+
+Notes
+-----
+
+.. note::
+   - Module Sempv2 Config: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientCertAuthority/getClientCertAuthorities
+   - Module Sempv2 Monitor: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/clientCertAuthority/getClientCertAuthorities
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
+   - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_client_cert_authority_module`
+
+
+
+Parameters
+----------
+
+api (optional)
+  The API the query should run against.
+
+  | **type**: str
+  | **default**: config
+  | **choices**: config, monitor
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+page_count (optional)
+  The number of results to be fetched from broker in single call. Note: always returns the entire result set by following the cursor.
+
+  | **type**: int
+  | **default**: 100
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+query_params (optional)
+  The query parameters.
+
+  | **type**: dict
+  | **default**: {}
+
+  select (optional)
+    Include in the response only selected attributes of the object, or exclude from the response selected attributes of the object. See the documentation for the select parameter.
+
+    | **type**: list
+    | **default**: []
+
+  where (optional)
+    Include in the response only objects where certain conditions are true. See the the documentation for the where parameter.
+
+    Note: URL encoded automatically, you can safely use '/, <, <=, >, >=, != .. '
+
+    | **type**: list
+    | **default**: []
+
+
+reverse_proxy (optional)
+  Use a reverse proxy / api gateway. Note: **Experimental. Not permitted for Solace Cloud API**.
+
+  | **type**: dict
+
+  headers (optional)
+    Additional headers to add to the http call. Example: 'apiKey: {my-api-key}'.
+
+    | **type**: dict
+
+    x-asc-module (optional)
+      Flag for the module to add the header 'x-asc-module:{module-name}' to the http call with it's module name.
+
+      | **type**: bool
+      | **default**: False
+
+    x-asc-module-op (optional)
+      Flag for the module to add the header 'x-asc-module-op:{module operation}' to the http call with the module's operation.
+
+      | **type**: bool
+      | **default**: False
+
+
+  query_params (optional)
+    Additional query paramters to add to the URL. Example: 'apiCode: {my-api-code}'.
+
+    | **type**: dict
+
+  semp_base_path (optional)
+    Base path prepended to all SEMP calls. Example: 'my/base/path'. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}
+
+    | **type**: str
+
+  use_basic_auth (optional)
+    Flag to use basic authentication in the http(s) call or not. Uses 'username'/'password'.
+
+    | **type**: bool
+    | **default**: False
+
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+  | **default**: False
+
+solace_cloud_api_token (optional)
+  The API Token.
+
+  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
+  | **type**: str
+
+solace_cloud_home (optional)
+  The Solace Cloud home region.
+
+  | **type**: str
+  | **choices**: us, au, US, AU, 
+
+solace_cloud_service_id (optional)
+  The service id in Solace Cloud.
+
+  Click on the service in Solace Cloud - the service id is in the URL.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
+  | **type**: str
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+validate_certs (optional)
+  Flag to switch validation of client certificates on/off when using a secure connection.
+
+  | **type**: bool
+  | **default**: True
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+result_list
+  The list of objects found containing requested fields. Payload depends on API called.
+
+  | **returned**: success
+  | **type**: list
+
+result_list_count
+  Number of items in result_list.
+
+  | **returned**: success
+  | **type**: int
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+

@@ -1,0 +1,276 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_cloud_service.py
+
+.. _solace_cloud_service_module:
+
+solace_cloud_service -- manage Solace Cloud services
+====================================================
+
+Create & delete Solace Cloud services.
+
+Note that you can't change a service once it has been created. Only option: delete & re-create.
+
+Note that a service name must be unique in the global Solace Cloud namespace. Creating a service using an existing name (regardless in which account) will fail.
+
+Creating a service in Solace Cloud is a long-running process. In case creation fails, module will delete the service and try again, up to 3 times.
+
+The module operates at a Solace Cloud Account level, therefor, you don't necessarily require an inventory file. Using `hosts: localhost` as a host and passing the Solace Cloud Api Token as an environment variable works as well.
+
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   hosts: localhost
+   gather_facts: no
+   any_errors_fatal: true
+   collections:
+   - solace.pubsub_plus
+   tasks:
+   - name: check input
+     assert:
+       that:
+           - SOLACE_CLOUD_API_TOKEN is defined and SOLACE_CLOUD_API_TOKEN | length > 0
+       fail_msg: "one or more variables not defined"
+
+   - name: create service
+     solace_cloud_service:
+       api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+       name: "foo"
+       settings:
+           msgVpnName: "foo"
+           datacenterId: "aws-ca-central-1a"
+           serviceTypeId: "enterprise"
+           serviceClassId: "enterprise-250-nano"
+           eventBrokerVersion: "9.6"
+           state: present
+
+   - set_fact:
+       service_info: "{{ result.response }}"
+       trust_store_uri: "{{ result.response.msgVpnAttributes.truststoreUri }}"
+
+   - name: extract inventory from service info
+     solace_cloud_get_facts:
+       from_dict: "{{ service_info }}"
+       get_formattedHostInventory:
+           host_entry: "{{ service_info.name }}"
+           meta:
+               service_name: "{{ service_info.name }}"
+               service_id: "{{ service_info.serviceId }}"
+               datacenterId: "{{ service_info.datacenterId }}"
+               serviceTypeId: "{{ service_info.serviceTypeId}}"
+               serviceClassId: "{{ service_info.serviceClassId }}"
+               serviceClassDisplayedAttributes: "{{ service_info.serviceClassDisplayedAttributes }}"
+       register: result
+
+   - name: save inventory to file
+     copy:
+       content: "{{ result.facts.formattedHostInventory | to_nice_yaml }}"
+       dest: "./tmp/solace-cloud.{{ service_info.name }}.inventory.yml"
+       changed_when: false
+     delegate_to: localhost
+
+   - name: save service info to file
+     copy:
+       content: "{{ service_info | to_nice_yaml }}"
+       dest: "./tmp/solace-cloud.{{ service_info.name }}.info.yml"
+     delegate_to: localhost
+
+   - name: save service info to file
+     copy:
+       content: "{{ service_info | to_nice_yaml }}"
+       dest: "./tmp/solace-cloud.{{ service_info.name }}.info.yml"
+     delegate_to: localhost
+
+   - name: download certificate
+     get_url:
+       url: "{{ trust_store_uri }}"
+       dest: "./tmp/solace-cloud.{{ service_info.name }}.pem"
+
+   - name: delete service
+     solace_cloud_service:
+       api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
+       name: "{{ service_info.name }}"
+       state: absent
+
+
+
+Notes
+-----
+
+.. note::
+   - The Solace Cloud API does not support updates to a service. Hence, changes are not supported here.
+   - Module Solace Cloud API: https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_cloud_get_service_module`
+   - :ref:`solace_cloud_get_services_module`
+   - :ref:`solace_cloud_get_facts_module`
+
+
+
+Parameters
+----------
+
+name (optional)
+  The name of the service to manage. Mandatory for state='present'.
+
+  Note: The name must be a key, it is used as a YAML / JSON key. Use only ASCII, '-', or '_'. No whitespaces.
+
+  | **type**: str
+
+solace_cloud_api_token (required)
+  The API Token.
+
+  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+
+  | **type**: str
+  | **aliases**: api_token
+
+solace_cloud_home (optional)
+  The Solace Cloud home region.
+
+  | **type**: str
+  | **choices**: us, au, US, AU, 
+
+solace_cloud_service_id (optional)
+  The service id of a service in Solace Cloud.
+
+  Allowed option for state='absent'
+
+  | **type**: str
+  | **aliases**: service_id
+
+solace_cloud_settings (optional)
+  Additional settings for state=present. See Reference documentation output of :ref:`solace_cloud_get_service <solace_cloud_get_service_module>` for details.
+
+  Note: For state=present, provide at least: msgVpnName, datacenterId, serviceTypeId, serviceClassId.
+
+  | **type**: dict
+  | **aliases**: settings
+
+state (optional)
+  Target state.
+
+  | **type**: str
+  | **default**: present
+  | **choices**: present, absent
+
+timeout (optional)
+  Connection timeout in seconds for the http request or overall call interaction timeout for Solace Cloud API.
+
+  | **type**: int
+  | **default**: 60
+
+validate_certs (optional)
+  Flag to switch validation of client certificates on/off when using a secure connection.
+
+  | **type**: bool
+  | **default**: True
+
+wait_timeout_minutes (optional)
+  Minutes to wait until service is created. Module polls every 30 seconds to check on service state.
+
+  wait_timeout_minutes == 0 ==> no waiting, module returns immediately.
+
+  wait_timeout_minutes > 0 ==> waits, polls every 30 seconds until service request completed.
+
+  | **type**: int
+  | **default**: 30
+
+
+
+
+
+Return Values
+-------------
+
+response
+  response from the Api call. contains the service info.
+
+  | **returned**: success
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "accountingLimits": [
+       {
+         "id": "NetworkUsage",
+         "thresholds": [
+           {
+             "type": "warning",
+             "value": "75"
+           }
+         ]
+       }
+     ],
+     "adminState": "completed",
+     "attributes": {
+       "Clients": "250",
+       "High Availability": "HA Group",
+       "Message Broker Tenancy": "Dedicated",
+       "Network Speed": "450 Mbps",
+       "Network Usage": "50 GB per month",
+       "Queues": "250",
+       "Storage": "25 GB",
+       "certificateAuthorities": [],
+       "clientProfiles": [],
+       "created": 1608128117689,
+       "creationState": "pending",
+       "customizedMessagingPorts": {},
+       "customizedResourceNames": {},
+       "datacenterId": "aws-eu-west-2a",
+       "locked": false,
+       "messagingStorage": 25,
+       "monitoring": {},
+       "msgVpnAttributes": {},
+       "msgVpnName": "as_test_broker",
+       "name": "ansible_solace_test_broker",
+       "serviceClassDisplayedAttributes": null,
+       "serviceClassId": "enterprise-250-nano",
+       "serviceId": "1a2o94jfedl9",
+       "servicePackageId": "DH-V13.0",
+       "serviceStage": "generalavailability",
+       "serviceTypeId": "enterprise",
+       "timestamp": 0,
+       "type": "service",
+       "userId": "xxx"
+     }
+   }
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+msg
+  error message if not ok
+
+  | **returned**: error
+  | **type**: str
+
+

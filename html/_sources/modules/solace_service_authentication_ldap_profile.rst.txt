@@ -1,0 +1,314 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_service_authentication_ldap_profile.py
+
+.. _solace_service_authentication_ldap_profile_module:
+
+solace_service_authentication_ldap_profile -- ldap profile
+==========================================================
+
+Configure a LDAP Profile object on a Broker Service.
+
+Self-Hosted Broker Service: most operations are NOT idempotent.
+
+Solace Cloud Service: only 1 LDAP Profile object allowed, name='default'. Once LDAP Profile is created it cannot be deleted, disable instead.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+     name: "solace_service_authentication_ldap_profile example"
+     hosts: all
+     gather_facts: no
+     any_errors_fatal: true
+     collections:
+       - solace.pubsub_plus
+     module_defaults:
+       solace_service_authentication_ldap_profile:
+         host: "{{ sempv2_host }}"
+         port: "{{ sempv2_port }}"
+         secure_connection: "{{ sempv2_is_secure_connection }}"
+         username: "{{ sempv2_username }}"
+         password: "{{ sempv2_password }}"
+         timeout: "{{ sempv2_timeout }}"
+         solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+     tasks:
+     - name: set args for ldap profile
+       set_fact:
+         ldap_profile_settings:
+           ldap_profile_name: "{{ 'asct_ldap_profile_1' if broker_type != 'solace_cloud' else 'default' }}"
+           allow_unauthentication_authentication: false
+           admin_dn: uid=solace_service,ou=Users,o=orgId,dc=myorg,dc=com
+           admin_pwd: solace_service_pwd
+           start_tls: false
+           ldap_server_uri_1: ldap://ldap_1.myorg.com:389
+           ldap_server_uri_2: ldap://ldap_2.myorg.com:389
+           search:
+             base_dn: ou=Users,o=orgId,dc=myorg,dc=com
+             filter: (cn=$CLIENT_USERNAME)
+             follow_continuation_references: true
+             deref: always
+             scope: subtree
+             timeout: 20
+
+     - name: create
+       solace_service_authentication_ldap_profile:
+         name: "{{ ldap_profile_settings.ldap_profile_name }}"
+         solace_cloud_settings:
+           allowUnauthenticatedAuthentication: "{{ ldap_profile_settings.allow_unauthentication_authentication }}"
+           adminDn: "{{ ldap_profile_settings.admin_dn }}"
+           adminPassword: "{{ ldap_profile_settings.admin_pwd }}"
+           ldapServerOne: "{{ ldap_profile_settings.ldap_server_uri_1 }}"
+           searchBaseDn: "{{ ldap_profile_settings.search.base_dn }}"
+           searchFilter: "{{ ldap_profile_settings.search.filter }}"
+           searchFollowContinuationReferences: "{{ ldap_profile_settings.search.follow_continuation_references }}"
+           searchDeref: "{{ ldap_profile_settings.search.deref }}"
+           searchScope: "{{ ldap_profile_settings.search.scope }}"
+           searchTimeout: "{{ ldap_profile_settings.search.timeout }}"
+           startTls: "{{ ldap_profile_settings.start_tls }}"
+         sempv1_settings:
+           admin:
+             admin-dn: "{{ ldap_profile_settings.admin_dn }}"
+             admin-password: "{{ ldap_profile_settings.admin_pwd }}"
+           search:
+             base-dn:
+               distinguished-name: "{{ ldap_profile_settings.search.base_dn }}"
+             filter:
+               filter: "{{ ldap_profile_settings.search.filter }}"
+             timeout:
+               duration: "{{ ldap_profile_settings.search.timeout }}"
+           ldap-server:
+             ldap-host: "{{ ldap_profile_settings.ldap_server_uri_1 }}"
+             server-index: "1"
+         state: present
+
+     - name: update
+       solace_service_authentication_ldap_profile:
+         name: "{{ ldap_profile_settings.ldap_profile_name }}"
+         solace_cloud_settings:
+           ldapServerTwo: "{{ ldap_profile_settings.ldap_server_uri_2 }}"
+         sempv1_settings:
+           ldap-server:
+             ldap-host: "{{ ldap_profile_settings.ldap_server_uri_2 }}"
+             server-index: 2
+         state: present
+
+     - name: enable
+       solace_service_authentication_ldap_profile:
+         name: "{{ ldap_profile_settings.ldap_profile_name }}"
+         state: enabled
+
+     - name: disable
+       solace_service_authentication_ldap_profile:
+         name: "{{ ldap_profile_settings.ldap_profile_name }}"
+         state: disabled
+
+     - name: delete
+       solace_service_authentication_ldap_profile:
+         name: "{{ ldap_profile_settings.ldap_profile_name }}"
+         state: absent
+       when: broker_type != 'solace_cloud'
+
+
+
+Notes
+-----
+
+.. note::
+   - STATUS: **EXPERIMENTAL**
+   - Module Sempv1 Config: https://docs.solace.com/Configuring-and-Managing/Configuring-LDAP-Authentication.htm
+   - Module Solace Cloud: no API documentation available, reverse engineer from console.
+   - Sempv2 Config Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/
+   - Sempv2 Monitor Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/
+   - Sempv2 Action Reference: https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_get_service_authentication_ldap_profiles_module`
+
+
+
+Parameters
+----------
+
+host (optional)
+  Hostname of Solace Broker.
+
+  | **type**: str
+  | **default**: localhost
+
+name (required)
+  Name of the LDAP Profile. Maps to 'ldap-profile' in the SEMP V1 API.
+
+  | **type**: str
+  | **aliases**: ldap_profile, ldap_profile_name
+
+password (optional)
+  Administrator password for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+port (optional)
+  Management port of Solace Broker.
+
+  | **type**: int
+  | **default**: 8080
+
+reverse_proxy (optional)
+  Use a reverse proxy / api gateway. Note: **Experimental. Not permitted for Solace Cloud API**.
+
+  | **type**: dict
+
+  headers (optional)
+    Additional headers to add to the http call. Example: 'apiKey: {my-api-key}'.
+
+    | **type**: dict
+
+    x-asc-module (optional)
+      Flag for the module to add the header 'x-asc-module:{module-name}' to the http call with it's module name.
+
+      | **type**: bool
+      | **default**: False
+
+    x-asc-module-op (optional)
+      Flag for the module to add the header 'x-asc-module-op:{module operation}' to the http call with the module's operation.
+
+      | **type**: bool
+      | **default**: False
+
+
+  query_params (optional)
+    Additional query paramters to add to the URL. Example: 'apiCode: {my-api-code}'.
+
+    | **type**: dict
+
+  semp_base_path (optional)
+    Base path prepended to all SEMP calls. Example: 'my/base/path'. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}
+
+    | **type**: str
+
+  use_basic_auth (optional)
+    Flag to use basic authentication in the http(s) call or not. Uses 'username'/'password'.
+
+    | **type**: bool
+    | **default**: False
+
+
+secure_connection (optional)
+  If true, use https rather than http.
+
+  | **type**: bool
+  | **default**: False
+
+sempv1_settings (optional)
+  JSON dictionary of additional configuration for the SEMP V1 API. Converted automatically to RPC XML. See Reference documentation.
+
+  | **type**: dict
+
+solace_cloud_api_token (optional)
+  The API Token.
+
+  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
+  | **type**: str
+
+solace_cloud_home (optional)
+  The Solace Cloud home region.
+
+  | **type**: str
+  | **choices**: us, au, US, AU, 
+
+solace_cloud_service_id (optional)
+  The service id in Solace Cloud.
+
+  Click on the service in Solace Cloud - the service id is in the URL.
+
+  Either both (solace_cloud_api_token AND solace_cloud_service_id) must be provided or none.
+
+  | **type**: str
+
+solace_cloud_settings (optional)
+  JSON dictionary of additional configuration for the Solace Cloud API. See Reference documentation.
+
+  | **type**: dict
+  | **aliases**: settings
+
+state (optional)
+  Target state.
+
+  | **type**: str
+  | **default**: present
+  | **choices**: present, absent, enabled, disabled
+
+timeout (optional)
+  Connection timeout in seconds for the http request.
+
+  | **type**: int
+  | **default**: 10
+
+username (optional)
+  Administrator username for Solace Broker.
+
+  | **type**: str
+  | **default**: admin
+
+validate_certs (optional)
+  Flag to switch validation of client certificates on/off when using a secure connection.
+
+  | **type**: bool
+  | **default**: True
+
+x_broker (optional)
+  Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.
+
+  | **type**: str
+
+
+
+
+
+Return Values
+-------------
+
+response
+  The call/response to/from the API request.
+
+  | **returned**: success
+  | **type**: dict
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+

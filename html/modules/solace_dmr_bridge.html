@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>solace_dmr_bridge – dmr bridge &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/contentui.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/contentui.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="solace_dmr_cluster – dmr cluster" href="solace_dmr_cluster.html" />
+    <link rel="prev" title="solace_client_username – client username" href="solace_client_username.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Using Solace PubSub+ Ansible Collection</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ansible-versions.html">Ansible Version Details</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../basics.html">The Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inventory-files.html">Best Practices for Ansible-Solace Inventory Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tips-tricks.html">Tips &amp; Tricks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules &amp; Roles</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../facts_and_general_modules.html">Fact &amp; General Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../solace_config_modules.html#configuration-settings-for-modules">Configuration Settings for Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../solace_config_modules.html#idempotency">Idempotency</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../solace_config_modules.html#module-reference">Module Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_client_connect_exception.html">solace_acl_client_connect_exception – client connect exception for acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_client_connect_exceptions.html">solace_acl_client_connect_exceptions – list of client connect address exceptions on an acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_profile.html">solace_acl_profile – configure acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_publish_topic_exception.html">solace_acl_publish_topic_exception – publish topic exception for acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_publish_topic_exceptions.html">solace_acl_publish_topic_exceptions – list of publish topic exceptions on an acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_share_name_exception.html">solace_acl_subscribe_share_name_exception – subscribe share name exception for acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_share_name_exceptions.html">solace_acl_subscribe_share_name_exceptions – list of subscribe share name exceptions on an acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_topic_exception.html">solace_acl_subscribe_topic_exception – subscribe topic exception for acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_acl_subscribe_topic_exceptions.html">solace_acl_subscribe_topic_exceptions – list of subscribe topic exceptions on an acl profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_authentication_oauth_provider.html">solace_authentication_oauth_provider – oauth provider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_authorization_group.html">solace_authorization_group – authorization group</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_bridge.html">solace_bridge – bridge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_subscription.html">solace_bridge_remote_subscription – remote subscription on a bridge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_subscriptions.html">solace_bridge_remote_subscriptions – list of remote subscriptions on a bridge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_bridge_remote_vpn.html">solace_bridge_remote_vpn – bridge remote vpn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_bridge_trusted_cn.html">solace_bridge_trusted_cn – trusted common name for bridge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cert_authority.html">solace_cert_authority – certificate authority</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_client_cert_authority.html">solace_client_cert_authority – client certificate authority</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_client_cert_authority_ocsp_trusted_cn.html">solace_client_cert_authority_ocsp_trusted_cn – ocsp responder trusted common name</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_client_profile.html">solace_client_profile – client profile for sempv2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_client_username.html">solace_client_username – client username</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_dmr_bridge – dmr bridge</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="solace_dmr_cluster.html">solace_dmr_cluster – dmr cluster</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_dmr_cluster_link.html">solace_dmr_cluster_link – link on a dmr cluster</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_dmr_cluster_link_remote_address.html">solace_dmr_cluster_link_remote_address – remote address for dmr cluster link</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_dmr_cluster_link_trusted_cn.html">solace_dmr_cluster_link_trusted_cn – trusted common name for dmr cluster link</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_domain_cert_authority.html">solace_domain_cert_authority – domain certificate authority</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_jndi_connection_factory.html">solace_jndi_connection_factory – JNDI connection-factory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_jndi_queue.html">solace_jndi_queue – jndi queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_jndi_queues.html">solace_jndi_queues – manage a list of jndi queues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_jndi_topic.html">solace_jndi_topic – jndi topic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_jndi_topics.html">solace_jndi_topics – manage a list of jndi topics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_mqtt_session.html">solace_mqtt_session – mqtt session</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_mqtt_session_subscription.html">solace_mqtt_session_subscription – subscription for mqtt session</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_queue.html">solace_queue – queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_queue_cancel_replay.html">solace_queue_cancel_replay – cancel replay on queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_queue_start_replay.html">solace_queue_start_replay – start replay on queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_queue_subscription.html">solace_queue_subscription – subscription on a queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_queue_subscriptions.html">solace_queue_subscriptions – list of subscriptions on a queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_rdp.html">solace_rdp – rest delivery point</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_rdp_queue_binding.html">solace_rdp_queue_binding – queue bindining on rdp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer.html">solace_rdp_rest_consumer – rest consumer on rdp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer_trusted_cn.html">solace_rdp_rest_consumer_trusted_cn – trusted common name on rdp rest consumer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_replay_log.html">solace_replay_log – replay log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_replay_log_trim_logged_msgs.html">solace_replay_log_trim_logged_msgs – trim msgs on replay log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_service_authentication_ldap_profile.html">solace_service_authentication_ldap_profile – ldap profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_topic_endpoint.html">solace_topic_endpoint – topic endpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_vpn.html">solace_vpn – vpn</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../solace_get_modules.html">Solace Get Object List Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../roles.html">Roles</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Solace PubSub+ Ansible Collection </a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a> &raquo;</li>
+      <li>solace_dmr_bridge – dmr bridge</li>
+      <li class="wy-breadcrumbs-aside">
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_dmr_bridge.py" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="solace-dmr-bridge-dmr-bridge">
+<span id="solace-dmr-bridge-module"></span><h1>solace_dmr_bridge – dmr bridge<a class="headerlink" href="#solace-dmr-bridge-dmr-bridge" title="Permalink to this headline"></a></h1>
+<p>Configure a DMR Bridge Object. Allows addition, removal and configuration of DMR brige objects in an idempotent manner.</p>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
+<span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">no</span><span class="w"></span>
+<span class="nt">any_errors_fatal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="nt">collections</span><span class="p">:</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span><span class="w"></span>
+<span class="nt">module_defaults</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_dmr_bridge</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">secure_connection</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_username</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">msg_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">add</span><span class="w"></span>
+<span class="w">    </span><span class="nt">solace_dmr_bridge</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">remoteNode</span><span class="w"></span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">remove</span><span class="w"></span>
+<span class="w">    </span><span class="nt">solace_dmr_bridge</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">remoteNode</span><span class="w"></span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absent</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Module Sempv2 Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrBridge">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/dmrBridge</a></p></li>
+<li><p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a></p></li>
+<li><p>Sempv2 Monitor Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/</a></p></li>
+<li><p>Sempv2 Action Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/</a></p></li>
+</ul>
+</div>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline"></a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="solace_get_dmr_bridges.html#solace-get-dmr-bridges-module"><span class="std std-ref">solace_get_dmr_bridges – get list of dmr bridges</span></a></p></li>
+</ul>
+</div>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline"></a></h2>
+<dl>
+<dt>host (optional)</dt><dd><p>Hostname of Solace Broker.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: localhost</div>
+</div>
+</dd>
+<dt>msg_vpn (required)</dt><dd><p>The message vpn.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>name (required)</dt><dd><p>Name of the DMR bridge object. Maps to ‘remoteNodeName’ in the API.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>aliases</strong>: remote_node_name</div>
+</div>
+</dd>
+<dt>password (optional)</dt><dd><p>Administrator password for Solace Broker.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: admin</div>
+</div>
+</dd>
+<dt>port (optional)</dt><dd><p>Management port of Solace Broker.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 8080</div>
+</div>
+</dd>
+<dt>reverse_proxy (optional)</dt><dd><p>Use a reverse proxy / api gateway. Note: <strong>Experimental. Not permitted for Solace Cloud API</strong>.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+<dl>
+<dt>headers (optional)</dt><dd><p>Additional headers to add to the http call. Example: ‘apiKey: {my-api-key}’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+<dl>
+<dt>x-asc-module (optional)</dt><dd><p>Flag for the module to add the header ‘x-asc-module:{module-name}’ to the http call with it’s module name.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
+</div>
+</dd>
+<dt>x-asc-module-op (optional)</dt><dd><p>Flag for the module to add the header ‘x-asc-module-op:{module operation}’ to the http call with the module’s operation.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt>query_params (optional)</dt><dd><p>Additional query paramters to add to the URL. Example: ‘apiCode: {my-api-code}’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+</dd>
+<dt>semp_base_path (optional)</dt><dd><p>Base path prepended to all SEMP calls. Example: ‘my/base/path’. Resulting URL will be: http(s)://{host}:{port}/{semp_base_path}/{module-semp-call-path}</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>use_basic_auth (optional)</dt><dd><p>Flag to use basic authentication in the http(s) call or not. Uses ‘username’/’password’.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt>secure_connection (optional)</dt><dd><p>If true, use https rather than http.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: False</div>
+</div>
+</dd>
+<dt>sempv2_settings (optional)</dt><dd><p>JSON dictionary of additional configuration for the SEMP V2 API. See Reference documentation.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: dict</div>
+<div class="line"><strong>aliases</strong>: settings</div>
+</div>
+</dd>
+<dt>state (optional)</dt><dd><p>Target state.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: present</div>
+<div class="line"><strong>choices</strong>: present, absent</div>
+</div>
+</dd>
+<dt>timeout (optional)</dt><dd><p>Connection timeout in seconds for the http request.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 10</div>
+</div>
+</dd>
+<dt>username (optional)</dt><dd><p>Administrator username for Solace Broker.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: admin</div>
+</div>
+</dd>
+<dt>validate_certs (optional)</dt><dd><p>Flag to switch validation of client certificates on/off when using a secure connection.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: True</div>
+</div>
+</dd>
+<dt>x_broker (optional)</dt><dd><p>Custom HTTP header with the broker virtual router id, if using a SEMPv2 Proxy/agent infrastructure.</p>
+<div class="line-block">
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+</dl>
+</section>
+<section id="return-values">
+<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this headline"></a></h2>
+<dl>
+<dt>response</dt><dd><p>The response from the Solace Sempv2 request.</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: success</div>
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+</dd>
+<dt>msg</dt><dd><p>The response from the HTTP call in case of error.</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: error</div>
+<div class="line"><strong>type</strong>: dict</div>
+</div>
+</dd>
+<dt>rc</dt><dd><p>Return code. rc=0 on success, rc=1 on error.</p>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;rc&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;rc&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="solace_client_username.html" class="btn btn-neutral float-left" title="solace_client_username – client username" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="solace_dmr_cluster.html" class="btn btn-neutral float-right" title="solace_dmr_cluster – dmr cluster" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
+      <span class="lastupdated">Last updated on 07 May 2022 at 06:28.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
