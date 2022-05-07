@@ -2,17 +2,14 @@
 name: release-docs
 on:
   workflow_dispatch:
-  # # for production
-  # release:
-  #   types: [created]
 env:
-  DEBUG_FLAG: ${{ false }}
+  TEST_ANSIBLE_SOLACE_COLLECTION_DIR: "src/ansible_collections/solace/pubsub_plus"
   DOCS_MAKE_SCRIPT: "test-runner/run.make.docs.sh"
-  TEST_RUNNER_LOGS_DIR: publish-logs
-  TEST_TEST_RUNNER_LOGS_NAME: test-runner-publish-logs
+  TEST_RUNNER_LOGS_DIR: docs-logs
 
 jobs:
   release:
+    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-18.04
     strategy:
       matrix:
