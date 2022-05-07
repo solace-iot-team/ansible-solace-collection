@@ -20,6 +20,8 @@ jobs:
   publish_release:
     concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-18.04
+    permissions:
+      contents: write
     strategy:
       max-parallel: 1
       matrix:
@@ -79,19 +81,27 @@ jobs:
           cd docs/build/html
           ls -la
 
-      - name: Publish gh-pages
-        run: |
-          git fetch origin gh-pages
-          git worktree add gh-pages gh-pages
-          date > generated.txt
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          rsync -av ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/docs/build/html/ gh-pages/
-          cd gh-pages
-          git add -A
-          git commit --allow-empty -F ../generated.txt
-          # git push -f -u origin gh-pages
-          git push -u origin gh-pages
+      - name: deploy gh pages
+        env:
+          BUILD_FOLDER_PATH: "${{ env.TEST_ANSIBLE_SOLACE_COLLECTION_DIR }}/docs/build/html"
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: ${{ env.BUILD_FOLDER_PATH }} # The folder the action should deploy.
+
+      # - name: Publish gh-pages
+      #   run: |
+      #     git fetch origin gh-pages
+      #     git worktree add gh-pages gh-pages
+      #     date > generated.txt
+      #     git config user.name github-actions
+      #     git config user.email github-actions@github.com
+      #     rsync -av ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/docs/build/html/ gh-pages/
+      #     cd gh-pages
+      #     git add -A
+      #     git commit --allow-empty -F ../generated.txt
+      #     # git push -f -u origin gh-pages
+      #     git push -u origin gh-pages
 
       - name: Publish collection
         env:
