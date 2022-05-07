@@ -1,3 +1,0 @@
-modules/solace_cloud_client_profile.rst:83: [redirected permanently] https://docs.solace.com/Solace-Cloud/ght_use_rest_api_client_profiles.htm to https://docs.solace.com/Cloud/ght_use_rest_api_client_profiles.htm
-modules/solace_cloud_account_gather_facts.rst:76: [redirected permanently] https://docs.solace.com/Solace-Cloud/ght_use_rest_api_services.htm to https://docs.solace.com/Cloud/ght_use_rest_api_services.htm
-solace_config_modules.rst:8: [redirected permanently] https://docs.solace.com/Solace-Cloud/solace_cloud_rest_api.htm to https://docs.solace.com/Cloud/solace_cloud_rest_api.htm

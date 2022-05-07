@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/contentui.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/contentui.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorials &amp; Projects for Solace PubSub+ Ansible Collection" href="tutorials.html" />
+    <link rel="prev" title="Quickstart for Solace PubSub+ Ansible Collection" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Using Solace PubSub+ Ansible Collection</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation-dependencies">Installation &amp; Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-the-solace-pubsub-ansible-collection">Install the Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-the-python-interpreter">Set the Python interpreter</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#example-installation-macos">Example Installation: MacOs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-installation-ubuntu">Example Installation: Ubuntu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-installation-centos7">Example Installation: Centos7</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials &amp; Projects for Solace PubSub+ Ansible Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ansible-versions.html">Ansible Version Details</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="basics.html">The Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inventory-files.html">Best Practices for Ansible-Solace Inventory Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips-tricks.html">Tips &amp; Tricks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules &amp; Roles</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="facts_and_general_modules.html">Fact &amp; General Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solace_cloud_modules.html">Solace Cloud Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solace_config_modules.html">Solace Configuration &amp; Action Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solace_get_modules.html">Solace Get Object List Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roles.html">Roles</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Solace PubSub+ Ansible Collection </a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Installation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">requires_ansible</span><span class="p">:</span> <span class="s2">&quot;&gt;=2.10,&lt;2.13&quot;</span>
+</pre></div>
+</div>
+<section id="installation-dependencies">
+<h2>Installation &amp; Dependencies<a class="headerlink" href="#installation-dependencies" title="Permalink to this headline"></a></h2>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p>install python &gt;=3.8</p></li>
+</ul>
+</div></blockquote>
+<p>Python dependencies:
+<a class="reference download internal" download="" href="_downloads/0c266fb11e0c307794b7ea07d54b3bcd/requirements.txt"><code class="xref download docutils literal notranslate"><span class="pre">requirements</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">requests</span><span class="o">&gt;=</span><span class="mf">2.25.0</span>
+<span class="n">xmltodict</span><span class="o">&gt;=</span><span class="mf">0.12.0</span>
+<span class="n">docker</span><span class="o">-</span><span class="n">compose</span>
+</pre></div>
+</div>
+<p>Install dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># upgrade to latest pip3</span>
+$ python3 -m pip install --upgrade pip
+$ pip install -r requirements.txt
+$ pip install ansible
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Installing a specific version of ansible:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="s2">&quot;ansible&gt;=2.10.3,&lt;2.11&quot;</span>, <span class="c1"># for latest ansible_core 2.10</span>
+pip install <span class="s2">&quot;ansible&gt;=4.10.0,&lt;5.0.0&quot;</span>, <span class="c1"># for latest ansible_core 2.11</span>
+pip install <span class="s2">&quot;ansible&gt;=5.1.0,&lt;6.0.0&quot;</span> <span class="c1"># for latest ansible core 2.12</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="install-the-solace-pubsub-ansible-collection">
+<h3>Install the Solace PubSub+ Ansible Collection<a class="headerlink" href="#install-the-solace-pubsub-ansible-collection" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ansible-galaxy collection install solace.pubsub_plus
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">ansible-galaxy</span></code> command will not overwrite the existing collection if it
+is already installed. We can change this default behavior by adding a
+<code class="docutils literal notranslate"><span class="pre">--force</span></code> command line switch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ansible-galaxy collection install --force solace.pubsub_plus
+</pre></div>
+</div>
+</div>
+<p>The official Ansible documentation contains more information about the
+installation options in the <a class="reference external" href="https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#installing-collections">Using collections</a> document.</p>
+</section>
+<section id="set-the-python-interpreter">
+<h3>Set the Python interpreter<a class="headerlink" href="#set-the-python-interpreter" title="Permalink to this headline"></a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible-Solace only works with Python version &gt;=3.6. Most systems come with a Python version 2.x pre-installed in <cite>/usr/bin/python</cite>.</p>
+<p>By setting the environment variable <cite>ANSIBLE_PYTHON_INTERPRETER=”path-to-python3”</cite> we can tell Ansible which Python interpreter to use.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># manually</span>
+$ <span class="nb">export</span> <span class="nv">ANSIBLE_PYTHON_INTERPRETER</span><span class="o">={</span>path-to-your-python-3-bin<span class="o">}</span>
+<span class="c1"># dynamically</span>
+$ <span class="nb">export</span> <span class="nv">ANSIBLE_PYTHON_INTERPRETER</span><span class="o">=</span><span class="k">$(</span>python3 -c <span class="s2">&quot;import sys; print(sys.executable)&quot;</span><span class="k">)</span>
+</pre></div>
+</div>
+<p><strong>Ansible Playbook Error when using Python 2.x:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>fatal: [local_broker]: FAILED! =&gt; {
+    &quot;msg&quot;: &quot;Unable to import (&#39;ansible_collections&#39;, &#39;solace&#39;, &#39;pubsub_plus&#39;, &#39;plugins&#39;, &#39;module_utils&#39;, &#39;solace_api&#39;) due to invalid syntax&quot;
+}
+</pre></div>
+</div>
+<p>Solution: set the <cite>ANSIBLE_PYTHON_INTERPRETER={path-to-your-python-3-bin}</cite></p>
+</section>
+</section>
+<section id="example-installation-macos">
+<h2>Example Installation: MacOs<a class="headerlink" href="#example-installation-macos" title="Permalink to this headline"></a></h2>
+<dl class="simple">
+<dt>Sequence:</dt><dd><ul class="simple">
+<li><p>Homebrew</p></li>
+<li><p>Python - choose between <strong>Native</strong> or a <strong>Virtual Environment</strong></p></li>
+<li><p>Ansible</p></li>
+<li><p>Collection</p></li>
+<li><p>Docker Desktop</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Homebrew</span>
+<span class="c1"># https://brew.sh/</span>
+$ /bin/bash -c <span class="s2">&quot;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh<span class="k">)</span><span class="s2">&quot;</span>
+<span class="c1"># check if it was installed correctly</span>
+$ brew <span class="nb">help</span>
+
+<span class="c1"># Python</span>
+$ brew install python
+$ brew info python
+$ brew update <span class="o">&amp;&amp;</span> brew upgrade python
+$ python3 -V
+
+<span class="c1"># upgrade pip</span>
+$ python3 -m pip install --upgrade pip
+$ pip3 -V
+</pre></div>
+</div>
+<div class="content-tabs docutils container">
+<div class="tab-content docutils container" id="tab-native">
+<p class="tab-title">Native</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># ansible</span>
+$ pip3 install ansible
+<span class="c1"># check install</span>
+$ ansible --version
+$ ansible-playbook --version
+<span class="c1"># check install info</span>
+$ pip3 show ansible
+
+<span class="c1"># collection dependencies &amp; collection</span>
+$ pip3 install -r requirements.txt
+$ ansible-galaxy collection install solace.pubsub_plus
+<span class="c1"># check install path</span>
+$ ansible-galaxy collection list
+</pre></div>
+</div>
+</div>
+<div class="tab-content docutils container" id="tab-virtualenv">
+<p class="tab-title">Virtual Env</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ brew install pyenv
+<span class="c1"># download a Python version</span>
+$ pyenv install <span class="m">3</span>.8.6 <span class="c1"># or another version</span>
+<span class="c1"># bin: ~/.pyenv/versions/3.6.12/bin/python3</span>
+$ pip3 install virtualenv
+
+<span class="c1"># install the virtual env</span>
+$ mkdir my-project
+$ <span class="nb">cd</span> my-project
+$ mkdir venvs
+$ <span class="nb">cd</span> venvs
+
+<span class="c1"># create virtual env</span>
+$ virtualenv -p ~/.pyenv/versions/3.8.6/bin/python3 venv3.8.6
+<span class="c1"># activate virtual env</span>
+<span class="nb">source</span> venv3.8.6/bin/activate
+<span class="c1"># check</span>
+<span class="o">(</span>venv3.8.6<span class="o">)</span> ...$ python -V
+<span class="c1"># upgrade pip</span>
+<span class="o">(</span>venv3.8.6<span class="o">)</span> ...$ python -m pip install --upgrade pip
+
+<span class="c1"># ansible</span>
+$ pip install ansible
+<span class="c1"># check install</span>
+$ ansible --version
+$ ansible-playbook --version
+<span class="c1"># check install info</span>
+$ pip show ansible
+
+<span class="c1"># collection dependencies &amp; collection</span>
+$ pip install -r requirements.txt
+$ ansible-galaxy collection install solace.pubsub_plus -p venv3.8.6/lib/python3.8/site-packages/ansible_collections/
+<span class="c1"># [WARNING]: The specified collections path &#39;{root}/my-project/venvs/venv3.8.6/lib/python3.8/site-packages/ansible_collections&#39; is not part ...</span>
+<span class="c1"># add install path to ANSIBLE_COLLECTIONS_PATH</span>
+<span class="nb">export</span> <span class="nv">ANSIBLE_COLLECTIONS_PATH</span><span class="o">={</span>root<span class="o">}</span>/my-project/venvs/venv3.8.6/lib/python3.8/site-packages/ansible_collections
+<span class="c1"># check install path</span>
+$ ansible-galaxy collection list
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Don’t forget to set ANSIBLE_PYTHON_INTERPRETER={path-to-your-python-3-bin}</p>
+</div>
+<p><a class="reference external" href="https://www.docker.com/products/docker-desktop">Install Docker Desktop</a> if you want to use Solace Broker Services locally.</p>
+</section>
+<section id="example-installation-ubuntu">
+<h2>Example Installation: Ubuntu<a class="headerlink" href="#example-installation-ubuntu" title="Permalink to this headline"></a></h2>
+<p><strong>Python 3</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo apt update
+$ sudo apt -y upgrade
+$ sudo apt update
+
+$ sudo apt install python3
+$ python3 -V
+
+$ sudo apt install python3-pip
+$ sudo python -m pip install --upgrade pip
+$ pip -V
+</pre></div>
+</div>
+<p><strong>Ansible &amp; Solace Collection</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo pip install ansible
+$ pip show ansible
+$ ansible --version
+
+<span class="c1"># collection dependencies &amp; collection</span>
+$ sudo pip install -r requirements.txt
+$ ansible-galaxy collection install solace.pubsub_plus
+<span class="c1"># check install path</span>
+$ ansible-galaxy collection list
+</pre></div>
+</div>
+</section>
+<section id="example-installation-centos7">
+<h2>Example Installation: Centos7<a class="headerlink" href="#example-installation-centos7" title="Permalink to this headline"></a></h2>
+<p><strong>Python 3</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo yum install python3
+$ sudo yum install libselinux-python3
+
+$ sudo python3 -m pip install --upgrade pip
+$ pip -V
+</pre></div>
+</div>
+<p><strong>Ansible &amp; Solace Collection</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo pip install ansible
+$ pip show ansible
+$ ansible --version
+
+<span class="c1"># collection dependencies &amp; collection</span>
+$ sudo pip install -r requirements.txt
+$ ansible-galaxy collection install solace.pubsub_plus
+<span class="c1"># check install path</span>
+$ ansible-galaxy collection list
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quickstart for Solace PubSub+ Ansible Collection" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorials.html" class="btn btn-neutral float-right" title="Tutorials &amp; Projects for Solace PubSub+ Ansible Collection" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
+      <span class="lastupdated">Last updated on 07 May 2022 at 06:41.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
