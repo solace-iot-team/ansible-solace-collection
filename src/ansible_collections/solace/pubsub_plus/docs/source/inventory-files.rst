@@ -201,7 +201,7 @@ Inventory File for a Solace Cloud Account
         ansible_connection: local
         broker_type: solace_cloud
         solace_cloud_api_token: the-token
-
+        solace_cloud_home: us
 
 When your Playbook only manages a Solace Cloud account, for example to start/stop services, all you need in the Inventory File is the api token with the correct permissions.
 

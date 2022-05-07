@@ -104,6 +104,16 @@ options:
 
     BROKER_CONFIG_SOLACE_CLOUD = r'''
 options:
+  solace_cloud_home:
+    description: The Solace Cloud home region.
+    type: str
+    required: false
+    choices:
+      - us
+      - au
+      - US
+      - AU
+      - ''
   solace_cloud_api_token:
     description:
       - The API Token.
@@ -122,6 +132,16 @@ options:
 
     BROKER_CONFIG_SOLACE_CLOUD_MANDATORY = r'''
 options:
+  solace_cloud_home:
+    description: The Solace Cloud home region.
+    type: str
+    required: false
+    choices:
+      - us
+      - au
+      - US
+      - AU
+      - ''
   solace_cloud_api_token:
     description:
       - The API Token.
@@ -140,6 +160,16 @@ options:
 
     SOLACE_CLOUD_CONFIG_SOLACE_CLOUD = r'''
 options:
+  solace_cloud_home:
+    description: The Solace Cloud home region.
+    type: str
+    required: false
+    choices:
+      - us
+      - au
+      - US
+      - AU
+      - ''
   solace_cloud_api_token:
     description:
       - The API Token.
@@ -148,7 +178,7 @@ options:
     required: true
     aliases: [api_token]
   timeout:
-    description: Connection timeout in seconds for the http request.
+    description: Connection timeout in seconds for the http request or overall call interaction timeout for Solace Cloud API.
     required: false
     default: 60
     type: int

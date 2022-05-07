@@ -2,12 +2,13 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
+import os
 __metaclass__ = type
 
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceCloudApiResponseDataError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceCloudApiResponseDataError, SolaceEnvVarError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudConfig
 from ansible.module_utils.basic import AnsibleModule
@@ -489,7 +490,12 @@ class SolaceSempV1PagingGetApi(SolaceSempV1Api):
 
 class SolaceCloudApi(SolaceApi):
 
-    API_BASE_PATH = "https://api.solace.cloud/api/v0"
+    ENV_VAR_ANSIBLE_SOLACE_SOLACE_CLOUD_HOME = "ANSIBLE_SOLACE_SOLACE_CLOUD_HOME"
+    ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US = "us"
+    ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_AU = "au"
+    API_BASE_PATH_US = "https://api.solace.cloud/api/v0"
+    API_BASE_PATH_AU = "https://api.solacecloud.com.au/api/v0"
+
     API_DATA_CENTERS = "datacenters"
     API_SERVICES = "services"
     API_REQUESTS = "requests"
@@ -497,6 +503,28 @@ class SolaceCloudApi(SolaceApi):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
         return
+
+    def get_api_base_path(self, config: SolaceTaskSolaceCloudConfig) -> str:
+        solace_cloud_home_value = self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US
+
+        if config.solace_cloud_home is not None and config.solace_cloud_home != '':
+            solace_cloud_home_value = config.solace_cloud_home.lower()
+        else:
+            solaceCloudHomeEnvVal = os.getenv(
+                self.ENV_VAR_ANSIBLE_SOLACE_SOLACE_CLOUD_HOME)
+            if solaceCloudHomeEnvVal is not None and solaceCloudHomeEnvVal != '':
+                if solaceCloudHomeEnvVal.lower() == self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US:
+                    solace_cloud_home_value = self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US
+                elif solaceCloudHomeEnvVal.lower() == self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_AU:
+                    solace_cloud_home_value = self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_AU
+                else:
+                    raise SolaceEnvVarError(self.ENV_VAR_ANSIBLE_SOLACE_SOLACE_CLOUD_HOME,
+                                            solaceCloudHomeEnvVal,
+                                            f"allowed values: {self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US}, {self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_AU}")
+        if solace_cloud_home_value == self.ANSIBLE_SOLACE_SOLACE_CLOUD_HOME_US:
+            return self.API_BASE_PATH_US
+        else:
+            return self.API_BASE_PATH_AU
 
     def get_auth(self, config: SolaceTaskBrokerConfig) -> str:
         return config.get_solace_cloud_auth()
@@ -524,7 +552,7 @@ class SolaceCloudApi(SolaceApi):
     def get_data_centers(self, config: SolaceTaskSolaceCloudConfig) -> list:
         # GET /api/v0/datacenters
         resp = self.make_get_request(
-            config, [self.API_BASE_PATH, self.API_DATA_CENTERS], query_params=None)
+            config, [self.get_api_base_path(config), self.API_DATA_CENTERS], query_params=None)
         return resp
 
     def _transform_service(self, service: dict) -> dict:
@@ -546,7 +574,7 @@ class SolaceCloudApi(SolaceApi):
         module_op = SolaceTaskOps.OP_READ_OBJECT_LIST
         try:
             _resp = self.make_get_request(
-                config, [self.API_BASE_PATH, self.API_SERVICES], module_op)
+                config, [self.get_api_base_path(config), self.API_SERVICES], module_op)
         except SolaceApiError as e:
             resp = e.get_resp()
             # TODO: what is the code if solace cloud account has 0 services?
@@ -582,7 +610,7 @@ class SolaceCloudApi(SolaceApi):
         module_op = SolaceTaskOps.OP_READ_OBJECT
         try:
             _resp = self.make_get_request(
-                config, [self.API_BASE_PATH, self.API_SERVICES, service_id], module_op)
+                config, [self.get_api_base_path(config), self.API_SERVICES, service_id], module_op)
         except SolaceApiError as e:
             resp = e.get_resp()
             if resp['status_code'] == 404:
@@ -603,7 +631,7 @@ class SolaceCloudApi(SolaceApi):
         # POST https://api.solace.cloud/api/v0/services
         module_op = SolaceTaskOps.OP_CREATE_OBJECT
         resp = self.make_post_request(
-            config, [self.API_BASE_PATH, self.API_SERVICES], data, module_op)
+            config, [self.get_api_base_path(config), self.API_SERVICES], data, module_op)
         _service_id = resp['serviceId']
         if wait_timeout_minutes > 0:
             res = self.wait_for_service_create_completion(
@@ -671,7 +699,7 @@ class SolaceCloudApi(SolaceApi):
 
     def delete_service(self, config: SolaceTaskSolaceCloudConfig, service_id: str) -> dict:
         # DELETE https://api.solace.cloud/api/v0/services/{{serviceId}}
-        path_array = [SolaceCloudApi.API_BASE_PATH,
+        path_array = [self.get_api_base_path(config),
                       SolaceCloudApi.API_SERVICES, service_id]
         return self.make_delete_request(config, path_array)
 
@@ -702,7 +730,7 @@ class SolaceCloudApi(SolaceApi):
     def get_service_request_status(self, config: SolaceTaskBrokerConfig, service_id: str, request_id: str):
         module_op = SolaceTaskOps.OP_READ_OBJECT
         # GET https://api.solace.cloud/api/v0/services/{paste-your-serviceId-here}/requests/{{requestId}}
-        path_array = [self.API_BASE_PATH, self.API_SERVICES,
+        path_array = [self.get_api_base_path(config), self.API_SERVICES,
                       service_id, self.API_REQUESTS, request_id]
         resp = self.make_get_request(config, path_array, module_op)
         # resp may not yet contain 'adminProgress' depending on whether this creation has started yet
@@ -711,16 +739,62 @@ class SolaceCloudApi(SolaceApi):
             resp['adminProgress'] = 'inProgress'
         return resp
 
+    def wait_for_service_requests_to_finish(self, config: SolaceTaskBrokerConfig, timeout_minutes: int, service_id: str):
+        module_op = SolaceTaskOps.OP_READ_OBJECT
+        # GET https://api.solace.cloud/api/v0/services/{paste-your-serviceId-here}/requests
+        # returns list of dicts,
+        # - check all elements,
+        # - if "adminProgress" == "inProgress", wait and try again
+        # - raise SolaceApiError if timeout
+        are_all_completed = False
+        try_count = -1
+        delay = 30  # seconds
+        max_retries = (timeout_minutes * 60) // delay
+        while not are_all_completed and try_count < max_retries:
+            path_array = [self.get_api_base_path(config), self.API_SERVICES,
+                          service_id, self.API_REQUESTS]
+            resp = self.make_get_request(config, path_array, module_op)
+            # logging.debug(f"wait_for_service_requests_to_finish(): resp=\n{json.dumps(resp, indent=2)}")
+            # iterate through list to check if any adminProgress == inProgress
+            # use generator:
+            matches = (
+                respElem for respElem in resp if respElem['adminProgress'] == 'inProgress')
+            notCompletedElement = next(matches, None)
+            if notCompletedElement is None:
+                are_all_completed = True
+            try_count += 1
+            if not are_all_completed and timeout_minutes > 0:
+                time.sleep(delay)
+
+        if not are_all_completed:
+            msg = [
+                "timeout waiting for all outstanding service requests to be completed",
+                f"timeout(mins)={timeout_minutes}",
+                "request in progress:",
+                str(notCompletedElement)]
+            raise SolaceApiError(
+                resp, msg, self.get_module()._name, module_op)
+        return
+
     def make_service_post_request(self, config: SolaceTaskBrokerConfig, path_array: list, service_id: str, json_body, module_op):
+
+        timeout_minutes = config.get_timeout() // 60
+        # set min timeout to 5 mins
+        timeout_minutes = max(timeout_minutes, 5)
+
+        # check if there are any jobs still running against this service and wait until completed
+        self.wait_for_service_requests_to_finish(
+            config, timeout_minutes, service_id)
+
+        # now make the request
         resp = self.make_request(config, requests.post, path_array, json_body)
         # import logging, json
         # logging.debug(f"resp (make_request) = \n{json.dumps(resp, indent=2)}")
         request_id = resp['id']
-        timeout_minutes = 2
         is_completed = False
         is_failed = False
         try_count = -1
-        delay = 5  # seconds
+        delay = 15  # seconds
         max_retries = (timeout_minutes * 60) // delay
         # wait 1 cycle before start polling
         time.sleep(delay)
@@ -741,7 +815,7 @@ class SolaceCloudApi(SolaceApi):
                 resp, resp, self.get_module()._name, module_op)
         if not is_completed:
             msg = [
-                f"timeout service post request - not completed, state={resp['adminProgress']}", str(resp)]
+                f"timeout service post request - not completed, timeout(mins)={timeout_minutes}, state={resp['adminProgress']}", str(resp)]
             raise SolaceInternalError(msg)
         return resp
 
@@ -794,7 +868,7 @@ class SolaceCloudApiCertAuthority(SolaceCloudApi):
 
     def get_cert_authority(self, config, service_id, cert_authority_name, query_params):
         # GET services/{serviceId}/serviceCertificateAuthorities/{certAuthorityName}
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+        path_array = [self.get_api_base_path(config), SolaceCloudApi.API_SERVICES,
                       service_id, 'serviceCertificateAuthorities', cert_authority_name]
         resp = self.get_object_settings(config, path_array)
         cert_authority = resp['certificate']

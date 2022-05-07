@@ -232,7 +232,7 @@ class SolaceVpnTask(SolaceBrokerCRUDTask):
         # POST: services/{service-id}}/requests/updateAuthenticationRequests
         module_op = SolaceTaskOps.OP_UPDATE_OBJECT
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApi.API_BASE_PATH, SolaceCloudApi.API_SERVICES,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()), SolaceCloudApi.API_SERVICES,
                       service_id, SolaceCloudApi.API_REQUESTS, 'updateAuthenticationRequests']
         solace_cloud_resp = self.solace_cloud_api.make_service_post_request(
             self.get_config(),

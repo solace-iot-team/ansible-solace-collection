@@ -229,7 +229,7 @@ class SolaceClientCertAuthorityTask(SolaceBrokerCRUDTask):
     def _get_func_solace_cloud(self, cert_authority_name):
         # GET services/{serviceId}/serviceCertificateAuthorities/{certAuthorityName}
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApiCertAuthority.API_BASE_PATH, SolaceCloudApiCertAuthority.API_SERVICES,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()), SolaceCloudApiCertAuthority.API_SERVICES,
                       service_id, 'serviceCertificateAuthorities', cert_authority_name]
         return self.solace_cloud_api.get_object_settings(self.get_config(), path_array)
 
@@ -270,7 +270,7 @@ class SolaceClientCertAuthorityTask(SolaceBrokerCRUDTask):
         body.update(self.SOLACE_CLOUD_DEFAULTS)
         body.update(settings if settings else {})
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApiCertAuthority.API_BASE_PATH, SolaceCloudApiCertAuthority.API_SERVICES,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()), SolaceCloudApiCertAuthority.API_SERVICES,
                       service_id, SolaceCloudApiCertAuthority.API_REQUESTS, 'serviceCertificateAuthorityRequests']
         return self.solace_cloud_api.make_service_post_request(
             self.get_config(),
@@ -308,7 +308,7 @@ class SolaceClientCertAuthorityTask(SolaceBrokerCRUDTask):
             body['certificate'].update({'content': cert_content})
         body.update(settings if settings else {})
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApiCertAuthority.API_BASE_PATH, SolaceCloudApiCertAuthority.API_SERVICES,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()), SolaceCloudApiCertAuthority.API_SERVICES,
                       service_id, SolaceCloudApiCertAuthority.API_REQUESTS, 'serviceCertificateAuthorityRequests']
         return self.solace_cloud_api.make_service_post_request(
             self.get_config(),
@@ -335,7 +335,7 @@ class SolaceClientCertAuthorityTask(SolaceBrokerCRUDTask):
             }
         }
         service_id = self.get_config().get_params()['solace_cloud_service_id']
-        path_array = [SolaceCloudApiCertAuthority.API_BASE_PATH, SolaceCloudApiCertAuthority.API_SERVICES,
+        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()), SolaceCloudApiCertAuthority.API_SERVICES,
                       service_id, SolaceCloudApiCertAuthority.API_REQUESTS, 'serviceCertificateAuthorityRequests']
         return self.solace_cloud_api.make_service_post_request(
             self.get_config(),

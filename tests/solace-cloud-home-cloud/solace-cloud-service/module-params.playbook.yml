@@ -1,0 +1,53 @@
+# Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: Use with module params
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  tasks:
+
+    - name: "Check vars"
+      set_fact:
+        working_dir: "{{ WORKING_DIR }}"
+        sc_created_inventory_file: "{{ WORKING_DIR }}/{{ SOLACE_CLOUD_INVENTORY_FILE_NAME }}"
+        solace_cloud_home_cloud: "{{ ANSIBLE_SOLACE_SOLACE_CLOUD_HOME }}"
+        solace_cloud_api_token_us: "{{ SOLACE_CLOUD_API_TOKEN_US }}"
+        solace_cloud_api_token_au: "{{ SOLACE_CLOUD_API_TOKEN_AU }}"
+    - set_fact:
+        solace_cloud_api_token: "{{solace_cloud_api_token_us}}"
+        solace_cloud_home_param: "us"
+      when: solace_cloud_home_cloud is not defined or solace_cloud_home_cloud == '' or solace_cloud_home_cloud == 'US'
+    - set_fact:
+        solace_cloud_api_token: "{{solace_cloud_api_token_au}}"
+        solace_cloud_home_param: "au"
+      when:
+        - "solace_cloud_home_cloud is defined"
+        - "solace_cloud_home_cloud == 'AU'"
+    - assert:
+        that:
+          - solace_cloud_api_token is defined
+          - solace_cloud_home_param is defined
+
+    - debug:
+        msg:
+          - "solace_cloud_home_param={{solace_cloud_home_param}}"
+          - "solace_cloud_service_id={{solace_cloud_service_id}}"
+          - solace_cloud_api_token
+          - "{{ solace_cloud_api_token }}"
+
+    - name: "Get service details"
+      solace_cloud_get_service:
+        # solace_cloud_home: "{{ solace_cloud_home_param }}"
+        solace_cloud_home: "{{ meta.solace_cloud_home }}"
+        api_token: "{{ solace_cloud_api_token }}"
+        service_id: "{{ solace_cloud_service_id }}"
+      environment:
+        ANSIBLE_SOLACE_SOLACE_CLOUD_HOME: ''
+
+
+###
+# The End.

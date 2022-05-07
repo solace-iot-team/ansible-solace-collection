@@ -84,7 +84,7 @@
             - "certAuthorityName"
       register: result
     - assert:
-        that: result.result_list_count == 3
+        that: "result.result_list_count == {{ target_list.cert_authority_names | length }}"
 
     - name: "get: monitor: solace_get_cert_authorities: list"
       solace_get_cert_authorities:
@@ -94,7 +94,7 @@
             - "certAuthorityName=={{ target_list.where_pattern }}"
       register: result
     - assert:
-        that: result.result_list_count == 3
+        that: "result.result_list_count == {{ target_list.cert_authority_names | length }}"
 
     - name: "get: solace_cert_authority: delete"
       solace_cert_authority:

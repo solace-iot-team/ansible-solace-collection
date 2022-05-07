@@ -1,5 +1,25 @@
 # Release Notes
 
+## Version 1.9.0
+
+**Framework:**
+  * **Support for Solace Cloud Home: US & AU**
+    - affects all modules which use the Solace Cloud Api
+    - new env var: ANSIBLE_SOLACE_SOLACE_CLOUD_HOME='AU' or 'US'
+    - new optional module parameter: solace_cloud_home: choices=['us', 'au']
+    - logic:
+      - default: 'US'
+      - if module parameter is set: use module parameter
+      - else check env var
+        - if set, all modules which use the Solace Cloud API will switch their base url according to the home cloud
+  * **Fixed timeout for Solace Cloud Api Post request polling**
+    - timeout parameter now passed through
+    - min polling time set to 5 mins
+  * **Fixed error on outstanding requests for serviceId for Solace Cloud Api**
+    - check if serviceId has any outstanding requests before submitting a new one
+    - uses same timeout as the actual request
+
+
 ## Version 1.8.0
 New modules to manage cert authorities & support for ansible_core 2.12.
 

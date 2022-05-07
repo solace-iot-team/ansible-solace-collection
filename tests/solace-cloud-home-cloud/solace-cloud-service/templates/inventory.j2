@@ -1,0 +1,22 @@
+{#
+# ---------------------------------------------------------------------------------------------
+# MIT License
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke (ricardo.gomez-ulmke@solace.com)
+# ---------------------------------------------------------------------------------------------
+#}
+
+{
+  "all": {
+    "hosts": {
+      {% set num_services = created_services_dict.keys() | length %}
+      {% set f_index = {'index': 0 } %}
+      {% for service_name, service in created_services_dict.items() %}
+        {% if f_index.update({'index': f_index.index+1}) %} {% endif %}
+        "{{ service_name }}": {{ service | to_nice_json }}
+        {% if f_index.index < num_services %}
+        ,
+        {% endif %}
+      {% endfor %}
+    }
+  }
+}
