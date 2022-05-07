@@ -4,7 +4,7 @@
 name: docs
 on:
   # for testing
-  workflow_dispatch:
+  # workflow_dispatch:
   # testing branches
   # push:
   #   branches:

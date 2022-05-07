@@ -40,7 +40,7 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: Set up Python
+      - name: setup python matrix version
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
