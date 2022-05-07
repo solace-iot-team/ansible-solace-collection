@@ -74,7 +74,6 @@ jobs:
           ./${DOCS_MAKE_SCRIPT}
 
       - name: Check HTML dir
-        if: env.DEBUG_FLAG == 'true'
         run: |
           cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
           cd docs/build/html
