@@ -11,6 +11,8 @@ jobs:
   release:
     concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-18.04
+    permissions:
+      contents: write
     strategy:
       matrix:
         python-version: [ '3.8' ]

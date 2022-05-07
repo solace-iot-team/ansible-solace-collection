@@ -18,6 +18,7 @@ env:
 
 jobs:
   publish_release:
+    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-18.04
     strategy:
       max-parallel: 1
