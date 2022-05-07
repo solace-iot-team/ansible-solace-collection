@@ -67,10 +67,12 @@ jobs:
           ls -la
 
       - name: deploy gh pages
+        env:
+          BUILD_FOLDER_PATH: "${{ TEST_ANSIBLE_SOLACE_COLLECTION_DIR }}/docs/build"
         uses: JamesIves/github-pages-deploy-action@v4.3.3
         with:
           branch: gh-pages # The branch the action should deploy to.
-          folder: ${{ TEST_ANSIBLE_SOLACE_COLLECTION_DIR }}/docs/build # The folder the action should deploy.
+          folder: ${{ BUILD_FOLDER_PATH }} # The folder the action should deploy.
 
       # - name: Publish gh-pages
       #   run: |
