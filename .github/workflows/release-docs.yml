@@ -1,0 +1,71 @@
+
+name: release-docs
+on:
+  workflow_dispatch:
+  # # for production
+  # release:
+  #   types: [created]
+env:
+  DEBUG_FLAG: ${{ false }}
+  DOCS_MAKE_SCRIPT: "test-runner/run.make.docs.sh"
+  TEST_RUNNER_LOGS_DIR: publish-logs
+  TEST_TEST_RUNNER_LOGS_NAME: test-runner-publish-logs
+
+jobs:
+  release:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check Auth
+        if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
+        run: |
+          echo "not authorized"
+          echo '::set-output name=IS_AUTHORIZED::false'
+        id: auth
+      - name: Cancel Workflow
+        if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
+        uses: andymckay/cancel-action@0.2
+
+      - name: Checkout Current Branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+
+      - name: "docs:setup python"
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install docs make dependencies
+        run: |
+          pip install -r devel/devel.requirements.txt
+
+      - name: Make docs
+        run: |
+          export PROJECT_HOME="$GITHUB_WORKSPACE"
+          export LOG_DIR="$GITHUB_WORKSPACE/${TEST_RUNNER_LOGS_DIR}"
+          export RUN_FG=true
+          ./${DOCS_MAKE_SCRIPT}
+
+      - name: Check HTML dir
+        if: env.DEBUG_FLAG == 'true'
+        run: |
+          cd ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}
+          cd docs/build/html
+          ls -la
+
+      # - name: Publish gh-pages
+      #   run: |
+      #     git fetch origin gh-pages
+      #     git worktree add gh-pages gh-pages
+      #     date > generated.txt
+      #     git config user.name github-actions
+      #     git config user.email github-actions@github.com
+      #     rsync -av ${TEST_ANSIBLE_SOLACE_COLLECTION_DIR}/docs/build/html/ gh-pages/
+      #     cd gh-pages
+      #     git add -A
+      #     git commit --allow-empty -F ../generated.txt
+      #     # git push -f -u origin gh-pages
+      #     git push -u origin gh-pages
+
+###
+# The End.

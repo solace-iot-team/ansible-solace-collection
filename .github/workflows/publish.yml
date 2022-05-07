@@ -4,7 +4,7 @@
 name: publish release
 on:
   # for testing
-  workflow_dispatch:
+  # workflow_dispatch:
 
   release:
     types: [created]
