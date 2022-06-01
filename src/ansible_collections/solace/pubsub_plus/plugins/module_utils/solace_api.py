@@ -8,7 +8,7 @@ __metaclass__ = type
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceCloudApiResponseDataError, SolaceEnvVarError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceCloudApiResponseDataError, SolaceEnvVarError, SolaceError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudConfig
 from ansible.module_utils.basic import AnsibleModule
@@ -85,6 +85,11 @@ class SolaceApi(object):
                 return j['data']
         return {}
 
+    def get_response_body(self, resp):
+        if resp.text:
+            return resp.json()
+        return None
+
     def _make_request(self, config: SolaceTaskConfig, request_func, path_array: list, json_body, query_params, module_op):
         if self.safe_for_path_array:
             _path = SolaceApi.compose_path(
@@ -129,6 +134,21 @@ class SolaceApi(object):
                 logging.warning("resp.status_code: %d, resp.reason: '%s', try number: %d",
                                 resp.status_code, resp.reason, try_count)
                 time.sleep(delay_secs)
+            elif resp.status_code in [500]:
+                _body = self.get_response_body(resp)
+                if _body is not None:
+                    if 'subCode' in _body:
+                        if _body['subCode'] == '5000_104':
+                            logging.warning("resp.status_code: %d, resp.message: '%s', try number: %d",
+                                            resp.status_code, _body['message'], try_count)
+                            time.sleep(delay_secs)
+                          #  "status_code": 500,
+                          #   "body": {
+                          #   "message": "The server is too busy to respond",
+                          #   "subCode": "5000_104",
+                          #   "errorId": "52610751ae592888",
+                          #   "traceId": "52610751ae592888"
+                          # }
             else:
                 do_retry = False
             try_count += 1
@@ -542,6 +562,17 @@ class SolaceCloudApi(SolaceApi):
         # logging.debug(f">>>>> handling good response, resp.status_code={resp.status_code}")
         return self.handle_good_response(resp, module_op)
 
+    def handle_good_response(self, resp, module_op):
+        _resp = super().handle_good_response(resp, module_op)
+        if _resp == {}:
+            # return the body
+            if resp.text:
+                j = resp.json()
+                return j
+        else:
+            return _resp
+        return {}
+
     def handle_bad_response(self, resp, module_op):
         _resp = dict(status_code=resp.status_code,
                      reason=resp.reason
@@ -562,10 +593,14 @@ class SolaceCloudApi(SolaceApi):
         # msgVpnAttributes.vmrVersion="9.6.0.46"
         # eventBrokerVersion="9.6"
         vmrVersion = None
-        if service['msgVpnAttributes']:
-            vmrVersion = service['msgVpnAttributes']['vmrVersion']
+        if "msgVpnAttributes" in service:
+            if "vmrVersion" in service["msgVpnAttributes"]:
+                vmrVersion = service['msgVpnAttributes']['vmrVersion']
         if vmrVersion:
             service['eventBrokerVersion'] = vmrVersion[0:3]
+        else:
+            # total hack, no fallback option though
+            service['eventBrokerVersion'] = '9.6'
         # ----------
         return service
 
@@ -618,6 +653,20 @@ class SolaceCloudApi(SolaceApi):
             raise SolaceApiError(e.get_http_resp(), resp,
                                  self.get_module()._name, module_op) from e
         return self._transform_service(_resp)
+
+    def get_service_additional_hostnames(self, config: SolaceTaskSolaceCloudConfig, service_id: str) -> list:
+        # GET https://api.solace.cloud/api/v0/services/{{serviceId}}?connectionDetails=false
+        # retrieves a single service
+        service = self.get_service(config, service_id)
+        if not service:
+            raise SolaceError(
+                f"solace_cloud_service_id={service_id} not found")
+        additionalHostnames = []
+        if 'attributes' in service:
+            if 'additionalHostnames' in service['attributes']:
+                if isinstance(service['attributes']['additionalHostnames'], list):
+                    additionalHostnames = service['attributes']['additionalHostnames']
+        return additionalHostnames
 
     def get_services_with_details(self, config: SolaceTaskSolaceCloudConfig) -> list:
         # get services, then for each service, get details
@@ -788,8 +837,9 @@ class SolaceCloudApi(SolaceApi):
 
         # now make the request
         resp = self.make_request(config, requests.post, path_array, json_body)
-        # import logging, json
-        # logging.debug(f"resp (make_request) = \n{json.dumps(resp, indent=2)}")
+        import logging
+        import json
+        logging.debug(f"resp (make_request) = \n{json.dumps(resp, indent=2)}")
         request_id = resp['id']
         is_completed = False
         is_failed = False
