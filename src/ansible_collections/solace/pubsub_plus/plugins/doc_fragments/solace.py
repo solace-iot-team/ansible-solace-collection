@@ -200,6 +200,17 @@ options:
     aliases: [service_id]
 '''
 
+    SOLACE_CLOUD_SERVICE_CONFIG_SERVICE_ID_MANDATORY = r'''
+options:
+  solace_cloud_service_id:
+    description:
+      - The service id of a service in Solace Cloud.
+      - Click on the service in Solace Cloud - the service id is in the URL.
+    type: str
+    required: true
+    aliases: [service_id]
+'''
+
     VIRTUAL_ROUTER = r'''
 options:
   virtual_router:

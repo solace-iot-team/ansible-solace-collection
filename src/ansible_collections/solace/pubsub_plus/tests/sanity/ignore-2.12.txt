@@ -1,3 +1,5 @@
+plugins/modules/solace_cloud_service_hostname.py compile-2.7!skip
+plugins/modules/solace_cloud_service_hostnames.py compile-2.7!skip
 plugins/modules/solace_domain_cert_authority.py compile-2.7!skip
 plugins/modules/solace_get_client_cert_authorities.py compile-2.7!skip
 plugins/modules/solace_get_client_cert_authorities.py pep8:E501

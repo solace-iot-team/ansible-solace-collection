@@ -257,7 +257,8 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
     @ staticmethod
     def arg_spec_solace_cloud() -> dict:
         return dict(
-            solace_cloud_home=dict(type='str', required=False, default=None, choices=['us', 'au', 'US', 'AU', '']),
+            solace_cloud_home=dict(type='str', required=False, default=None, choices=[
+                                   'us', 'au', 'US', 'AU', '']),
             solace_cloud_api_token=dict(
                 type='str', required=False, no_log=True, default=None),
             solace_cloud_service_id=dict(
@@ -267,7 +268,8 @@ class SolaceTaskBrokerConfig(SolaceTaskConfig):
     @ staticmethod
     def arg_spec_solace_cloud_mandatory() -> dict:
         return dict(
-            solace_cloud_home=dict(type='str', required=False, default=None, choices=['us', 'au', 'US', 'AU', '']),
+            solace_cloud_home=dict(type='str', required=False, default=None, choices=[
+                                   'us', 'au', 'US', 'AU', '']),
             solace_cloud_api_token=dict(type='str',
                                         required=True,
                                         no_log=True),
@@ -389,7 +391,8 @@ class SolaceTaskSolaceCloudConfig(SolaceTaskConfig):
     @ staticmethod
     def arg_spec_solace_cloud() -> dict:
         return dict(
-            solace_cloud_home=dict(type='str', required=False, default=None, choices=['us', 'au', 'US', 'AU', '']),
+            solace_cloud_home=dict(type='str', required=False, default=None, choices=[
+                                   'us', 'au', 'US', 'AU', '']),
             solace_cloud_api_token=dict(
                 type='str', required=True, no_log=True, aliases=['api_token']),
             timeout=dict(type='int', default='60', required=False),
@@ -411,4 +414,11 @@ class SolaceTaskSolaceCloudServiceConfig(SolaceTaskSolaceCloudConfig):
         return dict(
             solace_cloud_service_id=dict(
                 type='str', required=False, default=None, aliases=['service_id'])
+        )
+
+    @ staticmethod
+    def arg_spec_solace_cloud_service_id_mandatory() -> dict:
+        return dict(
+            solace_cloud_service_id=dict(
+                type='str', required=True, aliases=['service_id'])
         )

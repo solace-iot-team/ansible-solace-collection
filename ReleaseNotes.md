@@ -1,5 +1,12 @@
 # Release Notes
 
+## Version 1.10.0
+
+**New Modules:**
+* **[solace_cloud_service_hostname](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_cloud_service_hostname.html)**
+* **[solace_cloud_service_hostnames](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_cloud_service_hostnames.html)**
+* **[solace_cloud_get_service_hostnames](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_cloud_get_service_hostnames.html)**
+
 ## Version 1.9.0
 
 **Framework:**

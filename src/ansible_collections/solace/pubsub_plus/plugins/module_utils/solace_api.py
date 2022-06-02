@@ -142,13 +142,13 @@ class SolaceApi(object):
                             logging.warning("resp.status_code: %d, resp.message: '%s', try number: %d",
                                             resp.status_code, _body['message'], try_count)
                             time.sleep(delay_secs)
-                          #  "status_code": 500,
-                          #   "body": {
-                          #   "message": "The server is too busy to respond",
-                          #   "subCode": "5000_104",
-                          #   "errorId": "52610751ae592888",
-                          #   "traceId": "52610751ae592888"
-                          # }
+                            #  "status_code": 500,
+                            #   "body": {
+                            #   "message": "The server is too busy to respond",
+                            #   "subCode": "5000_104",
+                            #   "errorId": "52610751ae592888",
+                            #   "traceId": "52610751ae592888"
+                            # }
             else:
                 do_retry = False
             try_count += 1
@@ -837,9 +837,9 @@ class SolaceCloudApi(SolaceApi):
 
         # now make the request
         resp = self.make_request(config, requests.post, path_array, json_body)
-        import logging
-        import json
-        logging.debug(f"resp (make_request) = \n{json.dumps(resp, indent=2)}")
+        # import logging
+        # import json
+        # logging.debug(f"resp (make_request) = \n{json.dumps(resp, indent=2)}")
         request_id = resp['id']
         is_completed = False
         is_failed = False

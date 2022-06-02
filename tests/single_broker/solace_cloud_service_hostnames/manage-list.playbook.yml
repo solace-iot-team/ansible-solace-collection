@@ -1,0 +1,82 @@
+# Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+-
+  name: manage list
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace.pubsub_plus.solace_cloud_get_service_hostnames:
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace.pubsub_plus.solace_cloud_service_hostname:
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+    solace.pubsub_plus.solace_cloud_service_hostnames:
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+  tasks:
+
+    - name: exit if not solace cloud
+      meta: end_play
+      when: broker_type != 'solace_cloud'
+
+    - set_fact:
+        additionalHostnames:
+        - manage-list-hostname-1
+        - manage-list-hostname-2
+
+    - name: ensure all hostnames in list are absent
+      solace_cloud_service_hostnames:
+        hostnames: "{{ additionalHostnames }}"
+        state: absent
+
+    - name: get list of existing hostnames
+      solace_cloud_get_service_hostnames:
+      register: result
+    - assert:
+        that:
+          - result.rc == 0
+          - result.result_list_count == 0
+
+    - name: add all hostnames in list
+      solace_cloud_service_hostnames:
+        hostnames: "{{ additionalHostnames }}"
+        state: exactly
+
+    - name: add another one
+      solace_cloud_service_hostname:
+        hostname: manage-list-should-be-removed
+        state: present
+        
+    - name: "idempotency: add all hostnames in list"
+      solace_cloud_service_hostnames:
+        hostnames: "{{ additionalHostnames }}"
+        state: exactly
+
+    - name: get list of existing hostnames
+      solace_cloud_get_service_hostnames:
+      register: result
+    - assert:
+        that:
+          - result.rc == 0
+          - result.result_list_count == 2
+
+    - name: ensure all hostnames in list are absent
+      solace_cloud_service_hostnames:
+        hostnames: "{{ additionalHostnames }}"
+        state: absent
+
+    - name: get list of existing hostnames
+      solace_cloud_get_service_hostnames:
+      register: result
+    - assert:
+        that:
+          - result.rc == 0
+          - result.result_list_count == 0
+
+###
+# The End.

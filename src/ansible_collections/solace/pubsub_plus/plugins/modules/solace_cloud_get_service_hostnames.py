@@ -17,11 +17,11 @@ short_description: get all service hostnames
 description:
 - "Get a list of additional hostnames configured on the service."
 extends_documentation_fragment:
-# - solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
-# - solace.pubsub_plus.solace.solace_cloud_service_config_service_id
-- solace.pubsub_plus.solace.broker_config_solace_cloud_mandatory
+- solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
+- solace.pubsub_plus.solace.solace_cloud_service_config_service_id_mandatory
 seealso:
 - module: solace_cloud_service_hostname
+- module: solace_cloud_service_hostnames
 - module: solace_cloud_get_service
 author:
 - Ricardo Gomez-Ulmke (@rjgu)
@@ -131,7 +131,7 @@ def run_module():
     module_args = {}
     arg_spec = SolaceTaskSolaceCloudConfig.arg_spec_solace_cloud()
     arg_spec.update(
-        SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service_id())
+        SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud_service_id_mandatory())
     arg_spec.update(module_args)
 
     module = AnsibleModule(

@@ -14,7 +14,7 @@ export PROJECT_HOME=$projectHome
 ansibleSolaceTests=(
   # "broker-cert"
   # "setup"
-  "solace_cloud_service_hostnames"
+  # "solace_cloud_service_hostnames"
   # "solace_acl_profile"
   # "solace_auth"
   # "solace_cert_authority"
@@ -28,7 +28,7 @@ ansibleSolaceTests=(
   # "solace_facts"
   # "solace_vpn"
   # "solace_rdp"
-  # "solace_queue"
+  "solace_queue"
   # "solace_client_username"
   # "solace_mqtt"
   # "solace_topic_endpoint"
