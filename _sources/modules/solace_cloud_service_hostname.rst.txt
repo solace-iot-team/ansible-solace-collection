@@ -1,0 +1,188 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_cloud_service_hostname.py
+
+.. _solace_cloud_service_hostname_module:
+
+solace_cloud_service_hostname -- manage service hostnames
+=========================================================
+
+Add & delete additional hostnames on a Solace Cloud service.
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   # Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+   # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+   -
+     name: solace_cloud_service_hostnames doc example
+     hosts: all
+     gather_facts: no
+     any_errors_fatal: true
+     collections:
+       - solace.pubsub_plus
+     module_defaults:
+       solace.pubsub_plus.solace_cloud_get_service_hostnames:
+         solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+       solace.pubsub_plus.solace_cloud_service_hostname:
+         solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+     tasks:
+
+       - name: exit if not solace cloud
+         meta: end_play
+         when: broker_type != 'solace_cloud'
+
+       - set_fact:
+           additionalHostnames:
+           - hostname-1
+           - hostname-2
+
+       - name: ensure all hostnames in list are absent
+         solace_cloud_service_hostname:
+           hostname: "{{ item }}"
+           state: absent
+         loop: "{{ additionalHostnames }}"
+
+       - name: add all hostnames in list
+         solace_cloud_service_hostname:
+           hostname: "{{ item }}"
+           state: present
+         loop: "{{ additionalHostnames }}"
+
+       - name: get list of existing hostnames
+         solace_cloud_get_service_hostnames:
+
+       - name: ensure all hostnames in list are absent
+         solace_cloud_service_hostname:
+           hostname: "{{ item }}"
+           state: absent
+         loop: "{{ additionalHostnames }}"
+
+   ###
+   # The End.
+
+
+
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_cloud_get_service_hostnames_module`
+   - :ref:`solace_cloud_service_hostnames_module`
+   - :ref:`solace_cloud_get_service_module`
+
+
+
+Parameters
+----------
+
+hostname (required)
+  The additional hostname on the service to manage.
+
+  | **type**: str
+
+solace_cloud_api_token (required)
+  The API Token.
+
+  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+
+  | **type**: str
+  | **aliases**: api_token
+
+solace_cloud_home (optional)
+  The Solace Cloud home region.
+
+  | **type**: str
+  | **choices**: us, au, US, AU, 
+
+solace_cloud_service_id (required)
+  The service id of a service in Solace Cloud.
+
+  Click on the service in Solace Cloud - the service id is in the URL.
+
+  | **type**: str
+  | **aliases**: service_id
+
+state (optional)
+  Target state.
+
+  | **type**: str
+  | **default**: present
+  | **choices**: present, absent
+
+timeout (optional)
+  Connection timeout in seconds for the http request or overall call interaction timeout for Solace Cloud API.
+
+  | **type**: int
+  | **default**: 60
+
+validate_certs (optional)
+  Flag to switch validation of client certificates on/off when using a secure connection.
+
+  | **type**: bool
+  | **default**: True
+
+
+
+
+
+Return Values
+-------------
+
+response
+  response from the Api call.
+
+  | **returned**: success
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "msg": null,
+     "rc": 0,
+     "response": {
+       "adminProgress": "completed",
+       "creationTimestamp": 0,
+       "id": "3icn47vcsgg",
+       "operation": "create",
+       "serviceHostName": "hostname-1",
+       "type": "serviceHostNameRequest"
+     }
+   }
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+msg
+  error message if not ok
+
+  | **returned**: error
+  | **type**: str
+
+

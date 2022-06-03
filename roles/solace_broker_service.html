@@ -15,6 +15,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/contentui.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -103,7 +104,7 @@
            <div itemprop="articleBody">
              
   <section id="solace-broker-service-manage-a-broker-service">
-<span id="solace-broker-service-role"></span><h1>solace_broker_service - manage a broker service<a class="headerlink" href="#solace-broker-service-manage-a-broker-service" title="Permalink to this headline"></a></h1>
+<span id="solace-broker-service-role"></span><h1>solace_broker_service - manage a broker service<a class="headerlink" href="#solace-broker-service-manage-a-broker-service" title="Permalink to this heading"></a></h1>
 <p>Manage a self-hosted Broker Service running in Docker.</p>
 <p>This role is a wrapper around <a class="reference external" href="https://docs.ansible.com/ansible/latest/collections/community/docker/docker_compose_module.html">community.general.docker_compose</a>.
 It also uses <a class="reference internal" href="../modules/solace_get_available.html#solace-get-available-module"><span class="std std-ref">solace_get_available – check if broker semp &amp; spool is available</span></a> for state=present to ensure the broker service has initialized properly.</p>
@@ -119,15 +120,15 @@ It also uses <a class="reference internal" href="../modules/solace_get_available
 </dl>
 </div>
 <section id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h2>
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>collection: <a class="reference external" href="https://docs.ansible.com/ansible/latest/collections/community/docker/docker_compose_module.html">community.general.docker_compose</a></p></li>
 </ul>
 </section>
 <section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
 <section id="start-single-broker-on-remote-ubuntu-18-vm">
-<h3>Start Single Broker on Remote Ubuntu-18 VM<a class="headerlink" href="#start-single-broker-on-remote-ubuntu-18-vm" title="Permalink to this headline"></a></h3>
+<h3>Start Single Broker on Remote Ubuntu-18 VM<a class="headerlink" href="#start-single-broker-on-remote-ubuntu-18-vm" title="Permalink to this heading"></a></h3>
 <p><strong>Example ansible controller ssh config:</strong></p>
 <p>Switch off host key checking:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir -p ~/.ssh
@@ -422,7 +423,7 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 </section>
 </section>
 <section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline"></a></h2>
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
 <table class="colwidths-given docutils align-default">
 <colgroup>
 <col style="width: 25%" />
@@ -457,7 +458,7 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 </table>
 </section>
 <section id="defaults">
-<h2>Defaults<a class="headerlink" href="#defaults" title="Permalink to this headline"></a></h2>
+<h2>Defaults<a class="headerlink" href="#defaults" title="Permalink to this heading"></a></h2>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;</span><span class="w"></span>
 <span class="c1"># GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)</span><span class="w"></span>
 <span class="nn">---</span><span class="w"></span>
@@ -540,7 +541,7 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 </div>
 </section>
 <section id="return-values">
-<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this headline"></a></h2>
+<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this heading"></a></h2>
 <table class="colwidths-given docutils align-default">
 <colgroup>
 <col style="width: 36%" />
@@ -573,7 +574,7 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 </tbody>
 </table>
 <section id="example-generated-broker-service-inventory-files">
-<h3>Example Generated Broker Service Inventory Files<a class="headerlink" href="#example-generated-broker-service-inventory-files" title="Permalink to this headline"></a></h3>
+<h3>Example Generated Broker Service Inventory Files<a class="headerlink" href="#example-generated-broker-service-inventory-files" title="Permalink to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">ansible_hostname</span></code> variable is used as the host entry.</p>
 <p><code class="docutils literal notranslate"><span class="pre">solace_broker_service_result.inventory</span></code></p>
 <p><strong>Remote VM:</strong></p>
@@ -610,7 +611,7 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 </div>
 </section>
 <section id="example-output-docker-compose-settings">
-<h3>Example Output Docker Compose Settings<a class="headerlink" href="#example-output-docker-compose-settings" title="Permalink to this headline"></a></h3>
+<h3>Example Output Docker Compose Settings<a class="headerlink" href="#example-output-docker-compose-settings" title="Permalink to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">solace_broker_service_result.docker_compose_settings</span></code></p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">definition</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">services</span><span class="p">:</span><span class="w"></span>
@@ -673,7 +674,7 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 07 May 2022 at 06:51.
+      <span class="lastupdated">Last updated on 03 Jun 2022 at 12:56.
       </span></p>
   </div>
 

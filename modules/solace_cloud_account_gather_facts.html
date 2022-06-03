@@ -15,6 +15,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/contentui.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -69,8 +70,11 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_cloud_client_profile.html">solace_cloud_client_profile – client profile for Solace Cloud</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_facts.html">solace_cloud_get_facts – get Solace Cloud service facts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_service.html">solace_cloud_get_service – get Solace Cloud service details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_service_hostnames.html">solace_cloud_get_service_hostnames – get all service hostnames</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_services.html">solace_cloud_get_services – get all services in Solace Cloud</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_cloud_service.html">solace_cloud_service – manage Solace Cloud services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_service_hostname.html">solace_cloud_service_hostname – manage service hostnames</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_service_hostnames.html">solace_cloud_service_hostnames – list of hostnames on a service</a></li>
 </ul>
 </li>
 </ul>
@@ -107,11 +111,11 @@
            <div itemprop="articleBody">
              
   <section id="solace-cloud-account-gather-facts-gather-account-services-facts">
-<span id="solace-cloud-account-gather-facts-module"></span><h1>solace_cloud_account_gather_facts – gather account services facts<a class="headerlink" href="#solace-cloud-account-gather-facts-gather-account-services-facts" title="Permalink to this headline"></a></h1>
+<span id="solace-cloud-account-gather-facts-module"></span><h1>solace_cloud_account_gather_facts – gather account services facts<a class="headerlink" href="#solace-cloud-account-gather-facts-gather-account-services-facts" title="Permalink to this heading"></a></h1>
 <p>Retrieves service info (facts) about all services available in the Solace Cloud Account.</p>
 <p>For example, use to retrieve the SEMP endpoints for a Solace Cloud service as inputs for other modules.</p>
 <section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
 <span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">no</span><span class="w"></span>
 <span class="nt">any_errors_fatal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
@@ -164,7 +168,7 @@
 </div>
 </section>
 <section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<h2>Notes<a class="headerlink" href="#notes" title="Permalink to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
@@ -173,7 +177,7 @@
 </div>
 </section>
 <section id="see-also">
-<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline"></a></h2>
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this heading"></a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -183,7 +187,7 @@
 </div>
 </section>
 <section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline"></a></h2>
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
 <dl>
 <dt>account_name (required)</dt><dd><p>The host specified in the inventory. Represents the Solace Cloud Account.</p>
 <p>Note: Only used internally in the playbooks, so you can choose whichever name makes sense in your case.</p>
@@ -228,7 +232,7 @@
 </dl>
 </section>
 <section id="return-values">
-<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this headline"></a></h2>
+<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this heading"></a></h2>
 <dl>
 <dt>solace_cloud_account</dt><dd><p>Contains the info from the Solace Cloud account by {_account_name_}.</p>
 <div class="line-block">
@@ -292,7 +296,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 07 May 2022 at 06:51.
+      <span class="lastupdated">Last updated on 03 Jun 2022 at 12:56.
       </span></p>
   </div>
 

@@ -15,6 +15,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/contentui.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -97,14 +98,14 @@
            <div itemprop="articleBody">
              
   <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">requires_ansible</span><span class="p">:</span> <span class="s2">&quot;&gt;=2.10,&lt;2.13&quot;</span>
 </pre></div>
 </div>
 <section id="installation-dependencies">
-<h2>Installation &amp; Dependencies<a class="headerlink" href="#installation-dependencies" title="Permalink to this headline"></a></h2>
+<h2>Installation &amp; Dependencies<a class="headerlink" href="#installation-dependencies" title="Permalink to this heading"></a></h2>
 <section id="prerequisites">
-<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h3>
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading"></a></h3>
 <blockquote>
 <div><ul class="simple">
 <li><p>install python &gt;=3.8</p></li>
@@ -135,7 +136,7 @@ pip install <span class="s2">&quot;ansible&gt;=5.1.0,&lt;6.0.0&quot;</span> <spa
 </div>
 </section>
 <section id="install-the-solace-pubsub-ansible-collection">
-<h3>Install the Solace PubSub+ Ansible Collection<a class="headerlink" href="#install-the-solace-pubsub-ansible-collection" title="Permalink to this headline"></a></h3>
+<h3>Install the Solace PubSub+ Ansible Collection<a class="headerlink" href="#install-the-solace-pubsub-ansible-collection" title="Permalink to this heading"></a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ansible-galaxy collection install solace.pubsub_plus
 </pre></div>
 </div>
@@ -152,7 +153,7 @@ is already installed. We can change this default behavior by adding a
 installation options in the <a class="reference external" href="https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#installing-collections">Using collections</a> document.</p>
 </section>
 <section id="set-the-python-interpreter">
-<h3>Set the Python interpreter<a class="headerlink" href="#set-the-python-interpreter" title="Permalink to this headline"></a></h3>
+<h3>Set the Python interpreter<a class="headerlink" href="#set-the-python-interpreter" title="Permalink to this heading"></a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Ansible-Solace only works with Python version &gt;=3.6. Most systems come with a Python version 2.x pre-installed in <cite>/usr/bin/python</cite>.</p>
@@ -174,7 +175,7 @@ $ <span class="nb">export</span> <span class="nv">ANSIBLE_PYTHON_INTERPRETER</sp
 </section>
 </section>
 <section id="example-installation-macos">
-<h2>Example Installation: MacOs<a class="headerlink" href="#example-installation-macos" title="Permalink to this headline"></a></h2>
+<h2>Example Installation: MacOs<a class="headerlink" href="#example-installation-macos" title="Permalink to this heading"></a></h2>
 <dl class="simple">
 <dt>Sequence:</dt><dd><ul class="simple">
 <li><p>Homebrew</p></li>
@@ -271,7 +272,7 @@ $ ansible-galaxy collection list
 <p><a class="reference external" href="https://www.docker.com/products/docker-desktop">Install Docker Desktop</a> if you want to use Solace Broker Services locally.</p>
 </section>
 <section id="example-installation-ubuntu">
-<h2>Example Installation: Ubuntu<a class="headerlink" href="#example-installation-ubuntu" title="Permalink to this headline"></a></h2>
+<h2>Example Installation: Ubuntu<a class="headerlink" href="#example-installation-ubuntu" title="Permalink to this heading"></a></h2>
 <p><strong>Python 3</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo apt update
 $ sudo apt -y upgrade
@@ -299,7 +300,7 @@ $ ansible-galaxy collection list
 </div>
 </section>
 <section id="example-installation-centos7">
-<h2>Example Installation: Centos7<a class="headerlink" href="#example-installation-centos7" title="Permalink to this headline"></a></h2>
+<h2>Example Installation: Centos7<a class="headerlink" href="#example-installation-centos7" title="Permalink to this heading"></a></h2>
 <p><strong>Python 3</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo yum install python3
 $ sudo yum install libselinux-python3
@@ -335,7 +336,7 @@ $ ansible-galaxy collection list
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 07 May 2022 at 06:51.
+      <span class="lastupdated">Last updated on 03 Jun 2022 at 12:56.
       </span></p>
   </div>
 

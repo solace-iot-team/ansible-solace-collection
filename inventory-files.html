@@ -15,6 +15,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/contentui.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -94,7 +95,7 @@
            <div itemprop="articleBody">
              
   <section id="best-practices-for-ansible-solace-inventory-files">
-<span id="inventory-files"></span><h1>Best Practices for Ansible-Solace Inventory Files<a class="headerlink" href="#best-practices-for-ansible-solace-inventory-files" title="Permalink to this headline"></a></h1>
+<span id="inventory-files"></span><h1>Best Practices for Ansible-Solace Inventory Files<a class="headerlink" href="#best-practices-for-ansible-solace-inventory-files" title="Permalink to this heading"></a></h1>
 <p>Ansible works with the concept of hosts. In short, a host for Ansible is a virtual machine.
 When you run an Ansible Playbook you specify an Inventory File which contains a list of hosts, groups and sub-groups (children) so you can target your Playbook
 at a single host or a specific group of hosts.
@@ -103,13 +104,13 @@ Please consult the <a class="reference external" href="https://docs.ansible.com/
 <p><strong>In Ansible-Solace hosts are not virtual machines but Solace PubSub+ Brokers or Solace Cloud Accounts.</strong></p>
 <p>Here are some examples and best practices for defining Inventory Files for Ansible-Solace.</p>
 <section id="general-comments">
-<h2>General Comments<a class="headerlink" href="#general-comments" title="Permalink to this headline"></a></h2>
+<h2>General Comments<a class="headerlink" href="#general-comments" title="Permalink to this heading"></a></h2>
 <p>Inventory Files can be written in YAML or JSON - Ansible handles these transparently.</p>
 <p>Entries for a Solace Broker (a host) are then accessible in the Playbook as a variable.
 Variables can be accessed using Jinja2 notation in the Playbook.</p>
 </section>
 <section id="inventory-file-for-a-standalone-solace-pubsub-broker">
-<h2>Inventory File for a Standalone Solace PubSub+ Broker<a class="headerlink" href="#inventory-file-for-a-standalone-solace-pubsub-broker" title="Permalink to this headline"></a></h2>
+<h2>Inventory File for a Standalone Solace PubSub+ Broker<a class="headerlink" href="#inventory-file-for-a-standalone-solace-pubsub-broker" title="Permalink to this heading"></a></h2>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span><span class="w"></span>
 <span class="nt">all</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"></span>
@@ -160,7 +161,7 @@ Similar to Vpn. Either place it in the Inventory File or a module’s arguments.
 </ul>
 </section>
 <section id="using-the-inventory-file-variables-in-a-playbook">
-<h2>Using the Inventory File Variables in a Playbook<a class="headerlink" href="#using-the-inventory-file-variables-in-a-playbook" title="Permalink to this headline"></a></h2>
+<h2>Using the Inventory File Variables in a Playbook<a class="headerlink" href="#using-the-inventory-file-variables-in-a-playbook" title="Permalink to this heading"></a></h2>
 <p>When calling an Ansible Playbook, you specify the Inventory File as an argument:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># single inventory file</span>
 ansible-playbook --inventory ./broker.inventory.yml ./my.playbook.yml
@@ -248,7 +249,7 @@ We specify the queue name in the call of <cite>solace_queue</cite> directly.</p>
 </ul>
 </section>
 <section id="inventory-file-for-a-solace-cloud-solace-pubsub-broker">
-<h2>Inventory File for a Solace Cloud Solace PubSub+ Broker<a class="headerlink" href="#inventory-file-for-a-solace-cloud-solace-pubsub-broker" title="Permalink to this headline"></a></h2>
+<h2>Inventory File for a Solace Cloud Solace PubSub+ Broker<a class="headerlink" href="#inventory-file-for-a-solace-cloud-solace-pubsub-broker" title="Permalink to this heading"></a></h2>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">all</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">hosts</span><span class="p">:</span><span class="w"></span>
 <span class="w">        </span><span class="nt">my_solace_cloud_service</span><span class="p">:</span><span class="w"></span>
@@ -307,7 +308,7 @@ and
 you now have a Playbook that can cope with standalone brokers and Solace Cloud broker Inventory Files equally.</p>
 </section>
 <section id="inventory-file-for-a-solace-cloud-account">
-<span id="inventory-files-solace-cloud-account"></span><h2>Inventory File for a Solace Cloud Account<a class="headerlink" href="#inventory-file-for-a-solace-cloud-account" title="Permalink to this headline"></a></h2>
+<span id="inventory-files-solace-cloud-account"></span><h2>Inventory File for a Solace Cloud Account<a class="headerlink" href="#inventory-file-for-a-solace-cloud-account" title="Permalink to this heading"></a></h2>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span><span class="w"></span>
 <span class="nt">all</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"></span>
@@ -322,7 +323,7 @@ you now have a Playbook that can cope with standalone brokers and Solace Cloud b
 <p>Note: The same considerations as discussed above apply to providing the api-token in the Inventory File or via an environment variable.</p>
 </section>
 <section id="generating-inventory-files-for-new-brokers">
-<h2>Generating Inventory Files for new Brokers<a class="headerlink" href="#generating-inventory-files-for-new-brokers" title="Permalink to this headline"></a></h2>
+<h2>Generating Inventory Files for new Brokers<a class="headerlink" href="#generating-inventory-files-for-new-brokers" title="Permalink to this heading"></a></h2>
 <dl class="simple">
 <dt>In case you want to create services and standalone brokers in a pipeline, Ansible Solace provides tools to</dt><dd><ul class="simple">
 <li><p>create the service / standalone broker</p></li>
@@ -446,7 +447,7 @@ It uses the Ansible Solace role <a class="reference internal" href="roles/solace
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 07 May 2022 at 06:51.
+      <span class="lastupdated">Last updated on 03 Jun 2022 at 12:56.
       </span></p>
   </div>
 

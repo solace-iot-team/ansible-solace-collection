@@ -15,6 +15,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/contentui.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -91,7 +92,7 @@
            <div itemprop="articleBody">
              
   <section id="the-basics">
-<h1>The Basics<a class="headerlink" href="#the-basics" title="Permalink to this headline"></a></h1>
+<h1>The Basics<a class="headerlink" href="#the-basics" title="Permalink to this heading"></a></h1>
 <p>The <cite>ansible-solace</cite> modules use a variety of the APIs provided by the Solace PubSub+ Platform:
 * Sempv2 Config &amp; Monitor Api
 * Sempv1 Api for situations where no equivalent Sempv2 call exists
@@ -101,7 +102,7 @@
 For example: SEMP v2 API: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/clientUsername">clientUsername</a> maps to <a class="reference internal" href="modules/solace_client_username.html#solace-client-username-module"><span class="std std-ref">solace_client_username – client username</span></a>.</p>
 <p>Some specific Solace Cloud APIs have modules as well, such as creating and deleting a service. They are named <cite>solace_cloud_{module}</cite>.</p>
 <section id="types-of-modules">
-<h2>Types of Modules<a class="headerlink" href="#types-of-modules" title="Permalink to this headline"></a></h2>
+<h2>Types of Modules<a class="headerlink" href="#types-of-modules" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p><strong>Configuration modules</strong>: <cite>solace_{configuration-object}</cite>.
 - add/update/delete a configuration object
@@ -112,7 +113,7 @@ For example: SEMP v2 API: <a class="reference external" href="https://docs.solac
 </ul>
 </section>
 <section id="ansible-hosts-are-not-hosts-but-brokers">
-<h2>Ansible Hosts are not Hosts but Brokers<a class="headerlink" href="#ansible-hosts-are-not-hosts-but-brokers" title="Permalink to this headline"></a></h2>
+<h2>Ansible Hosts are not Hosts but Brokers<a class="headerlink" href="#ansible-hosts-are-not-hosts-but-brokers" title="Permalink to this heading"></a></h2>
 <p>The Ansible concept of a host is that, a machine which Ansible logs into, transfers scripts, executes scripts, etc.</p>
 <p><strong>For `ansible-solace`, hosts are actually Brokers or Solace Cloud Accounts.</strong></p>
 <dl class="simple">
@@ -128,7 +129,7 @@ For example: SEMP v2 API: <a class="reference external" href="https://docs.solac
 </div>
 </section>
 <section id="logging-the-semp-solace-api-calls">
-<h2>Logging the SEMP/Solace API Calls<a class="headerlink" href="#logging-the-semp-solace-api-calls" title="Permalink to this headline"></a></h2>
+<h2>Logging the SEMP/Solace API Calls<a class="headerlink" href="#logging-the-semp-solace-api-calls" title="Permalink to this heading"></a></h2>
 <p>In order to log the REST calls made by <code class="docutils literal notranslate"><span class="pre">ansible-solace</span></code>, set the following environment variables:</p>
 <table class="colwidths-given docutils align-default">
 <colgroup>
@@ -169,7 +170,7 @@ For example: SEMP v2 API: <a class="reference external" href="https://docs.solac
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 07 May 2022 at 06:51.
+      <span class="lastupdated">Last updated on 03 Jun 2022 at 12:56.
       </span></p>
   </div>
 

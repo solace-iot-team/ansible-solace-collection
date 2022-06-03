@@ -15,6 +15,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/contentui.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -62,8 +63,11 @@
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_client_profile.html">solace_cloud_client_profile – client profile for Solace Cloud</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_get_facts.html">solace_cloud_get_facts – get Solace Cloud service facts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_get_service.html">solace_cloud_get_service – get Solace Cloud service details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_get_service_hostnames.html">solace_cloud_get_service_hostnames – get all service hostnames</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_get_services.html">solace_cloud_get_services – get all services in Solace Cloud</a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_service.html">solace_cloud_service – manage Solace Cloud services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_service_hostname.html">solace_cloud_service_hostname – manage service hostnames</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/solace_cloud_service_hostnames.html">solace_cloud_service_hostnames – list of hostnames on a service</a></li>
 </ul>
 </li>
 </ul>
@@ -98,12 +102,12 @@
            <div itemprop="articleBody">
              
   <section id="solace-cloud-modules">
-<h1>Solace Cloud Modules<a class="headerlink" href="#solace-cloud-modules" title="Permalink to this headline"></a></h1>
+<h1>Solace Cloud Modules<a class="headerlink" href="#solace-cloud-modules" title="Permalink to this heading"></a></h1>
 <p>Some Solace Cloud modules require the Solace Cloud API Token as an argument.
 This can either be provided in the inventory file or as an environment variable for example.</p>
 <p>See a detailed discussion here: <a class="reference internal" href="inventory-files.html#inventory-files-solace-cloud-account"><span class="std std-ref">Inventory File for a Solace Cloud Account</span></a>.</p>
 <section id="setting-solace-cloud-home-cloud-region">
-<h2>Setting Solace Cloud Home Cloud Region<a class="headerlink" href="#setting-solace-cloud-home-cloud-region" title="Permalink to this headline"></a></h2>
+<h2>Setting Solace Cloud Home Cloud Region<a class="headerlink" href="#setting-solace-cloud-home-cloud-region" title="Permalink to this heading"></a></h2>
 <p>Ansible Solace currently supports two Home Cloud Regions: <cite>us</cite> &amp; <cite>au</cite>.</p>
 <p>You can either use an environment variable to set the home region for all solace cloud modules and/or you can specify an additional parameter module by module.</p>
 <p>Environment Variable: <cite>ANSIBLE_SOLACE_SOLACE_CLOUD_HOME</cite> , values: [“US”, “AU”].</p>
@@ -122,15 +126,18 @@ This can either be provided in the inventory file or as an environment variable 
 </div>
 </section>
 <section id="module-reference">
-<h2>Module Reference<a class="headerlink" href="#module-reference" title="Permalink to this headline"></a></h2>
+<h2>Module Reference<a class="headerlink" href="#module-reference" title="Permalink to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_account_gather_facts.html">solace_cloud_account_gather_facts – gather account services facts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_client_profile.html">solace_cloud_client_profile – client profile for Solace Cloud</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_get_facts.html">solace_cloud_get_facts – get Solace Cloud service facts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_get_service.html">solace_cloud_get_service – get Solace Cloud service details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_get_service_hostnames.html">solace_cloud_get_service_hostnames – get all service hostnames</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_get_services.html">solace_cloud_get_services – get all services in Solace Cloud</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_service.html">solace_cloud_service – manage Solace Cloud services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_service_hostname.html">solace_cloud_service_hostname – manage service hostnames</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/solace_cloud_service_hostnames.html">solace_cloud_service_hostnames – list of hostnames on a service</a></li>
 </ul>
 </div>
 </section>
@@ -148,7 +155,7 @@ This can either be provided in the inventory file or as an environment variable 
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 07 May 2022 at 06:51.
+      <span class="lastupdated">Last updated on 03 Jun 2022 at 12:56.
       </span></p>
   </div>
 

@@ -15,13 +15,14 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/contentui.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="solace_acl_client_connect_exception – client connect exception for acl profile" href="modules/solace_acl_client_connect_exception.html" />
-    <link rel="prev" title="solace_cloud_service – manage Solace Cloud services" href="modules/solace_cloud_service.html" /> 
+    <link rel="prev" title="solace_cloud_service_hostnames – list of hostnames on a service" href="modules/solace_cloud_service_hostnames.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -144,7 +145,7 @@
            <div itemprop="articleBody">
              
   <section id="solace-configuration-action-modules">
-<h1>Solace Configuration &amp; Action Modules<a class="headerlink" href="#solace-configuration-action-modules" title="Permalink to this headline"></a></h1>
+<h1>Solace Configuration &amp; Action Modules<a class="headerlink" href="#solace-configuration-action-modules" title="Permalink to this heading"></a></h1>
 <p>Configuration modules mostly use the Solace Sempv2 Config Api. Some modules also use the Solace Cloud Api where required,
 so the same module can be used for both, standalone brokers and Solace Cloud services.</p>
 <ul class="simple">
@@ -152,7 +153,7 @@ so the same module can be used for both, standalone brokers and Solace Cloud ser
 <li><p>Solace Cloud Rest Api: <a class="reference external" href="https://docs.solace.com/Solace-Cloud/solace_cloud_rest_api.htm">https://docs.solace.com/Solace-Cloud/solace_cloud_rest_api.htm</a></p></li>
 </ul>
 <section id="configuration-settings-for-modules">
-<h2>Configuration Settings for Modules<a class="headerlink" href="#configuration-settings-for-modules" title="Permalink to this headline"></a></h2>
+<h2>Configuration Settings for Modules<a class="headerlink" href="#configuration-settings-for-modules" title="Permalink to this heading"></a></h2>
 <p>Each API used, Sempv2, Sempv1, Solace Cloud, offers settings or parameters to be included.</p>
 <p>The settings are NOT documented in the modules.</p>
 <p>Instead, each module documentation contains the URLs of the SEMP API call / Solace Cloud API call.
@@ -170,7 +171,7 @@ is based on the Sempv2 Config Api: <a class="reference external" href="https://d
 </ul>
 </div></blockquote>
 <section id="example-usage">
-<h3>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline"></a></h3>
+<h3>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this heading"></a></h3>
 <p>Modify these settings in a playbook using the <cite>settings</cite> argument:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Quickstart Configure Playbook</span><span class="w"></span>
 <span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
@@ -200,7 +201,7 @@ is based on the Sempv2 Config Api: <a class="reference external" href="https://d
 </section>
 </section>
 <section id="idempotency">
-<h2>Idempotency<a class="headerlink" href="#idempotency" title="Permalink to this headline"></a></h2>
+<h2>Idempotency<a class="headerlink" href="#idempotency" title="Permalink to this heading"></a></h2>
 <p>The configuration modules update/add/delete Broker objects in an idempotent manner.</p>
 <p>They argument <cite>state=[present, absent]</cite> determines the desired outcome of the module.
 The module’s behavior is as follows:</p>
@@ -235,7 +236,7 @@ The module’s behavior is as follows:</p>
 </ul>
 </section>
 <section id="module-reference">
-<h2>Module Reference<a class="headerlink" href="#module-reference" title="Permalink to this headline"></a></h2>
+<h2>Module Reference<a class="headerlink" href="#module-reference" title="Permalink to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules/solace_acl_client_connect_exception.html">solace_acl_client_connect_exception – client connect exception for acl profile</a></li>
@@ -295,7 +296,7 @@ The module’s behavior is as follows:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="modules/solace_cloud_service.html" class="btn btn-neutral float-left" title="solace_cloud_service – manage Solace Cloud services" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules/solace_cloud_service_hostnames.html" class="btn btn-neutral float-left" title="solace_cloud_service_hostnames – list of hostnames on a service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="modules/solace_acl_client_connect_exception.html" class="btn btn-neutral float-right" title="solace_acl_client_connect_exception – client connect exception for acl profile" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
@@ -303,7 +304,7 @@ The module’s behavior is as follows:</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 07 May 2022 at 06:51.
+      <span class="lastupdated">Last updated on 03 Jun 2022 at 12:56.
       </span></p>
   </div>
 

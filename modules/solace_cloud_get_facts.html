@@ -15,6 +15,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/contentui.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -68,8 +69,11 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_service.html">solace_cloud_get_service – get Solace Cloud service details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_service_hostnames.html">solace_cloud_get_service_hostnames – get all service hostnames</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_cloud_get_services.html">solace_cloud_get_services – get all services in Solace Cloud</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_cloud_service.html">solace_cloud_service – manage Solace Cloud services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_service_hostname.html">solace_cloud_service_hostname – manage service hostnames</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_cloud_service_hostnames.html">solace_cloud_service_hostnames – list of hostnames on a service</a></li>
 </ul>
 </li>
 </ul>
@@ -106,11 +110,11 @@
            <div itemprop="articleBody">
              
   <section id="solace-cloud-get-facts-get-solace-cloud-service-facts">
-<span id="solace-cloud-get-facts-module"></span><h1>solace_cloud_get_facts – get Solace Cloud service facts<a class="headerlink" href="#solace-cloud-get-facts-get-solace-cloud-service-facts" title="Permalink to this headline"></a></h1>
+<span id="solace-cloud-get-facts-module"></span><h1>solace_cloud_get_facts – get Solace Cloud service facts<a class="headerlink" href="#solace-cloud-get-facts-get-solace-cloud-service-facts" title="Permalink to this heading"></a></h1>
 <p>Convenience functions to access Solace Cloud service facts gathered with <a class="reference internal" href="solace_cloud_get_service.html#solace-cloud-get-service-module"><span class="std std-ref">solace_cloud_get_service</span></a> or returned by <a class="reference internal" href="solace_cloud_service.html#solace-cloud-service-module"><span class="std std-ref">solace_cloud_service</span></a>.</p>
 <p>Always returns the state of the service in <cite>facts.serviceState</cite>.</p>
 <section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
 <span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span><span class="w"></span>
 <span class="nt">any_errors_fatal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
@@ -241,7 +245,7 @@
 </div>
 </section>
 <section id="see-also">
-<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this headline"></a></h2>
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this heading"></a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -253,7 +257,7 @@
 </div>
 </section>
 <section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline"></a></h2>
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
 <dl>
 <dt>from_dict (required)</dt><dd><p>The JSON object (dict) which holds the service facts. Could be the result of <a class="reference internal" href="solace_cloud_get_service.html#solace-cloud-get-service-module"><span class="std std-ref">solace_cloud_get_service</span></a> or <a class="reference internal" href="solace_cloud_service.html#solace-cloud-service-module"><span class="std std-ref">solace_cloud_service</span></a> (state=present).</p>
 <div class="line-block">
@@ -317,7 +321,7 @@
 </dl>
 </section>
 <section id="return-values">
-<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this headline"></a></h2>
+<h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this heading"></a></h2>
 <dl>
 <dt>rc</dt><dd><p>Return code. rc=0 on success, rc=1 on error.</p>
 <div class="line-block">
@@ -445,7 +449,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 07 May 2022 at 06:51.
+      <span class="lastupdated">Last updated on 03 Jun 2022 at 12:56.
       </span></p>
   </div>
 

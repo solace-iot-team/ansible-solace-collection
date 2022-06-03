@@ -15,6 +15,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/contentui.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -102,7 +103,7 @@
            <div itemprop="articleBody">
              
   <section id="reverse-proxy-api-gateway">
-<span id="tips-tricks-content-reverse-proxy"></span><h1>Reverse Proxy / API Gateway<a class="headerlink" href="#reverse-proxy-api-gateway" title="Permalink to this headline"></a></h1>
+<span id="tips-tricks-content-reverse-proxy"></span><h1>Reverse Proxy / API Gateway<a class="headerlink" href="#reverse-proxy-api-gateway" title="Permalink to this heading"></a></h1>
 <p>For securing and managing SEMP API permissions for self-hosted Solace Brokers an API Gateway or Reverse Proxy may be used.
 This chapter describes how to configure the inventory and the ansible-solace modules to ‘go via’ the reverse proxy.</p>
 <div class="admonition note">
@@ -112,7 +113,7 @@ This chapter describes how to configure the inventory and the ansible-solace mod
 </ul>
 </div>
 <section id="configuring-the-reverse-proxy">
-<h2>Configuring the Reverse Proxy<a class="headerlink" href="#configuring-the-reverse-proxy" title="Permalink to this headline"></a></h2>
+<h2>Configuring the Reverse Proxy<a class="headerlink" href="#configuring-the-reverse-proxy" title="Permalink to this heading"></a></h2>
 <p>When using the <code class="docutils literal notranslate"><span class="pre">reverse_proxy</span></code> setting, the ansible-solace modules compose the URL based on the following pattern:</p>
 <p><code class="docutils literal notranslate"><span class="pre">http(s)://{proxy-host}:{proxy-port}/{proxy-base-path}/&lt;the</span> <span class="pre">original</span> <span class="pre">SEMP</span> <span class="pre">path</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">module's</span> <span class="pre">operation&gt;</span></code></p>
 <p>In addition, two header fields can be selected to be populated at run-time by the module:</p>
@@ -123,7 +124,7 @@ This chapter describes how to configure the inventory and the ansible-solace mod
 </ul>
 </div></blockquote>
 <section id="query-parameters-of-urls">
-<h3>Query parameters of URLs<a class="headerlink" href="#query-parameters-of-urls" title="Permalink to this headline"></a></h3>
+<h3>Query parameters of URLs<a class="headerlink" href="#query-parameters-of-urls" title="Permalink to this heading"></a></h3>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">get</span> <span class="pre">object</span> <span class="pre">list</span></code> modules add query parameters to the URL. Ensure the <code class="docutils literal notranslate"><span class="pre">reverse_proxy</span></code> is configured to let them pass through <strong>WITHOUT</strong> URL encoding the <code class="docutils literal notranslate"><span class="pre">,</span></code> and <code class="docutils literal notranslate"><span class="pre">*</span></code>.</p>
 <p>Example URL with <cite>where</cite> and <cite>select</cite> query parameters:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>https://{proxy-host}:{proxy-port}/{proxy-base-path}/SEMP/v2/config/msgVpns/{vpn}/clientUsernames?count=100&amp;select=clientUsername,enabled,guaranteedEndpointPermissionOverrideEnabled&amp;where=clientUsername==ansible-solace*,enabled==true,guaranteedEndpointPermissionOverrideEnabled==true
@@ -135,7 +136,7 @@ This chapter describes how to configure the inventory and the ansible-solace mod
 </div>
 </section>
 <section id="return-codes">
-<h3>Return Codes<a class="headerlink" href="#return-codes" title="Permalink to this headline"></a></h3>
+<h3>Return Codes<a class="headerlink" href="#return-codes" title="Permalink to this heading"></a></h3>
 <p>The HTTP return codes of the reverse proxy should not interfere with the framework’s handling of return codes:</p>
 <blockquote>
 <div><ul class="simple">
@@ -147,7 +148,7 @@ This chapter describes how to configure the inventory and the ansible-solace mod
 </section>
 </section>
 <section id="using-the-reverse-proxy">
-<h2>Using the Reverse Proxy<a class="headerlink" href="#using-the-reverse-proxy" title="Permalink to this headline"></a></h2>
+<h2>Using the Reverse Proxy<a class="headerlink" href="#using-the-reverse-proxy" title="Permalink to this heading"></a></h2>
 <p>The ansible-solace modules support the setting <code class="docutils literal notranslate"><span class="pre">reverse_proxy</span></code>.</p>
 <p>Template inventory file specifying the <code class="docutils literal notranslate"><span class="pre">semp_reverse_proxy</span></code> settings which can then be used in all playbooks:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span><span class="w"></span>
@@ -257,7 +258,7 @@ Using these headers certain module / operation combinations may be allowed/disal
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 07 May 2022 at 06:51.
+      <span class="lastupdated">Last updated on 03 Jun 2022 at 12:56.
       </span></p>
   </div>
 

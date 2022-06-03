@@ -1,0 +1,193 @@
+:github_url: https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_cloud_service_hostnames.py
+
+.. _solace_cloud_service_hostnames_module:
+
+solace_cloud_service_hostnames -- list of hostnames on a service
+================================================================
+
+Manage a list of additional hostnames on a service in a single transaction.
+
+Allows addition and removal of a list of additional hostnames as well as replacement of all existing additional hostnames on a service.
+
+Supports 'transactional' behavior with rollback to original list in case of error.
+
+De-duplicates hostname list.
+
+Reports which hostnames were added, deleted and omitted (duplicates). In case of an error, reports the invalid hostname.
+
+To delete all Subscription objects, use state='exactly' with an empty/null list (see examples).
+
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   # Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+   # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+   -
+     name: solace_cloud_service_hostnames doc example
+     hosts: all
+     gather_facts: no
+     any_errors_fatal: true
+     collections:
+       - solace.pubsub_plus
+     module_defaults:
+       solace.pubsub_plus.solace_cloud_service_hostnames:
+         solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+         solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
+     tasks:
+
+       - name: exit if not solace cloud
+         meta: end_play
+         when: broker_type != 'solace_cloud'
+
+       - set_fact:
+           additionalHostnames:
+           - manage-list-hostname-1
+           - manage-list-hostname-2
+
+       - name: ensure all hostnames in list are absent
+         solace_cloud_service_hostnames:
+           hostnames: "{{ additionalHostnames }}"
+           state: absent
+
+       - name: add all hostnames in list
+         solace_cloud_service_hostnames:
+           hostnames: "{{ additionalHostnames }}"
+           state: exactly
+
+       - name: ensure all hostnames in list are absent
+         solace_cloud_service_hostnames:
+           hostnames: null
+           state: exactly
+
+   ###
+   # The End.
+
+
+
+Notes
+-----
+
+.. note::
+   - Updating the `settings` on a list is not supported.
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`solace_cloud_get_service_hostnames_module`
+   - :ref:`solace_cloud_service_hostname_module`
+
+
+
+Parameters
+----------
+
+hostnames (required)
+  The list of additional hostnames to manage on the service.
+
+  | **type**: list
+
+solace_cloud_api_token (required)
+  The API Token.
+
+  Generate using Solace Cloud console with the appropriate permissions for the operations you want to enable.
+
+  | **type**: str
+  | **aliases**: api_token
+
+solace_cloud_home (optional)
+  The Solace Cloud home region.
+
+  | **type**: str
+  | **choices**: us, au, US, AU, 
+
+solace_cloud_service_id (required)
+  The service id of a service in Solace Cloud.
+
+  Click on the service in Solace Cloud - the service id is in the URL.
+
+  | **type**: str
+  | **aliases**: service_id
+
+state (optional)
+  Target state for CRUD list operation.
+
+  | **type**: str
+  | **default**: present
+  | **choices**: present, absent, exactly
+
+timeout (optional)
+  Connection timeout in seconds for the http request or overall call interaction timeout for Solace Cloud API.
+
+  | **type**: int
+  | **default**: 60
+
+validate_certs (optional)
+  Flag to switch validation of client certificates on/off when using a secure connection.
+
+  | **type**: bool
+  | **default**: True
+
+
+
+
+
+Return Values
+-------------
+
+response
+  The response of the operation.
+
+  | **returned**: always
+  | **type**: dict
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "success": {
+       "response": [
+         {
+           "added": "manage-list-hostname-1.messaging.solace.cloud"
+         },
+         {
+           "added": "manage-list-hostname-2.messaging.solace.cloud"
+         }
+       ]
+     }
+   }
+
+msg
+  The response from the HTTP call in case of error.
+
+  | **returned**: error
+  | **type**: dict
+
+rc
+  Return code. rc=0 on success, rc=1 on error.
+
+  | **returned**: always
+  | **type**: int
+  | **sample**:
+
+  .. code-block:: json
+
+     {
+     "error": {
+       "rc": 1
+     },
+     "success": {
+       "rc": 0
+     }
+   }
+
+

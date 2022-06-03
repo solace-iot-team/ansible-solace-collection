@@ -15,6 +15,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/contentui.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -92,9 +93,9 @@
            <div itemprop="articleBody">
              
   <section id="quickstart-for-solace-pubsub-ansible-collection">
-<h1>Quickstart for Solace PubSub+ Ansible Collection<a class="headerlink" href="#quickstart-for-solace-pubsub-ansible-collection" title="Permalink to this headline"></a></h1>
+<h1>Quickstart for Solace PubSub+ Ansible Collection<a class="headerlink" href="#quickstart-for-solace-pubsub-ansible-collection" title="Permalink to this heading"></a></h1>
 <section id="installation-dependencies">
-<h2>Installation &amp; Dependencies<a class="headerlink" href="#installation-dependencies" title="Permalink to this headline"></a></h2>
+<h2>Installation &amp; Dependencies<a class="headerlink" href="#installation-dependencies" title="Permalink to this heading"></a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">requires_ansible</span><span class="p">:</span> <span class="s2">&quot;&gt;=2.10,&lt;2.13&quot;</span>
 </pre></div>
 </div>
@@ -134,7 +135,7 @@ pip install <span class="s2">&quot;ansible&gt;=5.1.0,&lt;6.0.0&quot;</span> <spa
 </div>
 </section>
 <section id="playbooks">
-<h2>Playbooks<a class="headerlink" href="#playbooks" title="Permalink to this headline"></a></h2>
+<h2>Playbooks<a class="headerlink" href="#playbooks" title="Permalink to this heading"></a></h2>
 <dl class="simple">
 <dt>We need to run two playbooks:</dt><dd><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">service.playbook.yml</span></code>: creates a local broker service running in docker and generates the broker inventory file</p></li>
@@ -219,7 +220,7 @@ pip install <span class="s2">&quot;ansible&gt;=5.1.0,&lt;6.0.0&quot;</span> <spa
 </div>
 </section>
 <section id="run">
-<h2>Run<a class="headerlink" href="#run" title="Permalink to this headline"></a></h2>
+<h2>Run<a class="headerlink" href="#run" title="Permalink to this heading"></a></h2>
 <p>When we run the first playbook, the role <code class="docutils literal notranslate"><span class="pre">solace.pubsub_plus.solace_broker_service</span></code>
 will download the latest Solace PubSub+ Standard Edition broker and start it on
 the local machine using Docker.
@@ -265,7 +266,7 @@ console at <a class="reference external" href="http://localhost:8080">http://loc
 </dl>
 </section>
 <section id="using-an-existing-broker-service">
-<h2>Using an Existing Broker / Service<a class="headerlink" href="#using-an-existing-broker-service" title="Permalink to this headline"></a></h2>
+<h2>Using an Existing Broker / Service<a class="headerlink" href="#using-an-existing-broker-service" title="Permalink to this heading"></a></h2>
 <p>To use an existing standalone broker or Solace Cloud Service, you must provide the inventory file to the playbook <cite>configure.playbook.yml</cite>.</p>
 <p>For a discussion on Ansible Solace Inventory Files, see <a class="reference internal" href="inventory-files.html#inventory-files"><span class="std std-ref">Best Practices for Ansible-Solace Inventory Files</span></a>.</p>
 </section>
@@ -283,7 +284,7 @@ console at <a class="reference external" href="http://localhost:8080">http://loc
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 07 May 2022 at 06:51.
+      <span class="lastupdated">Last updated on 03 Jun 2022 at 12:56.
       </span></p>
   </div>
 
