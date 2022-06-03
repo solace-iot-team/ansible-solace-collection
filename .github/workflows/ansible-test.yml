@@ -10,9 +10,9 @@ on:
   #   branches:
   #     - mtn-120
 
-  schedule:
-    # - cron: '0 1 * * THU'
-    - cron: '0 2 * * *'
+  # schedule:
+  #   # - cron: '0 1 * * THU'
+  #   - cron: '0 2 * * *'
   pull_request:
     branches:
       - main
