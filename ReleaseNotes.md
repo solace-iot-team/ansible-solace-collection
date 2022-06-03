@@ -7,6 +7,10 @@
 * **[solace_cloud_service_hostnames](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_cloud_service_hostnames.html)**
 * **[solace_cloud_get_service_hostnames](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_cloud_get_service_hostnames.html)**
 
+**Tests:**
+* **integration tests**
+  - removed from tests: "ansible>=2.10.3,<2.11", # this is 2.10
+
 ## Version 1.9.0
 
 **Framework:**
