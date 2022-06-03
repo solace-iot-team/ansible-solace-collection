@@ -417,12 +417,9 @@ class SolaceCloudCRUDTask(SolaceCRUDTask):
         return self.config
 
 
-class SolaceBrokerCRUDListTask(SolaceBrokerCRUDTask):
+class SolaceCRUDListTask(SolaceCRUDTask):
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
-        self.sempv2_api = SolaceSempV2Api(module)
-        self.sempv2_get_paging_api = SolaceSempV2PagingGetApi(
-            module, self.is_supports_paging())
         self.existing_key_list = None
         self.created_key_list = []
         self.deleted_key_list = []
@@ -475,10 +472,7 @@ class SolaceBrokerCRUDListTask(SolaceBrokerCRUDTask):
         super().validate_params()
 
     def get_objects(self) -> list:
-        objects = self.sempv2_get_paging_api.get_all_objects_from_config_api(
-            self.get_config(),
-            self.get_objects_path_array())
-        return objects
+        raise SolaceInternalErrorAbstractMethod()
 
     def get_object_key_list(self, object_key) -> list:
         objects = self.get_objects()
@@ -576,6 +570,40 @@ class SolaceBrokerCRUDListTask(SolaceBrokerCRUDTask):
                 'response': response_list
             })
         return None, self.get_result()
+
+
+class SolaceBrokerCRUDListTask(SolaceCRUDListTask):
+    def __init__(self, module: AnsibleModule):
+        super().__init__(module)
+        self.config = SolaceTaskBrokerConfig(module)
+        self.sempv2_api = SolaceSempV2Api(module)
+        self.sempv2_get_paging_api = SolaceSempV2PagingGetApi(
+            module, self.is_supports_paging())
+
+    def get_settings_arg_name(self) -> str:
+        return 'sempv2_settings'
+
+    def get_config(self) -> SolaceTaskBrokerConfig:
+        return self.config
+
+    def get_objects(self) -> list:
+        objects = self.sempv2_get_paging_api.get_all_objects_from_config_api(
+            self.get_config(),
+            self.get_objects_path_array())
+        return objects
+
+
+class SolaceCloudCRUDListTask(SolaceCRUDListTask):
+    def __init__(self, module: AnsibleModule):
+        super().__init__(module)
+        self.config = SolaceTaskSolaceCloudServiceConfig(module)
+        self.solace_cloud_api = SolaceCloudApi(module)
+
+    def get_settings_arg_name(self) -> str:
+        return 'solace_cloud_settings'
+
+    def get_config(self) -> SolaceTaskSolaceCloudServiceConfig:
+        return self.config
 
 
 class SolaceBrokerCRUDTopicExListTask(SolaceBrokerCRUDListTask):
