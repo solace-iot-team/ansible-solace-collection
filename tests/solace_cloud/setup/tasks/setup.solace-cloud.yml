@@ -31,6 +31,7 @@
           datacenterId: "{{ sc_service.datacenterId }}"
           serviceTypeId: "{{ sc_service.serviceTypeId }}"
           serviceClassId: "{{ sc_service.serviceClassId }}"
+          eventBrokerVersion: "{{ sc_service.eventBrokerVersion }}"
           attributes: "{{ sc_service.attributes | default(omit) }}"
         state: present
       register: result
@@ -50,6 +51,7 @@
             datacenterId: "{{ sc_service_info.datacenterId }}"
             serviceTypeId: "{{ sc_service_info.serviceTypeId}}"
             serviceClassId: "{{ sc_service_info.serviceClassId }}"
+            eventBrokerVersion: "{{ sc_service.eventBrokerVersion }}"
             serviceClassDisplayedAttributes: "{{ sc_service_info.serviceClassDisplayedAttributes }}"
       register: result
       ignore_errors: yes
@@ -68,6 +70,7 @@
       datacenterId: "{{ sc_service.datacenterId }}"
       serviceTypeId: "{{ sc_service.serviceTypeId }}"
       serviceClassId: "{{ sc_service.serviceClassId }}"
+      eventBrokerVersion: "{{ sc_service.eventBrokerVersion }}"
       attributes: "{{ sc_service.attributes | default(omit) }}"
     state: present
   register: result
@@ -87,6 +90,7 @@
         datacenterId: "{{ sc_service_info.datacenterId }}"
         serviceTypeId: "{{ sc_service_info.serviceTypeId}}"
         serviceClassId: "{{ sc_service_info.serviceClassId }}"
+        eventBrokerVersion: "{{ sc_service.eventBrokerVersion }}"        
         serviceClassDisplayedAttributes: "{{ sc_service_info.serviceClassDisplayedAttributes }}"
   register: result
 

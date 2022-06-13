@@ -18,6 +18,7 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$ANSIBLE_SOLACE_TESTS" ]; then
     export ANSIBLE_SOLACE_TESTS=(
       "setup"
+      "solace_cloud_service_hostnames"
       "solace_cloud_service"
       "teardown"
     )
