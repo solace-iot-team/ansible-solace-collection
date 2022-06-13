@@ -592,6 +592,8 @@ class SolaceCloudApi(SolaceApi):
         # if it doesn't exist
         # msgVpnAttributes.vmrVersion="9.6.0.46"
         # eventBrokerVersion="9.6"
+        if "eventBrokerVersion" in service:
+            return service
         vmrVersion = None
         if "msgVpnAttributes" in service:
             if "vmrVersion" in service["msgVpnAttributes"]:
@@ -640,7 +642,7 @@ class SolaceCloudApi(SolaceApi):
         return None
 
     def get_service(self, config: SolaceTaskSolaceCloudConfig, service_id: str) -> dict:
-        # GET https://api.solace.cloud/api/v0/services/{{serviceId}}
+        # GET https://api.solace.cloud/api/v0/services/{{serviceId}}?included=serviceClass
         # retrieves a single service
         module_op = SolaceTaskOps.OP_READ_OBJECT
         try:
