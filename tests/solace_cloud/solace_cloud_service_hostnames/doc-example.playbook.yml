@@ -23,8 +23,9 @@
 
     - set_fact:
         additionalHostnames:
-        - hostname-1
-        - hostname-2
+        # hostnames must be unique across all services 
+        - "{{ solace_cloud_service_id }}-hostname-1"
+        - "{{ solace_cloud_service_id }}-hostname-2"
 
     - name: ensure all hostnames in list are absent
       solace_cloud_service_hostname:

@@ -21,6 +21,8 @@ description:
 - "De-duplicates hostname list."
 - "Reports which hostnames were added, deleted and omitted (duplicates). In case of an error, reports the invalid hostname."
 - "To delete all Subscription objects, use state='exactly' with an empty/null list (see examples)."
+notes:
+- "This module only supports solace broker services < 9.13."
 options:
   hostnames:
     description: The list of additional hostnames to manage on the service.
@@ -119,7 +121,6 @@ from ansible.module_utils.basic import AnsibleModule
 
 class SolaceCloudServiceHostnamesTask(SolaceCloudCRUDListTask):
 
-    # OBJECT_KEY = 'subscriptionTopic'
     HOSTNAME_SUFFIX = ".messaging.solace.cloud"
 
     def __init__(self, module):

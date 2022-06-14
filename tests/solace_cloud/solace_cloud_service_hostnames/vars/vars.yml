@@ -1,7 +1,8 @@
 ---
 additionalHostnames:
-- asct-1
-- asct-2
-- asct-3
-- asct-4
-- asct-5
+- "{{ solace_cloud_service_id }}-asct-1"
+- "{{ solace_cloud_service_id }}-asct-2"
+# - asct-2
+# - asct-3
+# - asct-4
+# - asct-5

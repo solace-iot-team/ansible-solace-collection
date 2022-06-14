@@ -21,6 +21,14 @@ options:
     - The additional hostname on the service to manage.
     type: str
     required: true
+  access_type:
+    description:
+    - "The access type for the hostname. Note: 'private' not implemented."
+    type: str
+    required: false
+    choices:
+      - public
+    default: public
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
 - solace.pubsub_plus.solace.solace_cloud_service_config_service_id_mandatory
@@ -121,7 +129,7 @@ from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_s
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task import SolaceCloudCRUDTask
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskSolaceCloudServiceConfig
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_api import SolaceCloudApi
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceError, SolaceApiError, SolaceCloudApiResponseDataError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
 from ansible.module_utils.basic import AnsibleModule
 
@@ -145,9 +153,17 @@ class SolaceCloudServiceHostnameTask(SolaceCloudCRUDTask):
     def get_func(self, service_id, hostname):
         additionalHostnames = self.solace_cloud_api.get_service_additional_hostnames(
             self.get_config(), service_id)
+        # [
+        #   {'hostName': 'asct-1.messaging.solace.cloud', 'accessType': 'public'},
+        #   {'hostName': 'x9h5rv8gvp4-asct-1.messaging.solace.cloud', 'accessType': 'public'}
+        # ]
+        # raise SolaceCloudApiResponseDataError(
+        #     self.get_module()._name, 'check additionalHostnames', additionalHostnames)
         # find hostname in list
         _hostname = hostname + self.HOSTNAME_SUFFIX
-        if(_hostname in additionalHostnames):
+        foundList = [
+            element for element in additionalHostnames if element['hostName'] == _hostname]
+        if len(foundList) > 0:
             return {
                 "additionalHostname": _hostname
             }
@@ -156,6 +172,7 @@ class SolaceCloudServiceHostnameTask(SolaceCloudCRUDTask):
 
     def create_func(self, service_id, hostname, settings=None):
         # POST: Request URL: https://api.solace.cloud/api/v0/services/{service_id}/serviceHostNames
+        # POST: Request URL: https://api.solace.cloud/api/v0/serviceConnectionEndpoints/{serviceConnectionEndpointId}/serviceHostNames
         # {
         #   "serviceHostName": "testtest",
         #   "operation": "create"
@@ -165,11 +182,37 @@ class SolaceCloudServiceHostnameTask(SolaceCloudCRUDTask):
             "serviceHostName": hostname,
             "operation": "create"
         }
-        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()),
-                      SolaceCloudApi.API_SERVICES,
-                      service_id,
-                      'serviceHostNames']
-        return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, json_body=data, module_op=module_op)
+        try:
+            path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()),
+                          SolaceCloudApi.API_SERVICES,
+                          service_id,
+                          'serviceHostNames']
+            return self.solace_cloud_api.make_service_post_request(
+                self.get_config(), path_array, service_id, json_body=data, module_op=module_op)
+        except SolaceApiError as e:
+            http_resp = e.get_http_resp()
+            # http_body = self.get_response_body(http_resp)
+            http_body = self.solace_cloud_api.get_response_body(http_resp)
+            # raise SolaceCloudApiResponseDataError(
+            #     self.get_module()._name, 'http_body', http_body)
+            if http_body is not None:
+                if 'subCode' in http_body:
+                    if http_body['subCode'] == '5000_102':
+                        # try the other api call here
+                        # raise TypeError('try the other api call...')
+                        # need to get the serviceConnectionEndpointId for this hostname
+                        serviceConnectionEndpointId = self.solace_cloud_api.get_service_connection_endpoint_id(
+                            self.get_config(), service_id, self.get_config().get_params()['access_type'])
+                        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()),
+                                      SolaceCloudApi.API_SERVICE_CONNECTION_ENDPOINTS,
+                                      serviceConnectionEndpointId,
+                                      'serviceHostNames']
+                        return self.solace_cloud_api.make_service_post_request(
+                            self.get_config(), path_array, service_id, json_body=data, module_op=module_op)
+        msg = [
+            "Unable to create hostname.",
+        ]
+        raise SolaceError(msg, dict(service_id=service_id, hostname=hostname))
 
     def update_func(self, service_id, hostname, settings=None, delta_settings=None):
         msg = [
@@ -181,6 +224,7 @@ class SolaceCloudServiceHostnameTask(SolaceCloudCRUDTask):
 
     def delete_func(self, service_id, hostname):
         # POST: Request URL: https://api.solace.cloud/api/v0/services/{service_id}/serviceHostNames
+        # POST: Request URL: https://api.solace.cloud/api/v0/serviceConnectionEndpoints/{serviceConnectionEndpointId}/serviceHostNames
         # {
         #   "serviceHostName": "test-hostnames",
         #   "operation": "delete"
@@ -190,16 +234,45 @@ class SolaceCloudServiceHostnameTask(SolaceCloudCRUDTask):
             "serviceHostName": hostname,
             "operation": "delete"
         }
-        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()),
-                      SolaceCloudApi.API_SERVICES,
-                      service_id,
-                      'serviceHostNames']
-        return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, json_body=data, module_op=module_op)
+        try:
+            path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()),
+                          SolaceCloudApi.API_SERVICES,
+                          service_id,
+                          'serviceHostNames']
+            return self.solace_cloud_api.make_service_post_request(self.get_config(), path_array, service_id, json_body=data, module_op=module_op)
+        except SolaceApiError as e:
+            http_resp = e.get_http_resp()
+            # http_body = self.get_response_body(http_resp)
+            http_body = self.solace_cloud_api.get_response_body(http_resp)
+            # raise SolaceCloudApiResponseDataError(
+            #     self.get_module()._name, 'http_body', http_body)
+            if http_body is not None:
+                if 'subCode' in http_body:
+                    if http_body['subCode'] == '5000_102':
+                        # try the other api call here
+                        # raise TypeError('try the other api call...')
+                        # need to get the serviceConnectionEndpointId for this hostname
+                        serviceConnectionEndpointId = self.solace_cloud_api.get_service_connection_endpoint_id(
+                            self.get_config(), service_id, self.get_config().get_params()['access_type'])
+                        path_array = [self.solace_cloud_api.get_api_base_path(self.get_config()),
+                                      SolaceCloudApi.API_SERVICE_CONNECTION_ENDPOINTS,
+                                      serviceConnectionEndpointId,
+                                      'serviceHostNames']
+                        return self.solace_cloud_api.make_service_post_request(
+                            self.get_config(), path_array, service_id, json_body=data, module_op=module_op)
+        msg = [
+            "Unable to delete hostname.",
+        ]
+        raise SolaceError(msg, dict(service_id=service_id, hostname=hostname))
 
 
 def run_module():
     module_args = dict(
         hostname=dict(type='str', required=True),
+        access_type=dict(type='str', required=False,
+                         default='public', choices=['public'])
+        #  private not implemented yet
+        #  default='public', choices=['public', 'private'])
         # wait_timeout_minutes=dict(type='int', required=False, default=30)
     )
     arg_spec = SolaceTaskSolaceCloudServiceConfig.arg_spec_solace_cloud()

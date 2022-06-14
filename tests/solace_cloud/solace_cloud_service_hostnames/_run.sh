@@ -25,9 +25,9 @@ solaceCloudInventory=$(assertFile $scriptLogName "$WORKING_DIR/$SOLACE_CLOUD_INV
 
 playbooks=(
   "$scriptDir/main.playbook.yml"
-  # "$scriptDir/manage-list.playbook.yml"
-  # "$scriptDir/doc-example.playbook.yml"
-  # "$scriptDir/doc-example.manage-list.playbook.yml"
+  "$scriptDir/manage-list.playbook.yml"
+  "$scriptDir/doc-example.playbook.yml"
+  "$scriptDir/doc-example.manage-list.playbook.yml"
 )
 
 ##############################################################################################################################
