@@ -38,6 +38,11 @@
         hostnames: "{{ additionalHostnames }}"
         state: absent
 
+    - name: ensure no hostnames are present
+      solace_cloud_service_hostnames:
+        hostnames: null
+        state: exactly
+
     - name: get list of existing hostnames
       solace_cloud_get_service_hostnames:
       register: result
@@ -49,6 +54,7 @@
     - name: add all hostnames in list
       solace_cloud_service_hostnames:
         hostnames: "{{ additionalHostnames }}"
+        timeout: 600 # 10 minutes
         state: exactly
 
     - name: add another one

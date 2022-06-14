@@ -681,6 +681,20 @@ class SolaceCloudApi(SolaceApi):
                                  self.get_module()._name, module_op) from e
         return self._transform_service(_resp)
 
+    def get_service_additional_hostnames_prior_9_13(self, config: SolaceTaskSolaceCloudConfig, service_id: str) -> list:
+        # GET https://api.solace.cloud/api/v0/services/{{serviceId}}?connectionDetails=false
+        # retrieves a single service
+        service = self.get_service(config, service_id)
+        if not service:
+            raise SolaceError(
+                f"solace_cloud_service_id={service_id} not found")
+        additionalHostnames = []
+        if 'attributes' in service:
+            if 'additionalHostnames' in service['attributes']:
+                if isinstance(service['attributes']['additionalHostnames'], list):
+                    additionalHostnames = service['attributes']['additionalHostnames']
+        return additionalHostnames
+
     def get_service_additional_hostnames(self, config: SolaceTaskSolaceCloudConfig, service_id: str) -> list:
         # GET https://api.solace.cloud/api/v0/services/{{serviceId}}?connectionDetails=false
         # retrieves a single service

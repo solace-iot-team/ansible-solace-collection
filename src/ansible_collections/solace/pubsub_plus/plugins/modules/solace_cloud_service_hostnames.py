@@ -131,7 +131,7 @@ class SolaceCloudServiceHostnamesTask(SolaceCloudCRUDListTask):
 
     def get_object_key_list(self, object_key) -> list:
         # object_key = service_id
-        additionalHostnames = self.solace_cloud_api.get_service_additional_hostnames(
+        additionalHostnames = self.solace_cloud_api.get_service_additional_hostnames_prior_9_13(
             self.get_config(), object_key)
         return additionalHostnames
 
