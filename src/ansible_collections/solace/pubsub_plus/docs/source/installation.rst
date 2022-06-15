@@ -62,7 +62,7 @@ Set the Python interpreter
 
 .. note::
 
-  Ansible-Solace only works with Python version >=3.6. Most systems come with a Python version 2.x pre-installed in `/usr/bin/python`.
+  Ansible-Solace only works with Python version >=3.8. Most systems come with a Python version 2.x pre-installed in `/usr/bin/python`.
 
   By setting the environment variable `ANSIBLE_PYTHON_INTERPRETER="path-to-python3"` we can tell Ansible which Python interpreter to use.
 
@@ -140,7 +140,7 @@ Sequence:
         $ brew install pyenv
         # download a Python version
         $ pyenv install 3.8.6 # or another version
-        # bin: ~/.pyenv/versions/3.6.12/bin/python3
+        # bin: ~/.pyenv/versions/3.8.6/bin/python3
         $ pip3 install virtualenv
 
         # install the virtual env
