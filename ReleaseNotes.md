@@ -1,5 +1,12 @@
 # Release Notes
 
+## Version 1.10.1
+
+**Enhancements:**
+- **Modules: solace_cloud_service_hostname, solace_cloud_get_service_hostnames**
+  - allows for managing service hostnames for broker version below and above 9.13 (using public attribute only)
+  - _Note: Module `solace_cloud_service_hostnames` still only supports versions < 9.13_
+
 ## Version 1.10.0
 
 **New Modules:**

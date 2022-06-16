@@ -13,6 +13,7 @@ export PROJECT_HOME=$projectHome
 
 ansibleSolaceTests=(
   "setup"
+  "solace_cloud_service_hostnames"
   "solace_cloud_service"
   "teardown"
 )
@@ -38,6 +39,7 @@ export ANSIBLE_SOLACE_ENABLE_LOGGING=True
 
 export RUN_FG=true
 # export RUN_FG=false
+export CLEAN_WORKING_DIR=False
 
 ../_run.sh
 

@@ -46,6 +46,7 @@
     - name: add hostname 0
       solace_cloud_service_hostname:
         hostname: "{{ target_hostname_list.additionalHostnames[0] }}"
+        access_type: "public"
         state: present
 
     - name: get list of existing hostnames
@@ -74,17 +75,26 @@
         state: present
       loop: "{{ target_hostname_list.additionalHostnames }}"
 
-    - name: "catch exception: add another one"
-      solace_cloud_service_hostname:
-        hostname: failing
-        state: present
+    - name: get list of existing hostnames
+      solace_cloud_get_service_hostnames:
       register: result
-      ignore_errors: yes
     - assert:
         that:
-          - result.rc == 1
-          - result.msg.status_code == 400
-          - "'has maximum 5 additional hostnames' in result.msg | string"
+        - result.rc == 0
+        - result.result_list_count == target_hostname_list.additionalHostnames | length
+
+         # takes too long
+    # - name: "catch exception: add another one"
+    #   solace_cloud_service_hostname:
+    #     hostname: failing
+    #     state: present
+    #   register: result
+    #   ignore_errors: yes
+    # - assert:
+    #     that:
+    #       - result.rc == 1
+    #       - result.msg.status_code == 400
+    #       - "'has maximum 5 additional hostnames' in result.msg | string"
 
     - name: ensure all hostnames in list are absent
       solace_cloud_service_hostname:

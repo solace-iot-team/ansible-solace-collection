@@ -8,7 +8,7 @@ __metaclass__ = type
 from ansible_collections.solace.pubsub_plus.plugins.module_utils import solace_sys
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_utils import SolaceUtils
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_consts import SolaceTaskOps
-from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceCloudApiResponseDataError, SolaceEnvVarError, SolaceError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError
+from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceCloudApiError, SolaceCloudApiResponseDataError, SolaceEnvVarError, SolaceError, SolaceInternalErrorAbstractMethod, SolaceApiError, SolaceParamsValidationError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_error import SolaceInternalError
 from ansible_collections.solace.pubsub_plus.plugins.module_utils.solace_task_config import SolaceTaskConfig, SolaceTaskBrokerConfig, SolaceTaskSolaceCloudConfig
 from ansible.module_utils.basic import AnsibleModule
@@ -149,6 +149,30 @@ class SolaceApi(object):
                             #   "errorId": "52610751ae592888",
                             #   "traceId": "52610751ae592888"
                             # }
+                        elif _body['subCode'] == '5000_102':
+                            logging.warning("resp.status_code: %d, resp.message: '%s', try number: %d",
+                                            resp.status_code, _body['message'], try_count)
+                            time.sleep(delay_secs)
+
+                            #   "errorId": "3ee0a936e43bdf8b",
+                            #     "message": "Job ovd2i0cdxtb is still in progress.",
+                            #     "meta": {
+                            #         "display": {
+                            #             "service": [
+                            #                 {
+                            #                     "id": [
+                            #                         "Another request against this service is in progress. Job ovd2i0cdxtb is still in progress."
+                            #                     ]
+                            #                 }
+                            #             ]
+                            #         }
+                            #     },
+                            #     "subCode": "5000_102",
+                            #     "traceId": "3ee0a936e43bdf8b"
+                            # },
+                            # "reason": "",
+                            # "status_code": 400
+
             else:
                 do_retry = False
             try_count += 1
@@ -519,6 +543,7 @@ class SolaceCloudApi(SolaceApi):
     API_DATA_CENTERS = "datacenters"
     API_SERVICES = "services"
     API_REQUESTS = "requests"
+    API_SERVICE_CONNECTION_ENDPOINTS = "serviceConnectionEndpoints"
 
     def __init__(self, module: AnsibleModule):
         super().__init__(module)
@@ -592,6 +617,8 @@ class SolaceCloudApi(SolaceApi):
         # if it doesn't exist
         # msgVpnAttributes.vmrVersion="9.6.0.46"
         # eventBrokerVersion="9.6"
+        if "eventBrokerVersion" in service:
+            return service
         vmrVersion = None
         if "msgVpnAttributes" in service:
             if "vmrVersion" in service["msgVpnAttributes"]:
@@ -640,7 +667,7 @@ class SolaceCloudApi(SolaceApi):
         return None
 
     def get_service(self, config: SolaceTaskSolaceCloudConfig, service_id: str) -> dict:
-        # GET https://api.solace.cloud/api/v0/services/{{serviceId}}
+        # GET https://api.solace.cloud/api/v0/services/{{serviceId}}?included=serviceClass
         # retrieves a single service
         module_op = SolaceTaskOps.OP_READ_OBJECT
         try:
@@ -654,7 +681,7 @@ class SolaceCloudApi(SolaceApi):
                                  self.get_module()._name, module_op) from e
         return self._transform_service(_resp)
 
-    def get_service_additional_hostnames(self, config: SolaceTaskSolaceCloudConfig, service_id: str) -> list:
+    def get_service_additional_hostnames_prior_9_13(self, config: SolaceTaskSolaceCloudConfig, service_id: str) -> list:
         # GET https://api.solace.cloud/api/v0/services/{{serviceId}}?connectionDetails=false
         # retrieves a single service
         service = self.get_service(config, service_id)
@@ -667,6 +694,62 @@ class SolaceCloudApi(SolaceApi):
                 if isinstance(service['attributes']['additionalHostnames'], list):
                     additionalHostnames = service['attributes']['additionalHostnames']
         return additionalHostnames
+
+    def get_service_additional_hostnames(self, config: SolaceTaskSolaceCloudConfig, service_id: str) -> list:
+        # GET https://api.solace.cloud/api/v0/services/{{serviceId}}?connectionDetails=false
+        # retrieves a single service
+        service = self.get_service(config, service_id)
+        if not service:
+            raise SolaceError(
+                f"solace_cloud_service_id={service_id} not found")
+        # get the default one, don't include in list
+        default_hostname = service['msgVpnAttributes']['subDomainName']
+        if default_hostname is None:
+            raise SolaceCloudApiError(
+                config.get_module()._name, "service['msgVpnAttributes']['subDomainName'] is None")
+        publicHostnames = []
+        privateHostnames = []
+        allHostnames = []
+        # distinguish between changes in api (depends on the broker version)
+        if "serviceConnectionEndpoints" in service:
+            if isinstance(service['serviceConnectionEndpoints'], list):
+                for serviceConnectionEndpoint in service['serviceConnectionEndpoints']:
+                    if serviceConnectionEndpoint['accessType'] == 'public':
+                        publicHostnames = serviceConnectionEndpoint['hostNames']
+                    else:
+                        privateHostnames = serviceConnectionEndpoint['hostNames']
+        if 'attributes' in service:
+            if 'additionalHostnames' in service['attributes']:
+                if isinstance(service['attributes']['additionalHostnames'], list):
+                    publicHostnames = service['attributes']['additionalHostnames']
+        for publicHostname in publicHostnames:
+            if publicHostname != default_hostname:
+                allHostnames.append(
+                    {"hostName": publicHostname, "accessType": "public"})
+        for privateHostname in privateHostnames:
+            if privateHostname != default_hostname:
+                allHostnames.append(
+                    {"hostName": privateHostname, "accessType": "private"})
+        return allHostnames
+
+    def get_service_connection_endpoint_id(self, config: SolaceTaskSolaceCloudConfig, service_id: str, access_type: str) -> str:
+        service = self.get_service(config, service_id)
+        if not service:
+            raise SolaceError(
+                f"solace_cloud_service_id={service_id} not found")
+        if "serviceConnectionEndpoints" not in service:
+            raise SolaceCloudApiError(
+                config.get_module()._name, "serviceConnectionEndpoints not in service")
+        if not isinstance(service['serviceConnectionEndpoints'], list):
+            raise SolaceCloudApiError(config.get_module(
+            )._name, "not isinstance(service['serviceConnectionEndpoints'], list)")
+        # find the endpoint id by hostname
+        for serviceConnectionEndpoint in service['serviceConnectionEndpoints']:
+            # serviceConnectionEndpoint['serviceConnectionEndpointId']
+            if serviceConnectionEndpoint['accessType'] == access_type:
+                return serviceConnectionEndpoint['serviceConnectionEndpointId']
+        raise SolaceCloudApiResponseDataError(config.get_module(
+        )._name, 'cannot find serviceConnectionEndpointId for accessType', {'accessType': access_type})
 
     def get_services_with_details(self, config: SolaceTaskSolaceCloudConfig) -> list:
         # get services, then for each service, get details

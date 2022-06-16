@@ -24,6 +24,10 @@
       meta: end_play
       when: broker_type != 'solace_cloud'
 
+    - name: exit if not 9.10
+      meta: end_host
+      when: meta.eventBrokerVersion != '9.10'
+
     - set_fact:
         additionalHostnames:
         - manage-list-hostname-1
@@ -33,6 +37,11 @@
       solace_cloud_service_hostnames:
         hostnames: "{{ additionalHostnames }}"
         state: absent
+
+    - name: ensure no hostnames are present
+      solace_cloud_service_hostnames:
+        hostnames: null
+        state: exactly
 
     - name: get list of existing hostnames
       solace_cloud_get_service_hostnames:
@@ -45,13 +54,14 @@
     - name: add all hostnames in list
       solace_cloud_service_hostnames:
         hostnames: "{{ additionalHostnames }}"
+        timeout: 600 # 10 minutes
         state: exactly
 
     - name: add another one
       solace_cloud_service_hostname:
         hostname: manage-list-should-be-removed
         state: present
-        
+
     - name: "idempotency: add all hostnames in list"
       solace_cloud_service_hostnames:
         hostnames: "{{ additionalHostnames }}"

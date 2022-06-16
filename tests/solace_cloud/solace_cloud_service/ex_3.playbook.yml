@@ -36,11 +36,11 @@
           datacenterId: "{{ sc_service.datacenterId }}"
           serviceTypeId: "{{ sc_service.serviceTypeId}}"
           serviceClassId: "{{ sc_service.serviceClassId }}"
-          attributes:
-            customizedMessagingPorts:
-              serviceSmfPlainTextListenPort: 55555
-              serviceSmfCompressedListenPort: 55003
-              serviceSmfTlsListenPort: 55443
+          # attributes:
+          #   customizedMessagingPorts:
+          #     serviceSmfPlainTextListenPort: 55555
+          #     serviceSmfCompressedListenPort: 55003
+          #     serviceSmfTlsListenPort: 55443
         state: present
       register: result
 

@@ -3,12 +3,23 @@
 
 ---
   solace_cloud_services:
+    - name: asct_solace_cloud_2
+      msgVpnName: asct_solace_cloud_2
+      # datacenterId: "aws-eu-west-2a"
+      # datacenterId: "aws-ca-central-1a"
+      datacenterId: "eks-ca-central-1a"
+      serviceTypeId: "developer"
+      serviceClassId: "developer"
+      eventBrokerVersion: "9.13"
+      # serviceTypeId: "enterprise"
+      # serviceClassId: "enterprise-250-nano"
     - name: asct_solace_cloud
       msgVpnName: asct_solace_cloud
       # datacenterId: "aws-eu-west-2a"
       datacenterId: "aws-ca-central-1a"
       serviceTypeId: "developer"
       serviceClassId: "developer"
+      eventBrokerVersion: "9.10"
       # serviceTypeId: "enterprise"
       # serviceClassId: "enterprise-250-nano"
       attributes:
@@ -26,14 +37,6 @@
           serviceRestIncomingTlsListenPort: 0
           serviceWebPlainTextListenPort: 0
           serviceWebTlsListenPort: 0
-    - name: asct_solace_cloud_2
-      msgVpnName: asct_solace_cloud_2
-      # datacenterId: "aws-eu-west-2a"
-      datacenterId: "aws-ca-central-1a"
-      serviceTypeId: "developer"
-      serviceClassId: "developer"
-      # serviceTypeId: "enterprise"
-      # serviceClassId: "enterprise-250-nano"
 
 ###
 # The End.

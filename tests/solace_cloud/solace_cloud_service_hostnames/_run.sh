@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 scriptDir=$(cd $(dirname "$0") && pwd);
@@ -14,13 +14,14 @@ source $PROJECT_HOME/.lib/functions.sh
 
   if [ -z "$WORKING_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
   if [ -z "$LOG_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
+  if [ -z "$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS"; exit 1; fi
 
 ##############################################################################################################################
 # Settings
 export ANSIBLE_SOLACE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible-solace.log"
 export ANSIBLE_LOG_PATH="$LOG_DIR/$scriptLogName.ansible.log"
-INVENTORY_FILE="$WORKING_DIR/broker.inventory.yml"
-inventory=$(assertFile $scriptLogName $INVENTORY_FILE) || exit
+
+solaceCloudInventory=$(assertFile $scriptLogName "$WORKING_DIR/$SOLACE_CLOUD_INVENTORY_FILE_NAME") || exit
 
 playbooks=(
   "$scriptDir/main.playbook.yml"
@@ -35,10 +36,10 @@ for playbook in ${playbooks[@]}; do
 
   playbook=$(assertFile $scriptLogName $playbook) || exit
   ansible-playbook \
-                  -i $inventory \
+                  -i $solaceCloudInventory \
                   $playbook \
                   --extra-vars "WORKING_DIR=$WORKING_DIR" \
-                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN"
+                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS"
   code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
 done
