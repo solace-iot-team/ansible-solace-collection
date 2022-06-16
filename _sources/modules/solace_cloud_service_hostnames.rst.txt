@@ -75,6 +75,7 @@ Notes
 -----
 
 .. note::
+   - This module only supports solace broker services < 9.13.
    - Updating the `settings` on a list is not supported.
 
 

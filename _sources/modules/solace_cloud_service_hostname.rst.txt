@@ -86,6 +86,13 @@ See Also
 Parameters
 ----------
 
+access_type (optional)
+  The access type for the hostname. Note: 'private' not implemented.
+
+  | **type**: str
+  | **default**: public
+  | **choices**: public
+
 hostname (required)
   The additional hostname on the service to manage.
 

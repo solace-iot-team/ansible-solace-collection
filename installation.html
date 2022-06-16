@@ -156,7 +156,7 @@ installation options in the <a class="reference external" href="https://docs.ans
 <h3>Set the Python interpreter<a class="headerlink" href="#set-the-python-interpreter" title="Permalink to this heading"></a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Ansible-Solace only works with Python version &gt;=3.6. Most systems come with a Python version 2.x pre-installed in <cite>/usr/bin/python</cite>.</p>
+<p>Ansible-Solace only works with Python version &gt;=3.8. Most systems come with a Python version 2.x pre-installed in <cite>/usr/bin/python</cite>.</p>
 <p>By setting the environment variable <cite>ANSIBLE_PYTHON_INTERPRETER=”path-to-python3”</cite> we can tell Ansible which Python interpreter to use.</p>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># manually</span>
@@ -227,7 +227,7 @@ $ ansible-galaxy collection list
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ brew install pyenv
 <span class="c1"># download a Python version</span>
 $ pyenv install <span class="m">3</span>.8.6 <span class="c1"># or another version</span>
-<span class="c1"># bin: ~/.pyenv/versions/3.6.12/bin/python3</span>
+<span class="c1"># bin: ~/.pyenv/versions/3.8.6/bin/python3</span>
 $ pip3 install virtualenv
 
 <span class="c1"># install the virtual env</span>
@@ -336,7 +336,7 @@ $ ansible-galaxy collection list
 
   <div role="contentinfo">
     <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 03 Jun 2022 at 12:56.
+      <span class="lastupdated">Last updated on 16 Jun 2022 at 08:37.
       </span></p>
   </div>
 
