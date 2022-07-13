@@ -12,11 +12,11 @@
     solace.pubsub_plus.solace_cloud_get_service_hostnames:
       timeout: "{{ sempv2_timeout }}"
       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
-      solace_cloud_service_id: "{{ FIXED_SOLACE_CLOUD_SERVICE_ID }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id }}"
     solace.pubsub_plus.solace_cloud_service_hostname:
       timeout: "{{ sempv2_timeout }}"
       solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN }}"
-      solace_cloud_service_id: "{{ FIXED_SOLACE_CLOUD_SERVICE_ID }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id }}"
   pre_tasks:
   - include_vars:
       file: "vars.yml"

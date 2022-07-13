@@ -15,7 +15,6 @@ source $PROJECT_HOME/.lib/functions.sh
   if [ -z "$WORKING_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: WORKING_DIR"; exit 1; fi
   if [ -z "$LOG_DIR" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: LOG_DIR"; exit 1; fi
   if [ -z "$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS_AU" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS_AU"; exit 1; fi
-  if [ -z "$FIXED_SOLACE_CLOUD_SERVICE_ID_AU" ]; then echo ">>> XT_ERROR: - $scriptLogName - missing env var: FIXED_SOLACE_CLOUD_SERVICE_ID_AU"; exit 1; fi
 
 ##############################################################################################################################
 # Settings
@@ -38,8 +37,7 @@ for playbook in ${playbooks[@]}; do
                   -i $solaceCloudInventory \
                   $playbook \
                   --extra-vars "WORKING_DIR=$WORKING_DIR" \
-                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS_AU" \
-                  --extra-vars "FIXED_SOLACE_CLOUD_SERVICE_ID=$FIXED_SOLACE_CLOUD_SERVICE_ID_AU"
+                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS_AU"
 
   code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
