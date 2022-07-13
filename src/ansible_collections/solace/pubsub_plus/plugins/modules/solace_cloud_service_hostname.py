@@ -23,11 +23,12 @@ options:
     required: true
   access_type:
     description:
-    - "The access type for the hostname. Note: 'private' not implemented."
+    - "The access type for the hostname."
     type: str
     required: false
     choices:
       - public
+      - private
     default: public
 extends_documentation_fragment:
 - solace.pubsub_plus.solace.solace_cloud_config_solace_cloud
@@ -270,7 +271,7 @@ def run_module():
     module_args = dict(
         hostname=dict(type='str', required=True),
         access_type=dict(type='str', required=False,
-                         default='public', choices=['public'])
+                         default='public', choices=['public', 'private'])
         #  private not implemented yet
         #  default='public', choices=['public', 'private'])
         # wait_timeout_minutes=dict(type='int', required=False, default=30)

@@ -12,10 +12,12 @@ export PROJECT_HOME=$projectHome
 
 
 ansibleSolaceTests=(
-  "setup"
-  "solace_cloud_service_hostnames"
-  "solace_cloud_service"
-  "teardown"
+  # "setup"
+  # "solace_cloud_service_hostnames"
+  # "solace_cloud_service"
+  # "teardown"
+  # manual, with fixed service id
+  "solace_cloud_service_hostnames_manual"
 )
 export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
