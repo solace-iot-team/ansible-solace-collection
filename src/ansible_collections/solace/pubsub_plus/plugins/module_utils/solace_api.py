@@ -434,8 +434,13 @@ class SolaceSempV1Api(SolaceApi):
         try:
             v = SolaceUtils.create_version(s)
         except SolaceInternalError as e:
-            raise SolaceInternalError(
-                f"sempv1 version parsing failed: {raw_api_version}") from e
+            # try format: soltr/10_0_1VMR
+            s = raw_api_version[6:12].replace('_', '.')
+            try:
+                v = SolaceUtils.create_version(s)
+            except SolaceInternalError as e:
+                raise SolaceInternalError(
+                    f"sempv1 version parsing failed: {raw_api_version}") from e
         return raw_api_version, v
 
     def get_headers(self, config: SolaceTaskConfig, op: str) -> dict:
