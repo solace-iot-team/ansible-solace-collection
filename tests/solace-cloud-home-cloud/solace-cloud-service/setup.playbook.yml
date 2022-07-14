@@ -50,7 +50,7 @@
     - set_fact:
         solace_cloud_api_token: "{{solace_cloud_api_token_au}}"
         # "datacenterId": "testenterpriseorg-gke-aus-se1-a",
-        datacenterId: "testenterpriseorg-gke-aus-se1-a"
+        datacenterId: "solaceseaustralia-eks-ap-southeast-2"
       when:
         - "solace_cloud_home_cloud is defined"
         - "solace_cloud_home_cloud == 'AU'"
