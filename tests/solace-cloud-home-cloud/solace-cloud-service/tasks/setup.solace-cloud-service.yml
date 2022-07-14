@@ -24,7 +24,7 @@
       attributes: "{{ sc_service.attributes | default(omit) }}"
     state: present
   register: result
-
+    
 - set_fact:
     sc_service_id: "{{ result.response.serviceId }}"
     sc_service_info: "{{ result.response }}"
