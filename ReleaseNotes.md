@@ -1,5 +1,15 @@
 # Release Notes
 
+## Version 1.10.2
+
+**Enhancements:**
+* **[solace_cloud_service_hostname](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_cloud_service_hostname.html)**
+  - added access_type='private' option
+
+**Framework:**
+* **solace_api**
+  - fixed handling of sempv1 version number
+
 ## Version 1.10.1
 
 **Enhancements:**
