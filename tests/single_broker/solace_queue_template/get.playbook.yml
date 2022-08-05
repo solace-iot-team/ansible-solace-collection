@@ -1,0 +1,134 @@
+# Copyright (c) 2020, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+-
+  name: "get: solace_get_queues"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace.pubsub_plus.solace_queue_template:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace.pubsub_plus.solace_get_queue_templates:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace.pubsub_plus.solace_queue:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace.pubsub_plus.solace_get_queues:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+
+  pre_tasks:
+  - include_vars:
+      file: "queue-templates.vars.yml"
+      name: target_list
+  tasks:
+
+    - name: "get all queue templates"
+      solace_get_queue_templates:
+      register: result
+
+    - name: "delete all queue templates"
+      solace_queue_template:
+        name: "{{ item.data.queueTemplateName }}"
+        state: absent
+      loop: "{{ result.result_list }}"
+
+    - name: "delete all queue templates: idempotent"
+      solace_queue_template:
+        name: "{{ item.data.queueTemplateName }}"
+        state: absent
+      loop: "{{ result.result_list }}"
+      register: result
+    - assert:
+        that:
+          - result.changed==false
+
+    - name: "get: solace_get_queue_templates:config:all"
+      solace_get_queue_templates:
+      register: result
+    - assert:
+        that:
+          - result.rc==0
+          - result.result_list==[]
+          - result.result_list_count==0
+
+    - name: "main: call tasks: adding/updating queue templates"
+      solace_queue_template:
+        name: "{{ queue_template_item.name }}"
+        # settings:
+        #   accessType: exclusive
+        #   maxMsgSpoolUsage: 1
+        #   maxRedeliveryCount: 10
+        #   maxTtl: 10
+        #   respectTtlEnabled: true
+        #   queueNameFilter: "{{ queue_template_item.name }}>"
+        state: present
+      loop: "{{ target_list.queue_templates }}"
+      loop_control:
+        loop_var: queue_template_item
+
+    - name: "solace_get_queue_templates(config)"
+      solace_get_queue_templates:
+        api: config
+        query_params:
+          where:
+            - "queueTemplateName==ansible-solace/test*"
+          select:
+            - "queueTemplateName"
+      register: result
+    - assert:
+        that: result.result_list_count == 3
+
+    - name: "solace_get_queue_templates(monitor)"
+      solace_get_queue_templates:
+        api: monitor
+        query_params:
+          where:
+            - "queueTemplateName==ansible-solace/test*"
+          select:
+            - "queueTemplateName"
+      register: result
+    - assert:
+        that: result.result_list_count == 3
+
+    - name: "remove all queue templates"
+      solace_queue_template:
+        name: "{{ item.name }}"
+        state: absent
+      loop: "{{ target_list.queue_templates }}"
+
+    - name: "get: solace_get_queue_templates(monitor)"
+      solace_get_queue_templates:
+        query_params:
+          where:
+            - "queueTemplateName==ansible-solace/test*"
+      register: result
+    - assert:
+        that: result.result_list_count == 0
+
+###
+# The End.

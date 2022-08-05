@@ -65,6 +65,9 @@ plugins/modules/solace_client_profile.py pep8:E501
 plugins/modules/solace_cloud_client_profile.py compile-2.7!skip
 plugins/modules/solace_cloud_client_profile.py pep8:E501
 plugins/modules/solace_queue.py compile-2.7!skip
+plugins/modules/solace_get_queue_templates.py pep8:E501
+plugins/modules/solace_get_queue_templates.py compile-2.7!skip
+plugins/modules/solace_queue_template.py compile-2.7!skip
 plugins/modules/solace_rdp.py compile-2.7!skip
 plugins/modules/solace_rdp_queue_binding.py compile-2.7!skip
 plugins/modules/solace_rdp_queue_binding.py pep8:E501
