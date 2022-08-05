@@ -31,43 +31,76 @@ extends_documentation_fragment:
 - solace.pubsub_plus.solace.state
 seealso:
 - module: solace_get_queue_templates
-- module: solace_queue
 author:
 - Ulrich Herbst (@uherbstsolace)
 '''
 
 EXAMPLES = '''
-hosts: all
-gather_facts: no
-any_errors_fatal: true
-collections:
-- solace.pubsub_plus
-omodule_defaults:
-  solace_queue_template:
-    host: "{{ sempv2_host }}"
-    port: "{{ sempv2_port }}"
-    secure_connection: "{{ sempv2_is_secure_connection }}"
-    username: "{{ sempv2_username }}"
-    password: "{{ sempv2_password }}"
-    timeout: "{{ sempv2_timeout }}"
-    msg_vpn: "{{ vpn }}"
-tasks:
-- name: add queue template
-  solace_queue_template:
-    name: bar
-    state: present
+  name: queue template example
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace.pubsub_plus.solace_queue_template:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace.pubsub_plus.solace_get_queue_templates:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
 
-- name: update queue template
-  solace_queue_template:
-    name: bar
-    setttings:
-      maxBindCount: 100
-    state: present
+  tasks:
 
-- name: remove queue template
-  solace_queue_template:
-    name: bar
-    state: absent
+  - name: create a queue template
+    solace_queue_template:
+      name: foo
+      settings:
+        accessType: non-exclusive
+        maxMsgSpoolUsage: 1
+        maxRedeliveryCount: 10
+        maxTtl: 10
+        respectTtlEnabled: true
+        queueNameFilter: "foo/bar/>"
+      state: present
+
+  - name: update the queue template
+    solace_queue_template:
+      name: foo
+      settings:
+        accessType: exclusive
+      state: present
+
+  - name: get queue templates (config)
+    solace_get_queue_templates:
+      api: config
+      query_params:
+        where:
+          - "queueTemplateName==foo"
+    register: result
+
+  - name: get queue templates (monitor)
+    solace_get_queue_templates:
+      api: monitor
+      query_params:
+        where:
+          - "queueTemplateName==foo"
+    register: result
+
+  - name: delete queue template
+    solace_queue_template:
+      name: foo
+      state: absent
 '''
 
 RETURN = '''

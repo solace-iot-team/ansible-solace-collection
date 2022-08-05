@@ -2,56 +2,68 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 -
-  name: "solace_vpn example"
+  name: queue template example
   hosts: all
   gather_facts: no
   any_errors_fatal: true
   collections:
     - solace.pubsub_plus
   module_defaults:
-    solace.pubsub_plus.solace_vpn:
+    solace.pubsub_plus.solace_queue_template:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
-      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
-      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
-    solace.pubsub_plus.solace_get_vpns:
+      msg_vpn: "{{ vpn }}"
+    solace.pubsub_plus.solace_get_queue_templates:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
       secure_connection: "{{ sempv2_is_secure_connection }}"
       username: "{{ sempv2_username }}"
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+
   tasks:
-  - name: get 1 vpn config
-    solace_get_vpns:
-      page_count: 1
+
+  - name: create a queue template
+    solace_queue_template:
+      name: foo
+      settings:
+        accessType: non-exclusive
+        maxMsgSpoolUsage: 1
+        maxRedeliveryCount: 10
+        maxTtl: 10
+        respectTtlEnabled: true
+        queueNameFilter: "foo/bar/>"
+      state: present
+
+  - name: update the queue template
+    solace_queue_template:
+      name: foo
+      settings:
+        accessType: exclusive
+      state: present
+
+  - name: get queue templates (config)
+    solace_get_queue_templates:
+      api: config
+      query_params:
+        where:
+          - "queueTemplateName==foo"
     register: result
 
-  - set_fact:
-      msg_vpn_name: "{{ result.result_list[0].data.msgVpnName  }}"
-      current_settings: "{{ result.result_list[0].data }}"
+  - name: get queue templates (monitor)
+    solace_get_queue_templates:
+      api: monitor
+      query_params:
+        where:
+          - "queueTemplateName==foo"
+    register: result
 
-  - name: self-hosted broker only
-    block:
-      - name: create new vpn if not solace cloud
-        solace_vpn:
-          name: foo
-          state: present
-
-      - name: delete new vpn if not solace cloud
-        solace_vpn:
-          name: foo
-          state: absent
-    when: broker_type != 'solace_cloud'
-
-  - name: update vpn
-    solace_vpn:
-      name: "{{ msg_vpn_name }}"
-      settings:
-        authenticationBasicType: internal
-        eventLargeMsgThreshold: 100
-      state: present
+  - name: delete queue template
+    solace_queue_template:
+      name: foo
+      state: absent

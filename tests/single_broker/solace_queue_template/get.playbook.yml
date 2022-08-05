@@ -24,22 +24,22 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
-    solace.pubsub_plus.solace_queue:
-      host: "{{ sempv2_host }}"
-      port: "{{ sempv2_port }}"
-      secure_connection: "{{ sempv2_is_secure_connection }}"
-      username: "{{ sempv2_username }}"
-      password: "{{ sempv2_password }}"
-      timeout: "{{ sempv2_timeout }}"
-      msg_vpn: "{{ vpn }}"
-    solace.pubsub_plus.solace_get_queues:
-      host: "{{ sempv2_host }}"
-      port: "{{ sempv2_port }}"
-      secure_connection: "{{ sempv2_is_secure_connection }}"
-      username: "{{ sempv2_username }}"
-      password: "{{ sempv2_password }}"
-      timeout: "{{ sempv2_timeout }}"
-      msg_vpn: "{{ vpn }}"
+    # solace.pubsub_plus.solace_queue:
+    #   host: "{{ sempv2_host }}"
+    #   port: "{{ sempv2_port }}"
+    #   secure_connection: "{{ sempv2_is_secure_connection }}"
+    #   username: "{{ sempv2_username }}"
+    #   password: "{{ sempv2_password }}"
+    #   timeout: "{{ sempv2_timeout }}"
+    #   msg_vpn: "{{ vpn }}"
+    # solace.pubsub_plus.solace_get_queues:
+    #   host: "{{ sempv2_host }}"
+    #   port: "{{ sempv2_port }}"
+    #   secure_connection: "{{ sempv2_is_secure_connection }}"
+    #   username: "{{ sempv2_username }}"
+    #   password: "{{ sempv2_password }}"
+    #   timeout: "{{ sempv2_timeout }}"
+    #   msg_vpn: "{{ vpn }}"
 
   pre_tasks:
   - include_vars:
@@ -79,13 +79,13 @@
     - name: "main: call tasks: adding/updating queue templates"
       solace_queue_template:
         name: "{{ queue_template_item.name }}"
-        # settings:
-        #   accessType: exclusive
-        #   maxMsgSpoolUsage: 1
-        #   maxRedeliveryCount: 10
-        #   maxTtl: 10
-        #   respectTtlEnabled: true
-        #   queueNameFilter: "{{ queue_template_item.name }}>"
+        settings:
+          accessType: exclusive
+          maxMsgSpoolUsage: 1
+          maxRedeliveryCount: 10
+          maxTtl: 10
+          respectTtlEnabled: true
+          queueNameFilter: "{{ queue_template_item.name }}>"
         state: present
       loop: "{{ target_list.queue_templates }}"
       loop_control:
