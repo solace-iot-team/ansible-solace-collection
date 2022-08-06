@@ -1,5 +1,12 @@
 # Release Notes
 
+## Version 1.11.0
+
+**New Modules:**
+* **[solace_queue_template](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_queue_template.html)**
+* **[solace_get_queue_templates](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_queue_templates.html)**
+
+
 ## Version 1.10.2
 
 **Enhancements:**

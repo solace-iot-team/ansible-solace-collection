@@ -1,0 +1,75 @@
+# Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- set_fact:
+    queue_template_settings:
+      accessType: non-exclusive
+      maxMsgSpoolUsage: 1
+      maxRedeliveryCount: 10
+      maxTtl: 10
+      respectTtlEnabled: true
+      # ansible-solace/test/q-template/__1__/>
+      queueNameFilter: "{{ queue_template_item.name }}/>"
+
+- name: "queue-template: create"
+  solace_queue_template:
+    name: "{{ queue_template_item.name }}"
+    settings: "{{ queue_template_settings }}"
+    state: present
+
+- name: "queue-template: present idempotent"
+  solace_queue_template:
+    name: "{{ queue_template_item.name }}"
+    settings: "{{ queue_template_settings }}"
+    state: present
+  register: result
+- assert:
+    that:
+      result.changed==false
+
+# Note: to create a queue based on a template, you need
+# - mqtt client which connects using qos1 and in client profile template enabled
+# - smf client which creates a queue with client profile enabled
+
+# - name: "create queue based on template"
+#   solace_queue:
+#     # ansible-solace/test/q-template/__1__/queue
+#     name: "{{ queue_template_item.name }}/queue"
+#     settings:
+#       permission: "consume"
+#       maxMsgSpoolUsage: 100
+#     state: present
+#
+# - name: "get queue"
+#   solace.pubsub_plus.solace_get_queues:
+#     query_params:
+#       where:
+#         - "queueName=={{ queue_template_item.name }}/queue"
+#   register: result
+# - assert:
+#     that:
+#       - result.rc==0
+#       - result.result_list_count==1
+#
+# - name: "verify queue was created based on template"
+#   assert:
+#     that:
+#       - item.data.respectTtlEnabled==true
+#
+#       # accessType: exclusive
+#       # maxMsgSpoolUsage: 1
+#       # maxRedeliveryCount: 10
+#       # maxTtl: 10
+#
+#   loop: "{{ result.result_list }}"
+#
+#
+# - name: "queue: delete"
+#   solace_queue:
+#     name: "{{ queue_template_item.name }}/queue"
+#     state: absent
+
+###
+# The End.

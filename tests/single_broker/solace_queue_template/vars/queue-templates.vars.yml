@@ -1,0 +1,11 @@
+# Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+queue_templates:
+- name: ansible-solace/test/q-template/__1__
+  # queue: ansible-solace/test/q-template/__1__/queue
+- name: ansible-solace/test/q-template/__2__
+  # queue: ansible-solace/test/q-template/__2__/queue
+- name: ansible-solace/test/q-template/__3__
+  # queue: ansible-solace/test/q-template/__3__/queue
