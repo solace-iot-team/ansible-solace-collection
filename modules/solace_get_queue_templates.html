@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>solace_get_acl_profiles – get list of acl profiles &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
+  <title>solace_get_queue_templates – get list of queue-templates &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/contentui.css" type="text/css" />
@@ -21,8 +21,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="solace_get_acl_publish_topic_exceptions – get list of publish topic exceptions on an acl profile" href="solace_get_acl_publish_topic_exceptions.html" />
-    <link rel="prev" title="solace_get_acl_client_connect_exceptions – get list of client connect address exceptions on an acl profile" href="solace_get_acl_client_connect_exceptions.html" /> 
+    <link rel="next" title="solace_get_queues – get list of queues" href="solace_get_queues.html" />
+    <link rel="prev" title="solace_get_queue_subscriptions – get list of subscriptions on a queue" href="solace_get_queue_subscriptions.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -61,14 +61,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../solace_get_modules.html">Solace Get Object List Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../solace_get_modules.html#module-reference">Module Reference</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="solace_get_acl_client_connect_exceptions.html">solace_get_acl_client_connect_exceptions – get list of client connect address exceptions on an acl profile</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_acl_profiles – get list of acl profiles</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_acl_profiles.html">solace_get_acl_profiles – get list of acl profiles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_acl_publish_topic_exceptions.html">solace_get_acl_publish_topic_exceptions – get list of publish topic exceptions on an acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_acl_subscribe_share_name_exceptions.html">solace_get_acl_subscribe_share_name_exceptions – get list of subscribe share name exceptions on an acl profile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_acl_subscribe_topic_exceptions.html">solace_get_acl_subscribe_topic_exceptions – get list of subscribe topic exceptions on an acl profile</a></li>
@@ -97,7 +90,14 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_session_subscriptions.html">solace_get_mqtt_session_subscriptions – get list of mqtt session subscriptions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_mqtt_sessions.html">solace_get_mqtt_sessions – get list of mqtt sessions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_queue_subscriptions.html">solace_get_queue_subscriptions – get list of subscriptions on a queue</a></li>
-<li class="toctree-l3"><a class="reference internal" href="solace_get_queue_templates.html">solace_get_queue_templates – get list of queue-templates</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">solace_get_queue_templates – get list of queue-templates</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_queues.html">solace_get_queues – get list of queues</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_queue_bindings.html">solace_get_rdp_queue_bindings – get list of rdp queue bindings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_rest_consumer_trusted_cns.html">solace_get_rdp_rest_consumer_trusted_cns – get list of rdp rest consumer trusted common names</a></li>
@@ -132,10 +132,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../solace_get_modules.html">Solace Get Object List Modules</a> &raquo;</li>
-      <li>solace_get_acl_profiles – get list of acl profiles</li>
+      <li>solace_get_queue_templates – get list of queue-templates</li>
       <li class="wy-breadcrumbs-aside">
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_acl_profiles.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_queue_templates.py" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -143,20 +143,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="solace-get-acl-profiles-get-list-of-acl-profiles">
-<span id="solace-get-acl-profiles-module"></span><h1>solace_get_acl_profiles – get list of acl profiles<a class="headerlink" href="#solace-get-acl-profiles-get-list-of-acl-profiles" title="Permalink to this heading"></a></h1>
-<p>Get a list of ACL Profile Objects.</p>
+  <section id="solace-get-queue-templates-get-list-of-queue-templates">
+<span id="solace-get-queue-templates-module"></span><h1>solace_get_queue_templates – get list of queue-templates<a class="headerlink" href="#solace-get-queue-templates-get-list-of-queue-templates" title="Permalink to this heading"></a></h1>
+<p>Get a list of Queue-template objects.</p>
 <p>Implements the config and monitor API.</p>
 <p>Retrieves all objects that match the criteria defined in the ‘where’ clause and returns the fields defined in the ‘select’ parameter.</p>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">queue template example</span><span class="w"></span>
+<span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
 <span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">no</span><span class="w"></span>
 <span class="nt">any_errors_fatal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
 <span class="nt">collections</span><span class="p">:</span><span class="w"></span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span><span class="w"></span>
 <span class="nt">module_defaults</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">solace_acl_profile</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace.pubsub_plus.solace_queue_template</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
 <span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
 <span class="w">    </span><span class="nt">secure_connection</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
@@ -164,7 +165,7 @@
 <span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
 <span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
 <span class="w">    </span><span class="nt">msg_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="nt">solace_get_acl_profiles</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace.pubsub_plus.solace_get_queue_templates</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_host</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
 <span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_port</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
 <span class="w">    </span><span class="nt">secure_connection</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_is_secure_connection</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
@@ -172,43 +173,48 @@
 <span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_password</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
 <span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">sempv2_timeout</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
 <span class="w">    </span><span class="nt">msg_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">vpn</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+
 <span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create acl profile</span><span class="w"></span>
-<span class="w">  </span><span class="nt">solace_acl_profile</span><span class="p">:</span><span class="w"></span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create a queue template</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_queue_template</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span><span class="w"></span>
+<span class="w">    </span><span class="nt">settings</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">accessType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">non-exclusive</span><span class="w"></span>
+<span class="w">      </span><span class="nt">maxMsgSpoolUsage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+<span class="w">      </span><span class="nt">maxRedeliveryCount</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w"></span>
+<span class="w">      </span><span class="nt">maxTtl</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w"></span>
+<span class="w">      </span><span class="nt">respectTtlEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">      </span><span class="nt">queueNameFilter</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo/bar/&gt;&quot;</span><span class="w"></span>
 <span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get acl profiles config</span><span class="w"></span>
-<span class="w">  </span><span class="nt">solace_get_acl_profiles</span><span class="p">:</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">update the queue template</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_queue_template</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span><span class="w"></span>
+<span class="w">    </span><span class="nt">settings</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">accessType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">exclusive</span><span class="w"></span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get queue templates (config)</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_get_queue_templates</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config</span><span class="w"></span>
 <span class="w">    </span><span class="nt">query_params</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="nt">where</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;aclProfileName==foo&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">select</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;aclProfileName&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;queueTemplateName==foo&quot;</span><span class="w"></span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">print result</span><span class="w"></span>
-<span class="w">  </span><span class="nt">debug</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get acl profiles monitor</span><span class="w"></span>
-<span class="w">  </span><span class="nt">solace_get_acl_profiles</span><span class="p">:</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get queue templates (monitor)</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_get_queue_templates</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">monitor</span><span class="w"></span>
 <span class="w">    </span><span class="nt">query_params</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="nt">where</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;aclProfileName==foo&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">select</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;aclProfileName&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;queueTemplateName==foo&quot;</span><span class="w"></span>
 <span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">print result</span><span class="w"></span>
-<span class="w">  </span><span class="nt">debug</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.result_list_count</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">delete queue template</span><span class="w"></span>
+<span class="w">  </span><span class="nt">solace_queue_template</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foo</span><span class="w"></span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absent</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -217,8 +223,8 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
-<li><p>Module Sempv2 Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfiles">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/aclProfile/getMsgVpnAclProfiles</a></p></li>
-<li><p>Module Sempv2 Monitor: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/aclProfile/getMsgVpnAclProfiles">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/aclProfile/getMsgVpnAclProfiles</a></p></li>
+<li><p>Module Sempv2 Config: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/software-broker/config/index.html#/queueTemplate/getMsgVpnQueueTemplates">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/software-broker/config/index.html#/queueTemplate/getMsgVpnQueueTemplates</a></p></li>
+<li><p>Module Sempv2 Monitor: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/queueTemmplate/getMsgVpnQueueTemplates">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/queueTemmplate/getMsgVpnQueueTemplates</a></p></li>
 <li><p>Sempv2 Config Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/</a></p></li>
 <li><p>Sempv2 Monitor Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/monitor/index.html#/</a></p></li>
 <li><p>Sempv2 Action Reference: <a class="reference external" href="https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/">https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/action/index.html#/</a></p></li>
@@ -230,7 +236,7 @@
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="solace_acl_profile.html#solace-acl-profile-module"><span class="std std-ref">solace_acl_profile – configure acl profile</span></a></p></li>
+<li><p><a class="reference internal" href="solace_queue_template.html#solace-queue-template-module"><span class="std std-ref">solace_queue_template – queue template</span></a></p></li>
 </ul>
 </div>
 </section>
@@ -413,8 +419,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="solace_get_acl_client_connect_exceptions.html" class="btn btn-neutral float-left" title="solace_get_acl_client_connect_exceptions – get list of client connect address exceptions on an acl profile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="solace_get_acl_publish_topic_exceptions.html" class="btn btn-neutral float-right" title="solace_get_acl_publish_topic_exceptions – get list of publish topic exceptions on an acl profile" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="solace_get_queue_subscriptions.html" class="btn btn-neutral float-left" title="solace_get_queue_subscriptions – get list of subscriptions on a queue" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="solace_get_queues.html" class="btn btn-neutral float-right" title="solace_get_queues – get list of queues" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
