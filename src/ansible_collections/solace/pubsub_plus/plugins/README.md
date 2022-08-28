@@ -62,6 +62,7 @@
     ├── solace_get_rdp_rest_consumers.py
     ├── solace_get_rdps.py
     ├── solace_get_replay_logs.py
+    ├── solace_get_replicated_topics.py
     ├── solace_get_topic_endpoints.py
     ├── solace_get_vpn_clients.py
     ├── solace_get_vpns.py
@@ -77,6 +78,8 @@
     ├── solace_rdp_rest_consumer_trusted_cn.py
     ├── solace_replay_log.py
     ├── solace_replay_log_trim_logged_msgs.py
+    ├── solace_replicated_topic.py
+    ├── solace_replicated_topics.py
     ├── solace_topic_endpoint.py
     └── solace_vpn.py
 ```
