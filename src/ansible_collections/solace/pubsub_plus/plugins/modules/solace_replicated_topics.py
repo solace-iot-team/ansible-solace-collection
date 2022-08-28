@@ -66,16 +66,16 @@ EXAMPLES = '''
         - topic-2
       state: present
 
-  - name: replace subscriptions
+  - name: replace replicated topics
     solace_replicated_topics:
       topics:
         - new-topic-1
         - new-topic-2
       state: exactly
 
-  - name: delete all subscriptions
+  - name: delete all replicated topics
     solace_replicated_topics:
-      replicated_topics: null
+      replicated_topics: []
       state: exactly
 
 '''
