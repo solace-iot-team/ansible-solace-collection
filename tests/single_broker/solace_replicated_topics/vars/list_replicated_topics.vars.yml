@@ -1,0 +1,20 @@
+---
+search_pattern: ansible-solace*
+replicated_topics:
+- topics:
+  - ansible-solace/test/list/1/>
+  - ansible-solace/test/list/2/>
+  - ansible-solace/test/list/3/>
+  replicationMode: async
+  state: exactly
+- topics:
+  - ansible-solace/test/list/a/>
+  - ansible-solace/test/list/b/>
+  - ansible-solace/test/list/c/>
+  - ansible-solace/test/list/c/>
+  replicationMode: sync
+  state: present
+- topics:
+  - ansible-solace/test/list/2/>
+  - ansible-solace/test/list/b/>
+  state: absent

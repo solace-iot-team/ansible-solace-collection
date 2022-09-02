@@ -127,6 +127,12 @@ class SolaceReplicatedTopicTask(SolaceBrokerCRUDTask):
                       'msgVpns', vpn_name, 'replicatedTopics']
         return self.sempv2_api.make_post_request(self.get_config(), path_array, data)
 
+    def update_func(self, vpn_name, replicated_topic, settings=None, delta_settings=None):
+        # PATCH /msgVpns/{msgVpnName}/replicatedTopics/{replicatedTopic}
+        path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG,
+                      'msgVpns', vpn_name, 'replicatedTopics', replicated_topic]
+        return self.sempv2_api.make_patch_request(self.get_config(), path_array, settings)
+
     def delete_func(self, vpn_name, replicated_topic):
         # DELETE /msgVpns/{msgVpnName}/replicatedTopics/{replicatedTopic}
         path_array = [SolaceSempV2Api.API_BASE_SEMPV2_CONFIG, 'msgVpns',

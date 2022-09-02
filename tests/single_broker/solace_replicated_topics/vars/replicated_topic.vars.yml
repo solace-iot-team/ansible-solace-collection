@@ -1,0 +1,7 @@
+---
+search_pattern: ansible-solace*
+replicated_topics:
+- topic: ansible-solace/test/name/1
+  replicationMode: async
+- topic: ansible-solace/test/name/a
+  replicationMode: sync
