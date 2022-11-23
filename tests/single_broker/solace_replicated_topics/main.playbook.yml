@@ -1,0 +1,89 @@
+# Copyright (c) 2022, Solace Corporation, Paulus Gunadi, <paulus.gunadi@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "main: solace_replicated_topic"
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - solace.pubsub_plus
+  module_defaults:
+    solace.pubsub_plus.solace_replicated_topic:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace.pubsub_plus.solace_get_replicated_topics:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+  pre_tasks:
+  - include_vars:
+      file: "replicated_topic.vars.yml"
+      name: target_list
+  tasks:
+
+    - name: "main: solace_replicated_topic: remove all - start"
+      solace_replicated_topic:
+        topic: "{{ item.topic }}"
+        state: absent
+      loop: "{{ target_list.replicated_topics }}"
+
+    - name: "main: solace_replicated_topic: creating all"
+      solace_replicated_topic:
+        topic: "{{ item.topic }}"
+        settings:
+          replicationMode: "{{ item.replicationMode | default(omit) }}"
+        state: present
+      loop: "{{ target_list.replicated_topics }}"
+
+    - name: "main: solace_replicated_topic: updating all"
+      solace_replicated_topic:
+        topic: "{{ item.topic }}"
+        settings:
+          replicationMode: "sync"
+        state: present
+      loop: "{{ target_list.replicated_topics }}"
+
+    - name: "main: solace_get_replicated_topics(config) - check updates ok"
+      solace_get_replicated_topics:
+        query_params:
+          where:
+            - "replicatedTopic=={{ target_list.search_pattern }}"
+            - "replicationMode==sync"
+          select:
+            - "replicatedTopic"
+            - "replicationMode"
+      register: result
+    - assert:
+        that:
+          - result.result_list_count == 2
+          - result.result_list[0].data.replicationMode == 'sync'
+          - result.result_list[1].data.replicationMode == 'sync'
+
+    - name: "main: solace_replicated_topic: remove all - end"
+      solace_replicated_topic:
+        topic: "{{ item.topic }}"
+        state: absent
+      loop: "{{ target_list.replicated_topics }}"
+
+    - name: "main: solace_get_replicated_topics(config) - check none exist"
+      solace_get_replicated_topics:
+        query_params:
+          where:
+            - "replicatedTopic=={{ target_list.search_pattern }}"
+          select:
+            - "replicatedTopic"
+      register: result
+    - assert:
+        that: result.result_list_count == 0
+
+###
+# The End.

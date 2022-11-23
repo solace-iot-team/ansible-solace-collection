@@ -38,6 +38,7 @@ source $PROJECT_HOME/.lib/functions.sh
       "solace_topic_endpoint"
       "solace_get_vpn_clients"
       "solace_client_profile"
+      "solace_replicated_topics"
       "teardown"
     )
   fi
