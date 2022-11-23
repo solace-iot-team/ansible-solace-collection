@@ -11,6 +11,10 @@
 * **[solace_rdp_queue_binding_protected_header](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_rdp_queue_binding_protected_header.html)**
 * **[solace_get_rdp_queue_binding_protected_headers](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_rdp_queue_binding_protected_headers.html)**
 
+**Test with Ansible Versions:**
+  - added test with ansible 6, 2.13
+  - removed test with ansible 4, 2.11
+
 ## Version 1.11.0
 
 **New Modules:**
