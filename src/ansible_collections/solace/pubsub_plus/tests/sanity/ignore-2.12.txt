@@ -161,3 +161,5 @@ plugins/modules/solace_get_jndi_queues.py compile-2.7!skip
 plugins/modules/solace_get_jndi_topics.py compile-2.7!skip
 plugins/modules/solace_jndi_queues.py compile-2.7!skip
 plugins/modules/solace_jndi_topics.py compile-2.7!skip
+plugins/modules/solace_get_replicated_topics.py compile-2.7!skip
+plugins/modules/solace_replicated_topics.py compile-2.7!skip

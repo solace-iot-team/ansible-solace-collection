@@ -12,7 +12,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: solace_get_vpn_replicated_topics
+module: solace_get_replicated_topics
 short_description: get list of vpn replicated topics
 description:
 - "Get a list of VPN Replicated Topics objects."
