@@ -19,6 +19,7 @@ source $PROJECT_HOME/.lib/functions.sh
     export ANSIBLE_SOLACE_TESTS=(
       # "broker-cert"
       "setup"
+      "solace_client_profile"
       "solace_jndi"
       "solace_replay"
       "solace_get_list"
@@ -37,7 +38,6 @@ source $PROJECT_HOME/.lib/functions.sh
       "solace_mqtt"
       "solace_topic_endpoint"
       "solace_get_vpn_clients"
-      "solace_client_profile"
       "solace_replicated_topics"
       "teardown"
     )
