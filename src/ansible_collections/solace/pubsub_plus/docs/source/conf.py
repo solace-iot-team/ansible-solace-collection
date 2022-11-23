@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Solace PubSub+ Ansible Collection '
-copyright = '2021, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>'
+copyright = '2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>'
 author = 'Ricardo Gomez-Ulmke'
 
 # The full version, including alpha/beta/rc tags

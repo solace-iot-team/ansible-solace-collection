@@ -13,12 +13,12 @@ export PROJECT_HOME=$projectHome
 
 ansibleSolaceTests=(
   # "broker-cert"
-  "setup"
+  # "setup"
   # "solace_acl_profile"
   # "solace_auth"
   # "solace_cert_authority"
   # "solace_client_profile"
-  "solace_jndi"
+  # "solace_jndi"
   # "solace_replay"
   # "solace_get_list"
   # "solace_service_auth"
@@ -26,7 +26,7 @@ ansibleSolaceTests=(
   # "solace_oauth"
   # "solace_facts"
   # "solace_vpn"
-  # "solace_rdp"
+  "solace_rdp"
   # "solace_queue"
   # "solace_queue_template"
   # "solace_replicated_topics"

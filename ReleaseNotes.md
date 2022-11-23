@@ -3,9 +3,13 @@
 ## Version 1.12.0
 
 **New Modules:**
-* **[solace_replicated_topics](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_replicated_topics.html)**
 * **[solace_replicated_topic](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_replicated_topic.html)**
+* **[solace_replicated_topics](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_replicated_topics.html)**
 * **[solace_get_replicated_topics](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_replicated_topics.html)**
+* **[solace_rdp_queue_binding_header](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_rdp_queue_binding_header.html)**
+* **[solace_get_rdp_queue_binding_headers](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_rdp_queue_binding_headers.html)**
+* **[solace_rdp_queue_binding_protected_header](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_rdp_queue_binding_protected_header.html)**
+* **[solace_get_rdp_queue_binding_protected_headers](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_rdp_queue_binding_protected_headers.html)**
 
 ## Version 1.11.0
 
