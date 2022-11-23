@@ -19,7 +19,8 @@ env:
 jobs:
   publish_release:
     concurrency: ci-${{ github.ref }}
-    runs-on: ubuntu-18.04
+    # runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     permissions:
       contents: write
     strategy:
@@ -32,19 +33,19 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
         run: |
           echo "not authorized"
-          echo '::set-output name=IS_AUTHORIZED::false'
+          echo "{IS_AUTHORIZED}={false}" >> $GITHUB_OUTPUT
         id: auth
       - name: Cancel Workflow
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
         uses: andymckay/cancel-action@0.2
 
       - name: Checkout Current Branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
 
       - name: setup python matrix version
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
