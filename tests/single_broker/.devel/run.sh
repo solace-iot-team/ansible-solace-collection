@@ -18,7 +18,7 @@ ansibleSolaceTests=(
   # "solace_auth"
   # "solace_cert_authority"
   # "solace_client_profile"
-  # "solace_jndi"
+  "solace_jndi"
   # "solace_replay"
   # "solace_get_list"
   # "solace_service_auth"
@@ -29,7 +29,7 @@ ansibleSolaceTests=(
   # "solace_rdp"
   # "solace_queue"
   # "solace_queue_template"
-  "solace_replicated_topics"
+  # "solace_replicated_topics"
   # "solace_client_username"
   # "solace_mqtt"
   # "solace_topic_endpoint"
@@ -40,6 +40,7 @@ export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
 
 # local broker
   export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:latest"
+  export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:10.2"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.10.0.15"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.9.0.23"
   # export BROKER_DOCKER_IMAGE="solace/solace-pubsub-standard:9.8.0.12"
@@ -51,10 +52,10 @@ export ANSIBLE_SOLACE_TESTS="${ansibleSolaceTests[*]}"
   export BROKER_DOCKER_COMPOSE_FILE="$projectHome/test-runner/files/PubSubStandard_singleNode.yml"
   export INVENTORY_FILE=$LOCAL_BROKER_INVENTORY_FILE
 
-# solace cloud broker
-  export BROKER_TYPE="solace_cloud"
-  export INVENTORY_FILE="$projectHome/test-runner/files/solace-cloud-account.inventory.yml"
-  export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
+# # solace cloud broker
+#   export BROKER_TYPE="solace_cloud"
+#   export INVENTORY_FILE="$projectHome/test-runner/files/solace-cloud-account.inventory.yml"
+#   export SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN_ALL_PERMISSIONS
 
 export CLEAN_WORKING_DIR=False
 

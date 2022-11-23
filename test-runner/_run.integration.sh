@@ -32,9 +32,10 @@ source $PROJECT_HOME/.lib/functions.sh
   # "solace/solace-pubsub-standard:9.8.0.12"
   # "solace/solace-pubsub-standard:9.9.0.23"
   # "solace/solace-pubsub-standard:9.10.0.15"
+  # "solace/solace-pubsub-standard:10.2"
 
   brokerDockerImages=(
-    "solace/solace-pubsub-standard:9.7.0.42"
+    "solace/solace-pubsub-standard:10.2"
     "solace/solace-pubsub-standard:latest"
   )
 

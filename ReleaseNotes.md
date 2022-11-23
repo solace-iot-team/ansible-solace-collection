@@ -1,5 +1,12 @@
 # Release Notes
 
+## Version 1.12.0
+
+**New Modules:**
+* **[solace_replicated_topics](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_replicated_topics.html)**
+* **[solace_replicated_topic](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_replicated_topic.html)**
+* **[solace_get_replicated_topics](https://solace-iot-team.github.io/ansible-solace-collection/modules/solace_get_replicated_topics.html)**
+
 ## Version 1.11.0
 
 **New Modules:**

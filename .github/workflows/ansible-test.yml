@@ -24,9 +24,8 @@ env:
 
 jobs:
   ansbile_test:
-    runs-on: ubuntu-18.04
-    # runs-on: ubuntu-latest
-      # pre-installed: /usr/bin/python=2.7.17 and /usr/bin/python3=3.6.9
+    # runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
