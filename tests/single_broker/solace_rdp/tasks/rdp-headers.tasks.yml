@@ -1,0 +1,126 @@
+# Copyright (c) 2022, Solace Corporation, Ricardo Gomez-Ulmke, <ricardo.gomez-ulmke@solace.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+    - name: "Create protected header"
+      solace_rdp_queue_binding_protected_header:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        header_name: "protected-header"
+        settings:
+          headerValue: 'protected header value'
+        state: present
+
+    - name: "list protected headers: config"
+      solace_get_rdp_queue_binding_protected_headers:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        query_params:
+          where:
+            - "headerName==protected*"
+      register: result
+    - assert:
+        that:
+          - "result.rc == 0"
+          - "result.result_list_count == 1"
+          - "result.result_list | length == 1"
+
+    - name: "list protected headers: monitor"
+      solace_get_rdp_queue_binding_protected_headers:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        api: monitor
+        query_params:
+          where:
+            - "headerName==protected*"
+      register: result
+    - assert:
+        that:
+          - "result.rc == 0"
+          - "result.result_list_count == 1"
+          - "result.result_list | length == 1"
+
+    - name: "remove protected header"
+      solace_rdp_queue_binding_protected_header:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        header_name: "protected-header"
+        state: absent
+
+    - name: "list protected headers: config"
+      solace_get_rdp_queue_binding_protected_headers:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        query_params:
+          where:
+            - "headerName==protected*"
+      register: result
+    - assert:
+        that:
+          - "result.rc == 0"
+          - "result.result_list_count == 0"
+          - "result.result_list | length == 0"
+
+# normal request header
+    - name: "Create request header"
+      solace_rdp_queue_binding_header:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        header_name: "request-header"
+        settings:
+          headerValue: 'request header value'
+        state: present
+
+    - name: "list request headers: config"
+      solace_get_rdp_queue_binding_headers:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        query_params:
+          where:
+            - "headerName==request*"
+      register: result
+    - assert:
+        that:
+          - "result.rc == 0"
+          - "result.result_list_count == 1"
+          - "result.result_list | length == 1"
+
+    - name: "list reqeust headers: monitor"
+      solace_get_rdp_queue_binding_headers:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        api: monitor
+        query_params:
+          where:
+            - "headerName==request*"
+      register: result
+    - assert:
+        that:
+          - "result.rc == 0"
+          - "result.result_list_count == 1"
+          - "result.result_list | length == 1"
+
+    - name: "remove request header"
+      solace_rdp_queue_binding_header:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        header_name: "request-header"
+        state: absent
+
+    - name: "list request headers: config"
+      solace_get_rdp_queue_binding_headers:
+        rdp_name: "rdp-test-ansible-solace"
+        queue_name: "rdp-test-ansible-solace"
+        query_params:
+          where:
+            - "headerName==request*"
+      register: result
+    - assert:
+        that:
+          - "result.rc == 0"
+          - "result.result_list_count == 0"
+          - "result.result_list | length == 0"
+
+###
+# The End.

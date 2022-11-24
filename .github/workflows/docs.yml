@@ -23,7 +23,7 @@ env:
 
 jobs:
   docs_test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         python-version: [ '3.8' ]
@@ -40,12 +40,12 @@ jobs:
         uses: andymckay/cancel-action@0.2
 
       - name: Checkout Current Branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
 
       - name: setup python matrix version
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 

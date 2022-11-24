@@ -32,47 +32,12 @@ source $PROJECT_HOME/.lib/functions.sh
   # "solace/solace-pubsub-standard:9.8.0.12"
   # "solace/solace-pubsub-standard:9.9.0.23"
   # "solace/solace-pubsub-standard:9.10.0.15"
+  # "solace/solace-pubsub-standard:10.2"
 
   brokerDockerImages=(
-    "solace/solace-pubsub-standard:9.7.0.42"
+    "solace/solace-pubsub-standard:10.2"
     "solace/solace-pubsub-standard:latest"
   )
-
-#################################################################################################################################################
-ansibleSolaceTestTargetGroup="solace_cloud"
-#################################################################################################################################################
-  echo "##############################################################################################################"
-  echo "# Test target group: $ansibleSolaceTestTargetGroup(solace_cloud)"
-
-  export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup"
-  mkdir -p $LOG_DIR
-
-  export SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE=$solaceCloudAccountInventoryFile
-  export TEARDOWN_SOLACE_CLOUD=True
-
-  runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
-  $runScript
-  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
-
-#################################################################################################################################################
-ansibleSolaceTestTargetGroup="examples"
-#################################################################################################################################################
-
-  for brokerDockerImage in ${brokerDockerImages[@]}; do
-
-    brokerDockerImageLogPath=${brokerDockerImage//":"/"_"}
-    export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup/$brokerDockerImageLogPath"
-    mkdir -p $LOG_DIR
-    export BROKER_DOCKER_IMAGE=$brokerDockerImage
-
-    echo "##############################################################################################################"
-    echo "# Test target group: $ansibleSolaceTestTargetGroup($brokerDockerImage)"
-
-    runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
-    $runScript
-    code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
-
-  done
 
 #################################################################################################################################################
 ansibleSolaceTestTargetGroup="single_broker"
@@ -139,6 +104,42 @@ ansibleSolaceTestTargetGroup="two_brokers"
 
     echo "##############################################################################################################"
     echo "# Test target group: $ansibleSolaceTestTargetGroup(solace_cloud, $brokerDockerImage)"
+
+    runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
+    $runScript
+    code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+
+  done
+
+#################################################################################################################################################
+ansibleSolaceTestTargetGroup="solace_cloud"
+#################################################################################################################################################
+  echo "##############################################################################################################"
+  echo "# Test target group: $ansibleSolaceTestTargetGroup(solace_cloud)"
+
+  export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup"
+  mkdir -p $LOG_DIR
+
+  export SOLACE_CLOUD_ACCOUNT_INVENTORY_FILE=$solaceCloudAccountInventoryFile
+  export TEARDOWN_SOLACE_CLOUD=True
+
+  runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
+  $runScript
+  code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - code=$code - runScript='$runScript' - $scriptLogName"; exit 1; fi
+
+#################################################################################################################################################
+ansibleSolaceTestTargetGroup="examples"
+#################################################################################################################################################
+
+  for brokerDockerImage in ${brokerDockerImages[@]}; do
+
+    brokerDockerImageLogPath=${brokerDockerImage//":"/"_"}
+    export LOG_DIR="$baseLogDir/$ansibleSolaceTestTargetGroup/$brokerDockerImageLogPath"
+    mkdir -p $LOG_DIR
+    export BROKER_DOCKER_IMAGE=$brokerDockerImage
+
+    echo "##############################################################################################################"
+    echo "# Test target group: $ansibleSolaceTestTargetGroup($brokerDockerImage)"
 
     runScript="$testsBaseDir/$ansibleSolaceTestTargetGroup/_run.sh"
     $runScript

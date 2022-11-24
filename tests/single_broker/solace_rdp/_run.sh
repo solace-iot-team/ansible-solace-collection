@@ -35,7 +35,8 @@ for playbook in ${playbooks[@]}; do
   ansible-playbook \
                   -i $inventory \
                   $playbook \
-                  --extra-vars "WORKING_DIR=$WORKING_DIR"
+                  --extra-vars "WORKING_DIR=$WORKING_DIR" \
+                  --extra-vars "SOLACE_CLOUD_API_TOKEN=$SOLACE_CLOUD_API_TOKEN"
   code=$?; if [[ $code != 0 ]]; then echo ">>> XT_ERROR - $code - script:$scriptLogName, playbook:$playbook"; exit 1; fi
 
 done

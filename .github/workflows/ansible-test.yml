@@ -24,9 +24,8 @@ env:
 
 jobs:
   ansbile_test:
-    runs-on: ubuntu-18.04
-    # runs-on: ubuntu-latest
-      # pre-installed: /usr/bin/python=2.7.17 and /usr/bin/python3=3.6.9
+    # runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
@@ -44,7 +43,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && github.actor != 'ricardojosegomezulmke'
         run: |
           echo "not authorized"
-          echo '::set-output name=IS_AUTHORIZED::false'
+          echo "{IS_AUTHORIZED}={false}" >> $GITHUB_OUTPUT
         id: auth
       - name: Cancel Workflow
         if: ${{ always() && steps.auth.outputs.IS_AUTHORIZED == 'false' }}
@@ -66,7 +65,7 @@ jobs:
           python3 --version
 
       - name: Checkout Current Branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
 
@@ -77,7 +76,7 @@ jobs:
         # python 3.6 support only available up to 2.11 ansible_core
 
       - name: set up python 3.6
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.6
 
@@ -91,7 +90,7 @@ jobs:
           pip install -r "${PIP_DEVEL_REQUIREMENTS_FILE}"
 
       - name: setup python matrix version
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 

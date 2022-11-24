@@ -157,3 +157,13 @@ plugins/modules/solace_get_jndi_queues.py compile-2.7!skip
 plugins/modules/solace_get_jndi_topics.py compile-2.7!skip
 plugins/modules/solace_jndi_queues.py compile-2.7!skip
 plugins/modules/solace_jndi_topics.py compile-2.7!skip
+plugins/modules/solace_get_replicated_topics.py compile-2.7!skip
+plugins/modules/solace_replicated_topics.py compile-2.7!skip
+plugins/modules/solace_get_rdp_queue_binding_protected_headers.py compile-2.7!skip
+plugins/modules/solace_get_rdp_queue_binding_protected_headers.py pep8:E501
+plugins/modules/solace_rdp_queue_binding_protected_header.py compile-2.7!skip
+plugins/modules/solace_rdp_queue_binding_protected_header.py pep8:E501
+plugins/modules/solace_get_rdp_queue_binding_headers.py compile-2.7!skip
+plugins/modules/solace_get_rdp_queue_binding_headers.py pep8:E501
+plugins/modules/solace_rdp_queue_binding_header.py compile-2.7!skip
+plugins/modules/solace_rdp_queue_binding_header.py pep8:E501

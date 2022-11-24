@@ -9,6 +9,15 @@
   collections:
     - solace.pubsub_plus
   module_defaults:
+    solace.pubsub_plus.solace_gather_facts:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      solace_cloud_api_token: "{{ SOLACE_CLOUD_API_TOKEN if broker_type=='solace_cloud' else omit }}"
+      solace_cloud_service_id: "{{ solace_cloud_service_id | default(omit) }}"
     solace.pubsub_plus.solace_rdp:
       host: "{{ sempv2_host }}"
       port: "{{ sempv2_port }}"
@@ -81,8 +90,47 @@
       password: "{{ sempv2_password }}"
       timeout: "{{ sempv2_timeout }}"
       msg_vpn: "{{ vpn }}"
+    solace.pubsub_plus.solace_rdp_queue_binding_header:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace.pubsub_plus.solace_get_rdp_queue_binding_headers:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace.pubsub_plus.solace_rdp_queue_binding_protected_header:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
+    solace.pubsub_plus.solace_get_rdp_queue_binding_protected_headers:
+      host: "{{ sempv2_host }}"
+      port: "{{ sempv2_port }}"
+      secure_connection: "{{ sempv2_is_secure_connection }}"
+      username: "{{ sempv2_username }}"
+      password: "{{ sempv2_password }}"
+      timeout: "{{ sempv2_timeout }}"
+      msg_vpn: "{{ vpn }}"
 
   tasks:
+
+    - name: gather facts
+      solace_gather_facts:
+      # no_log: true
+    - set_fact:
+        is_solace_cloud: "{{ ansible_facts.solace.isSolaceCloud }}"
+        sempv2_version: "{{ ansible_facts.solace.about.api.sempVersion }}"
 
     - name: "main: Create RDP - Disabled"
       solace_rdp:
@@ -173,6 +221,11 @@
         settings:
           postRequestTarget: "/api/post/event?code=xxx"
         state: present
+
+# headers
+    - name: "main: call tasks: headers"
+      include_tasks: ./tasks/rdp-headers.tasks.yml
+      when: sempv2_version|float >= 2.30
 
     - name: "main: solace_get_rdp_queue_bindings: config"
       solace_get_rdp_queue_bindings:
