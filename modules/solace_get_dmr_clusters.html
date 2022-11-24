@@ -17,6 +17,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/contentui.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -99,11 +100,14 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_get_queue_subscriptions.html">solace_get_queue_subscriptions – get list of subscriptions on a queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_queue_templates.html">solace_get_queue_templates – get list of queue-templates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_queues.html">solace_get_queues – get list of queues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_queue_binding_headers.html">solace_get_rdp_queue_binding_headers – get list of headers on rdp queue binding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_queue_binding_protected_headers.html">solace_get_rdp_queue_binding_protected_headers – get list of protected headers on rdp queue binding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_queue_bindings.html">solace_get_rdp_queue_bindings – get list of rdp queue bindings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_rest_consumer_trusted_cns.html">solace_get_rdp_rest_consumer_trusted_cns – get list of rdp rest consumer trusted common names</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdp_rest_consumers.html">solace_get_rdp_rest_consumers – get list of rdp rest consumers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_rdps.html">solace_get_rdps – get list of rdps</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_replay_logs.html">solace_get_replay_logs – get list of replay logs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_get_replicated_topics.html">solace_get_replicated_topics – get list of vpn replicated topics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_service_authentication_ldap_profiles.html">solace_get_service_authentication_ldap_profiles – get ldap profiles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_topic_endpoints.html">solace_get_topic_endpoints – get list of topic endpoints</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_get_vpn_clients.html">solace_get_vpn_clients – get list of vpn clients</a></li>
@@ -130,9 +134,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../solace_get_modules.html">Solace Get Object List Modules</a> &raquo;</li>
-      <li>solace_get_dmr_clusters – get list of dmr clusters</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../solace_get_modules.html">Solace Get Object List Modules</a></li>
+      <li class="breadcrumb-item active">solace_get_dmr_clusters – get list of dmr clusters</li>
       <li class="wy-breadcrumbs-aside">
               <!-- User defined GitHub URL -->
               <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_get_dmr_clusters.py" class="fa fa-github"> Edit on GitHub</a>
@@ -395,8 +399,8 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 06 Aug 2022 at 05:49.
+    <p>&#169; Copyright 2022, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
+      <span class="lastupdated">Last updated on 24 Nov 2022 at 07:29.
       </span></p>
   </div>
 

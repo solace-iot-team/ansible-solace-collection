@@ -17,6 +17,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/contentui.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -103,10 +104,14 @@
 <li class="toctree-l3"><a class="reference internal" href="solace_queue_template.html">solace_queue_template – queue template</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp.html">solace_rdp – rest delivery point</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_queue_binding.html">solace_rdp_queue_binding – queue bindining on rdp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_rdp_queue_binding_header.html">solace_rdp_queue_binding_header – header on queue bindining on rdp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_rdp_queue_binding_protected_header.html">solace_rdp_queue_binding_protected_header – protected header on queue bindining on rdp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer.html">solace_rdp_rest_consumer – rest consumer on rdp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_rdp_rest_consumer_trusted_cn.html">solace_rdp_rest_consumer_trusted_cn – trusted common name on rdp rest consumer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_replay_log.html">solace_replay_log – replay log</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_replay_log_trim_logged_msgs.html">solace_replay_log_trim_logged_msgs – trim msgs on replay log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_replicated_topic.html">solace_replicated_topic – replicated topic on a MessageVpn’s replication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="solace_replicated_topics.html">solace_replicated_topics – list of replicated topics on a MessageVpn’s replication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="solace_service_authentication_ldap_profile.html">solace_service_authentication_ldap_profile – ldap profile</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">solace_topic_endpoint – topic endpoint</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
@@ -138,9 +143,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a> &raquo;</li>
-      <li>solace_topic_endpoint – topic endpoint</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../solace_config_modules.html">Solace Configuration &amp; Action Modules</a></li>
+      <li class="breadcrumb-item active">solace_topic_endpoint – topic endpoint</li>
       <li class="wy-breadcrumbs-aside">
               <!-- User defined GitHub URL -->
               <a href="https://github.com/solace-iot-team/ansible-solace-collection/tree/main/src/ansible_collections/solace/pubsub_plus/plugins/modules/solace_topic_endpoint.py" class="fa fa-github"> Edit on GitHub</a>
@@ -376,8 +381,8 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 06 Aug 2022 at 05:49.
+    <p>&#169; Copyright 2022, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
+      <span class="lastupdated">Last updated on 24 Nov 2022 at 07:29.
       </span></p>
   </div>
 
