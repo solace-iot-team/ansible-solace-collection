@@ -13,8 +13,8 @@ brew install pyenv
 
 pip3 install virtualenv
 
-pyenv install 3.6.12
-# bin: ~/.pyenv/versions/3.6.12/bin/python3
+pyenv install 3.8.10
+# bin: ~/.pyenv/versions/3.8.10/bin/python3
 
 ````
 
@@ -24,36 +24,36 @@ pyenv install 3.6.12
 mkdir ./venvs
 cd venvs
 # create virtual env
-virtualenv -p ~/.pyenv/versions/3.6.12/bin/python3 venv3.6.12
+virtualenv -p ~/.pyenv/versions/3.8.10/bin/python3 venv3.8.10
 # activate virtual env
-source venv3.6.12/bin/activate
+source venv3.8.10/bin/activate
 # check
-(venv3.6.12) ...$ python3 -V
+(venv3.8.10) ...$ python3 -V
 
 ````
 ### Upgrade pip
 ````bash
-(venv3.6.12) ...$ python3 -m pip install --upgrade pip
+(venv3.8.10) ...$ python3 -m pip install --upgrade pip
 ````
 ### Install Ansible Version Required
 ````bash
 # install the devel version required
-(venv3.6.12) ...$ pip install 'ansible>=2.10.3,<2.11'
+(venv3.8.10) ...$ pip install "ansible>=5.1.0,<6.0.0" # this is 2.12
 # check
-(venv3.6.12) ...$ ansible --version
+(venv3.8.10) ...$ ansible --version
 ````
 
 ### Install Devel Requirements in Python Virtual Env
 ````bash
-(venv3.6.12) ...$ cd devel
-(venv3.6.12) ...$ pip install -r devel.requirements.txt
-(venv3.6.12) ...$ pip install -r ../src/ansible_collections/solace/pubsub_plus/requirements.txt
+(venv3.8.10) ...$ cd devel
+(venv3.8.10) ...$ pip install -r devel.requirements.txt
+(venv3.8.10) ...$ pip install -r ../src/ansible_collections/solace/pubsub_plus/requirements.txt
 ````
 
 ### Activate Ansible-Solace Collection Devel Env
 ````bash
-(venv3.6.12) ...$ source {root}/devel/bin/asc-devel-activate
-(asc-devel)(venv3.6.12) ...$ asc-devel-show
+(venv3.8.10) ...$ source {root}/devel/bin/asc-devel-activate
+(asc-devel)(venv3.8.10) ...$ asc-devel-show
 
 output:
 env vars & links
@@ -61,13 +61,13 @@ env vars & links
 
 ### Deactivate Ansible-Solace Collection Devel Env
 ````bash
-(asc-devel)(venv3.6.12) ...$ asc-devel-deactivate
-(venv3.6.12) ...$
+(asc-devel)(venv3.8.10) ...$ asc-devel-deactivate
+(venv3.8.10) ...$
 ````
 
 ### Deactivate Python Virtual Env
 ````bash
-(venv3.6.12) ...$ deactivate
+(venv3.8.10) ...$ deactivate
 ...$
 ````
 
