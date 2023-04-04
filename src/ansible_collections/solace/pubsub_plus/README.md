@@ -13,4 +13,6 @@ For user guides, tutorials and references please visit [the documentation site](
 [Release Notes](https://github.com/solace-iot-team/ansible-solace-collection/blob/main/ReleaseNotes.md) |
 [Development](https://github.com/solace-iot-team/ansible-solace-collection/tree/main/devel)
 
----
+This is not an officially supported Solace product.
+
+For more information, please use the [Solace Community](https://solace.community/).
