@@ -6,6 +6,11 @@ The collection is available on `Ansible Galaxy`_.
 
 .. literalinclude:: ../../meta/runtime.yml
 
+
+Please note that this is not an officially supported Solace product.
+
+For more information, please use the `Solace Community`.
+
 .. toctree::
   :maxdepth: 1
   :caption: Using Solace PubSub+ Ansible Collection
@@ -54,3 +59,6 @@ Repos & Links
 
 .. _Ansible Galaxy:
   https://galaxy.ansible.com/solace/pubsub_plus
+
+.. _Solace Community:
+  https://solace.community
