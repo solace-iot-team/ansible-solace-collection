@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>solace_cloud_service – manage Solace Cloud services &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
@@ -12,10 +12,9 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/contentui.js"></script>
@@ -31,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Solace PubSub+ Ansible Collection 
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -98,7 +101,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../solace_cloud_modules.html">Solace Cloud Modules</a></li>
       <li class="breadcrumb-item active">solace_cloud_service – manage Solace Cloud services</li>
       <li class="wy-breadcrumbs-aside">
@@ -120,77 +123,77 @@
 <p>The module operates at a Solace Cloud Account level, therefor, you don’t necessarily require an inventory file. Using <cite>hosts: localhost</cite> as a host and passing the Solace Cloud Api Token as an environment variable works as well.</p>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w"></span>
-<span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">no</span><span class="w"></span>
-<span class="nt">any_errors_fatal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="nt">collections</span><span class="p">:</span><span class="w"></span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span><span class="w"></span>
-<span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">check input</span><span class="w"></span>
-<span class="w">  </span><span class="nt">assert</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">that</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SOLACE_CLOUD_API_TOKEN is defined and SOLACE_CLOUD_API_TOKEN | length &gt; 0</span><span class="w"></span>
-<span class="w">    </span><span class="nt">fail_msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;one</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">more</span><span class="nv"> </span><span class="s">variables</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">defined&quot;</span><span class="w"></span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span>
+<span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">no</span>
+<span class="nt">any_errors_fatal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">collections</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus</span>
+<span class="nt">tasks</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">check input</span>
+<span class="w">  </span><span class="nt">assert</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">that</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SOLACE_CLOUD_API_TOKEN is defined and SOLACE_CLOUD_API_TOKEN | length &gt; 0</span>
+<span class="w">    </span><span class="nt">fail_msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;one</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">more</span><span class="nv"> </span><span class="s">variables</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">defined&quot;</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create service</span><span class="w"></span>
-<span class="w">  </span><span class="nt">solace_cloud_service</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">api_token</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">SOLACE_CLOUD_API_TOKEN</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">msgVpnName</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">datacenterId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;aws-ca-central-1a&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">serviceTypeId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;enterprise&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">serviceClassId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;enterprise-250-nano&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">eventBrokerVersion</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;9.6&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create service</span>
+<span class="w">  </span><span class="nt">solace_cloud_service</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api_token</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">SOLACE_CLOUD_API_TOKEN</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo&quot;</span>
+<span class="w">    </span><span class="nt">settings</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">msgVpnName</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;foo&quot;</span>
+<span class="w">        </span><span class="nt">datacenterId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;aws-ca-central-1a&quot;</span>
+<span class="w">        </span><span class="nt">serviceTypeId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;enterprise&quot;</span>
+<span class="w">        </span><span class="nt">serviceClassId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;enterprise-250-nano&quot;</span>
+<span class="w">        </span><span class="nt">eventBrokerVersion</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;9.6&quot;</span>
+<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">set_fact</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">service_info</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.response</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">trust_store_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.response.msgVpnAttributes.truststoreUri</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">set_fact</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">service_info</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.response</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">trust_store_uri</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.response.msgVpnAttributes.truststoreUri</span> <span class="cp">}}</span><span class="s">&quot;</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">extract inventory from service info</span><span class="w"></span>
-<span class="w">  </span><span class="nt">solace_cloud_get_facts</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">from_dict</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">get_formattedHostInventory</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">host_entry</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">meta</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="nt">service_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">            </span><span class="nt">service_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.serviceId</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">            </span><span class="nt">datacenterId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.datacenterId</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">            </span><span class="nt">serviceTypeId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.serviceTypeId</span><span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">            </span><span class="nt">serviceClassId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.serviceClassId</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">            </span><span class="nt">serviceClassDisplayedAttributes</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.serviceClassDisplayedAttributes</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">extract inventory from service info</span>
+<span class="w">  </span><span class="nt">solace_cloud_get_facts</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">from_dict</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">get_formattedHostInventory</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">host_entry</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">        </span><span class="nt">meta</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">service_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">            </span><span class="nt">service_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.serviceId</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">            </span><span class="nt">datacenterId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.datacenterId</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">            </span><span class="nt">serviceTypeId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.serviceTypeId</span><span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">            </span><span class="nt">serviceClassId</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.serviceClassId</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">            </span><span class="nt">serviceClassDisplayedAttributes</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.serviceClassDisplayedAttributes</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">save inventory to file</span><span class="w"></span>
-<span class="w">  </span><span class="nt">copy</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.facts.formattedHostInventory</span> <span class="o">|</span> <span class="nf">to_nice_yaml</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./tmp/solace-cloud.</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">.inventory.yml&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">changed_when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">save inventory to file</span>
+<span class="w">  </span><span class="nt">copy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">result.facts.formattedHostInventory</span> <span class="o">|</span> <span class="nf">to_nice_yaml</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./tmp/solace-cloud.</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">.inventory.yml&quot;</span>
+<span class="w">    </span><span class="nt">changed_when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">save service info to file</span><span class="w"></span>
-<span class="w">  </span><span class="nt">copy</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info</span> <span class="o">|</span> <span class="nf">to_nice_yaml</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./tmp/solace-cloud.</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">.info.yml&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">save service info to file</span>
+<span class="w">  </span><span class="nt">copy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info</span> <span class="o">|</span> <span class="nf">to_nice_yaml</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./tmp/solace-cloud.</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">.info.yml&quot;</span>
+<span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">save service info to file</span><span class="w"></span>
-<span class="w">  </span><span class="nt">copy</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info</span> <span class="o">|</span> <span class="nf">to_nice_yaml</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./tmp/solace-cloud.</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">.info.yml&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">save service info to file</span>
+<span class="w">  </span><span class="nt">copy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">content</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info</span> <span class="o">|</span> <span class="nf">to_nice_yaml</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./tmp/solace-cloud.</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">.info.yml&quot;</span>
+<span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">download certificate</span><span class="w"></span>
-<span class="w">  </span><span class="nt">get_url</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">trust_store_uri</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./tmp/solace-cloud.</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">.pem&quot;</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">download certificate</span>
+<span class="w">  </span><span class="nt">get_url</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">trust_store_uri</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./tmp/solace-cloud.</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">.pem&quot;</span>
 
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">delete service</span><span class="w"></span>
-<span class="w">  </span><span class="nt">solace_cloud_service</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">api_token</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">SOLACE_CLOUD_API_TOKEN</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absent</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">delete service</span>
+<span class="w">  </span><span class="nt">solace_cloud_service</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api_token</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">SOLACE_CLOUD_API_TOKEN</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">service_info.name</span> <span class="cp">}}</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absent</span>
 </pre></div>
 </div>
 </section>
@@ -289,51 +292,51 @@
 <div class="line"><strong>type</strong>: dict</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;accountingLimits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NetworkUsage&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">      </span><span class="nt">&quot;thresholds&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
-<span class="w">        </span><span class="p">{</span><span class="w"></span>
-<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;warning&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">          </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;75&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
-<span class="w">      </span><span class="p">]</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="p">],</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;adminState&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;completed&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;attributes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;Clients&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;250&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;High Availability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HA Group&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;Message Broker Tenancy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Dedicated&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;Network Speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;450 Mbps&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;Network Usage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;50 GB per month&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;Queues&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;250&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;Storage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;25 GB&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;certificateAuthorities&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;clientProfiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;created&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1608128117689</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;creationState&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pending&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;customizedMessagingPorts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;customizedResourceNames&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;datacenterId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;aws-eu-west-2a&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;locked&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;messagingStorage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;monitoring&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;msgVpnAttributes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;msgVpnName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;as_test_broker&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ansible_solace_test_broker&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;serviceClassDisplayedAttributes&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;serviceClassId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;enterprise-250-nano&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;serviceId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1a2o94jfedl9&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;servicePackageId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DH-V13.0&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;serviceStage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;generalavailability&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;serviceTypeId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;enterprise&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;service&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;userId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;xxx&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;accountingLimits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NetworkUsage&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;thresholds&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;warning&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;75&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;adminState&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;completed&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;attributes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;Clients&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;250&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;High Availability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HA Group&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;Message Broker Tenancy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Dedicated&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;Network Speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;450 Mbps&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;Network Usage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;50 GB per month&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;Queues&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;250&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;Storage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;25 GB&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;certificateAuthorities&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">    </span><span class="nt">&quot;clientProfiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">    </span><span class="nt">&quot;created&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1608128117689</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;creationState&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pending&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;customizedMessagingPorts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">    </span><span class="nt">&quot;customizedResourceNames&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">    </span><span class="nt">&quot;datacenterId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;aws-eu-west-2a&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;locked&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;messagingStorage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;monitoring&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">    </span><span class="nt">&quot;msgVpnAttributes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">    </span><span class="nt">&quot;msgVpnName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;as_test_broker&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ansible_solace_test_broker&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;serviceClassDisplayedAttributes&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;serviceClassId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;enterprise-250-nano&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;serviceId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1a2o94jfedl9&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;servicePackageId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DH-V13.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;serviceStage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;generalavailability&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;serviceTypeId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;enterprise&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;service&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;userId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;xxx&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </dd>
@@ -343,14 +346,14 @@
 <div class="line"><strong>type</strong>: int</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;rc&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
-<span class="w">  </span><span class="p">},</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;rc&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;rc&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;rc&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </dd>
@@ -376,7 +379,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 24 Nov 2022 at 07:29.
+      <span class="lastupdated">Last updated on 04 Apr 2023 at 11:30.
       </span></p>
   </div>
 

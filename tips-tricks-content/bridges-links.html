@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Working with Bridges &amp; Links &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
@@ -12,10 +12,9 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/contentui.js"></script>
@@ -31,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Solace PubSub+ Ansible Collection 
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -83,7 +86,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../tips-tricks.html">Tips &amp; Tricks</a></li>
       <li class="breadcrumb-item active">Working with Bridges &amp; Links</li>
       <li class="wy-breadcrumbs-aside">
@@ -100,22 +103,22 @@
 <p>When working with bridges and links, the Ansible playbook needs to configure both sides of the bridge or link.
 For example, when configuring a bridge between two brokers <cite>broker_a</cite> and <cite>broker_b</cite> the sequence is as follows:</p>
 <dl class="field-list simple">
-<dt class="field-odd">client username</dt>
+<dt class="field-odd">client username<span class="colon">:</span></dt>
 <dd class="field-odd"><p>for the bridge to use to connect to the remote broker</p>
 </dd>
-<dt class="field-even">queue</dt>
+<dt class="field-even">queue<span class="colon">:</span></dt>
 <dd class="field-even"><p>the queue for the bridge</p>
 </dd>
-<dt class="field-odd">queue subscription</dt>
+<dt class="field-odd">queue subscription<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the subscription to events going into the queue</p>
 </dd>
-<dt class="field-even">bridge</dt>
+<dt class="field-even">bridge<span class="colon">:</span></dt>
 <dd class="field-even"><p>the bridge</p>
 </dd>
-<dt class="field-odd">bridge remote vpn</dt>
+<dt class="field-odd">bridge remote vpn<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the remote broker connection</p>
 </dd>
-<dt class="field-even">bridge remote subscription</dt>
+<dt class="field-even">bridge remote subscription<span class="colon">:</span></dt>
 <dd class="field-even"><p>the subscription to events going across the bridge</p>
 </dd>
 </dl>
@@ -125,102 +128,102 @@ For example, when configuring a bridge between two brokers <cite>broker_a</cite>
 <li><p>defines two brokers: <em>broker_a</em> and <em>broker_b</em></p></li>
 <li><p>on each broker, defines the bridge remote counterpart: <em>broker_a==&gt;broker_b</em> and <em>broker_b==&gt;broker_a</em></p></li>
 </ul>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span><span class="w"></span>
-<span class="nt">all</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">broker_a</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># ansible-solace module configuration</span><span class="w"></span>
-<span class="w">      </span><span class="nt">broker_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span><span class="w"></span>
-<span class="w">      </span><span class="nt">ansible_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_a_vm.messaging.acme.com</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_is_secure_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;60&#39;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_a_vpn</span><span class="w"></span>
-<span class="w">      </span><span class="nt">virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># bridge remote counterpart configuration</span><span class="w"></span>
-<span class="w">      </span><span class="nt">bridge_1</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">remote_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_b</span><span class="w"></span>
-<span class="w">        </span><span class="nt">remote_vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_b_vpn</span><span class="w"></span>
-<span class="w">    </span><span class="nt">broker_b</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># ansible-solace module configuration</span><span class="w"></span>
-<span class="w">      </span><span class="nt">broker_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span><span class="w"></span>
-<span class="w">      </span><span class="nt">ansible_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_b_vm.messaging.acme.com</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_is_secure_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;60&#39;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_b_vpn</span><span class="w"></span>
-<span class="w">      </span><span class="nt">virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># bridge remote counterpart configuration</span><span class="w"></span>
-<span class="w">      </span><span class="nt">bridge_1</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">remote_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_a</span><span class="w"></span>
-<span class="w">        </span><span class="nt">remote_vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_a_vpn</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="nt">all</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">broker_a</span><span class="p">:</span>
+<span class="w">      </span><span class="c1"># ansible-solace module configuration</span>
+<span class="w">      </span><span class="nt">broker_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<span class="w">      </span><span class="nt">ansible_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<span class="w">      </span><span class="nt">sempv2_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_a_vm.messaging.acme.com</span>
+<span class="w">      </span><span class="nt">sempv2_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<span class="w">      </span><span class="nt">sempv2_is_secure_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">      </span><span class="nt">sempv2_username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="w">      </span><span class="nt">sempv2_password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="w">      </span><span class="nt">sempv2_timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;60&#39;</span>
+<span class="w">      </span><span class="nt">vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_a_vpn</span>
+<span class="w">      </span><span class="nt">virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span>
+<span class="w">      </span><span class="c1"># bridge remote counterpart configuration</span>
+<span class="w">      </span><span class="nt">bridge_1</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">remote_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_b</span>
+<span class="w">        </span><span class="nt">remote_vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_b_vpn</span>
+<span class="w">    </span><span class="nt">broker_b</span><span class="p">:</span>
+<span class="w">      </span><span class="c1"># ansible-solace module configuration</span>
+<span class="w">      </span><span class="nt">broker_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<span class="w">      </span><span class="nt">ansible_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<span class="w">      </span><span class="nt">sempv2_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_b_vm.messaging.acme.com</span>
+<span class="w">      </span><span class="nt">sempv2_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<span class="w">      </span><span class="nt">sempv2_is_secure_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">      </span><span class="nt">sempv2_username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="w">      </span><span class="nt">sempv2_password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="w">      </span><span class="nt">sempv2_timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;60&#39;</span>
+<span class="w">      </span><span class="nt">vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_b_vpn</span>
+<span class="w">      </span><span class="nt">virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span>
+<span class="w">      </span><span class="c1"># bridge remote counterpart configuration</span>
+<span class="w">      </span><span class="nt">bridge_1</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">remote_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_a</span>
+<span class="w">        </span><span class="nt">remote_vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker_a_vpn</span>
 </pre></div>
 </div>
 <p>Let’s take this cut down playbook:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_gather_facts</span><span class="p">:</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">tasks</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_gather_facts</span><span class="p">:</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_client_username</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span><span class="w"></span>
-<span class="w">    </span><span class="nt">settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">      </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1_password</span><span class="w"></span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_client_username</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span>
+<span class="w">    </span><span class="nt">settings</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">      </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1_password</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 
-<span class="w">  </span><span class="c1"># ... create queue, subscription</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># ... create queue, subscription</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_bridge</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span><span class="w"></span>
-<span class="w">    </span><span class="nt">settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">      </span><span class="nt">remoteAuthenticationBasicClientUsername</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span><span class="w"></span>
-<span class="w">      </span><span class="nt">remoteAuthenticationBasicPassword</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1_password</span><span class="w"></span>
-<span class="w">      </span><span class="nt">remoteAuthenticationScheme</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">basic</span><span class="w"></span>
-<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_bridge</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span>
+<span class="w">    </span><span class="nt">settings</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">      </span><span class="nt">remoteAuthenticationBasicClientUsername</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span>
+<span class="w">      </span><span class="nt">remoteAuthenticationBasicPassword</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1_password</span>
+<span class="w">      </span><span class="nt">remoteAuthenticationScheme</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">basic</span>
+<span class="w">    </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 
-<span class="w">    </span><span class="c1"># read the bridge parameters from the inventory</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">set_fact</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">remote_inventory_hostname</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">bridge_1.remote_host</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">remote_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">bridge_1.remote_vpn</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># read the bridge parameters from the inventory</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">set_fact</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">remote_inventory_hostname</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">bridge_1.remote_host</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">      </span><span class="nt">remote_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">bridge_1.remote_vpn</span><span class="nv"> </span><span class="s">}}&quot;</span>
 
-<span class="w">    </span><span class="c1"># get the facts of the remote broker</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_get_facts</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">hostvars</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">hostvars</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">hostvars_inventory_hostname</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_inventory_hostname</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">msg_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_vpn</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">get_functions</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get_vpnBridgeRemoteMsgVpnLocations</span><span class="w"></span>
-<span class="w">    </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">remote_host_bridge</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># get the facts of the remote broker</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_get_facts</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">hostvars</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">hostvars</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">      </span><span class="nt">hostvars_inventory_hostname</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_inventory_hostname</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">      </span><span class="nt">msg_vpn</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_vpn</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">      </span><span class="nt">get_functions</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get_vpnBridgeRemoteMsgVpnLocations</span>
+<span class="w">    </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">remote_host_bridge</span>
 
-<span class="w">    </span><span class="c1"># set the remote parameters on the bridge</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_bridge_remote_vpn</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_vpn</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">bridge_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span><span class="w"></span>
-<span class="w">      </span><span class="nt">bridge_virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled</span><span class="w"></span>
-<span class="w">      </span><span class="nt">remote_vpn_location</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_host_bridge.facts.vpnBridgeRemoteMsgVpnLocations.plain</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">        </span><span class="nt">tlsEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">        </span><span class="nt">compressedDataEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">        </span><span class="nt">queueBinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span><span class="w"></span>
-<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># set the remote parameters on the bridge</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_bridge_remote_vpn</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_vpn</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">      </span><span class="nt">bridge_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span>
+<span class="w">      </span><span class="nt">bridge_virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span>
+<span class="w">      </span><span class="c1"># choose the correct remote location depending on the settings.tlsEnabled, settings.compressedDataEnabled</span>
+<span class="w">      </span><span class="nt">remote_vpn_location</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">remote_host_bridge.facts.vpnBridgeRemoteMsgVpnLocations.plain</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">      </span><span class="nt">settings</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">        </span><span class="nt">tlsEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">        </span><span class="nt">compressedDataEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">        </span><span class="nt">queueBinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 
-<span class="w">  </span><span class="c1"># ... add a trusted common name if required</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># ... add a trusted common name if required</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_bridge_remote_subscription</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">bridge_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span><span class="w"></span>
-<span class="w">      </span><span class="nt">bridge_virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span><span class="w"></span>
-<span class="w">      </span><span class="nt">remote_subscription_topic</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ansible/solace/test/bridge/da/&gt;&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">deliverAlwaysEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">solace_bridge_remote_subscription</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">bridge_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge_1</span>
+<span class="w">      </span><span class="nt">bridge_virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span>
+<span class="w">      </span><span class="nt">remote_subscription_topic</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ansible/solace/test/bridge/da/&gt;&quot;</span>
+<span class="w">      </span><span class="nt">settings</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">deliverAlwaysEnabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">      </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 </pre></div>
 </div>
 <p>The correct execution of the above playbook depends on ensuring that it has access to the facts from all brokers in the task
@@ -228,10 +231,10 @@ For example, when configuring a bridge between two brokers <cite>broker_a</cite>
 To achieve that, we can use a simple trick Ansible provides, setting <strong>forks=1</strong>. This ensures that each task is executed on all hosts in the
 inventory before the playbook moves on to the next task.</p>
 <p>Example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook <span class="se">\</span>
-              --forks <span class="m">1</span> <span class="se">\</span>
-              -i my-inventory-file.yml
-              my-bridge-playbook.yml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook<span class="w"> </span><span class="se">\</span>
+<span class="w">              </span>--forks<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">              </span>-i<span class="w"> </span>my-inventory-file.yml
+<span class="w">              </span>my-bridge-playbook.yml
 </pre></div>
 </div>
 <div class="admonition seealso">
@@ -254,7 +257,7 @@ inventory before the playbook moves on to the next task.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 24 Nov 2022 at 07:29.
+      <span class="lastupdated">Last updated on 04 Apr 2023 at 11:30.
       </span></p>
   </div>
 

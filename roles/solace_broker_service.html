@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>solace_broker_service - manage a broker service &mdash; Solace PubSub+ Ansible Collection  r0.0.2 documentation</title>
@@ -12,10 +12,9 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/contentui.js"></script>
@@ -30,11 +29,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> Solace PubSub+ Ansible Collection 
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Solace PubSub+ Ansible Collection 
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -92,7 +95,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../roles.html">Roles</a></li>
       <li class="breadcrumb-item active">solace_broker_service - manage a broker service</li>
       <li class="wy-breadcrumbs-aside">
@@ -132,15 +135,15 @@ It also uses <a class="reference internal" href="../modules/solace_get_available
 <h3>Start Single Broker on Remote Ubuntu-18 VM<a class="headerlink" href="#start-single-broker-on-remote-ubuntu-18-vm" title="Permalink to this heading"></a></h3>
 <p><strong>Example ansible controller ssh config:</strong></p>
 <p>Switch off host key checking:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir -p ~/.ssh
-<span class="nb">echo</span> <span class="s2">&quot;Host *&quot;</span> &gt; ~/.ssh/config
-<span class="nb">echo</span> <span class="s2">&quot; StrictHostKeyChecking no&quot;</span> &gt;&gt; ~/.ssh/config
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>~/.ssh
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Host *&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>~/.ssh/config
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot; StrictHostKeyChecking no&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.ssh/config
 </pre></div>
 </div>
 <p><strong>Example Bootstrap for Ubuntu-18:</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
 
-<span class="nv">scriptName</span><span class="o">=</span><span class="k">$(</span>basename <span class="k">$(</span><span class="nb">test</span> -L <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span> <span class="o">&amp;&amp;</span> readlink <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span> <span class="o">||</span> <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">))</span><span class="p">;</span>
+<span class="nv">scriptName</span><span class="o">=</span><span class="k">$(</span>basename<span class="w"> </span><span class="k">$(</span><span class="nb">test</span><span class="w"> </span>-L<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>readlink<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">))</span><span class="p">;</span>
 
 <span class="c1">############################################################################################################################</span>
 <span class="c1"># Bootstrap Ubuntu-18 VM with prerequisites to run role solace_broker_service.</span>
@@ -152,15 +155,15 @@ It also uses <a class="reference internal" href="../modules/solace_get_available
 <span class="c1">############################################################################################################################</span>
 <span class="c1"># Check Environment Variables</span>
 
-  <span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; XT_ERROR: - </span><span class="nv">$scriptName</span><span class="s2"> - missing env var: vmAdminUsr&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span> <span class="k">fi</span>
-  <span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$vmPublicIpAddress</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot;&gt;&gt;&gt; XT_ERROR: - </span><span class="nv">$scriptName</span><span class="s2"> - missing env var: vmPublicIpAddress&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span> <span class="k">fi</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&gt;&gt;&gt; XT_ERROR: - </span><span class="nv">$scriptName</span><span class="s2"> - missing env var: vmAdminUsr&quot;</span><span class="p">;</span><span class="w"> </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vmPublicIpAddress</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&gt;&gt;&gt; XT_ERROR: - </span><span class="nv">$scriptName</span><span class="s2"> - missing env var: vmPublicIpAddress&quot;</span><span class="p">;</span><span class="w"> </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="k">fi</span>
 
 <span class="c1">############################################################################################################################</span>
 <span class="c1"># Run</span>
 
-<span class="nb">echo</span> <span class="s2">&quot; &gt;&gt;&gt; Bootstrap vm ...&quot;</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot; &gt;&gt;&gt; Bootstrap vm ...&quot;</span>
 
-ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class="s2">@</span><span class="nv">$vmPublicIpAddress</span><span class="s2">&quot;</span> <span class="s">&lt;&lt;BOOT_EOL</span>
+ssh<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class="s2">@</span><span class="nv">$vmPublicIpAddress</span><span class="s2">&quot;</span><span class="w"> </span><span class="s">&lt;&lt;BOOT_EOL</span>
 <span class="s">  sudo apt-get update</span>
 <span class="s">  sudo apt-get -y upgrade</span>
 <span class="s">  echo &quot;&gt;&gt;&gt; docker ==================================================&quot;</span>
@@ -180,9 +183,9 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 <span class="s">  sudo apt-get -y upgrade</span>
 <span class="s">BOOT_EOL</span>
 
-<span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span> <span class="nb">echo</span> <span class="s2">&quot; &gt;&gt;&gt; XT_ERROR: bootstrap vm&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">1</span><span class="p">;</span> <span class="k">fi</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot; &gt;&gt;&gt; XT_ERROR: bootstrap vm&quot;</span><span class="p">;</span><span class="w"> </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="k">fi</span>
 
-<span class="nb">echo</span> <span class="s2">&quot; &gt;&gt;&gt; Success.&quot;</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot; &gt;&gt;&gt; Success.&quot;</span>
 
 
 <span class="c1">###</span>
@@ -190,65 +193,65 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 </pre></div>
 </div>
 <p><strong>Example Template Inventory File for Remote VM:</strong></p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span><span class="w"></span>
-<span class="nt">all</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">remotehost</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">ansible_host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;public-ip-address&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">ansible_user</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin-user&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">ansible_become</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">      </span><span class="nt">ansible_python_interpreter</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/usr/bin/python3&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">solace_broker_service</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">semp_host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;fqdns&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">semp_port_plain</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span><span class="w"></span>
-<span class="w">        </span><span class="nt">semp_port_secure</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1943</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="nt">all</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">remotehost</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">ansible_host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;public-ip-address&quot;</span>
+<span class="w">      </span><span class="nt">ansible_user</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin-user&quot;</span>
+<span class="w">      </span><span class="nt">ansible_become</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">      </span><span class="nt">ansible_python_interpreter</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/usr/bin/python3&quot;</span>
+<span class="w">      </span><span class="nt">solace_broker_service</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">semp_host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;fqdns&quot;</span>
+<span class="w">        </span><span class="nt">semp_port_plain</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<span class="w">        </span><span class="nt">semp_port_secure</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1943</span>
 </pre></div>
 </div>
 <p><strong>Example Inventory File for Local Machine (the Ansible controller):</strong></p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span><span class="w"></span>
-<span class="nt">all</span><span class="p">:</span><span class="w"></span>
-<span class="w"> </span><span class="nt">hosts</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="nt">localhost</span><span class="p">:</span><span class="w"></span>
-<span class="w">     </span><span class="nt">ansible_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="nt">all</span><span class="p">:</span>
+<span class="w"> </span><span class="nt">hosts</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">localhost</span><span class="p">:</span>
+<span class="w">     </span><span class="nt">ansible_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
 </pre></div>
 </div>
 <p><strong>Example Playbook to Create &amp; Delete a Service using the default settings:</strong></p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker service create and delete</span><span class="w"></span>
-<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
-<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">standup broker service</span><span class="w"></span>
-<span class="w">    </span><span class="nt">include_role</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span><span class="w"></span>
-<span class="w">    </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">docker_compose_settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-project-name</span><span class="w"></span>
-<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">broker service create and delete</span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span>
+<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">standup broker service</span>
+<span class="w">    </span><span class="nt">include_role</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span>
+<span class="w">    </span><span class="nt">vars</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">docker_compose_settings</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-project-name</span>
+<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Output</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">role</span><span class="nv"> </span><span class="s">results&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">debug</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Output</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">role</span><span class="nv"> </span><span class="s">results&quot;</span>
+<span class="w">    </span><span class="nt">debug</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result</span><span class="nv"> </span><span class="s">}}&quot;</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Output</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">broker</span><span class="nv"> </span><span class="s">service</span><span class="nv"> </span><span class="s">inventory&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">debug</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result.broker_service.inventory</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Output</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">broker</span><span class="nv"> </span><span class="s">service</span><span class="nv"> </span><span class="s">inventory&quot;</span>
+<span class="w">    </span><span class="nt">debug</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result.broker_service.inventory</span><span class="nv"> </span><span class="s">}}&quot;</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Output</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">docker_compose</span><span class="nv"> </span><span class="s">settings</span><span class="nv"> </span><span class="s">used&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">debug</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result.broker_service.docker_compose_settings</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Output</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">docker_compose</span><span class="nv"> </span><span class="s">settings</span><span class="nv"> </span><span class="s">used&quot;</span>
+<span class="w">    </span><span class="nt">debug</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result.broker_service.docker_compose_settings</span><span class="nv"> </span><span class="s">}}&quot;</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Output</span><span class="nv"> </span><span class="s">docker</span><span class="nv"> </span><span class="s">logs&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">debug</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result.broker_service.docker_logs</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Output</span><span class="nv"> </span><span class="s">docker</span><span class="nv"> </span><span class="s">logs&quot;</span>
+<span class="w">    </span><span class="nt">debug</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result.broker_service.docker_logs</span><span class="nv"> </span><span class="s">}}&quot;</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">delete broker service</span><span class="w"></span>
-<span class="w">    </span><span class="nt">include_role</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span><span class="w"></span>
-<span class="w">    </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">docker_compose_settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-project-name</span><span class="w"></span>
-<span class="w">        </span><span class="nt">definition</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result.broker_service.docker_compose_settings.definition</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absent</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">delete broker service</span>
+<span class="w">    </span><span class="nt">include_role</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span>
+<span class="w">    </span><span class="nt">vars</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">docker_compose_settings</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-project-name</span>
+<span class="w">        </span><span class="nt">definition</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">solace_broker_service_result.broker_service.docker_compose_settings.definition</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absent</span>
 </pre></div>
 </div>
 <p><strong>Run the Playbook:</strong></p>
@@ -275,157 +278,157 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 </ul>
 </dd>
 </dl>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook <span class="se">\</span>
-              -i <span class="o">{</span>inventory-file<span class="o">}</span> <span class="se">\</span>
-              <span class="o">{</span>playbook-file<span class="o">}</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible-playbook<span class="w"> </span><span class="se">\</span>
+<span class="w">              </span>-i<span class="w"> </span><span class="o">{</span>inventory-file<span class="o">}</span><span class="w"> </span><span class="se">\</span>
+<span class="w">              </span><span class="o">{</span>playbook-file<span class="o">}</span>
 </pre></div>
 </div>
 <p><strong>Example Playbook with default settings and docker compose file:</strong></p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service</span><span class="w"></span>
-<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
-<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set docker compose yaml file</span><span class="w"></span>
-<span class="w">    </span><span class="nt">set_fact</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">broker_docker_compose_file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{path}/docker_compose_file.yml&quot;</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service</span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span>
+<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set docker compose yaml file</span>
+<span class="w">    </span><span class="nt">set_fact</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">broker_docker_compose_file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{path}/docker_compose_file.yml&quot;</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service with docker compose file</span><span class="w"></span>
-<span class="w">    </span><span class="nt">include_role</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span><span class="w"></span>
-<span class="w">    </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">docker_compose_settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-project-name</span><span class="w"></span>
-<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
-<span class="w">        </span><span class="nt">definition</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">lookup(&#39;file&#39;,</span><span class="nv"> </span><span class="s">broker_docker_compose_file)</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">from_yaml</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service with docker compose file</span>
+<span class="w">    </span><span class="nt">include_role</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span>
+<span class="w">    </span><span class="nt">vars</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">docker_compose_settings</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-project-name</span>
+<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
+<span class="w">        </span><span class="nt">definition</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">lookup(&#39;file&#39;,</span><span class="nv"> </span><span class="s">broker_docker_compose_file)</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">from_yaml</span><span class="nv"> </span><span class="s">}}&quot;</span>
 </pre></div>
 </div>
 <p><strong>Example Playbook with default settings and inline definition for docker compose:</strong></p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service</span><span class="w"></span>
-<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
-<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set the docker compose definition</span><span class="w"></span>
-<span class="w">    </span><span class="nt">set_fact</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">_docker_compose_definition</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.3&#39;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">services</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="nt">primary</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-container</span><span class="w"></span>
-<span class="w">            </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace/solace-pubsub-standard:latest</span><span class="w"></span>
-<span class="w">            </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span><span class="w"></span>
-<span class="w">            </span><span class="nt">shm_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1g</span><span class="w"></span>
-<span class="w">            </span><span class="nt">ulimits</span><span class="p">:</span><span class="w"></span>
-<span class="w">              </span><span class="nt">core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="w">              </span><span class="nt">nofile</span><span class="p">:</span><span class="w"></span>
-<span class="w">                </span><span class="nt">soft</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2448</span><span class="w"></span>
-<span class="w">                </span><span class="nt">hard</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">38048</span><span class="w"></span>
-<span class="w">            </span><span class="nt">volumes</span><span class="p">:</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/spool/softAdb:/usr/sw/internalSpool/softAdb:Z&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/spool:/usr/sw/internalSpool:Z&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/jail:/usr/sw/jail:Z&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/diagnostics:/var/lib/solace/diags:Z&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/adbBackup:/usr/sw/adb:Z&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/var:/usr/sw/var:Z&quot;</span><span class="w"></span>
-<span class="w">            </span><span class="nt">ports</span><span class="p">:</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;8080:8080&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;1883:1883&#39;</span><span class="w"></span>
-<span class="w">            </span><span class="nt">environment</span><span class="p">:</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_globalaccesslevel=admin</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_password=admin</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_scaling_maxconnectioncount=100</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service</span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span>
+<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set the docker compose definition</span>
+<span class="w">    </span><span class="nt">set_fact</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">_docker_compose_definition</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.3&#39;</span>
+<span class="w">        </span><span class="nt">services</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">primary</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-container</span>
+<span class="w">            </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace/solace-pubsub-standard:latest</span>
+<span class="w">            </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<span class="w">            </span><span class="nt">shm_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1g</span>
+<span class="w">            </span><span class="nt">ulimits</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">              </span><span class="nt">nofile</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">soft</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2448</span>
+<span class="w">                </span><span class="nt">hard</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">38048</span>
+<span class="w">            </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/spool/softAdb:/usr/sw/internalSpool/softAdb:Z&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/spool:/usr/sw/internalSpool:Z&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/jail:/usr/sw/jail:Z&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/diagnostics:/var/lib/solace/diags:Z&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/adbBackup:/usr/sw/adb:Z&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/var:/usr/sw/var:Z&quot;</span>
+<span class="w">            </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;8080:8080&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;1883:1883&#39;</span>
+<span class="w">            </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_globalaccesslevel=admin</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_password=admin</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_scaling_maxconnectioncount=100</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service</span><span class="w"></span>
-<span class="w">    </span><span class="nt">include_role</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span><span class="w"></span>
-<span class="w">    </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">docker_compose_settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-project-name</span><span class="w"></span>
-<span class="w">        </span><span class="nt">services</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span><span class="w"></span>
-<span class="w">        </span><span class="nt">definition</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">_docker_compose_definition</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">recreate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span><span class="w"></span>
-<span class="w">        </span><span class="nt">restarted</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span><span class="w"></span>
-<span class="w">        </span><span class="nt">debug</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span><span class="w"></span>
-<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service</span>
+<span class="w">    </span><span class="nt">include_role</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span>
+<span class="w">    </span><span class="nt">vars</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">docker_compose_settings</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-project-name</span>
+<span class="w">        </span><span class="nt">services</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span>
+<span class="w">        </span><span class="nt">definition</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">_docker_compose_definition</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">        </span><span class="nt">recreate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
+<span class="w">        </span><span class="nt">restarted</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span>
+<span class="w">        </span><span class="nt">debug</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span>
+<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 </pre></div>
 </div>
 <p><strong>Example docker compose definition for secure SEMP:</strong></p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service</span><span class="w"></span>
-<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span><span class="w"></span>
-<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service</span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span>
+<span class="w">  </span><span class="nt">tasks</span><span class="p">:</span>
 
-<span class="w">  </span><span class="c1"># set: _user</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># create: _user</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># set: ssl_cert_file</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># set: _user</span>
+<span class="w">  </span><span class="c1"># create: _user</span>
+<span class="w">  </span><span class="c1"># set: ssl_cert_file</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Copy</span><span class="nv"> </span><span class="s">cert</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">mount</span><span class="nv"> </span><span class="s">path</span><span class="nv"> </span><span class="s">secrets&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">copy</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ssl_cert_file</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">/var/local/secrets</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">_user</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Copy</span><span class="nv"> </span><span class="s">cert</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">mount</span><span class="nv"> </span><span class="s">path</span><span class="nv"> </span><span class="s">secrets&quot;</span>
+<span class="w">    </span><span class="nt">copy</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ssl_cert_file</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">      </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">/var/local/secrets</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">      </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">_user</span><span class="nv"> </span><span class="s">}}&quot;</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">set_fact</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">_ssl_cert_filename</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ssl_cert_file</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">basename</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">set_fact</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">_ssl_cert_filename</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ssl_cert_file</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">basename</span><span class="nv"> </span><span class="s">}}&quot;</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set the docker compose definition</span><span class="w"></span>
-<span class="w">    </span><span class="nt">set_fact</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">_docker_compose_definition</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.3&#39;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">services</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="nt">primary</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-container</span><span class="w"></span>
-<span class="w">            </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace/solace-pubsub-standard:latest</span><span class="w"></span>
-<span class="w">            </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span><span class="w"></span>
-<span class="w">            </span><span class="nt">shm_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1g</span><span class="w"></span>
-<span class="w">            </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">_user</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">            </span><span class="nt">ulimits</span><span class="p">:</span><span class="w"></span>
-<span class="w">              </span><span class="nt">core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="w">              </span><span class="nt">nofile</span><span class="p">:</span><span class="w"></span>
-<span class="w">                </span><span class="nt">soft</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2448</span><span class="w"></span>
-<span class="w">                </span><span class="nt">hard</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">38048</span><span class="w"></span>
-<span class="w">            </span><span class="nt">volumes</span><span class="p">:</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/secrets:/run/secrets&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/spool/softAdb:/usr/sw/internalSpool/softAdb:Z&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/spool:/usr/sw/internalSpool:Z&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/jail:/usr/sw/jail:Z&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/diagnostics:/var/lib/solace/diags:Z&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/adbBackup:/usr/sw/adb:Z&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/var:/usr/sw/var:Z&quot;</span><span class="w"></span>
-<span class="w">            </span><span class="nt">ports</span><span class="p">:</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;1943:1943&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;8080:8080&quot;</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;1883:1883&#39;</span><span class="w"></span>
-<span class="w">            </span><span class="nt">environment</span><span class="p">:</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_globalaccesslevel=admin</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_password=admin</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_scaling_maxconnectioncount=100</span><span class="w"></span>
-<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;tls_servercertificate_filepath=/run/secrets/{{</span><span class="nv"> </span><span class="s">_ssl_cert_filename</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set the docker compose definition</span>
+<span class="w">    </span><span class="nt">set_fact</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">_docker_compose_definition</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.3&#39;</span>
+<span class="w">        </span><span class="nt">services</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">primary</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-container</span>
+<span class="w">            </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace/solace-pubsub-standard:latest</span>
+<span class="w">            </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<span class="w">            </span><span class="nt">shm_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1g</span>
+<span class="w">            </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">_user</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">            </span><span class="nt">ulimits</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">              </span><span class="nt">nofile</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">soft</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2448</span>
+<span class="w">                </span><span class="nt">hard</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">38048</span>
+<span class="w">            </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/secrets:/run/secrets&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/spool/softAdb:/usr/sw/internalSpool/softAdb:Z&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/spool:/usr/sw/internalSpool:Z&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/jail:/usr/sw/jail:Z&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/diagnostics:/var/lib/solace/diags:Z&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/adbBackup:/usr/sw/adb:Z&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/var/local/var:/usr/sw/var:Z&quot;</span>
+<span class="w">            </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;1943:1943&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;8080:8080&quot;</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;1883:1883&#39;</span>
+<span class="w">            </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_globalaccesslevel=admin</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_password=admin</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_scaling_maxconnectioncount=100</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;tls_servercertificate_filepath=/run/secrets/{{</span><span class="nv"> </span><span class="s">_ssl_cert_filename</span><span class="nv"> </span><span class="s">}}&quot;</span>
 
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service</span><span class="w"></span>
-<span class="w">    </span><span class="nt">include_role</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span><span class="w"></span>
-<span class="w">    </span><span class="nt">vars</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">docker_compose_settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-project-name</span><span class="w"></span>
-<span class="w">        </span><span class="nt">services</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span><span class="w"></span>
-<span class="w">        </span><span class="nt">definition</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">_docker_compose_definition</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">recreate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span><span class="w"></span>
-<span class="w">        </span><span class="nt">restarted</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span><span class="w"></span>
-<span class="w">        </span><span class="nt">debug</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span><span class="w"></span>
-<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create broker service</span>
+<span class="w">    </span><span class="nt">include_role</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace.pubsub_plus.solace_broker_service</span>
+<span class="w">    </span><span class="nt">vars</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">docker_compose_settings</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-docker-project-name</span>
+<span class="w">        </span><span class="nt">services</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span>
+<span class="w">        </span><span class="nt">definition</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">_docker_compose_definition</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">        </span><span class="nt">recreate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
+<span class="w">        </span><span class="nt">restarted</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span>
+<span class="w">        </span><span class="nt">debug</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span>
+<span class="w">        </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
 </pre></div>
 </div>
 <p>Check the certificate of the broker service:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>openssl s_client -showcerts -servername <span class="o">{</span>fqdns<span class="o">}</span> -connect <span class="o">{</span>fqdns<span class="o">}</span>:1943
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>openssl<span class="w"> </span>s_client<span class="w"> </span>-showcerts<span class="w"> </span>-servername<span class="w"> </span><span class="o">{</span>fqdns<span class="o">}</span><span class="w"> </span>-connect<span class="w"> </span><span class="o">{</span>fqdns<span class="o">}</span>:1943
 </pre></div>
 </div>
 </section>
 </section>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
-<table class="colwidths-given docutils align-default">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 25%" />
 <col style="width: 30%" />
@@ -460,90 +463,90 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 </section>
 <section id="defaults">
 <h2>Defaults<a class="headerlink" href="#defaults" title="Permalink to this heading"></a></h2>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;</span><span class="w"></span>
-<span class="c1"># GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)</span><span class="w"></span>
-<span class="nn">---</span><span class="w"></span>
-<span class="nt">default_generate</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">inventory_settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">inventory_hostname</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ansible_hostname|default(omit)</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">sempv2_host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ansible_host</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">sempv2_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span><span class="w"></span>
-<span class="w">    </span><span class="nt">sempv2_username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
-<span class="w">    </span><span class="nt">sempv2_password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
-<span class="w">    </span><span class="nt">sempv2_is_secure_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">    </span><span class="nt">sempv2_validate_certs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">    </span><span class="nt">vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
-<span class="w">    </span><span class="nt">virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span><span class="w"></span>
-<span class="nt">default_docker_compose_settings</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">args.__required__</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="nt">restarted</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span><span class="w"></span>
-<span class="w">  </span><span class="nt">recreate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span><span class="w"></span>
-<span class="w">  </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span><span class="w"></span>
-<span class="w">  </span><span class="nt">definition</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.3&#39;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">services</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">primary</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PubSubStandard_singleNode</span><span class="w"></span>
-<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace/solace-pubsub-standard:latest</span><span class="w"></span>
-<span class="w">        </span><span class="nt">shm_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1g</span><span class="w"></span>
-<span class="w">        </span><span class="nt">ulimits</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="nt">core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="w">          </span><span class="nt">nofile</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="nt">soft</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2448</span><span class="w"></span>
-<span class="w">            </span><span class="nt">hard</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">38048</span><span class="w"></span>
-<span class="w">        </span><span class="nt">deploy</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="nt">restart_policy</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">on-failure</span><span class="w"></span>
-<span class="w">            </span><span class="nt">max_attempts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
-<span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="c1">#Port Mappings:  Ports are mapped straight through from host to</span><span class="w"></span>
-<span class="w">        </span><span class="c1">#container.  This may result in port collisions on commonly used</span><span class="w"></span>
-<span class="w">        </span><span class="c1">#ports that will cause failure of the container to start.</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#Web transport</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;80:80&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#Web transport over TLS</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;443:443&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#MQTT Default VPN</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;1883:1883&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#AMQP Default VPN over TLS</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;5671:5671&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#AMQP Default VPN</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;5672:5672&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#MQTT Default VPN over WebSockets</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;8000:8000&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#MQTT Default VPN over WebSockets / TLS</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;8443:8443&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#MQTT Default VPN over TLS</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;8883:8883&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#SEMP over TLS</span><span class="w"></span>
-<span class="w">          </span><span class="c1"># - &quot;1943:1943&quot;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#SEMP / PubSub+ Manager</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">combined_generate.inventory_settings.sempv2_port</span><span class="nv"> </span><span class="s">}}:8080&quot;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#REST Default VPN</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;9000:9000&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#REST Default VPN over TLS</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;9443:9443&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#SMF</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;55554:55555&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#SMF Compressed</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;55003:55003&#39;</span><span class="w"></span>
-<span class="w">          </span><span class="c1">#SMF over TLS</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;55443:55443&#39;</span><span class="w"></span>
-<span class="w">        </span><span class="nt">environment</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;username_admin_globalaccesslevel={{</span><span class="nv"> </span><span class="s">combined_generate.inventory_settings.sempv2_username</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;username_admin_password={{</span><span class="nv"> </span><span class="s">combined_generate.inventory_settings.sempv2_password</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
-<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_scaling_maxconnectioncount=100</span><span class="w"></span>
-<span class="nt">default_result</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">broker_service</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">inventory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w"></span>
-<span class="w">    </span><span class="nt">docker_compose_defintion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w"></span>
-<span class="w">    </span><span class="nt">docker_logs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Copyright (c) 2021, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;</span>
+<span class="c1"># GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)</span>
+<span class="nn">---</span>
+<span class="nt">default_generate</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">inventory_settings</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">inventory_hostname</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ansible_hostname|default(omit)</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">    </span><span class="nt">sempv2_host</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">ansible_host</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">    </span><span class="nt">sempv2_port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<span class="w">    </span><span class="nt">sempv2_username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="w">    </span><span class="nt">sempv2_password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="w">    </span><span class="nt">sempv2_is_secure_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">sempv2_validate_certs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<span class="w">    </span><span class="nt">virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span>
+<span class="nt">default_docker_compose_settings</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">args.__required__</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">  </span><span class="nt">restarted</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yes</span>
+<span class="w">  </span><span class="nt">recreate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
+<span class="w">  </span><span class="nt">state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">present</span>
+<span class="w">  </span><span class="nt">definition</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.3&#39;</span>
+<span class="w">    </span><span class="nt">services</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">primary</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PubSubStandard_singleNode</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace/solace-pubsub-standard:latest</span>
+<span class="w">        </span><span class="nt">shm_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1g</span>
+<span class="w">        </span><span class="nt">ulimits</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">          </span><span class="nt">nofile</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">soft</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2448</span>
+<span class="w">            </span><span class="nt">hard</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">38048</span>
+<span class="w">        </span><span class="nt">deploy</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">restart_policy</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">on-failure</span>
+<span class="w">            </span><span class="nt">max_attempts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">        </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">        </span><span class="c1">#Port Mappings:  Ports are mapped straight through from host to</span>
+<span class="w">        </span><span class="c1">#container.  This may result in port collisions on commonly used</span>
+<span class="w">        </span><span class="c1">#ports that will cause failure of the container to start.</span>
+<span class="w">          </span><span class="c1">#Web transport</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;80:80&#39;</span>
+<span class="w">          </span><span class="c1">#Web transport over TLS</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;443:443&#39;</span>
+<span class="w">          </span><span class="c1">#MQTT Default VPN</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;1883:1883&#39;</span>
+<span class="w">          </span><span class="c1">#AMQP Default VPN over TLS</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;5671:5671&#39;</span>
+<span class="w">          </span><span class="c1">#AMQP Default VPN</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;5672:5672&#39;</span>
+<span class="w">          </span><span class="c1">#MQTT Default VPN over WebSockets</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;8000:8000&#39;</span>
+<span class="w">          </span><span class="c1">#MQTT Default VPN over WebSockets / TLS</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;8443:8443&#39;</span>
+<span class="w">          </span><span class="c1">#MQTT Default VPN over TLS</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;8883:8883&#39;</span>
+<span class="w">          </span><span class="c1">#SEMP over TLS</span>
+<span class="w">          </span><span class="c1"># - &quot;1943:1943&quot;</span>
+<span class="w">          </span><span class="c1">#SEMP / PubSub+ Manager</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">combined_generate.inventory_settings.sempv2_port</span><span class="nv"> </span><span class="s">}}:8080&quot;</span>
+<span class="w">          </span><span class="c1">#REST Default VPN</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;9000:9000&#39;</span>
+<span class="w">          </span><span class="c1">#REST Default VPN over TLS</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;9443:9443&#39;</span>
+<span class="w">          </span><span class="c1">#SMF</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;55554:55555&#39;</span>
+<span class="w">          </span><span class="c1">#SMF Compressed</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;55003:55003&#39;</span>
+<span class="w">          </span><span class="c1">#SMF over TLS</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;55443:55443&#39;</span>
+<span class="w">        </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;username_admin_globalaccesslevel={{</span><span class="nv"> </span><span class="s">combined_generate.inventory_settings.sempv2_username</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;username_admin_password={{</span><span class="nv"> </span><span class="s">combined_generate.inventory_settings.sempv2_password</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_scaling_maxconnectioncount=100</span>
+<span class="nt">default_result</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">broker_service</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">inventory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">docker_compose_defintion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">docker_logs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
 </pre></div>
 </div>
 </section>
 <section id="return-values">
 <h2>Return Values<a class="headerlink" href="#return-values" title="Permalink to this heading"></a></h2>
-<table class="colwidths-given docutils align-default">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 36%" />
 <col style="width: 64%" />
@@ -579,78 +582,78 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 <p>The <code class="docutils literal notranslate"><span class="pre">ansible_hostname</span></code> variable is used as the host entry.</p>
 <p><code class="docutils literal notranslate"><span class="pre">solace_broker_service_result.inventory</span></code></p>
 <p><strong>Remote VM:</strong></p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">all</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">{</span><span class="nv">ansible_hostname</span><span class="p p-Indicator">}:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">ansible_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span><span class="w"></span>
-<span class="w">      </span><span class="nt">broker_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_host</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">FQDNS</span><span class="p p-Indicator">}</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_is_secure_connection</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;True&#39;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_port</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1943&#39;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;60&#39;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
-<span class="w">      </span><span class="nt">virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span><span class="w"></span>
-<span class="w">      </span><span class="nt">vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">all</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">{</span><span class="nv">ansible_hostname</span><span class="p p-Indicator">}:</span>
+<span class="w">      </span><span class="nt">ansible_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<span class="w">      </span><span class="nt">broker_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<span class="w">      </span><span class="nt">sempv2_host</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nv">FQDNS</span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="nt">sempv2_is_secure_connection</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;True&#39;</span>
+<span class="w">      </span><span class="nt">sempv2_password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="w">      </span><span class="nt">sempv2_port</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1943&#39;</span>
+<span class="w">      </span><span class="nt">sempv2_timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;60&#39;</span>
+<span class="w">      </span><span class="nt">sempv2_username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="w">      </span><span class="nt">virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span>
+<span class="w">      </span><span class="nt">vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
 </pre></div>
 </div>
 <p><strong>Localhost:</strong></p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">all</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">{</span><span class="nv">ansible_hostname</span><span class="p p-Indicator">}:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">ansible_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span><span class="w"></span>
-<span class="w">      </span><span class="nt">broker_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_is_secure_connection</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;True&#39;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_port</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1943&#39;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;60&#39;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">sempv2_username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span><span class="w"></span>
-<span class="w">      </span><span class="nt">virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span><span class="w"></span>
-<span class="w">      </span><span class="nt">vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">all</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">hosts</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">{</span><span class="nv">ansible_hostname</span><span class="p p-Indicator">}:</span>
+<span class="w">      </span><span class="nt">ansible_connection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<span class="w">      </span><span class="nt">broker_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<span class="w">      </span><span class="nt">sempv2_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span>
+<span class="w">      </span><span class="nt">sempv2_is_secure_connection</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;True&#39;</span>
+<span class="w">      </span><span class="nt">sempv2_password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="w">      </span><span class="nt">sempv2_port</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1943&#39;</span>
+<span class="w">      </span><span class="nt">sempv2_timeout</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;60&#39;</span>
+<span class="w">      </span><span class="nt">sempv2_username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="w">      </span><span class="nt">virtual_router</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span>
+<span class="w">      </span><span class="nt">vpn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
 </pre></div>
 </div>
 </section>
 <section id="example-output-docker-compose-settings">
 <h3>Example Output Docker Compose Settings<a class="headerlink" href="#example-output-docker-compose-settings" title="Permalink to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">solace_broker_service_result.docker_compose_settings</span></code></p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">definition</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">services</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">primary</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pubSubStandardSingleNode</span><span class="w"></span>
-<span class="w">      </span><span class="nt">deploy</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">restart_policy</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">on-failure</span><span class="w"></span>
-<span class="w">          </span><span class="nt">max_attempts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
-<span class="w">      </span><span class="nt">environment</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_globalaccesslevel=admin</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_password=admin</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_scaling_maxconnectioncount=100</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tls_servercertificate_filepath=/run/secrets/asc.pem</span><span class="w"></span>
-<span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace/solace-pubsub-standard:latest</span><span class="w"></span>
-<span class="w">      </span><span class="nt">ports</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1943:1943</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080:8080</span><span class="w"></span>
-<span class="w">      </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span><span class="w"></span>
-<span class="w">      </span><span class="nt">shm_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1g</span><span class="w"></span>
-<span class="w">      </span><span class="nt">ulimits</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="w">        </span><span class="nt">nofile</span><span class="p">:</span><span class="w"></span>
-<span class="w">          </span><span class="nt">hard</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">38048</span><span class="w"></span>
-<span class="w">          </span><span class="nt">soft</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2448</span><span class="w"></span>
-<span class="w">      </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;4000&#39;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">volumes</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/secrets:/run/secrets</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/spool/softAdb:/usr/sw/internalSpool/softAdb:Z</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/spool:/usr/sw/internalSpool:Z</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/jail:/usr/sw/jail:Z</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/diagnostics:/var/lib/solace/diags:Z</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/adbBackup:/usr/sw/adb:Z</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/var:/usr/sw/var:Z</span><span class="w"></span>
-<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.3&#39;</span><span class="w"></span>
-<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asc-test_roles_broker_service_single_node</span><span class="w"></span>
-<span class="nt">services</span><span class="p">:</span><span class="w"></span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">definition</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">services</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">primary</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pubSubStandardSingleNode</span>
+<span class="w">      </span><span class="nt">deploy</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">restart_policy</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">on-failure</span>
+<span class="w">          </span><span class="nt">max_attempts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_globalaccesslevel=admin</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">username_admin_password=admin</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system_scaling_maxconnectioncount=100</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tls_servercertificate_filepath=/run/secrets/asc.pem</span>
+<span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">solace/solace-pubsub-standard:latest</span>
+<span class="w">      </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1943:1943</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080:8080</span>
+<span class="w">      </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<span class="w">      </span><span class="nt">shm_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1g</span>
+<span class="w">      </span><span class="nt">ulimits</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">core</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">        </span><span class="nt">nofile</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">hard</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">38048</span>
+<span class="w">          </span><span class="nt">soft</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2448</span>
+<span class="w">      </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;4000&#39;</span>
+<span class="w">      </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/secrets:/run/secrets</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/spool/softAdb:/usr/sw/internalSpool/softAdb:Z</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/spool:/usr/sw/internalSpool:Z</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/jail:/usr/sw/jail:Z</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/diagnostics:/var/lib/solace/diags:Z</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/adbBackup:/usr/sw/adb:Z</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/local/broker_services/asc-test_roles_broker_service_single_node/data/var:/usr/sw/var:Z</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.3&#39;</span>
+<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asc-test_roles_broker_service_single_node</span>
+<span class="nt">services</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary</span>
 </pre></div>
 </div>
 <div class="admonition seealso">
@@ -675,7 +678,7 @@ ssh <span class="s2">&quot;</span><span class="nv">$vmAdminUsr</span><span class
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022, Solace Corporation, Ricardo Gomez-Ulmke, &lt;ricardo.gomez-ulmke@solace.com&gt;.
-      <span class="lastupdated">Last updated on 24 Nov 2022 at 07:29.
+      <span class="lastupdated">Last updated on 04 Apr 2023 at 11:30.
       </span></p>
   </div>
 
