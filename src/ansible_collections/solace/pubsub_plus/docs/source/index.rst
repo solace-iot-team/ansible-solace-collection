@@ -9,7 +9,7 @@ The collection is available on `Ansible Galaxy`_.
 
 Please note that this is not an officially supported Solace product.
 
-For more information, please use the `Solace Community`.
+For more information, please use the `Solace Community`_.
 
 .. toctree::
   :maxdepth: 1
